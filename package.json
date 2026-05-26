@@ -1,0 +1,21 @@
+{
+  "name": "khan-enterprises",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:up": "docker-compose -f docker/docker-compose.yml up -d",
+    "db:down": "docker-compose -f docker/docker-compose.yml down",
+    "prisma:generate": "turbo run prisma:generate",
+    "prisma:migrate": "turbo run prisma:migrate"
+  },
+  "devDependencies": {
+    "turbo": "^1.13.0"
+  }
+}

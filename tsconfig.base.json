@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@khan/types": ["packages/types/src/index.ts"],
+      "@khan/ui/*": ["packages/ui/src/*"],
+      "@khan/utils": ["packages/utils/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
