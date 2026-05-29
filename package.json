@@ -13,7 +13,8 @@
     "db:up": "docker-compose -f docker/docker-compose.yml up -d",
     "db:down": "docker-compose -f docker/docker-compose.yml down",
     "prisma:generate": "turbo run prisma:generate",
-    "prisma:migrate": "turbo run prisma:migrate"
+    "prisma:migrate": "turbo run prisma:migrate",
+    "db:seed": "npm run seed --workspace=@khan/prisma"
   },
   "devDependencies": {
     "@types/pg": "^8.20.0",
