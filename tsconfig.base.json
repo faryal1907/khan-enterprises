@@ -15,6 +15,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
+      "@khan/prisma": ["packages/prisma/index.ts"],
       "@khan/types": ["packages/types/src/index.ts"],
       "@khan/ui/*": ["packages/ui/src/*"],
       "@khan/utils": ["packages/utils/src/index.ts"]

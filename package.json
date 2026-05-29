@@ -16,6 +16,11 @@
     "prisma:migrate": "turbo run prisma:migrate"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "turbo": "^1.13.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "pg": "^8.21.0"
   }
 }

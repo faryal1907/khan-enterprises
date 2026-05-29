@@ -1,0 +1,17 @@
+# Use this workspace to collaborate
+workspace:
+  id: 1548c068-30ea-4bc1-8afd-d1b3b8e66ff3
+
+localResources:
+  docs:
+    - ..\apps\web\web\README.md
+    - ..\README.md
+    - ..\apps\web\web\AGENTS.md
+    - ..\apps\web\README.md
+    - ..\apps\web\CLAUDE.md
+    - ..\apps\web\AGENTS.md
+    - ..\apps\admin\README.md
+    - ..\apps\admin\AGENTS.md
+    - ..\docs\prisma_v7_upgrade_guide.md
+    - ..\docs\setup_guide_and_troubleshooting_tips.md
+    - ..\docs\sprint1.md
