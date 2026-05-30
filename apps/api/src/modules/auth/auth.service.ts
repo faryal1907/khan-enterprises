@@ -1,11 +1,113 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
 import { PrismaService } from "../../prisma/prisma.service";
+import { LoginDto } from "./dto/login.dto";
+import { JwtPayload } from "./strategies/jwt.strategy";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+  ) {}
 
-  /** Look up a user by email to verify they exist in the system. */
+  // ─── Login ────────────────────────────────────────────────────────────────
+
+  async login(dto: LoginDto) {
+    // 1. Find user — include passwordHash this time
+    const user = await this.prisma.client.user.findUnique({
+      where: { email: dto.email },
+      select: {
+        id: true,
+        email: true,
+        passwordHash: true,
+        fullName: true,
+        role: true,
+        status: true,
+        branchId: true,
+        branch: { select: { id: true, name: true, city: true } },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException("Invalid email or password.");
+    }
+
+    if (user.status !== "ACTIVE") {
+      throw new ForbiddenException("Account is suspended or inactive.");
+    }
+
+    // 2. Verify password
+    const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!passwordValid) {
+      throw new UnauthorizedException("Invalid email or password.");
+    }
+
+    // 3. Issue tokens
+    const tokens = await this.issueTokens(user.id, user.email, user.role, user.branchId);
+
+    // 4. Return tokens + safe user profile (no passwordHash)
+    const { passwordHash: _omit, ...profile } = user;
+    return { ...tokens, user: profile };
+  }
+
+  // ─── Refresh ──────────────────────────────────────────────────────────────
+
+  async refresh(rawRefreshToken: string) {
+    // Hash the incoming token to look it up
+    const tokenHash = this.hashToken(rawRefreshToken);
+
+    const stored = await this.prisma.client.refreshToken.findFirst({
+      where: { tokenHash },
+      include: {
+        user: {
+          select: { id: true, email: true, role: true, status: true, branchId: true },
+        },
+      },
+    });
+
+    if (!stored) {
+      throw new UnauthorizedException("Invalid refresh token.");
+    }
+
+    if (stored.expiresAt < new Date()) {
+      // Clean up expired token
+      await this.prisma.client.refreshToken.delete({ where: { id: stored.id } });
+      throw new UnauthorizedException("Refresh token has expired. Please log in again.");
+    }
+
+    if (stored.user.status !== "ACTIVE") {
+      throw new ForbiddenException("Account is suspended or inactive.");
+    }
+
+    // Rotate: delete old token, issue new pair
+    await this.prisma.client.refreshToken.delete({ where: { id: stored.id } });
+
+    return this.issueTokens(
+      stored.user.id,
+      stored.user.email,
+      stored.user.role,
+      stored.user.branchId,
+    );
+  }
+
+  // ─── Logout ───────────────────────────────────────────────────────────────
+
+  async logout(rawRefreshToken: string) {
+    const tokenHash = this.hashToken(rawRefreshToken);
+    // Silently succeed even if token not found (already logged out)
+    await this.prisma.client.refreshToken.deleteMany({ where: { tokenHash } });
+    return { message: "Logged out successfully." };
+  }
+
+  // ─── User queries (existing, kept intact) ─────────────────────────────────
+
   async findUserByEmail(email: string) {
     const user = await this.prisma.client.user.findUnique({
       where: { email },
@@ -26,7 +128,6 @@ export class AuthService {
     return user;
   }
 
-  /** Return all registered staff users (for admin dashboard user management). */
   async getAllUsers() {
     return this.prisma.client.user.findMany({
       select: {
@@ -41,5 +142,59 @@ export class AuthService {
       },
       orderBy: { createdAt: "desc" },
     });
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  private async issueTokens(
+    userId: string,
+    email: string,
+    role: string,
+    branchId: string | null,
+  ) {
+    const payload: JwtPayload = { sub: userId, email, role, branchId };
+
+    const accessToken = this.jwt.sign(payload as object, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: this.parseDurationSeconds(process.env.JWT_EXPIRE ?? "15m"),
+    });
+
+    // Generate a cryptographically random refresh token
+    const rawRefreshToken = crypto.randomBytes(64).toString("hex");
+    const tokenHash = this.hashToken(rawRefreshToken);
+
+    const refreshExpireMs = this.parseDuration(process.env.JWT_REFRESH_EXPIRE ?? "7d");
+
+    await this.prisma.client.refreshToken.create({
+      data: {
+        userId,
+        tokenHash,
+        expiresAt: new Date(Date.now() + refreshExpireMs),
+      },
+    });
+
+    return { accessToken, refreshToken: rawRefreshToken };
+  }
+
+  private hashToken(token: string): string {
+    return crypto.createHash("sha256").update(token).digest("hex");
+  }
+
+  /** Converts "7d", "15m", "1h" to milliseconds */
+  private parseDuration(duration: string): number {
+    return this.parseDurationSeconds(duration) * 1000;
+  }
+
+  /** Converts "7d", "15m", "1h" to seconds (for JWT expiresIn) */
+  private parseDurationSeconds(duration: string): number {
+    const unit = duration.slice(-1);
+    const value = parseInt(duration.slice(0, -1), 10);
+    switch (unit) {
+      case "s": return value;
+      case "m": return value * 60;
+      case "h": return value * 60 * 60;
+      case "d": return value * 24 * 60 * 60;
+      default:  return 7 * 24 * 60 * 60; // fallback 7d
+    }
   }
 }

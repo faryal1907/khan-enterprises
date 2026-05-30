@@ -1,0 +1,32 @@
+$kind: http-request
+name: List Branches
+method: GET
+url: '{{baseUrl}}/api/branches'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array of branches", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an("array");
+      });
+
+      pm.test("Each branch has required fields", () => {
+        const branches = pm.response.json();
+        if (branches.length > 0) {
+          const branch = branches[0];
+          pm.expect(branch).to.have.property("id");
+          pm.expect(branch).to.have.property("name");
+          // Save first branchId for downstream requests
+          pm.environment.set("branchId", branch.id);
+        }
+      });
+
+      pm.test("Response time is under 2000ms", () => {
+        pm.expect(pm.response.responseTime).to.be.below(2000);
+      });

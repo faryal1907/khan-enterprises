@@ -1,0 +1,32 @@
+$kind: http-request
+name: Get Me
+method: GET
+url: '{{baseUrl}}/api/auth/me'
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has user object", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("user");
+        pm.expect(json.user).to.be.an("object");
+      });
+
+      pm.test("User has expected fields", () => {
+        const { user } = pm.response.json();
+        pm.expect(user).to.have.property("id");
+        pm.expect(user).to.have.property("email");
+        pm.expect(user).to.have.property("role");
+        pm.expect(user).to.have.property("id");
+        pm.expect(user.status).to.equal("ACTIVE");
+      });
+
+      pm.test("User does not expose passwordHash", () => {
+        const { user } = pm.response.json();
+        pm.expect(user).to.not.have.property("passwordHash");
+      });

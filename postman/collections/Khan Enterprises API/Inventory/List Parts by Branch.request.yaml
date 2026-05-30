@@ -1,0 +1,43 @@
+$kind: http-request
+name: List Parts by Branch
+method: GET
+url: '{{baseUrl}}/api/inventory/parts?branchId={{branchId}}'
+order: 4000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an("array");
+      });
+
+      pm.test("All returned parts belong to the requested branch", () => {
+        const parts = pm.response.json();
+        const requestedBranchId = pm.environment.get("branchId");
+        if (parts.length > 0 && requestedBranchId) {
+          parts.forEach((part) => {
+            if (part.branchId !== undefined) {
+              pm.expect(String(part.branchId)).to.equal(String(requestedBranchId));
+            }
+          });
+        }
+      });
+
+      pm.test("Part quantities are non-negative numbers", () => {
+        const parts = pm.response.json();
+        parts.forEach((part) => {
+          if (part.quantity !== undefined) {
+            pm.expect(part.quantity).to.be.a("number");
+            pm.expect(part.quantity).to.be.at.least(0);
+          }
+        });
+      });
+
+      pm.test("Response time is under 2000ms", () => {
+        pm.expect(pm.response.responseTime).to.be.below(2000);
+      });

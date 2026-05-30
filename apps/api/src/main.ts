@@ -1,3 +1,10 @@
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Load root .env when Nest runs from apps/api (monorepo layout)
+config({ path: resolve(process.cwd(), ".env") });
+config({ path: resolve(process.cwd(), "../../.env") });
+
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from '@nestjs/common';

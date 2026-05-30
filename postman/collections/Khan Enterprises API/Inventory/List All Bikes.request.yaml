@@ -1,0 +1,42 @@
+$kind: http-request
+name: List All Bikes
+method: GET
+url: '{{baseUrl}}/api/inventory/bikes'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array of bike units", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an("array");
+      });
+
+      pm.test("Each bike unit has required fields", () => {
+        const bikes = pm.response.json();
+        if (bikes.length > 0) {
+          const bike = bikes[0];
+          pm.expect(bike).to.have.property("id");
+          pm.expect(bike).to.have.property("status");
+          // Save first bikeId for downstream requests
+          pm.environment.set("bikeId", bike.id);
+        }
+      });
+
+      pm.test("Bike statuses are valid enum values", () => {
+        const bikes = pm.response.json();
+        const validStatuses = ["AVAILABLE", "RESERVED", "SOLD", "IN_DELIVERY"];
+        bikes.forEach((bike) => {
+          if (bike.status) {
+            pm.expect(validStatuses).to.include(bike.status);
+          }
+        });
+      });
+
+      pm.test("Response time is under 2000ms", () => {
+        pm.expect(pm.response.responseTime).to.be.below(2000);
+      });

@@ -1,0 +1,67 @@
+$kind: http-request
+name: Login
+method: POST
+url: '{{baseUrl}}/api/auth/login'
+order: 1000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "admin@khan.com",
+      "password": "admin123"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      // ── Status check ──────────────────────────────────────────────────────────
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      // ── Response structure ─────────────────────────────────────────────────────
+      pm.test("Response has accessToken", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("accessToken");
+        pm.expect(json.accessToken).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has refreshToken", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("refreshToken");
+        pm.expect(json.refreshToken).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("Response has user object", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("user");
+        pm.expect(json.user).to.be.an("object");
+        pm.expect(json.user).to.have.property("id");
+        pm.expect(json.user).to.have.property("email");
+        pm.expect(json.user).to.have.property("role");
+      });
+
+      pm.test("User does not expose passwordHash", () => {
+        const json = pm.response.json();
+        pm.expect(json.user).to.not.have.property("passwordHash");
+      });
+
+      // ── Save tokens to environment ─────────────────────────────────────────────
+      const json = pm.response.json();
+      if (json.accessToken) {
+        pm.environment.set("accessToken", json.accessToken);
+      }
+      if (json.refreshToken) {
+        pm.environment.set("refreshToken", json.refreshToken);
+      }
+      if (json.user && json.user.id) {
+        pm.environment.set("userId", json.user.id);
+      }
+      if (json.user && json.user.branchId) {
+        pm.environment.set("branchId", json.user.branchId);
+      }

@@ -1,0 +1,13 @@
+$kind: collection
+name: Khan Enterprises API
+description: |-
+  Complete API collection for the Khan Enterprises Motorcycle Sales & ERP Platform.
+  Covers Auth, Branches, Inventory (Bikes & Parts), Offers, Orders, Deliveries, and Audit Logs.
+
+  Set the "Local Development" environment before running.
+  Run the "Login" request first — it auto-saves accessToken, refreshToken, and userId to env vars.
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'

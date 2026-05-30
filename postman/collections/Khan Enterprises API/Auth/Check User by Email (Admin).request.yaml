@@ -1,0 +1,34 @@
+$kind: http-request
+name: 'Check User by Email (Admin)'
+method: GET
+url: '{{baseUrl}}/api/auth/check'
+order: 4000
+queryParams:
+  - key: email
+    value: admin@khan.com
+    description: Email address to look up
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response confirms user exists", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("exists");
+        pm.expect(json.exists).to.be.true;
+      });
+
+      pm.test("Response has user object", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("user");
+        pm.expect(json.user).to.be.an("object");
+        pm.expect(json.user).to.have.property("email");
+      });
+
+      pm.test("User does not expose passwordHash", () => {
+        const { user } = pm.response.json();
+        pm.expect(user).to.not.have.property("passwordHash");
+      });

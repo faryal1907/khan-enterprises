@@ -31,7 +31,7 @@ That guide covers the monorepo layout, request flow, database design (serialized
 | Sprint | Focus | Status |
 |--------|--------|--------|
 | **Sprint 1** | Monorepo, Docker Postgres, Prisma schema (15 models), seed, read-only API (auth check, inventory, branches), Next.js scaffolds | **Done** — see [sprint1_finalized.md](./sprint1_finalized.md) |
-| **Sprint 2** | JWT login/logout/refresh, RBAC guards, offer/negotiation API, begin admin & customer UI | Planned |
+| **Sprint 2** | JWT login/logout/refresh, RBAC guards, Postman auth tests | **Done** — see [sprint2.md](./sprint2.md) §9 |
 | **Later phases** | Orders, payments (Safepay, JazzCash, Raast), delivery, PDF invoices, ERP dashboards, audit exports | Schema ready; API/UI not built |
 
 ---

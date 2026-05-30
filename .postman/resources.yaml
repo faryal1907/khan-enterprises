@@ -18,3 +18,6 @@ localResources:
     - ..\docs\sprint1_finalized.md
     - ..\docs\overall_picture_and_sprints.md
     - ..\docs\khan_enterprises_full_project_explained.md
+    - ..\docs\api_routes.md
+    - ..\docs\sprint2.md
+    - ..\docs\docker.md

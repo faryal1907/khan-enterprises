@@ -1,0 +1,36 @@
+$kind: http-request
+name: Get Branch by ID
+method: GET
+url: '{{baseUrl}}/api/branches/{{branchId}}'
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is a branch object", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.be.an("object");
+        pm.expect(json).to.not.be.an("array");
+      });
+
+      pm.test("Branch has required fields", () => {
+        const branch = pm.response.json();
+        pm.expect(branch).to.have.property("id");
+        pm.expect(branch).to.have.property("name");
+      });
+
+      pm.test("Branch ID matches requested ID", () => {
+        const branch = pm.response.json();
+        const requestedId = pm.environment.get("branchId");
+        if (requestedId) {
+          pm.expect(String(branch.id)).to.equal(String(requestedId));
+        }
+      });
+
+      pm.test("Response time is under 2000ms", () => {
+        pm.expect(pm.response.responseTime).to.be.below(2000);
+      });

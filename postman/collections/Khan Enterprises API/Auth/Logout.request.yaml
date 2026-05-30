@@ -1,0 +1,33 @@
+$kind: http-request
+name: Logout
+method: POST
+url: '{{baseUrl}}/api/auth/logout'
+order: 7000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "refreshToken": "{{refreshToken}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response confirms logout", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("message");
+        pm.expect(json.message).to.include("Logged out");
+      });
+
+      // ── Clear tokens from environment ──────────────────────────────────────────
+      pm.environment.set("accessToken", "");
+      pm.environment.set("refreshToken", "");
