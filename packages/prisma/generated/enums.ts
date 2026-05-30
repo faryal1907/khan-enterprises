@@ -85,8 +85,9 @@ export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
 export const PaymentMethod = {
   CASH: 'CASH',
   BANK_TRANSFER: 'BANK_TRANSFER',
-  EASYPAISA: 'EASYPAISA',
-  HBL: 'HBL'
+  SAFEPAY: 'SAFEPAY',
+  JAZZCASH: 'JAZZCASH',
+  RAAST: 'RAAST'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

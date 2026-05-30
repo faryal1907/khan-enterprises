@@ -72,8 +72,9 @@ enum PaymentStatus {
 enum PaymentMethod {
   CASH
   BANK_TRANSFER
-  EASYPAISA
-  HBL
+  SAFEPAY      // Phase 1 — Visa/Mastercard debit & credit cards
+  JAZZCASH     // Phase 1 — Mobile wallet payments
+  RAAST        // Phase 2 — Instant bank transfer via PayFast, zero MDR
 }
 
 enum AuditAction {

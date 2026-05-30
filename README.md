@@ -95,7 +95,7 @@ The system is compartmentalized into self-contained vertical domains. Every doma
 | **Customer Product Catalog** | `HIGH` | Phase 2 | Public showcase with filters (type, engine capacity, color) and pricing. |
 | **Negotiation & Offers** | `CRITICAL` | Phase 3 | Negotiation workflow between customer and sales agent (counter-offers). |
 | **Order Lifecycle** | `CRITICAL` | Phase 3 | Tracks states from successful negotiation to payment and fulfillment. |
-| **Payment Gateway** | `CRITICAL` | Phase 4 | Online payment gateway integration, transaction records, and invoice webhooks. |
+| **Payment Gateway** | `CRITICAL` | Phase 4 | Safepay (cards) + JazzCash (mobile wallet) in Phase 1; Raast via PayFast (instant bank transfer, zero MDR) in Phase 2. |
 | **Transactions & Refunds** | `CRITICAL` | Phase 4 | Ledger balancing, secure refund channels, and financial records. |
 | **Sales Staff Registry** | `CRITICAL` | Phase 5 | Internal registration workflow, credentials provisioning, and performance metrics. |
 | **PDF Invoice Generator** | `HIGH` | Phase 5 | Dynamic generation of PDF invoices, purchase contracts, and delivery receipts. |
