@@ -1,3 +1,11 @@
+import { config } from "dotenv";
+import path from "path";
+
+// Load root .env when running standalone (seed, scripts). No-op in NestJS/Next.js
+// which load env vars through their own mechanisms before this module is imported.
+config({ path: path.resolve(process.cwd(), "../../.env") });
+config({ path: path.resolve(process.cwd(), ".env") });
+
 import { PrismaClient } from "./generated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
