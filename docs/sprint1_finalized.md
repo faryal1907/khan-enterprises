@@ -114,12 +114,12 @@ npx prisma db seed
 
 | Entity        | Records                                                                 |
 | :------------ | :---------------------------------------------------------------------- |
-| Branches      | Karachi South Central, Lahore DHA Cantt, Islamabad Blue Area            |
+| Branches      | Islamabad Headquarters, Tordher Branch                                  |
 | Users         | 1 ADMIN (`admin@khan.com`), 2 MANAGERs, 1 SALES_STAFF                  |
-| Vendors       | Honda Atlas, Yamaha Motor Pakistan, Suzuki Motor Pakistan               |
-| Bike Models   | Honda CG 125, Yamaha YBR 125G, Suzuki GR 150                           |
-| Bike Units    | 4 serialized units (3 AVAILABLE, 1 RESERVED)                           |
-| Parts         | NGK Spark Plug, Yamaha Air Filter — with stock levels at Karachi branch |
+| Vendors       | Evee Pakistan, Roadking Motors                                          |
+| Bike Models   | Evee: C1 Pro, E5, Thunder, City Rider — Roadking: RK 125, RK 150, RK Cruiser, RK 70 |
+| Bike Units    | 10 serialized units (7 AVAILABLE, 2 RESERVED, 1 SOLD)                  |
+| Parts         | 9 parts (Evee + Roadking) with stock split across Islamabad HQ and Tordher |
 
 > All seeded user passwords are placeholder bcrypt hashes. Real auth is a Sprint 2 concern.
 
@@ -212,13 +212,13 @@ curl "http://localhost:4000/api/inventory/parts"
   "bikes": [
     {
       "id": "...",
-      "chassisNumber": "HON125CG2026X9001",
-      "engineNumber": "HON-ENG-9001",
-      "serialNumber": "SN-HON-001",
+      "chassisNumber": "EVC1P-2025-78492",
+      "engineNumber": "EMOT-78492-EV25",
+      "serialNumber": "SR-EV-C1P-001",
       "status": "AVAILABLE",
-      "model": { "brand": "Honda", "modelName": "CG 125 Self-Start", "basePrice": "285000.00" },
-      "vendor": { "name": "Honda Atlas Motorcycles" },
-      "branch": { "name": "Karachi South Central", "city": "Karachi" }
+      "model": { "brand": "Evee", "modelName": "C1 Pro", "basePrice": "285000.00" },
+      "vendor": { "name": "Evee Pakistan" },
+      "branch": { "name": "Islamabad Headquarters", "city": "Islamabad" }
     }
   ]
 }
@@ -250,9 +250,9 @@ curl "http://localhost:4000/api/branches/<branch-uuid>"
   "branches": [
     {
       "id": "...",
-      "name": "Islamabad Blue Area",
+      "name": "Islamabad Headquarters",
       "city": "Islamabad",
-      "address": "Shop 4, AKM Fazal-ul-Haq Road, Blue Area",
+      "address": "Plot 12, Street 4, F-10 Markaz, Islamabad",
       "manager": null,
       "_count": { "users": 0, "bikeInventory": 1, "partInventory": 0 }
     }

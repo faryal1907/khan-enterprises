@@ -1,4 +1,5 @@
 import { prisma } from "./index";
+import bcrypt from "bcrypt";
 
 async function main() {
   console.log("🌱 Starting database seeding...");
@@ -7,7 +8,6 @@ async function main() {
   // CLEAN DB
   // ============================================================================
   console.log("🧹 Cleaning existing database entities...");
-  // Truncate tables in reverse order to avoid FK constraints
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "AuditLog" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Document" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "DeliveryRequest" CASCADE;');
@@ -23,52 +23,47 @@ async function main() {
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "RefreshToken" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "User" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Branch" CASCADE;');
-
   console.log("✨ Database is now sparkling clean.");
 
   // ============================================================================
-  // 1. SEED BRANCHES
+  // 1. BRANCHES
   // ============================================================================
   console.log("🏢 Seeding Branches...");
-  const branchKhi = await prisma.branch.create({
-    data: {
-      name: "Karachi South Central",
-      city: "Karachi",
-      address: "Plot 43-B, Main Shahrah-e-Faisal, Block 6, PECHS",
-      phoneNumber: "+922134542671",
-    },
-  });
 
-  const branchLhr = await prisma.branch.create({
+  const branchHQ = await prisma.branch.create({
     data: {
-      name: "Lahore DHA Cantt",
-      city: "Lahore",
-      address: "Building 12, Sector CCA, Phase 5 DHA, Cantt",
-      phoneNumber: "+924235742672",
-    },
-  });
-
-  const branchIsb = await prisma.branch.create({
-    data: {
-      name: "Islamabad Blue Area",
+      name: "Islamabad Headquarters",
       city: "Islamabad",
-      address: "Shop 4, AKM Fazal-ul-Haq Road, Blue Area",
-      phoneNumber: "+92512822673",
+      address: "Plot 12, Street 4, F-10 Markaz, Islamabad",
+      phoneNumber: "+925188001001",
     },
   });
 
-  console.log(`✅ Seeded ${[branchKhi, branchLhr, branchIsb].length} branches.`);
+  const branchTordher = await prisma.branch.create({
+    data: {
+      name: "Tordher Branch",
+      city: "Tordher",
+      address: "Main GT Road, Near Tordher Chowk, Tordher, KPK",
+      phoneNumber: "+929876543210",
+    },
+  });
+
+  console.log(`✅ Seeded 2 branches.`);
 
   // ============================================================================
-  // 2. SEED USERS (SYSTEM STAFF)
+  // 2. USERS
   // ============================================================================
   console.log("👥 Seeding System Users...");
-  const mockPasswordHash = "$2b$10$EPf91Yu.4p3U.gZ.9i3Hee3Zl5d9i23J2123Yd8349283"; // placeholder bcrypt hash for "password"
 
-  const adminUser = await prisma.user.create({
+  const adminPasswordHash   = await bcrypt.hash("admin123",   10);
+  const managerPasswordHash = await bcrypt.hash("manager123", 10);
+  const salesPasswordHash   = await bcrypt.hash("sales123",   10);
+
+  // ADMIN — global, no branch
+  await prisma.user.create({
     data: {
       email: "admin@khan.com",
-      passwordHash: mockPasswordHash,
+      passwordHash: adminPasswordHash,
       fullName: "Muhammad Ali Khan",
       phoneNumber: "+923001234567",
       role: "ADMIN",
@@ -76,161 +71,196 @@ async function main() {
     },
   });
 
-  const khiManager = await prisma.user.create({
+  // MANAGER — Islamabad HQ
+  const hqManager = await prisma.user.create({
     data: {
-      email: "khi.manager@khan.com",
-      passwordHash: mockPasswordHash,
-      fullName: "Kamran Shah Khi Manager",
+      email: "isb.manager@khan.com",
+      passwordHash: managerPasswordHash,
+      fullName: "Kamran Shah",
       phoneNumber: "+923331234567",
       role: "MANAGER",
       status: "ACTIVE",
-      branchId: branchKhi.id,
+      branchId: branchHQ.id,
     },
   });
 
-  const lhrManager = await prisma.user.create({
+  // MANAGER — Tordher Branch
+  const tordherManager = await prisma.user.create({
     data: {
-      email: "lhr.manager@khan.com",
-      passwordHash: mockPasswordHash,
-      fullName: "Bilal Butt Lhr Manager",
+      email: "tordher.manager@khan.com",
+      passwordHash: managerPasswordHash,
+      fullName: "Bilal Khan",
       phoneNumber: "+923211234567",
       role: "MANAGER",
       status: "ACTIVE",
-      branchId: branchLhr.id,
+      branchId: branchTordher.id,
     },
   });
 
-  await prisma.branch.update({ where: { id: branchKhi.id }, data: { managerId: khiManager.id } });
-  await prisma.branch.update({ where: { id: branchLhr.id }, data: { managerId: lhrManager.id } });
+  // Assign managers to their branches
+  await prisma.branch.update({ where: { id: branchHQ.id },      data: { managerId: hqManager.id } });
+  await prisma.branch.update({ where: { id: branchTordher.id }, data: { managerId: tordherManager.id } });
 
-  const khiStaff = await prisma.user.create({
+  // SALES_STAFF — Tordher Branch
+  await prisma.user.create({
     data: {
-      email: "khi.staff@khan.com",
-      passwordHash: mockPasswordHash,
-      fullName: "Siddique Ahmed Khi Agent",
+      email: "tordher.staff@khan.com",
+      passwordHash: salesPasswordHash,
+      fullName: "Siddique Ahmed",
       phoneNumber: "+923451234567",
       role: "SALES_STAFF",
       status: "ACTIVE",
-      branchId: branchKhi.id,
+      branchId: branchTordher.id,
     },
   });
 
-  console.log("✅ Seeded user roles (ADMIN, MANAGER, SALES_STAFF).");
+  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs, 1 SALES_STAFF.");
 
   // ============================================================================
-  // 3. SEED VENDORS (MANUFACTURERS)
+  // 3. VENDORS
+  // Real contact details used. Contact person names are placeholders.
   // ============================================================================
-  console.log("🏭 Seeding Manufacturers & Vendors...");
-  const vendorHonda = await prisma.vendor.create({
+  console.log("🏭 Seeding Vendors...");
+
+  const vendorEvee = await prisma.vendor.create({
     data: {
-      name: "Honda Atlas Motorcycles",
-      contactPerson: "Mr. Asif Honda",
-      phoneNumber: "+9221111333444",
-      email: "sales@atlas.com.pk",
-      address: "F-36, Mauripur Link Road, S.I.T.E., Karachi",
+      name: "Evee Pakistan",
+      phoneNumber: "+923252292290",
+      email: "sales@evee.pk",
+      address: "19-KM, Baghdadi Street, Off Multan Road, Lahore, Punjab, Pakistan",
     },
   });
 
-  const vendorYamaha = await prisma.vendor.create({
+  const vendorRoadking = await prisma.vendor.create({
     data: {
-      name: "Yamaha Motor Pakistan",
-      contactPerson: "Mr. Kenji Yamaha",
-      phoneNumber: "+9221111444555",
-      email: "info@yamaha.com.pk",
-      address: "Sector 27, Korangi Industrial Area, Karachi",
+      name: "Roadking Motors",
+      phoneNumber: "+923286225737",
+      email: "contact@roadking.com.pk",
+      address: "Industrial Area, Chak No. 209, Jaranwala Road, Faisalabad, Pakistan",
     },
   });
 
-  const vendorSuzuki = await prisma.vendor.create({
+  console.log("✅ Seeded 2 vendors: Evee Pakistan, Roadking Motors.");
+
+  // ============================================================================
+  // 4. BIKE MODELS
+  // ============================================================================
+  console.log("🏍️ Seeding Bike Models...");
+
+  // --- Evee (Electric) ---
+  const modelEveeC1Pro = await prisma.bikeModel.create({
     data: {
-      name: "Suzuki Motor Pakistan",
-      contactPerson: "Mr. Tariq Suzuki",
-      phoneNumber: "+9221111555666",
-      email: "sales@suzuki.com.pk",
-      address: "DSU-12, Bin Qasim Industrial Park, Karachi",
+      brand: "Evee",
+      modelName: "C1 Pro",
+      year: 2025,
+      engineCapacity: "Electric",
+      color: "Pearl White / Matte Black / Red",
+      description: "Premium electric scooter with fast charging and a refined urban riding experience.",
+      basePrice: 285000,
     },
   });
 
-  console.log(`✅ Seeded ${[vendorHonda, vendorYamaha, vendorSuzuki].length} manufacturers.`);
-
-  // ============================================================================
-  // 4. SEED BIKE CATALOG MODELS
-  // ============================================================================
-  console.log("🏍️ Seeding Motorcycle Catalog Models...");
-  const modelHonda125 = await prisma.bikeModel.create({
+  const modelEveeE5 = await prisma.bikeModel.create({
     data: {
-      brand: "Honda",
-      modelName: "CG 125 Self-Start",
-      year: 2026,
+      brand: "Evee",
+      modelName: "E5",
+      year: 2025,
+      engineCapacity: "Electric",
+      color: "Blue / Silver / Green",
+      description: "Family commuter electric bike with high mileage per charge and a comfortable posture.",
+      basePrice: 195000,
+    },
+  });
+
+  const modelEveeThunder = await prisma.bikeModel.create({
+    data: {
+      brand: "Evee",
+      modelName: "Thunder",
+      year: 2025,
+      engineCapacity: "Electric",
+      color: "Black / Orange",
+      description: "Sporty electric bike with powerful torque and aggressive styling.",
+      basePrice: 345000,
+    },
+  });
+
+  const modelEveeCityRider = await prisma.bikeModel.create({
+    data: {
+      brand: "Evee",
+      modelName: "City Rider",
+      year: 2024,
+      engineCapacity: "Electric",
+      color: "White / Grey",
+      description: "Budget-friendly daily commuter electric bike for short city routes.",
+      basePrice: 165000,
+    },
+  });
+
+  // --- Roadking (Petrol) ---
+  const modelRK125 = await prisma.bikeModel.create({
+    data: {
+      brand: "Roadking",
+      modelName: "RK 125",
+      year: 2025,
       engineCapacity: "125cc",
-      color: "Red",
-      description: "Euro II self-start edition standard Pakistani commuter icon with unparalleled engine response.",
-      basePrice: 285000.00,
+      color: "Black / Red / Blue",
+      description: "Reliable entry-level commuter motorcycle built for everyday city and town use.",
+      basePrice: 185000,
     },
   });
 
-  const modelYamaha125G = await prisma.bikeModel.create({
+  const modelRK150 = await prisma.bikeModel.create({
     data: {
-      brand: "Yamaha",
-      modelName: "YBR 125G",
-      year: 2026,
-      engineCapacity: "125cc",
-      color: "Matte Black",
-      description: "Dual-sport sports edition commuter with high ground clearance, engine balance, and sporty fairings.",
-      basePrice: 485000.00,
-    },
-  });
-
-  const modelSuzuki150 = await prisma.bikeModel.create({
-    data: {
-      brand: "Suzuki",
-      modelName: "GR 150",
-      year: 2026,
+      brand: "Roadking",
+      modelName: "RK 150",
+      year: 2025,
       engineCapacity: "150cc",
-      color: "Blue",
-      description: "Premium long-route tourer featuring front shock gaiters, ergonomic seating, and absolute ride comfort.",
-      basePrice: 545000.00,
+      color: "Matte Black / Silver",
+      description: "Powerful mid-range bike suited for both highway cruising and city commuting.",
+      basePrice: 245000,
     },
   });
 
-  console.log(`✅ Seeded ${[modelHonda125, modelYamaha125G, modelSuzuki150].length} catalog models.`);
+  const modelRKCruiser = await prisma.bikeModel.create({
+    data: {
+      brand: "Roadking",
+      modelName: "RK Cruiser",
+      year: 2024,
+      engineCapacity: "250cc",
+      color: "Deep Green / Brown",
+      description: "Classic cruiser-style motorcycle with an ergonomic seat and long-distance comfort.",
+      basePrice: 425000,
+    },
+  });
+
+  const modelRK70 = await prisma.bikeModel.create({
+    data: {
+      brand: "Roadking",
+      modelName: "RK 70",
+      year: 2025,
+      engineCapacity: "70cc",
+      color: "Red / Black",
+      description: "Light and fuel-efficient bike ideal for students and beginner riders.",
+      basePrice: 135000,
+    },
+  });
+
+  console.log("✅ Seeded 8 bike models: 4 Evee, 4 Roadking.");
 
   // ============================================================================
-  // 5. SEED SERIALIZED BIKE UNITS (BIKEUNIT)
+  // 5. SERIALIZED BIKE UNITS
   // ============================================================================
-  console.log("🏷️ Seeding Serialized Bike Units (Chassis/Engine Unique Units)...");
-  const bike1 = await prisma.bikeUnit.create({
-    data: {
-      vendorId: vendorHonda.id,
-      branchId: branchKhi.id,
-      modelId: modelHonda125.id,
-      chassisNumber: "HON125CG2026X9001",
-      engineNumber: "HON-ENG-9001",
-      serialNumber: "SN-HON-001",
-      status: "AVAILABLE",
-    },
-  });
+  console.log("🏷️ Seeding Bike Units...");
 
-  const bike2 = await prisma.bikeUnit.create({
+  // --- Evee Units ---
+  await prisma.bikeUnit.create({
     data: {
-      vendorId: vendorYamaha.id,
-      branchId: branchKhi.id,
-      modelId: modelYamaha125G.id,
-      chassisNumber: "YAM125G2026Y8002",
-      engineNumber: "YAM-ENG-8002",
-      serialNumber: "SN-YAM-002",
-      status: "AVAILABLE",
-    },
-  });
-
-  const bike3 = await prisma.bikeUnit.create({
-    data: {
-      vendorId: vendorSuzuki.id,
-      branchId: branchLhr.id,
-      modelId: modelSuzuki150.id,
-      chassisNumber: "SUZ150GR2026Z7003",
-      engineNumber: "SUZ-ENG-7003",
-      serialNumber: "SN-SUZ-003",
+      vendorId: vendorEvee.id,
+      branchId: branchHQ.id,
+      modelId: modelEveeC1Pro.id,
+      chassisNumber: "EVC1P-2025-78492",
+      engineNumber: "EMOT-78492-EV25",
+      serialNumber: "SR-EV-C1P-001",
       status: "AVAILABLE",
     },
   });
@@ -238,61 +268,241 @@ async function main() {
   const reservedExpiry = new Date();
   reservedExpiry.setHours(reservedExpiry.getHours() + 48);
 
-  const bike4 = await prisma.bikeUnit.create({
+  await prisma.bikeUnit.create({
     data: {
-      vendorId: vendorHonda.id,
-      branchId: branchIsb.id,
-      modelId: modelHonda125.id,
-      chassisNumber: "HON125CG2026X9004",
-      engineNumber: "HON-ENG-9004",
-      serialNumber: "SN-HON-004",
+      vendorId: vendorEvee.id,
+      branchId: branchTordher.id,
+      modelId: modelEveeC1Pro.id,
+      chassisNumber: "EVC1P-2025-78493",
+      engineNumber: "EMOT-78493-EV25",
+      serialNumber: "SR-EV-C1P-002",
       status: "RESERVED",
-      negotiatedPrice: 280000.00,
       reservedUntil: reservedExpiry,
     },
   });
 
-  console.log(`✅ Seeded ${[bike1, bike2, bike3, bike4].length} serialized units.`);
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorEvee.id,
+      branchId: branchHQ.id,
+      modelId: modelEveeE5.id,
+      chassisNumber: "EVE5-2025-31904",
+      engineNumber: "EMOT-31904-EV25",
+      serialNumber: "SR-EV-E5-003",
+      status: "AVAILABLE",
+    },
+  });
+
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorEvee.id,
+      branchId: branchTordher.id,
+      modelId: modelEveeThunder.id,
+      chassisNumber: "EVTHN-2025-67281",
+      engineNumber: "EMOT-67281-EV25",
+      serialNumber: "SR-EV-THN-001",
+      status: "AVAILABLE",
+    },
+  });
+
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorEvee.id,
+      branchId: branchHQ.id,
+      modelId: modelEveeCityRider.id,
+      chassisNumber: "EVCR-2024-55123",
+      engineNumber: "EMOT-55123-EV24",
+      serialNumber: "SR-EV-CR-004",
+      status: "SOLD",
+      soldAt: new Date("2025-03-15"),
+    },
+  });
+
+  // --- Roadking Units ---
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorRoadking.id,
+      branchId: branchHQ.id,
+      modelId: modelRK125.id,
+      chassisNumber: "RK125-2025-44871",
+      engineNumber: "RK125ENG-44871",
+      serialNumber: "SR-RK-125-005",
+      status: "AVAILABLE",
+    },
+  });
+
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorRoadking.id,
+      branchId: branchTordher.id,
+      modelId: modelRK150.id,
+      chassisNumber: "RK150-2025-22904",
+      engineNumber: "RK150ENG-22904",
+      serialNumber: "SR-RK-150-001",
+      status: "AVAILABLE",
+    },
+  });
+
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorRoadking.id,
+      branchId: branchHQ.id,
+      modelId: modelRKCruiser.id,
+      chassisNumber: "RKC-2024-77192",
+      engineNumber: "RKC250ENG-77192",
+      serialNumber: "SR-RK-CRS-002",
+      status: "RESERVED",
+      reservedUntil: reservedExpiry,
+    },
+  });
+
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorRoadking.id,
+      branchId: branchTordher.id,
+      modelId: modelRK70.id,
+      chassisNumber: "RK70-2025-11234",
+      engineNumber: "RK70ENG-11234",
+      serialNumber: "SR-RK-70-006",
+      status: "AVAILABLE",
+    },
+  });
+
+  await prisma.bikeUnit.create({
+    data: {
+      vendorId: vendorRoadking.id,
+      branchId: branchHQ.id,
+      modelId: modelRK125.id,
+      chassisNumber: "RK125-2025-44872",
+      engineNumber: "RK125ENG-44872",
+      serialNumber: "SR-RK-125-007",
+      status: "AVAILABLE",
+    },
+  });
+
+  console.log("✅ Seeded 10 bike units: 5 Evee, 5 Roadking.");
 
   // ============================================================================
-  // 6. SEED PARTS & SPARES
+  // 6. PARTS & ACCESSORIES
   // ============================================================================
-  console.log("⚙️ Seeding Parts Catalog & Stock Quantities...");
-  const partPlug = await prisma.part.create({
+  console.log("⚙️ Seeding Parts & Accessories...");
+
+  // --- Evee Parts ---
+  const partEveeCharger = await prisma.part.create({
     data: {
-      name: "NGK Spark Plug C7HSA",
-      sku: "PRT-NGK-C7HSA",
+      name: "Evee C1 Fast Charger",
+      sku: "PRT-EV-C1CHG",
       category: "Electrical",
-      description: "High durability Japanese spark plug ensuring optimized combustion firing.",
-      sellingPrice: 450.00,
+      description: "Original fast charger for Evee C1 Pro. Compatible with standard 220V outlets.",
+      sellingPrice: 8500,
     },
   });
 
-  const partFilter = await prisma.part.create({
+  const partEveeBattery = await prisma.part.create({
     data: {
-      name: "Yamaha YBR Original Air Filter",
-      sku: "PRT-YAM-AIRFLT",
-      category: "Filter",
-      description: "High-density fiber air intake filter for optimal filtration.",
-      sellingPrice: 1200.00,
+      name: "Evee Lithium Battery Pack",
+      sku: "PRT-EV-BAT5",
+      category: "Electrical",
+      description: "Replacement lithium-ion battery pack for Evee E5 and compatible models.",
+      sellingPrice: 65000,
     },
   });
 
-  await prisma.partInventory.create({
-    data: { partId: partPlug.id, branchId: branchKhi.id, quantity: 50, reservedQuantity: 0, reorderLevel: 10 },
-  });
-  await prisma.partInventory.create({
-    data: { partId: partFilter.id, branchId: branchKhi.id, quantity: 25, reservedQuantity: 2, reorderLevel: 5 },
+  const partEveeHeadlight = await prisma.part.create({
+    data: {
+      name: "Evee LED Headlight",
+      sku: "PRT-EV-LHD",
+      category: "Accessories",
+      description: "High-brightness LED headlight unit for Evee electric scooters.",
+      sellingPrice: 4200,
+    },
   });
 
-  console.log("✅ Seeded parts catalog and matching branch inventory metrics.");
+  const partEveeFloorMat = await prisma.part.create({
+    data: {
+      name: "Evee Floor Mat Set",
+      sku: "PRT-EV-MAT",
+      category: "Accessories",
+      description: "Anti-slip rubber floor mat set for Evee scooter footboard.",
+      sellingPrice: 1800,
+    },
+  });
 
-  console.log("🚀 Database Seeding complete! Workspace is fully ready for development.");
+  // --- Roadking Parts ---
+  const partRKOilFilter = await prisma.part.create({
+    data: {
+      name: "Roadking RK Oil Filter",
+      sku: "PRT-RK-OILF",
+      category: "Maintenance",
+      description: "Genuine oil filter for Roadking 125cc and 150cc engines.",
+      sellingPrice: 650,
+    },
+  });
+
+  const partRKSparkPlug = await prisma.part.create({
+    data: {
+      name: "Roadking 125cc Spark Plug",
+      sku: "PRT-RK-SP125",
+      category: "Electrical",
+      description: "OEM spark plug for Roadking RK 125 engine.",
+      sellingPrice: 450,
+    },
+  });
+
+  const partRKWheel = await prisma.part.create({
+    data: {
+      name: "Roadking Alloy Wheel",
+      sku: "PRT-RK-WHL150",
+      category: "Mechanical",
+      description: "Lightweight alloy wheel compatible with Roadking RK 150.",
+      sellingPrice: 18500,
+    },
+  });
+
+  const partRKSeatCover = await prisma.part.create({
+    data: {
+      name: "Roadking Seat Cover",
+      sku: "PRT-RK-SEAT",
+      category: "Accessories",
+      description: "Durable waterproof seat cover for all Roadking models.",
+      sellingPrice: 2800,
+    },
+  });
+
+  const partRKChain = await prisma.part.create({
+    data: {
+      name: "Roadking Chain Sprocket Kit",
+      sku: "PRT-RK-CHAIN150",
+      category: "Mechanical",
+      description: "Complete chain and sprocket replacement kit for Roadking RK 150.",
+      sellingPrice: 5200,
+    },
+  });
+
+  // --- Part Inventory (stock per branch) ---
+  // Evee parts — Islamabad HQ
+  await prisma.partInventory.create({ data: { partId: partEveeCharger.id,   branchId: branchHQ.id,      quantity: 12, reservedQuantity: 0, reorderLevel: 3  } });
+  await prisma.partInventory.create({ data: { partId: partEveeHeadlight.id, branchId: branchHQ.id,      quantity: 18, reservedQuantity: 0, reorderLevel: 5  } });
+  await prisma.partInventory.create({ data: { partId: partEveeFloorMat.id,  branchId: branchHQ.id,      quantity: 25, reservedQuantity: 0, reorderLevel: 5  } });
+  // Evee battery — Tordher
+  await prisma.partInventory.create({ data: { partId: partEveeBattery.id,   branchId: branchTordher.id, quantity: 5,  reservedQuantity: 0, reorderLevel: 2  } });
+
+  // Roadking parts — Islamabad HQ
+  await prisma.partInventory.create({ data: { partId: partRKOilFilter.id,   branchId: branchHQ.id,      quantity: 45, reservedQuantity: 0, reorderLevel: 10 } });
+  await prisma.partInventory.create({ data: { partId: partRKWheel.id,       branchId: branchHQ.id,      quantity: 8,  reservedQuantity: 0, reorderLevel: 2  } });
+  await prisma.partInventory.create({ data: { partId: partRKChain.id,       branchId: branchHQ.id,      quantity: 10, reservedQuantity: 0, reorderLevel: 3  } });
+  // Roadking parts — Tordher
+  await prisma.partInventory.create({ data: { partId: partRKSparkPlug.id,   branchId: branchTordher.id, quantity: 30, reservedQuantity: 0, reorderLevel: 8  } });
+  await prisma.partInventory.create({ data: { partId: partRKSeatCover.id,   branchId: branchTordher.id, quantity: 15, reservedQuantity: 0, reorderLevel: 4  } });
+
+  console.log("✅ Seeded 9 parts with inventory across both branches.");
+
+  console.log("🚀 Seeding complete! Khan Enterprises database is fully stocked.");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Error seeding database:", e);
+    console.error("❌ Seeding failed:", e);
     process.exit(1);
   })
   .finally(async () => {

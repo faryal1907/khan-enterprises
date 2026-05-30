@@ -140,7 +140,7 @@ Related models:
 
 ### Branches & staff
 
-- `Branch` — Karachi, Lahore, Islamabad (seeded)
+- `Branch` — Islamabad (Headquarters), Tordher (Branch) — seeded
 - `User` — staff roles: `ADMIN`, `MANAGER`, `SALES_STAFF` (no customer accounts in schema yet; offers store `customerName`/`customerPhone` inline)
 - `RefreshToken` — prepared for JWT login (Sprint 2)
 
@@ -194,7 +194,7 @@ npm run dev                # 5. Open all desks (API + web + admin via Turbo)
 
 Env vars live in root `.env` (`DATABASE_URL`, `JWT_*`, etc.) — API and Prisma read from there via [`prisma.config.ts`](../prisma.config.ts).
 
-**Seed data** ([`packages/prisma/seed.ts`](../packages/prisma/seed.ts)): 3 branches, Honda/Yamaha/Suzuki models, 4 bike units, parts at Karachi, users like `admin@khan.com` (password hashes are placeholders until real login).
+**Seed data** ([`packages/prisma/seed.ts`](../packages/prisma/seed.ts)): 2 branches (Islamabad HQ + Tordher), Honda/Yamaha/Suzuki models, 4 bike units, parts at Islamabad HQ, users like `admin@khan.com` (password hashes are real bcrypt hashes — see seed for dev passwords).
 
 ---
 
