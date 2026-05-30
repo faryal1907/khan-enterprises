@@ -411,6 +411,17 @@ Role-Based Access Control is enforced on the NestJS backend via explicit class d
 
 ---
 
+## 📚 Documentation
+
+| Guide | Description |
+| :--- | :--- |
+| [Overall picture & sprints](docs/overall_picture_and_sprints.md) | Doc index and sprint status at a glance |
+| [Full project explained](docs/khan_enterprises_full_project_explained.md) | Architecture, analogies, workflows, built vs. planned |
+| [Sprint 1 finalized](docs/sprint1_finalized.md) | API endpoints, env vars, local startup |
+| [Setup & troubleshooting](docs/setup_guide_and_troubleshooting_tips.md) | Environment setup and common fixes |
+
+---
+
 ## 🚀 7. Developer Guidelines
 
 For developers continuing active contributions on the codebase:
@@ -430,7 +441,7 @@ For developers continuing active contributions on the codebase:
     npm run prisma:migrate:dev --name description_of_change
     ```
 4.  **Local-First Verification:**
-    Verify your environment by reviewing the [Detailed Setup & Walkthrough Guide](file:///c:/Users/Laptop/Desktop/khan-enterprises/docs/setup_guide.md).
+    Verify your environment by reviewing the [Full Project Explained](docs/khan_enterprises_full_project_explained.md) and [Setup & Troubleshooting](docs/setup_guide_and_troubleshooting_tips.md) guides.
 
 ---
 
