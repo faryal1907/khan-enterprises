@@ -20,6 +20,11 @@ import { CurrentUser } from "./decorators/current-user.decorator";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get()
+  getRoot() {
+    return { message: "API is running 🚀" };
+  }
+
   /**
    * POST /api/auth/login
    * Authenticates a staff user and returns access + refresh tokens.
