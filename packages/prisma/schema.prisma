@@ -22,6 +22,7 @@ enum UserRole {
   ADMIN
   MANAGER
   SALES_STAFF
+  CUSTOMER
 }
 
 enum UserStatus {

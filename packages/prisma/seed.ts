@@ -123,6 +123,23 @@ async function main() {
 
   console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs, 1 SALES_STAFF.");
 
+    // TEST CUSTOMER (Non-Admin)
+  const customerPasswordHash = await bcrypt.hash("customer123", 10);
+
+  await prisma.user.create({
+    data: {
+      email: "customer1@khan.com",
+      passwordHash: customerPasswordHash,
+      fullName: "Ahmed Hassan",
+      phoneNumber: "+923001112233",
+      role: "CUSTOMER",           // Important: Use CUSTOMER role
+      status: "ACTIVE",
+      // No branchId for regular customers
+    },
+  });
+
+  console.log("✅ Seeded 1 Test Customer: customer1@khan.com");
+
   // ============================================================================
   // 3. VENDORS
   // Real contact details used. Contact person names are placeholders.
