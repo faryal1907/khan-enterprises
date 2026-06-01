@@ -22,3 +22,4 @@ localResources:
     - ..\docs\sprint2.md
     - ..\docs\docker.md
     - ..\docs\auth.md
+    - ..\docs\api-contract.md
