@@ -1,6 +1,6 @@
 export enum UserRole {
   ADMIN = "ADMIN",
-  BRANCH_MANAGER = "BRANCH_MANAGER",
+  MANAGER = "MANAGER",
   SALES_STAFF = "SALES_STAFF",
 }
 
@@ -8,8 +8,8 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  branchId?: string;
-  isActive: boolean;
+  branchId: string | null;
+  status: string;
 }
 
 export interface LoginResponse {

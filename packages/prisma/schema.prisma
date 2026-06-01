@@ -144,7 +144,7 @@ model User {
 
 model RefreshToken {
   id        String   @id @default(uuid())
-  tokenHash String
+  tokenHash String   @unique
   expiresAt DateTime
 
   userId String
@@ -379,7 +379,7 @@ model Order {
 
   customerName    String
   customerPhone   String
-  customerCNIC    String
+  customerCNIC    String  @unique
   customerAddress String
 
   negotiatedAmount Decimal @db.Decimal(12, 2)

@@ -8,8 +8,7 @@ export function Navigation() {
   if (!user) return null;
 
   const isAdmin = user.role === UserRole.ADMIN;
-  const isManager = user.role === UserRole.BRANCH_MANAGER;
-  const isStaff = user.role === UserRole.SALES_STAFF;
+  const isManager = user.role === UserRole.MANAGER;
 
   return (
     <nav className="border-b p-4">

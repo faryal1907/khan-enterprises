@@ -233,6 +233,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
     orderNumber?: string;
     offerId?: string;
+    customerCNIC?: string;
     AND?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[];
     OR?: Prisma.OrderWhereInput[];
     NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[];
@@ -240,7 +241,6 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
     branchId?: Prisma.StringFilter<"Order"> | string;
     customerName?: Prisma.StringFilter<"Order"> | string;
     customerPhone?: Prisma.StringFilter<"Order"> | string;
-    customerCNIC?: Prisma.StringFilter<"Order"> | string;
     customerAddress?: Prisma.StringFilter<"Order"> | string;
     negotiatedAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFilter<"Order"> | $Enums.PaymentMethod;
@@ -255,7 +255,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
     transactions?: Prisma.PaymentTransactionListRelationFilter;
     delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null;
     documents?: Prisma.DocumentListRelationFilter;
-}, "id" | "orderNumber" | "offerId">;
+}, "id" | "orderNumber" | "offerId" | "customerCNIC">;
 export type OrderOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     orderNumber?: Prisma.SortOrder;

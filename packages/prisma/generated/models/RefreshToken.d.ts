@@ -108,15 +108,15 @@ export type RefreshTokenOrderByWithRelationInput = {
 };
 export type RefreshTokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
+    tokenHash?: string;
     AND?: Prisma.RefreshTokenWhereInput | Prisma.RefreshTokenWhereInput[];
     OR?: Prisma.RefreshTokenWhereInput[];
     NOT?: Prisma.RefreshTokenWhereInput | Prisma.RefreshTokenWhereInput[];
-    tokenHash?: Prisma.StringFilter<"RefreshToken"> | string;
     expiresAt?: Prisma.DateTimeFilter<"RefreshToken"> | Date | string;
     userId?: Prisma.StringFilter<"RefreshToken"> | string;
     createdAt?: Prisma.DateTimeFilter<"RefreshToken"> | Date | string;
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
-}, "id">;
+}, "id" | "tokenHash">;
 export type RefreshTokenOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     tokenHash?: Prisma.SortOrder;
