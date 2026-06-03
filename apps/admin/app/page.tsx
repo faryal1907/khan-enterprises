@@ -1,36 +1,195 @@
 "use client";
 import { useAuthStore } from "@/lib/auth-store";
+import { theme } from "@/lib/colors";
 
 export default function Dashboard() {
   const { user } = useAuthStore();
 
-  // AuthProvider guarantees user is set by the time this renders
   if (!user) return null;
+
+  const isAdmin = user.role === "ADMIN";
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Welcome, {user.email}</h2>
-        <div className="space-y-2 text-sm text-gray-700">
-          <p><span className="font-medium">Role:</span> {user.role}</p>
-          <p><span className="font-medium">Branch:</span> {user.branchId ?? "All branches (Admin)"}</p>
-          <p><span className="font-medium">Status:</span> {user.status}</p>
-        </div>
-      </div>
+      <div className="max-w-7xl mx-auto">
+        <h1
+          className="text-3xl font-bold mb-6"
+          style={{ color: theme.text.primary }}
+        >
+          Dashboard
+        </h1>
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-blue-50 p-6 rounded-lg">
-          <h3 className="font-semibold text-lg mb-2">Total Bikes</h3>
-          <p className="text-3xl font-bold text-blue-600">—</p>
+        {/* User Info Card */}
+        <div
+          className="rounded-lg p-6 mb-8"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: theme.text.primary }}
+          >
+            Welcome, {user.email}
+          </h2>
+          <div className="space-y-2 text-sm">
+            <p style={{ color: theme.text.secondary }}>
+              <span className="font-medium">Role:</span> {user.role}
+            </p>
+            <p style={{ color: theme.text.secondary }}>
+              <span className="font-medium">Branch:</span> {user.branchId ?? "All branches (Admin)"}
+            </p>
+            <p style={{ color: theme.text.secondary }}>
+              <span className="font-medium">Status:</span> {user.status}
+            </p>
+          </div>
         </div>
-        <div className="bg-green-50 p-6 rounded-lg">
-          <h3 className="font-semibold text-lg mb-2">Available</h3>
-          <p className="text-3xl font-bold text-green-600">—</p>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div
+            className="rounded-lg p-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="font-semibold text-sm mb-2"
+              style={{ color: theme.text.secondary }}
+            >
+              Total Revenue
+            </h3>
+            <p
+              className="text-3xl font-bold"
+              style={{ color: theme.accents.primary }}
+            >
+              —
+            </p>
+            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
+              This month
+            </p>
+          </div>
+
+          <div
+            className="rounded-lg p-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="font-semibold text-sm mb-2"
+              style={{ color: theme.text.secondary }}
+            >
+              Total Sales
+            </h3>
+            <p
+              className="text-3xl font-bold"
+              style={{ color: theme.accents.secondary }}
+            >
+              —
+            </p>
+            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
+              This month
+            </p>
+          </div>
+
+          <div
+            className="rounded-lg p-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="font-semibold text-sm mb-2"
+              style={{ color: theme.text.secondary }}
+            >
+              Total Bikes
+            </h3>
+            <p
+              className="text-3xl font-bold"
+              style={{ color: theme.accents.tertiary }}
+            >
+              —
+            </p>
+            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
+              All branches
+            </p>
+          </div>
+
+          <div
+            className="rounded-lg p-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="font-semibold text-sm mb-2"
+              style={{ color: theme.text.secondary }}
+            >
+              Available Bikes
+            </h3>
+            <p
+              className="text-3xl font-bold"
+              style={{ color: theme.text.primary }}
+            >
+              —
+            </p>
+            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
+              Ready for sale
+            </p>
+          </div>
         </div>
-        <div className="bg-purple-50 p-6 rounded-lg">
-          <h3 className="font-semibold text-lg mb-2">Pending Orders</h3>
-          <p className="text-3xl font-bold text-purple-600">—</p>
+
+        {/* Alerts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div
+            className="rounded-lg p-6"
+            style={{
+              backgroundColor: theme.backgrounds.secondary,
+              border: `1px solid ${theme.accents.secondary}`,
+            }}
+          >
+            <h3
+              className="font-semibold text-lg mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Low Stock Alerts
+            </h3>
+            <p className="text-2xl font-bold" style={{ color: theme.accents.secondary }}>
+              —
+            </p>
+            <p className="text-sm mt-2" style={{ color: theme.text.secondary }}>
+              Parts below reorder level
+            </p>
+          </div>
+
+          <div
+            className="rounded-lg p-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="font-semibold text-lg mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Pending Items
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: theme.text.secondary }}>
+                  Pending Offers
+                </span>
+                <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  —
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: theme.text.secondary }}>
+                  Pending Orders
+                </span>
+                <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  —
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: theme.text.secondary }}>
+                  Delivery Requests
+                </span>
+                <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  —
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

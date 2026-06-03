@@ -422,7 +422,7 @@ TypeScript reads types from the `.d.ts` file without pulling the source `.ts` fi
 
 ## Sprint 3 Backlog
 
-- Apply `JwtAuthGuard` to inventory and branch routes
+- Apply `JwtAuthGuard` to inventory and branch routes ✓
 - `POST /api/offers` — submit a price offer on a bike
 - `PATCH /api/offers/:id` — counter / accept / reject
 - `POST /api/orders` — create order from accepted offer

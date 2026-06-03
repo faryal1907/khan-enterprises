@@ -23,3 +23,5 @@ localResources:
     - ..\docs\docker.md
     - ..\docs\auth.md
     - ..\docs\api-contract.md
+    - ..\docs\sprint-4-inventory-plan.md
+    - ..\docs\admin-ux-flow.md

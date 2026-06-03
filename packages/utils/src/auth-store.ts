@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
-import type { User } from "../../types/src/auth.js";
+import type { User } from "@khan/types";
 
 interface AuthState {
   user: User | null;

@@ -23,4 +23,3 @@ export interface LoginPayload {
   password: string;
 }
 
-export * from "./auth";
