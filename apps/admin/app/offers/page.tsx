@@ -1,8 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { theme } from "@/lib/colors";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
 
 export default function OffersListPage() {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === UserRole.ADMIN;
+
   const [filters, setFilters] = useState({
     status: "",
     branch: "",
@@ -11,7 +16,18 @@ export default function OffersListPage() {
     type: "",
   });
 
+  // Set branch filter to user's branch if not admin
+  useEffect(() => {
+    if (!isAdmin && user?.branchId) {
+      setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
+    }
+  }, [isAdmin, user?.branchId]);
+
   const handleFilterChange = (key: string, value: string) => {
+    // Prevent non-admins from changing branch filter
+    if (key === "branch" && !isAdmin) {
+      return;
+    }
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -71,17 +87,24 @@ export default function OffersListPage() {
               <select
                 value={filters.branch}
                 onChange={(e) => handleFilterChange("branch", e.target.value)}
+                disabled={!isAdmin}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
+                  opacity: !isAdmin ? 0.6 : 1,
                 }}
               >
                 <option value="">All Branches</option>
                 <option value="1">Islamabad HQ</option>
                 <option value="2">Tordher Branch</option>
               </select>
+              {!isAdmin && (
+                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                  Filtered to your branch
+                </p>
+              )}
             </div>
             <div>
               <label
@@ -160,7 +183,7 @@ export default function OffersListPage() {
           <table className="w-full">
             <thead>
               <tr
-                style={{ backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }}
+                style={{ backgroundColor: theme.backgrounds.secondary }}
               >
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Customer

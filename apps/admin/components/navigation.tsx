@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { theme } from "@/lib/colors";
 
 export function Navigation() {
+  const router = useRouter();
   const { user, logout } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   if (!user) return null;
 
   const isAdmin = user.role === UserRole.ADMIN;
+  const isManager = user.role === UserRole.MANAGER;
+  const isStaff = user.role === UserRole.SALES_STAFF;
 
   return (
     <nav
@@ -24,7 +28,7 @@ export function Navigation() {
             className="font-bold text-xl"
             style={{ color: theme.text.primary }}
           >
-            Khan Admin
+            Khan Enterprises
           </span>
           <div className="flex space-x-6">
             <div className="flex space-x-6 items-center">
@@ -61,7 +65,10 @@ export function Navigation() {
             {user.email}
           </span>
           <button
-            onClick={logout}
+            onClick={() => {
+              logout();
+              router.push("/login");
+            }}
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
             style={{
               backgroundColor: theme.accents.primary,
@@ -162,11 +169,7 @@ export function Navigation() {
                       Audit Logs
                     </p>
                   </a>
-                </>
-              )}
 
-              {isAdmin && (
-                <>
                   <a
                     href="/users"
                     className="text-center p-3 rounded-lg transition-colors hover:opacity-80"
@@ -187,6 +190,18 @@ export function Navigation() {
                     </p>
                   </a>
                 </>
+              )}
+
+              {isManager && (
+                <a
+                  href="/branches"
+                  className="text-center p-3 rounded-lg transition-colors hover:opacity-80"
+                  style={{ backgroundColor: theme.backgrounds.tertiary }}
+                >
+                  <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                    My Branch
+                  </p>
+                </a>
               )}
             </div>
           </div>

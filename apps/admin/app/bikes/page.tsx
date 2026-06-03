@@ -1,8 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { theme } from "@/lib/colors";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
 
 export default function BikesListPage() {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === UserRole.ADMIN;
+  const isManager = user?.role === UserRole.MANAGER;
+  const isStaff = user?.role === UserRole.SALES_STAFF;
+
   const [filters, setFilters] = useState({
     branch: "",
     status: "",
@@ -13,7 +20,18 @@ export default function BikesListPage() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
 
+  // Set branch filter to user's branch if not admin
+  useEffect(() => {
+    if (!isAdmin && user?.branchId) {
+      setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
+    }
+  }, [isAdmin, user?.branchId]);
+
   const handleFilterChange = (key: string, value: string) => {
+    // Prevent non-admins from changing branch filter
+    if (key === "branch" && !isAdmin) {
+      return;
+    }
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -39,6 +57,54 @@ export default function BikesListPage() {
           </a>
         </div>
 
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div
+            className="rounded-lg p-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Total Bikes
+            </p>
+            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
+              —
+            </p>
+          </div>
+          <div
+            className="rounded-lg p-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Low Stock Bikes
+            </p>
+            <p className="text-2xl font-bold" style={{ color: theme.accents.secondary }}>
+              —
+            </p>
+          </div>
+          <div
+            className="rounded-lg p-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Out of Stock Bikes
+            </p>
+            <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
+              —
+            </p>
+          </div>
+          <div
+            className="rounded-lg p-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Total Bike Inventory Value
+            </p>
+            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
+              —
+            </p>
+          </div>
+        </div>
+
         {/* Filters */}
         <div
           className="rounded-lg p-4 mb-6"
@@ -55,17 +121,24 @@ export default function BikesListPage() {
               <select
                 value={filters.branch}
                 onChange={(e) => handleFilterChange("branch", e.target.value)}
+                disabled={!isAdmin}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
+                  opacity: !isAdmin ? 0.6 : 1,
                 }}
               >
                 <option value="">All Branches</option>
                 <option value="1">Islamabad HQ</option>
                 <option value="2">Tordher Branch</option>
               </select>
+              {!isAdmin && (
+                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                  Filtered to your branch
+                </p>
+              )}
             </div>
             <div>
               <label
@@ -170,7 +243,7 @@ export default function BikesListPage() {
           <table className="w-full">
             <thead>
               <tr
-                style={{ backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }}
+                style={{ backgroundColor: theme.backgrounds.secondary }}
               >
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Chassis No.

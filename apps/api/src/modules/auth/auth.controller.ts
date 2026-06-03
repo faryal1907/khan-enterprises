@@ -2,6 +2,9 @@ import {
   Controller,
   Post,
   Get,
+  Put,
+  Delete,
+  Param,
   Body,
   Query,
   UseGuards,
@@ -89,5 +92,49 @@ export class AuthController {
   async checkUser(@Query("email") email: string) {
     const user = await this.authService.findUserByEmail(email);
     return { exists: true, user };
+  }
+
+  /**
+   * POST /api/auth/users
+   * Create a new staff user. ADMIN only.
+   */
+  @Post("users")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async createUser(@Body() dto: any) {
+    return this.authService.createUser(dto);
+  }
+
+  /**
+   * GET /api/auth/users/:id
+   * Get a single user by ID. ADMIN only.
+   */
+  @Get("users/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async getUser(@Param("id") id: string) {
+    return this.authService.getUserById(id);
+  }
+
+  /**
+   * PUT /api/auth/users/:id
+   * Update a user. ADMIN only.
+   */
+  @Put("users/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async updateUser(@Param("id") id: string, @Body() dto: any) {
+    return this.authService.updateUser(id, dto);
+  }
+
+  /**
+   * DELETE /api/auth/users/:id
+   * Deactivate a user. ADMIN only.
+   */
+  @Delete("users/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async deactivateUser(@Param("id") id: string) {
+    return this.authService.deactivateUser(id);
   }
 }

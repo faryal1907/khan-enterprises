@@ -1,5 +1,7 @@
 # Khan Enterprises Admin UX Flow Diagram
 
+# CHANGED A LOT OF THIS WITH RESPECT TO LOGICAL FLOW
+
 ## Overview
 
 Complete admin dashboard UX flow from login through inventory, offers, orders, sales, delivery, and analytics. Designed for ADMIN role with CEO-only features.
@@ -40,13 +42,35 @@ Complete admin dashboard UX flow from login through inventory, offers, orders, s
 **Auth Required:** Yes
 **Visibility:** Always visible (Entry point after login)
 
-**Features:**
-- KPIs + charts
-- Revenue metrics
-- Sales metrics
-- Inventory counts
-- Low stock alerts
-- Pending items count
+**Role-Specific Dashboards:**
+
+**Sales Staff Dashboard:**
+- New Offers
+- Negotiations
+- My Orders
+- Deliveries
+- Available Bikes
+- Available Parts
+- Pending Offers
+- Alerts
+
+**Branch Manager Dashboard:**
+- Branch Revenue
+- Bikes Sold
+- Available Bikes
+- Available Parts
+- Pending Offers
+- Orders Waiting Payment
+- Pending Deliveries
+- Issues
+
+**Admin Dashboard:**
+- Total Revenue
+- Total Sales
+- Total Bikes
+- Available Bikes
+- Low Stock Alerts
+- Pending Items
 
 **Navigation:**
 - To Bikes: `/bikes`
@@ -62,29 +86,7 @@ Complete admin dashboard UX flow from login through inventory, offers, orders, s
 
 ---
 
-## Inventory Management
 
-### Bike Inventory List
-**Route:** `/bikes`
-**Auth Required:** Yes
-**Visibility:** Feature screen
-
-**Features:**
-- All serialized bike units
-- Filterable by:
-  - Status (AVAILABLE, SOLD, RESERVED, DAMAGED, MAINTENANCE)
-  - Branch
-  - Model
-  - Vendor
-- View unit detail
-- Add new unit button
-
-**Navigation:**
-- To Bike Detail: `/bikes/:id`
-- To Add Bike: `/bikes/new`
-- Back to Dashboard: `/`
-
----
 
 ### Bike Unit Detail
 **Route:** `/bikes/:id`

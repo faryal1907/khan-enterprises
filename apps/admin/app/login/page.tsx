@@ -51,7 +51,7 @@ export default function LoginPage() {
             className="text-2xl font-bold"
             style={{ color: theme.text.primary }}
           >
-            Khan Admin
+            Khan Enterprises
           </h1>
           <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
             Sign in to your account

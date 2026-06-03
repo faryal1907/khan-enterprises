@@ -144,6 +144,114 @@ export class AuthService {
     });
   }
 
+  async getUserById(id: string) {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        branchId: true,
+        branch: { select: { id: true, name: true, city: true } },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException("User not found.");
+    }
+
+    return user;
+  }
+
+  async createUser(dto: {
+    email: string;
+    password: string;
+    fullName: string;
+    phoneNumber: string;
+    role: "ADMIN" | "MANAGER" | "SALES_STAFF";
+    branchId?: string;
+  }) {
+    const existingUser = await this.prisma.client.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new ForbiddenException("User with this email already exists.");
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.prisma.client.user.create({
+      data: {
+        email: dto.email,
+        passwordHash,
+        fullName: dto.fullName,
+        phoneNumber: dto.phoneNumber,
+        role: dto.role,
+        branchId: dto.branchId || null,
+        status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        branch: { select: { id: true, name: true, city: true } },
+        createdAt: true,
+      },
+    });
+
+    return user;
+  }
+
+  async updateUser(id: string, dto: {
+    fullName?: string;
+    phoneNumber?: string;
+    role?: "ADMIN" | "MANAGER" | "SALES_STAFF";
+    branchId?: string | null;
+    status?: "ACTIVE" | "INACTIVE";
+  }) {
+    const user = await this.prisma.client.user.update({
+      where: { id },
+      data: dto,
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        branch: { select: { id: true, name: true, city: true } },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return user;
+  }
+
+  async deactivateUser(id: string) {
+    const user = await this.prisma.client.user.update({
+      where: { id },
+      data: { status: "INACTIVE" },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        status: true,
+      },
+    });
+
+    return { message: "User deactivated successfully.", user };
+  }
+
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   private async issueTokens(

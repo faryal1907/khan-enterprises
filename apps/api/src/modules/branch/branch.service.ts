@@ -62,4 +62,235 @@ export class BranchService {
 
     return branch;
   }
+
+  async createBranch(dto: {
+    name: string;
+    city: string;
+    address: string;
+    phoneNumber: string;
+    managerId?: string;
+  }) {
+    const branch = await this.prisma.client.branch.create({
+      data: {
+        name: dto.name,
+        city: dto.city,
+        address: dto.address,
+        phoneNumber: dto.phoneNumber,
+        managerId: dto.managerId || null,
+      },
+      select: {
+        id: true,
+        name: true,
+        city: true,
+        address: true,
+        phoneNumber: true,
+        createdAt: true,
+        manager: {
+          select: { id: true, fullName: true, email: true },
+        },
+      },
+    });
+
+    return branch;
+  }
+
+  async updateBranch(id: string, dto: {
+    name?: string;
+    city?: string;
+    address?: string;
+    phoneNumber?: string;
+    managerId?: string | null;
+  }) {
+    const branch = await this.prisma.client.branch.update({
+      where: { id },
+      data: dto,
+      select: {
+        id: true,
+        name: true,
+        city: true,
+        address: true,
+        phoneNumber: true,
+        updatedAt: true,
+        manager: {
+          select: { id: true, fullName: true, email: true },
+        },
+      },
+    });
+
+    return branch;
+  }
+
+  async deleteBranch(id: string) {
+    await this.prisma.client.branch.delete({
+      where: { id },
+    });
+
+    return { message: "Branch deleted successfully." };
+  }
+
+  async getBranchMetrics(id: string) {
+    const branch = await this.prisma.client.branch.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        _count: {
+          select: {
+            bikeInventory: true,
+            partInventory: true,
+            orders: true,
+            users: true,
+          },
+        },
+      },
+    });
+
+    if (!branch) {
+      throw new NotFoundException(`Branch with id "${id}" not found.`);
+    }
+
+    // Calculate additional metrics
+    const orders = await this.prisma.client.order.findMany({
+      where: { branchId: id },
+      select: {
+        negotiatedAmount: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    const totalRevenue = orders.reduce((sum, order) => sum + Number(order.negotiatedAmount), 0);
+    const completedOrders = orders.filter((o) => o.status === "PAID" || o.status === "CONFIRMED").length;
+    const pendingOrders = orders.filter((o) => o.status === "PENDING_PAYMENT").length;
+
+    // Get recent orders (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentOrders = orders.filter((o) => o.createdAt >= thirtyDaysAgo).length;
+
+    return {
+      branch: {
+        id: branch.id,
+        name: branch.name,
+      },
+      metrics: {
+        inventory: {
+          bikes: branch._count.bikeInventory,
+          parts: branch._count.partInventory,
+        },
+        staff: branch._count.users,
+        orders: {
+          total: branch._count.orders,
+          completed: completedOrders,
+          pending: pendingOrders,
+          recent: recentOrders,
+        },
+        revenue: {
+          total: totalRevenue,
+          averageOrderValue: orders.length > 0 ? totalRevenue / orders.length : 0,
+        },
+      },
+    };
+  }
+
+  async transferStock(dto: {
+    type: "bike" | "part";
+    itemId: string;
+    fromBranchId: string;
+    toBranchId: string;
+    quantity?: number;
+  }) {
+    if (dto.type === "bike") {
+      // Transfer a single bike unit
+      const bikeUnit = await this.prisma.client.bikeUnit.findUnique({
+        where: { id: dto.itemId },
+      });
+
+      if (!bikeUnit) {
+        throw new NotFoundException("Bike unit not found.");
+      }
+
+      if (bikeUnit.branchId !== dto.fromBranchId) {
+        throw new Error("Bike unit is not in the source branch.");
+      }
+
+      await this.prisma.client.bikeUnit.update({
+        where: { id: dto.itemId },
+        data: { branchId: dto.toBranchId },
+      });
+
+      return { message: "Bike transferred successfully." };
+    } else {
+      // Transfer parts (with quantity)
+      if (!dto.quantity || dto.quantity <= 0) {
+        throw new Error("Quantity must be greater than 0 for part transfers.");
+      }
+
+      const fromInventory = await this.prisma.client.partInventory.findUnique({
+        where: {
+          partId_branchId: {
+            partId: dto.itemId,
+            branchId: dto.fromBranchId,
+          },
+        },
+      });
+
+      if (!fromInventory) {
+        throw new NotFoundException("Source inventory not found.");
+      }
+
+      if (fromInventory.quantity < dto.quantity) {
+        throw new Error("Insufficient stock in source branch.");
+      }
+
+      // Update source inventory
+      await this.prisma.client.partInventory.update({
+        where: {
+          partId_branchId: {
+            partId: dto.itemId,
+            branchId: dto.fromBranchId,
+          },
+        },
+        data: {
+          quantity: { decrement: dto.quantity },
+        },
+      });
+
+      // Update or create destination inventory
+      const toInventory = await this.prisma.client.partInventory.findUnique({
+        where: {
+          partId_branchId: {
+            partId: dto.itemId,
+            branchId: dto.toBranchId,
+          },
+        },
+      });
+
+      if (toInventory) {
+        await this.prisma.client.partInventory.update({
+          where: {
+            partId_branchId: {
+              partId: dto.itemId,
+              branchId: dto.toBranchId,
+            },
+          },
+          data: {
+            quantity: { increment: dto.quantity },
+          },
+        });
+      } else {
+        await this.prisma.client.partInventory.create({
+          data: {
+            partId: dto.itemId,
+            branchId: dto.toBranchId,
+            quantity: dto.quantity,
+            reservedQuantity: 0,
+            reorderLevel: 5,
+          },
+        });
+      }
+
+      return { message: "Parts transferred successfully." };
+    }
+  }
 }

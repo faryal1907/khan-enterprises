@@ -1,5 +1,6 @@
 "use client";
 import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
 import { theme } from "@/lib/colors";
 
 export default function Dashboard() {
@@ -7,7 +8,9 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  const isAdmin = user.role === "ADMIN";
+  const isAdmin = user.role === UserRole.ADMIN;
+  const isManager = user.role === UserRole.MANAGER;
+  const isStaff = user.role === UserRole.SALES_STAFF;
 
   return (
     <div className="p-8">
@@ -16,7 +19,7 @@ export default function Dashboard() {
           className="text-3xl font-bold mb-6"
           style={{ color: theme.text.primary }}
         >
-          Dashboard
+          {isStaff ? "My Dashboard" : isManager ? "Branch Dashboard" : "Dashboard"}
         </h1>
 
         {/* User Info Card */}
@@ -43,155 +46,293 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div
-            className="rounded-lg p-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="font-semibold text-sm mb-2"
-              style={{ color: theme.text.secondary }}
-            >
-              Total Revenue
-            </h3>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: theme.accents.primary }}
-            >
-              —
-            </p>
-            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
-              This month
-            </p>
-          </div>
+        {/* Sales Staff Dashboard */}
+        {isStaff && <SalesStaffDashboard />}
 
-          <div
-            className="rounded-lg p-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="font-semibold text-sm mb-2"
-              style={{ color: theme.text.secondary }}
-            >
-              Total Sales
-            </h3>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: theme.accents.secondary }}
-            >
-              —
-            </p>
-            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
-              This month
-            </p>
-          </div>
+        {/* Branch Manager Dashboard */}
+        {isManager && <BranchManagerDashboard />}
 
-          <div
-            className="rounded-lg p-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="font-semibold text-sm mb-2"
-              style={{ color: theme.text.secondary }}
-            >
-              Total Bikes
-            </h3>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: theme.accents.tertiary }}
-            >
-              —
-            </p>
-            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
-              All branches
-            </p>
-          </div>
-
-          <div
-            className="rounded-lg p-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="font-semibold text-sm mb-2"
-              style={{ color: theme.text.secondary }}
-            >
-              Available Bikes
-            </h3>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: theme.text.primary }}
-            >
-              —
-            </p>
-            <p className="text-xs mt-2" style={{ color: theme.text.muted }}>
-              Ready for sale
-            </p>
-          </div>
-        </div>
-
-        {/* Alerts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div
-            className="rounded-lg p-6"
-            style={{
-              backgroundColor: theme.backgrounds.secondary,
-              border: `1px solid ${theme.accents.secondary}`,
-            }}
-          >
-            <h3
-              className="font-semibold text-lg mb-4"
-              style={{ color: theme.text.primary }}
-            >
-              Low Stock Alerts
-            </h3>
-            <p className="text-2xl font-bold" style={{ color: theme.accents.secondary }}>
-              —
-            </p>
-            <p className="text-sm mt-2" style={{ color: theme.text.secondary }}>
-              Parts below reorder level
-            </p>
-          </div>
-
-          <div
-            className="rounded-lg p-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="font-semibold text-lg mb-4"
-              style={{ color: theme.text.primary }}
-            >
-              Pending Items
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: theme.text.secondary }}>
-                  Pending Offers
-                </span>
-                <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                  —
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: theme.text.secondary }}>
-                  Pending Orders
-                </span>
-                <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                  —
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: theme.text.secondary }}>
-                  Delivery Requests
-                </span>
-                <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                  —
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Admin Dashboard */}
+        {isAdmin && <AdminDashboard />}
       </div>
     </div>
+  );
+}
+
+function SalesStaffDashboard() {
+  return (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            New Offers
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Negotiations
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            My Orders
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Deliveries
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
+            —
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Available Bikes
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Available Parts
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Pending Offers
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Alerts
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function BranchManagerDashboard() {
+  return (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Branch Revenue
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Bikes Sold
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Available Bikes
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+            </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Available Parts
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+            </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Pending Offers
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Orders Waiting Payment
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Pending Deliveries
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+            </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Issues
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AdminDashboard() {
+  return (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Total Revenue
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Total Sales
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Total Bikes
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Available Bikes
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
+            —
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Low Stock Alerts
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
+            —
+          </p>
+        </div>
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Pending Items
+          </p>
+          <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
+            —
+          </p>
+        </div>
+      </div>
+    </>
   );
 }
