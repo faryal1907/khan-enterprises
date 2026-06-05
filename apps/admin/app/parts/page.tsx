@@ -16,7 +16,6 @@ export default function PartsListPage() {
 
   const [filters, setFilters] = useState({
     branch: "",
-    status: "",
     category: "",
     search: "",
   });
@@ -297,29 +296,6 @@ export default function PartsListPage() {
                 className="block text-sm font-medium mb-1"
                 style={{ color: theme.text.secondary }}
               >
-                Status
-              </label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange("status", e.target.value)}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-              >
-                <option value="">All Status</option>
-                <option value="HEALTHY">Healthy</option>
-                <option value="LOW_STOCK">Low Stock</option>
-                <option value="OUT_OF_STOCK">Out of Stock</option>
-              </select>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
                 Category
               </label>
               <select
@@ -430,9 +406,6 @@ export default function PartsListPage() {
                   Reorder Level
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Updated
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
@@ -443,7 +416,7 @@ export default function PartsListPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
+                  <td colSpan={6} className="px-6 py-8 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }}></div>
                     </div>
@@ -451,7 +424,7 @@ export default function PartsListPage() {
                 </tr>
               ) : parts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
+                  <td colSpan={6} className="px-6 py-8 text-center">
                     <p className="text-sm" style={{ color: theme.text.secondary }}>
                       No parts found
                     </p>
@@ -495,26 +468,6 @@ export default function PartsListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {part.reorderLevel}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className="inline-block px-2 py-1 text-xs font-medium rounded"
-                        style={{
-                          backgroundColor:
-                            part.quantity === 0
-                              ? theme.accents.primary
-                              : part.quantity < part.reorderLevel
-                              ? theme.accents.secondary
-                              : theme.accents.tertiary,
-                          color: theme.text.inverse,
-                        }}
-                      >
-                        {part.quantity === 0
-                          ? "Out of Stock"
-                          : part.quantity < part.reorderLevel
-                          ? "Low Stock"
-                          : "Healthy"}
-                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {new Date(part.updatedAt).toLocaleDateString()}
