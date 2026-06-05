@@ -5,6 +5,9 @@ import { QueryBikesDto } from "./dto/query-bikes.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
+import { CreatePartDto } from "./dto/create-part.dto";
+import { UpdatePartDto } from "./dto/update-part.dto";
+import { AdjustStockDto } from "./dto/adjust-stock.dto";
 
 @Injectable()
 export class InventoryService {
@@ -233,6 +236,229 @@ export class InventoryService {
         },
       },
       orderBy: { updatedAt: "desc" },
+    });
+  }
+
+  /** Create a new Part and PartInventory atomically using prisma.$transaction(). */
+  async createPart(dto: CreatePartDto) {
+    // Check SKU uniqueness
+    const existingSku = await this.prisma.client.part.findUnique({
+      where: { sku: dto.sku },
+    });
+    if (existingSku) {
+      throw new ConflictException(`Part with SKU ${dto.sku} already exists`);
+    }
+
+    // Check branch exists
+    const branch = await this.prisma.client.branch.findUnique({
+      where: { id: dto.branchId },
+    });
+    if (!branch) {
+      throw new NotFoundException(`Branch with ID ${dto.branchId} not found`);
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      const part = await tx.part.create({
+        data: {
+          name: dto.name,
+          sku: dto.sku,
+          category: dto.category,
+          description: dto.description,
+          sellingPrice: dto.sellingPrice,
+        },
+      });
+
+      const inventory = await tx.partInventory.create({
+        data: {
+          partId: part.id,
+          branchId: dto.branchId,
+          quantity: dto.quantity,
+          reorderLevel: dto.reorderLevel,
+        },
+        include: {
+          part: true,
+          branch: true,
+        },
+      });
+
+      return inventory;
+    });
+  }
+
+  /** Fetch a single Part with its PartInventory records per branch. */
+  async getPartById(id: string) {
+    const part = await this.prisma.client.part.findUnique({
+      where: { id },
+      include: {
+        inventories: {
+          include: {
+            branch: true,
+          },
+        },
+      },
+    });
+
+    if (!part) {
+      throw new NotFoundException(`Part with ID ${id} not found`);
+    }
+
+    return part;
+  }
+
+  /** Update Part metadata (name, sku, price, etc.). */
+  async updatePart(id: string, dto: UpdatePartDto) {
+    await this.getPartById(id);
+
+    // Check SKU uniqueness if being updated
+    if (dto.sku) {
+      const existingSku = await this.prisma.client.part.findFirst({
+        where: {
+          sku: dto.sku,
+          id: { not: id },
+        },
+      });
+      if (existingSku) {
+        throw new ConflictException(`Part with SKU ${dto.sku} already exists`);
+      }
+    }
+
+    return this.prisma.client.part.update({
+      where: { id },
+      data: dto,
+      include: {
+        inventories: {
+          include: {
+            branch: true,
+          },
+        },
+      },
+    });
+  }
+
+  /** Update quantity by signed delta AND create StockMovement record with performedById, reason, and movementType — all in one transaction. */
+  async adjustStock(inventoryId: string, dto: AdjustStockDto, userId?: string) {
+    const inventory = await this.prisma.client.partInventory.findUnique({
+      where: { id: inventoryId },
+    });
+    if (!inventory) {
+      throw new NotFoundException(`PartInventory with ID ${inventoryId} not found`);
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      const updatedInventory = await tx.partInventory.update({
+        where: { id: inventoryId },
+        data: {
+          quantity: {
+            increment: dto.quantity,
+          },
+        },
+        include: {
+          part: true,
+          branch: true,
+        },
+      });
+
+      const stockMovement = await tx.stockMovement.create({
+        data: {
+          inventoryId: inventoryId,
+          movementType: dto.movementType,
+          quantity: dto.quantity,
+          reason: dto.reason,
+          performedById: userId,
+        },
+        include: {
+          performedBy: true,
+        },
+      });
+
+      return { inventory: updatedInventory, movement: stockMovement };
+    });
+  }
+
+  /** Paginated movement history for a PartInventory. */
+  async getStockMovements(inventoryId: string, page: number = 1, limit: number = 20) {
+    const inventory = await this.prisma.client.partInventory.findUnique({
+      where: { id: inventoryId },
+    });
+    if (!inventory) {
+      throw new NotFoundException(`PartInventory with ID ${inventoryId} not found`);
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [movements, total] = await Promise.all([
+      this.prisma.client.stockMovement.findMany({
+        where: { inventoryId },
+        skip,
+        take: limit,
+        include: {
+          performedBy: {
+            select: {
+              id: true,
+              email: true,
+              fullName: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.stockMovement.count({
+        where: { inventoryId },
+      }),
+    ]);
+
+    return {
+      movements,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /** Return PartInventory rows where quantity < reorderLevel. */
+  async getLowStockItems(branchId?: string) {
+    const inventories = await this.prisma.client.partInventory.findMany({
+      where: branchId ? { branchId } : undefined,
+      select: {
+        id: true,
+        quantity: true,
+        reservedQuantity: true,
+        reorderLevel: true,
+        updatedAt: true,
+        part: {
+          select: {
+            id: true,
+            name: true,
+            sku: true,
+            category: true,
+            description: true,
+            sellingPrice: true,
+          },
+        },
+        branch: {
+          select: { id: true, name: true, city: true },
+        },
+      },
+    });
+
+    // Filter in memory where quantity < reorderLevel
+    return inventories.filter((inv) => inv.quantity < inv.reorderLevel);
+  }
+
+  /** Return all PartInventory rows for a given Part. */
+  async getBranchStockView(partId: string) {
+    const part = await this.getPartById(partId);
+
+    return this.prisma.client.partInventory.findMany({
+      where: { partId },
+      include: {
+        branch: true,
+        part: true,
+      },
+      orderBy: { quantity: "desc" },
     });
   }
 }
