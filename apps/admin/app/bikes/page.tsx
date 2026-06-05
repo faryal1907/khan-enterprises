@@ -1,8 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import {
+  getBikes,
+  getBranches,
+  getVendors,
+  getBikeModels,
+  transferBike,
+  updateBikeStatus,
+} from "@/lib/api/inventory";
+import type { Branch, Vendor, BikeModel, BikeUnit } from "@/lib/types";
 
 export default function BikesListPage() {
   const { user } = useAuthStore();
@@ -20,12 +30,68 @@ export default function BikesListPage() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
 
+  // Data state
+  const [bikes, setBikes] = useState<BikeUnit[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [bikeModels, setBikeModels] = useState<BikeModel[]>([]);
+
+  // Loading state
+  const [loading, setLoading] = useState(true);
+
+  // Modal state
+  const [selectedBike, setSelectedBike] = useState<BikeUnit | null>(null);
+  const [transferBranchId, setTransferBranchId] = useState("");
+  const [statusValue, setStatusValue] = useState("");
+
   // Set branch filter to user's branch if not admin
   useEffect(() => {
     if (!isAdmin && user?.branchId) {
       setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
   }, [isAdmin, user?.branchId]);
+
+  // Fetch reference data on mount
+  useEffect(() => {
+    const fetchReferenceData = async () => {
+      try {
+        const [branchesRes, vendorsRes, modelsRes] = await Promise.all([
+          getBranches(),
+          getVendors(),
+          getBikeModels(),
+        ]);
+        setBranches(branchesRes.branches);
+        setVendors(vendorsRes.vendors);
+        setBikeModels(modelsRes.bikeModels);
+      } catch (error) {
+        console.error("Failed to fetch reference data:", error);
+      }
+    };
+    fetchReferenceData();
+  }, []);
+
+  // Fetch bikes on mount and filter change
+  useEffect(() => {
+    const fetchBikes = async () => {
+      setLoading(true);
+      try {
+        const params: any = {};
+        if (filters.branch) params.branchId = filters.branch;
+        if (filters.status) params.status = filters.status;
+        if (filters.model) params.modelId = filters.model;
+        if (filters.vendor) params.vendorId = filters.vendor;
+        if (filters.search) params.search = filters.search;
+
+        const response = await getBikes(params);
+        setBikes(response.bikes);
+      } catch (error) {
+        console.error("Failed to fetch bikes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBikes();
+  }, [filters]);
 
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
@@ -34,6 +100,78 @@ export default function BikesListPage() {
     }
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Handle transfer
+  const handleTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBike || !transferBranchId) return;
+
+    try {
+      await transferBike(selectedBike.id, transferBranchId);
+      alert("Bike transferred successfully");
+      setShowTransferModal(false);
+      setTransferBranchId("");
+      setSelectedBike(null);
+      // Refetch bikes
+      const params: any = {};
+      if (filters.branch) params.branchId = filters.branch;
+      if (filters.status) params.status = filters.status;
+      if (filters.model) params.modelId = filters.model;
+      if (filters.vendor) params.vendorId = filters.vendor;
+      if (filters.search) params.search = filters.search;
+      const response = await getBikes(params);
+      setBikes(response.bikes);
+    } catch (error) {
+      console.error("Failed to transfer bike:", error);
+      alert("Failed to transfer bike");
+    }
+  };
+
+  // Handle status change
+  const handleStatusChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBike || !statusValue) return;
+
+    try {
+      await updateBikeStatus(selectedBike.id, statusValue);
+      alert("Status updated successfully");
+      setShowStatusModal(false);
+      setStatusValue("");
+      setSelectedBike(null);
+      // Refetch bikes
+      const params: any = {};
+      if (filters.branch) params.branchId = filters.branch;
+      if (filters.status) params.status = filters.status;
+      if (filters.model) params.modelId = filters.model;
+      if (filters.vendor) params.vendorId = filters.vendor;
+      if (filters.search) params.search = filters.search;
+      const response = await getBikes(params);
+      setBikes(response.bikes);
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      alert("Failed to update status");
+    }
+  };
+
+  // Open transfer modal
+  const openTransferModal = (bike: BikeUnit) => {
+    setSelectedBike(bike);
+    setTransferBranchId("");
+    setShowTransferModal(true);
+  };
+
+  // Open status modal
+  const openStatusModal = (bike: BikeUnit) => {
+    setSelectedBike(bike);
+    setStatusValue(bike.status);
+    setShowStatusModal(true);
+  };
+
+  // Compute summary stats
+  const totalBikes = bikes.length;
+  const availableBikes = bikes.filter((b) => b.status === "AVAILABLE").length;
+  const reservedBikes = bikes.filter((b) => b.status === "RESERVED").length;
+  const soldBikes = bikes.filter((b) => b.status === "SOLD").length;
 
   return (
     <div className="p-8">
@@ -67,7 +205,7 @@ export default function BikesListPage() {
               Total Bikes
             </p>
             <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              —
+              {totalBikes}
             </p>
           </div>
           <div
@@ -75,10 +213,10 @@ export default function BikesListPage() {
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Low Stock Bikes
+              Available
             </p>
-            <p className="text-2xl font-bold" style={{ color: theme.accents.secondary }}>
-              —
+            <p className="text-2xl font-bold" style={{ color: theme.accents.tertiary }}>
+              {availableBikes}
             </p>
           </div>
           <div
@@ -86,10 +224,10 @@ export default function BikesListPage() {
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Out of Stock Bikes
+              Reserved
             </p>
             <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
-              —
+              {reservedBikes}
             </p>
           </div>
           <div
@@ -97,10 +235,10 @@ export default function BikesListPage() {
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Total Bike Inventory Value
+              Sold
             </p>
             <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              —
+              {soldBikes}
             </p>
           </div>
         </div>
@@ -131,8 +269,11 @@ export default function BikesListPage() {
                 }}
               >
                 <option value="">All Branches</option>
-                <option value="1">Islamabad HQ</option>
-                <option value="2">Tordher Branch</option>
+                {branches.map((branch) => (
+                  <option key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </option>
+                ))}
               </select>
               {!isAdmin && (
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
@@ -182,11 +323,11 @@ export default function BikesListPage() {
                 }}
               >
                 <option value="">All Models</option>
-                <option value="EVEE_SCOOTER_X">Evee Scooter X</option>
-                <option value="EVEE_SCOOTER_Y">Evee Scooter Y</option>
-                <option value="EVEE_ELECTRIC_500W">Evee Electric 500W</option>
-                <option value="ROADKING_70CC">RoadKing 70cc</option>
-                <option value="ROADKING_100CC">RoadKing 100cc</option>
+                {bikeModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.brand} {model.modelName}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -207,8 +348,11 @@ export default function BikesListPage() {
                 }}
               >
                 <option value="">All Vendors</option>
-                <option value="EVEE">Evee</option>
-                <option value="ROADKING">RoadKing</option>
+                {vendors.map((vendor) => (
+                  <option key={vendor.id} value={vendor.id}>
+                    {vendor.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -268,58 +412,90 @@ export default function BikesListPage() {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <div className="flex space-x-2">
-                    <a
-                      href="/bikes/1"
-                      className="text-sm font-medium transition-colors hover:opacity-70"
-                      style={{ color: theme.accents.primary }}
-                    >
-                      View
-                    </a>
-                    <a
-                      href="/bikes/1/edit"
-                      className="text-sm font-medium transition-colors hover:opacity-70"
-                      style={{ color: theme.text.secondary }}
-                    >
-                      Edit
-                    </a>
-                    <button
-                      onClick={() => setShowTransferModal(true)}
-                      className="text-sm font-medium transition-colors hover:opacity-70"
-                      style={{ color: theme.text.secondary }}
-                    >
-                      Transfer
-                    </button>
-                    <button
-                      onClick={() => setShowStatusModal(true)}
-                      className="text-sm font-medium transition-colors hover:opacity-70"
-                      style={{ color: theme.accents.secondary }}
-                    >
-                      Status
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center">
+                    <div className="flex justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }}></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : bikes.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center">
+                    <p className="text-sm" style={{ color: theme.text.secondary }}>
+                      No bikes found
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                bikes.map((bike) => (
+                  <tr key={bike.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {bike.chassisNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {bike.engineNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {bike.model.brand} {bike.model.modelName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {bike.branch.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {bike.vendor.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor:
+                            bike.status === "AVAILABLE"
+                              ? theme.accents.tertiary
+                              : bike.status === "SOLD"
+                              ? theme.accents.primary
+                              : bike.status === "RESERVED"
+                              ? theme.accents.secondary
+                              : theme.backgrounds.secondary,
+                          color: bike.status === "AVAILABLE" || bike.status === "SOLD" ? theme.text.inverse : theme.text.primary,
+                        }}
+                      >
+                        {bike.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex space-x-2">
+                        <a
+                          href={`/bikes/${bike.id}`}
+                          className="text-sm font-medium transition-colors hover:opacity-70"
+                          style={{ color: theme.accents.primary }}
+                        >
+                          View
+                        </a>
+                        {(isAdmin || isManager) && (
+                          <>
+                            <button
+                              onClick={() => openTransferModal(bike)}
+                              className="text-sm font-medium transition-colors hover:opacity-70"
+                              style={{ color: theme.text.secondary }}
+                            >
+                              Transfer
+                            </button>
+                            <button
+                              onClick={() => openStatusModal(bike)}
+                              className="text-sm font-medium transition-colors hover:opacity-70"
+                              style={{ color: theme.accents.secondary }}
+                            >
+                              Status
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -340,7 +516,7 @@ export default function BikesListPage() {
               >
                 Transfer Branch
               </h3>
-              <form className="space-y-4">
+              <form onSubmit={handleTransfer} className="space-y-4">
                 <div>
                   <label
                     className="block text-sm font-medium mb-1"
@@ -349,6 +525,8 @@ export default function BikesListPage() {
                     To Branch
                   </label>
                   <select
+                    value={transferBranchId}
+                    onChange={(e) => setTransferBranchId(e.target.value)}
                     className="w-full px-3 py-2 rounded text-sm"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -357,14 +535,23 @@ export default function BikesListPage() {
                     }}
                   >
                     <option value="">Select branch</option>
-                    <option value="1">Islamabad HQ</option>
-                    <option value="2">Tordher Branch</option>
+                    {branches
+                      .filter((b) => b.id !== selectedBike?.branch.id)
+                      .map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
                     type="button"
-                    onClick={() => setShowTransferModal(false)}
+                    onClick={() => {
+                      setShowTransferModal(false);
+                      setTransferBranchId("");
+                      setSelectedBike(null);
+                    }}
                     className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -406,7 +593,7 @@ export default function BikesListPage() {
               >
                 Change Status
               </h3>
-              <form className="space-y-4">
+              <form onSubmit={handleStatusChange} className="space-y-4">
                 <div>
                   <label
                     className="block text-sm font-medium mb-1"
@@ -415,6 +602,8 @@ export default function BikesListPage() {
                     New Status
                   </label>
                   <select
+                    value={statusValue}
+                    onChange={(e) => setStatusValue(e.target.value)}
                     className="w-full px-3 py-2 rounded text-sm"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -432,7 +621,11 @@ export default function BikesListPage() {
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
                     type="button"
-                    onClick={() => setShowStatusModal(false)}
+                    onClick={() => {
+                      setShowStatusModal(false);
+                      setStatusValue("");
+                      setSelectedBike(null);
+                    }}
                     className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
