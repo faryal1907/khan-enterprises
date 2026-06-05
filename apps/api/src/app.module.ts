@@ -7,6 +7,8 @@ import { BranchModule } from "./modules/branch/branch.module";
 import { TransactionsModule } from "./modules/transactions/transactions.module";
 import { AuditLogsModule } from "./modules/audit-logs/audit-logs.module";
 import { UploadModule } from "./modules/upload/upload.module";
+import { VendorModule } from "./modules/vendor/vendor.module";
+import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { UploadModule } from "./modules/upload/upload.module";
     TransactionsModule,
     AuditLogsModule,
     UploadModule,
+    VendorModule,
+    BikeModelsModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute
