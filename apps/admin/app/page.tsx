@@ -68,40 +68,7 @@ function SalesStaffDashboard() {
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            New Offers
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            —
-          </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Negotiations
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
-          </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            My Orders
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
-          </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Deliveries
+            Pending Deliveries
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
             —
@@ -137,7 +104,7 @@ function SalesStaffDashboard() {
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Offers
+            Pending Sales
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
             —
@@ -215,7 +182,7 @@ function BranchManagerDashboard() {
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Offers
+            Pending Sales
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
             —
@@ -268,7 +235,7 @@ function AdminDashboard() {
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Total Revenue
+            Pending Orders
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
             —
@@ -290,7 +257,7 @@ function AdminDashboard() {
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Total Bikes
+            Available Parts
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
             —
@@ -326,7 +293,7 @@ function AdminDashboard() {
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Items
+            Pending Deliveries
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
             —

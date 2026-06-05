@@ -60,10 +60,24 @@ export default function UsersPage() {
 
     try {
       await api.delete(`/auth/users/${userId}`);
-      setUsers(users.filter((u) => u.id !== userId));
+      setUsers(users.map((u) => u.id === userId ? { ...u, status: "DEACTIVATED" } : u));
     } catch (err) {
       console.error("Failed to deactivate user:", err);
       alert("Failed to deactivate user");
+    }
+  };
+
+  const handleActivate = async (userId: string) => {
+    if (!confirm("Are you sure you want to activate this user?")) {
+      return;
+    }
+
+    try {
+      await api.post(`/auth/users/${userId}/activate`);
+      setUsers(users.map((u) => u.id === userId ? { ...u, status: "ACTIVE" } : u));
+    } catch (err) {
+      console.error("Failed to activate user:", err);
+      alert("Failed to activate user");
     }
   };
 
@@ -197,13 +211,21 @@ export default function UsersPage() {
                             View
                           </button>
                         </Link>
-                        {user.status === "ACTIVE" && (
+                        {user.status === "ACTIVE" ? (
                           <button
                             onClick={() => handleDeactivate(user.id)}
                             className="font-medium hover:opacity-70 ml-4"
                             style={{ color: theme.accents.secondary }}
                           >
                             Deactivate
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleActivate(user.id)}
+                            className="font-medium hover:opacity-70 ml-4"
+                            style={{ color: theme.accents.tertiary }}
+                          >
+                            Activate
                           </button>
                         )}
                       </div>

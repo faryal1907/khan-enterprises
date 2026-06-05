@@ -146,8 +146,7 @@ export default function AddBikePage() {
                 <option value="AVAILABLE">Available</option>
                 <option value="SOLD">Sold</option>
                 <option value="RESERVED">Reserved</option>
-                <option value="DAMAGED">Damaged</option>
-                <option value="MAINTENANCE">Maintenance</option>
+                <option value="IN_DELIVERY">In Delivery</option>
               </select>
             </div>
 

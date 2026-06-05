@@ -3,36 +3,44 @@ import { useState } from "react";
 import { theme } from "@/lib/colors";
 
 export default function ManualOrderPage() {
+  const [saleType, setSaleType] = useState<"BIKE" | "PART">("BIKE");
   const [formData, setFormData] = useState({
+    chassisNumber: "",
+    bikeModel: "",
+    bikePrice: "",
+    partId: "",
+    partName: "",
+    partQuantity: "",
+    partPrice: "",
     customerName: "",
+    customerCNIC: "",
     customerPhone: "",
-    customerEmail: "",
     customerAddress: "",
-    branch: "",
-    items: [] as Array<{ type: string; itemId: string; quantity: number; price: number }>,
-    paymentMethod: "",
     salePrice: "",
+    paymentMethod: "",
   });
 
-  const [showItemModal, setShowItemModal] = useState(false);
+  const [bikeDetails, setBikeDetails] = useState<any>(null);
 
   const handleInputChange = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const addItem = (type: string, itemId: string, quantity: number, price: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      items: [...prev.items, { type, itemId, quantity, price }],
-    }));
-    setShowItemModal(false);
-  };
-
-  const removeItem = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index),
-    }));
+  const handleChassisLookup = async () => {
+    // TODO: Implement chassis lookup API call
+    // For now, just simulate autofill
+    if (formData.chassisNumber) {
+      setBikeDetails({
+        model: "Honda CD 70",
+        price: "85000",
+      });
+      setFormData((prev) => ({
+        ...prev,
+        bikeModel: "Honda CD 70",
+        bikePrice: "85000",
+        salePrice: "85000",
+      }));
+    }
   };
 
   return (
@@ -43,12 +51,227 @@ export default function ManualOrderPage() {
             className="text-3xl font-bold"
             style={{ color: theme.text.primary }}
           >
-            Register Manual Sale
+            Register Sale
           </h1>
           <p style={{ color: theme.text.secondary }}>
-            Create an order directly for onsite sales (no negotiation step)
+            Manual sale entry with auto-generated documents
           </p>
         </div>
+
+        {/* Sale Type Selection */}
+        <div
+          className="rounded-lg p-6 mb-6"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <h3
+            className="text-lg font-semibold mb-4"
+            style={{ color: theme.text.primary }}
+          >
+            Sale Type
+          </h3>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setSaleType("BIKE")}
+              className={`px-6 py-3 text-sm font-medium rounded transition-colors ${
+                saleType === "BIKE" ? "opacity-100" : "opacity-60 hover:opacity-80"
+              }`}
+              style={{
+                backgroundColor: saleType === "BIKE" ? theme.accents.primary : theme.backgrounds.tertiary,
+                color: saleType === "BIKE" ? theme.text.inverse : theme.text.primary,
+                border: `1px solid ${saleType === "BIKE" ? theme.accents.primary : theme.borders.medium}`,
+              }}
+            >
+              Bike
+            </button>
+            <button
+              onClick={() => setSaleType("PART")}
+              className={`px-6 py-3 text-sm font-medium rounded transition-colors ${
+                saleType === "PART" ? "opacity-100" : "opacity-60 hover:opacity-80"
+              }`}
+              style={{
+                backgroundColor: saleType === "PART" ? theme.accents.primary : theme.backgrounds.tertiary,
+                color: saleType === "PART" ? theme.text.inverse : theme.text.primary,
+                border: `1px solid ${saleType === "PART" ? theme.accents.primary : theme.borders.medium}`,
+              }}
+            >
+              Part
+            </button>
+          </div>
+        </div>
+
+        {/* Bike Information */}
+        {saleType === "BIKE" && (
+          <div
+            className="rounded-lg p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Bike Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Chassis Number *
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={formData.chassisNumber}
+                    onChange={(e) => handleInputChange("chassisNumber", e.target.value)}
+                    className="flex-1 px-3 py-2 rounded text-sm"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                    }}
+                    placeholder="Enter chassis number"
+                  />
+                  <button
+                    onClick={handleChassisLookup}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                    style={{
+                      backgroundColor: theme.accents.primary,
+                      color: theme.text.inverse,
+                    }}
+                  >
+                    Lookup
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Model
+                </label>
+                <input
+                  type="text"
+                  value={formData.bikeModel}
+                  readOnly
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                    opacity: 0.7,
+                  }}
+                  placeholder="Auto-filled from chassis"
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Base Price
+                </label>
+                <input
+                  type="text"
+                  value={formData.bikePrice}
+                  readOnly
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                    opacity: 0.7,
+                  }}
+                  placeholder="Auto-filled from chassis"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Part Information */}
+        {saleType === "PART" && (
+          <div
+            className="rounded-lg p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Part Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Part *
+                </label>
+                <select
+                  value={formData.partId}
+                  onChange={(e) => handleInputChange("partId", e.target.value)}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                >
+                  <option value="">Select part</option>
+                  <option value="1">Brake Pad</option>
+                  <option value="2">Chain Kit</option>
+                  <option value="3">Oil Filter</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Quantity *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.partQuantity}
+                  onChange={(e) => handleInputChange("partQuantity", e.target.value)}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Quantity"
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Unit Price *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.partPrice}
+                  onChange={(e) => handleInputChange("partPrice", e.target.value)}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Price per unit"
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Customer Information */}
         <div
@@ -67,7 +290,7 @@ export default function ManualOrderPage() {
                 className="block text-sm font-medium mb-1"
                 style={{ color: theme.text.secondary }}
               >
-                Name *
+                Customer Name *
               </label>
               <input
                 type="text"
@@ -80,6 +303,26 @@ export default function ManualOrderPage() {
                   color: theme.text.primary,
                 }}
                 placeholder="Customer name"
+              />
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-1"
+                style={{ color: theme.text.secondary }}
+              >
+                CNIC *
+              </label>
+              <input
+                type="text"
+                value={formData.customerCNIC}
+                onChange={(e) => handleInputChange("customerCNIC", e.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                placeholder="CNIC number"
               />
             </div>
             <div>
@@ -107,26 +350,6 @@ export default function ManualOrderPage() {
                 className="block text-sm font-medium mb-1"
                 style={{ color: theme.text.secondary }}
               >
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.customerEmail}
-                onChange={(e) => handleInputChange("customerEmail", e.target.value)}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="Email address"
-              />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
                 Address
               </label>
               <input
@@ -139,13 +362,13 @@ export default function ManualOrderPage() {
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
                 }}
-                placeholder="Delivery address"
+                placeholder="Customer address"
               />
             </div>
           </div>
         </div>
 
-        {/* Order Details */}
+        {/* Sale Details */}
         <div
           className="rounded-lg p-6 mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -154,7 +377,7 @@ export default function ManualOrderPage() {
             className="text-lg font-semibold mb-4"
             style={{ color: theme.text.primary }}
           >
-            Order Details
+            Sale Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -162,22 +385,22 @@ export default function ManualOrderPage() {
                 className="block text-sm font-medium mb-1"
                 style={{ color: theme.text.secondary }}
               >
-                Branch *
+                Sale Price *
               </label>
-              <select
-                value={formData.branch}
-                onChange={(e) => handleInputChange("branch", e.target.value)}
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.salePrice}
+                onChange={(e) => handleInputChange("salePrice", e.target.value)}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
                 }}
-              >
-                <option value="">Select branch</option>
-                <option value="1">Islamabad HQ</option>
-                <option value="2">Tordher Branch</option>
-              </select>
+                placeholder="Final sale price"
+              />
             </div>
             <div>
               <label
@@ -198,115 +421,27 @@ export default function ManualOrderPage() {
               >
                 <option value="">Select payment method</option>
                 <option value="CASH">Cash</option>
-                <option value="BANK">Bank Transfer</option>
-                <option value="EASYPAYSA">EasyPaisa</option>
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="SAFEPAY">Safepay (Visa/Mastercard)</option>
+                <option value="JAZZCASH">JazzCash (Mobile Wallet)</option>
+                <option value="RAAST">Raast (Instant Bank Transfer)</option>
               </select>
             </div>
           </div>
         </div>
 
-        {/* Order Items */}
+        {/* Document Generation Notice */}
         <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          className="rounded-lg p-4 mb-6"
+          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <h3
-              className="text-lg font-semibold"
-              style={{ color: theme.text.primary }}
-            >
-              Order Items
-            </h3>
-            <button
-              onClick={() => setShowItemModal(true)}
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
-            >
-              Add Item
-            </button>
-          </div>
-          
-          {formData.items.length === 0 ? (
-            <p className="text-sm" style={{ color: theme.text.muted }}>
-              No items added yet
-            </p>
-          ) : (
-            <div
-              className="rounded-lg overflow-hidden"
-              style={{ backgroundColor: theme.backgrounds.tertiary }}
-            >
-              <table className="w-full">
-                <thead>
-                  <tr
-                    style={{ backgroundColor: theme.backgrounds.primary, borderBottom: `1px solid ${theme.borders.light}` }}
-                  >
-                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                      Type
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                      Item
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                      Quantity
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                      Price
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                      Total
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formData.items.map((item, index) => (
-                    <tr key={index} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                        {item.type}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                        {item.itemId}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                        {item.quantity}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                        {item.price}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                        {item.quantity * item.price}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs">
-                        <button
-                          onClick={() => removeItem(index)}
-                          className="text-sm font-medium transition-colors hover:opacity-70"
-                          style={{ color: theme.accents.secondary }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <div className="flex justify-end mt-4">
-            <div className="text-right">
-              <p className="text-sm font-medium" style={{ color: theme.text.secondary }}>
-                Order Total
-              </p>
-              <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
-                {formData.items.reduce((sum, item) => sum + item.quantity * item.price, 0)}
-              </p>
-            </div>
-          </div>
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
+            Upon submission, the following documents will be auto-generated:
+          </p>
+          <ul className="list-disc list-inside mt-2 text-sm" style={{ color: theme.text.secondary }}>
+            <li>Sale Agreement PDF</li>
+            <li>Invoice PDF</li>
+          </ul>
         </div>
 
         {/* Actions */}
@@ -329,132 +464,9 @@ export default function ManualOrderPage() {
               color: theme.text.inverse,
             }}
           >
-            Create Order
+            Register Sale
           </button>
         </div>
-
-        {/* Add Item Modal */}
-        {showItemModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
-                Add Item
-              </h3>
-              <form className="space-y-4">
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Type
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  >
-                    <option value="">Select type</option>
-                    <option value="BIKE">Bike</option>
-                    <option value="PART">Part</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Item
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  >
-                    <option value="">Select item</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Quantity"
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Price
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Sale price"
-                  />
-                </div>
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowItemModal(false)}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    Add Item
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

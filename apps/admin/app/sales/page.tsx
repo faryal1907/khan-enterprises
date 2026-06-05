@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 
 export default function SalesRecordsPage() {
   const { user } = useAuthStore();
+  const router = useRouter();
   const isAdmin = user?.role === UserRole.ADMIN;
 
   const [filters, setFilters] = useState({
@@ -33,16 +35,28 @@ export default function SalesRecordsPage() {
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: theme.text.primary }}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1
+              className="text-3xl font-bold"
+              style={{ color: theme.text.primary }}
+            >
+              Sales Records
+            </h1>
+            <p style={{ color: theme.text.secondary }}>
+              View all completed sales (confirmed, paid, and delivered orders)
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/sales/new")}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            style={{
+              backgroundColor: theme.accents.primary,
+              color: theme.text.inverse,
+            }}
           >
-            Sales Records
-          </h1>
-          <p style={{ color: theme.text.secondary }}>
-            View all completed sales (confirmed, paid, and delivered orders)
-          </p>
+            Register Sale
+          </button>
         </div>
 
         {/* Filters */}

@@ -161,8 +161,7 @@ export default function BikesListPage() {
                 <option value="AVAILABLE">Available</option>
                 <option value="SOLD">Sold</option>
                 <option value="RESERVED">Reserved</option>
-                <option value="DAMAGED">Damaged</option>
-                <option value="MAINTENANCE">Maintenance</option>
+                <option value="IN_DELIVERY">In Delivery</option>
               </select>
             </div>
             <div>
@@ -427,8 +426,7 @@ export default function BikesListPage() {
                     <option value="AVAILABLE">Available</option>
                     <option value="SOLD">Sold</option>
                     <option value="RESERVED">Reserved</option>
-                    <option value="DAMAGED">Damaged</option>
-                    <option value="MAINTENANCE">Maintenance</option>
+                    <option value="IN_DELIVERY">In Delivery</option>
                   </select>
                 </div>
                 <div className="flex justify-end space-x-3 pt-4">

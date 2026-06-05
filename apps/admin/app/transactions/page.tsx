@@ -218,8 +218,9 @@ export default function TransactionsPage() {
                 }}
               >
                 <option value="">All Gateways</option>
-                <option value="EASYPAISA">Easypaisa</option>
-                <option value="HBL">HBL</option>
+                <option value="SAFEPAY">Safepay (Visa/Mastercard)</option>
+                <option value="JAZZCASH">JazzCash (Mobile Wallet)</option>
+                <option value="RAAST">Raast (Instant Bank Transfer)</option>
                 <option value="BANK_TRANSFER">Bank Transfer</option>
                 <option value="CASH">Cash</option>
               </select>
