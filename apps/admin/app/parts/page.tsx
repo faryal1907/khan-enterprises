@@ -337,52 +337,7 @@ export default function PartsListPage() {
           </div>
         </div>
 
-        {/* Bulk Actions */}
-        <div className="flex items-center space-x-3 mb-4">
-          <button
-            onClick={() => setShowTransferModal(true)}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Transfer Stock
-          </button>
-          <button
-            onClick={() => setShowAdjustModal(true)}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Restock
-          </button>
-          <button
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Export CSV
-          </button>
-          <button
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Archive Parts
-          </button>
-        </div>
-
+        
         {/* Table */}
         <div
           className="rounded-lg overflow-hidden"

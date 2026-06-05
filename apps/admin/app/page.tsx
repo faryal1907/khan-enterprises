@@ -177,17 +177,7 @@ function BranchManagerDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Sales
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            —
-          </p>
-        </div>
+
         <div
           className="rounded-lg p-4"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
