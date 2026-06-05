@@ -1,15 +1,31 @@
-import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Put, Query, Param, Body, UseGuards } from "@nestjs/common";
 import { InventoryService } from "./inventory.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
+import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
+import { TransferBikeDto } from "./dto/transfer-bike.dto";
+import { AttachDocumentDto } from "./dto/attach-document.dto";
 
 @Controller("inventory")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
+
+  /**
+   * POST /api/inventory/bikes
+   * Creates a new BikeUnit with default AVAILABLE status.
+   */
+  @Post("bikes")
+  @Roles("ADMIN")
+  async createBike(@Body() dto: CreateBikeUnitDto) {
+    return this.inventoryService.createBike(dto);
+  }
 
   /**
    * GET /api/inventory/bikes
@@ -20,6 +36,49 @@ export class InventoryController {
   async getBikes(@Query("branchId") branchId?: string) {
     const bikes = await this.inventoryService.getAllBikes(branchId);
     return { count: bikes.length, bikes };
+  }
+
+  /**
+   * GET /api/inventory/bikes/:id
+   * Returns a single bike unit with documents and all associated relations.
+   */
+  @Get("bikes/:id")
+  async getBikeById(@Param("id") id: string) {
+    return this.inventoryService.getBikeById(id);
+  }
+
+  /**
+   * PATCH /api/inventory/bikes/:id/status
+   * Updates status of a bike unit.
+   */
+  @Patch("bikes/:id/status")
+  @Roles("ADMIN", "MANAGER")
+  async updateBikeStatus(@Param("id") id: string, @Body() dto: UpdateBikeStatusDto) {
+    return this.inventoryService.updateBikeStatus(id, dto);
+  }
+
+  /**
+   * PATCH /api/inventory/bikes/:id/branch
+   * Transfers a bike unit to a different branch.
+   */
+  @Patch("bikes/:id/branch")
+  @Roles("ADMIN")
+  async transferBike(@Param("id") id: string, @Body() dto: TransferBikeDto) {
+    return this.inventoryService.transferBike(id, dto);
+  }
+
+  /**
+   * POST /api/inventory/bikes/:id/documents
+   * Attaches a document record to a BikeUnit.
+   */
+  @Post("bikes/:id/documents")
+  @Roles("ADMIN")
+  async attachDocument(
+    @Param("id") id: string,
+    @Body() dto: AttachDocumentDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.inventoryService.attachDocument(id, dto, user.id);
   }
 
   /**
@@ -38,6 +97,7 @@ export class InventoryController {
    * Creates a new Part and PartInventory atomically.
    */
   @Post("parts")
+  @Roles("ADMIN", "MANAGER")
   async createPart(@Body() dto: CreatePartDto) {
     return this.inventoryService.createPart(dto);
   }
@@ -52,12 +112,34 @@ export class InventoryController {
   }
 
   /**
-   * PATCH /api/inventory/parts/:id
+   * PUT /api/inventory/parts/:id
    * Updates Part metadata (name, sku, price, etc.).
    */
-  @Patch("parts/:id")
+  @Put("parts/:id")
+  @Roles("ADMIN", "MANAGER")
   async updatePart(@Param("id") id: string, @Body() dto: UpdatePartDto) {
     return this.inventoryService.updatePart(id, dto);
+  }
+
+  /**
+   * GET /api/inventory/parts/low-stock
+   * GET /api/inventory/parts/low-stock?branchId=<id>
+   * Returns PartInventory rows where quantity < reorderLevel.
+   */
+  @Get("parts/low-stock")
+  @Roles("ADMIN", "MANAGER")
+  async getLowStockItems(@Query("branchId") branchId?: string) {
+    const items = await this.inventoryService.getLowStockItems(branchId);
+    return { count: items.length, items };
+  }
+
+  /**
+   * GET /api/inventory/parts/:id/branch-stock
+   * Returns all PartInventory rows for a given Part.
+   */
+  @Get("parts/:id/branch-stock")
+  async getBranchStockView(@Param("id") id: string) {
+    return this.inventoryService.getBranchStockView(id);
   }
 
   /**
@@ -65,6 +147,7 @@ export class InventoryController {
    * Updates quantity by signed delta and creates StockMovement record.
    */
   @Post("parts/:inventoryId/adjust-stock")
+  @Roles("ADMIN", "MANAGER")
   async adjustStock(
     @Param("inventoryId") inventoryId: string,
     @Body() dto: AdjustStockDto,
@@ -88,25 +171,5 @@ export class InventoryController {
       parseInt(page),
       parseInt(limit),
     );
-  }
-
-  /**
-   * GET /api/inventory/parts/low-stock
-   * GET /api/inventory/parts/low-stock?branchId=<id>
-   * Returns PartInventory rows where quantity < reorderLevel.
-   */
-  @Get("parts/low-stock")
-  async getLowStockItems(@Query("branchId") branchId?: string) {
-    const items = await this.inventoryService.getLowStockItems(branchId);
-    return { count: items.length, items };
-  }
-
-  /**
-   * GET /api/inventory/parts/:id/branch-stock
-   * Returns all PartInventory rows for a given Part.
-   */
-  @Get("parts/:id/branch-stock")
-  async getBranchStockView(@Param("id") id: string) {
-    return this.inventoryService.getBranchStockView(id);
   }
 }
