@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -18,7 +18,6 @@ export default function BikesListPage() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
   const isManager = user?.role === UserRole.MANAGER;
-  const isStaff = user?.role === UserRole.SALES_STAFF;
 
   const [filters, setFilters] = useState({
     branch: "",
@@ -44,12 +43,14 @@ export default function BikesListPage() {
   const [transferBranchId, setTransferBranchId] = useState("");
   const [statusValue, setStatusValue] = useState("");
 
-  // Set branch filter to user's branch if not admin
-  useEffect(() => {
+  // Adjust state during render when user.branchId changes to avoid synchronous setState in useEffect
+  const [prevUserBranchId, setPrevUserBranchId] = useState(user?.branchId);
+  if (user?.branchId !== prevUserBranchId) {
+    setPrevUserBranchId(user?.branchId);
     if (!isAdmin && user?.branchId) {
       setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
-  }, [isAdmin, user?.branchId]);
+  }
 
   // Fetch reference data on mount
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function BikesListPage() {
     const fetchBikes = async () => {
       setLoading(true);
       try {
-        const params: any = {};
+        const params: Record<string, string> = {};
         if (filters.branch) params.branchId = filters.branch;
         if (filters.status) params.status = filters.status;
         if (filters.model) params.modelId = filters.model;
@@ -113,7 +114,7 @@ export default function BikesListPage() {
       setTransferBranchId("");
       setSelectedBike(null);
       // Refetch bikes
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (filters.branch) params.branchId = filters.branch;
       if (filters.status) params.status = filters.status;
       if (filters.model) params.modelId = filters.model;
@@ -139,7 +140,7 @@ export default function BikesListPage() {
       setStatusValue("");
       setSelectedBike(null);
       // Refetch bikes
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (filters.branch) params.branchId = filters.branch;
       if (filters.status) params.status = filters.status;
       if (filters.model) params.modelId = filters.model;
@@ -183,7 +184,7 @@ export default function BikesListPage() {
           >
             Bikes Inventory
           </h1>
-          <a
+          <Link
             href="/bikes/new"
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
             style={{
@@ -192,7 +193,7 @@ export default function BikesListPage() {
             }}
           >
             Add New Bike
-          </a>
+          </Link>
         </div>
 
         {/* Summary Cards */}

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -39,12 +40,14 @@ export default function PartsListPage() {
   const [transferToBranch, setTransferToBranch] = useState("");
   const [transferQuantity, setTransferQuantity] = useState("");
 
-  // Set branch filter to user's branch if not admin
-  useEffect(() => {
+  // Adjust state during render when user.branchId changes to avoid synchronous setState in useEffect
+  const [prevUserBranchId, setPrevUserBranchId] = useState(user?.branchId);
+  if (user?.branchId !== prevUserBranchId) {
+    setPrevUserBranchId(user?.branchId);
     if (!isAdmin && user?.branchId) {
       setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
-  }, [isAdmin, user?.branchId]);
+  }
 
   // Fetch branches on mount
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function PartsListPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const params: any = {};
+        const params: Record<string, string> = {};
         if (filters.branch) params.branchId = filters.branch;
         if (filters.category) params.category = filters.category;
         if (filters.search) params.search = filters.search;
@@ -110,7 +113,7 @@ export default function PartsListPage() {
       setAdjustReason("");
       setSelectedPart(null);
       // Refetch parts
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (filters.branch) params.branchId = filters.branch;
       if (filters.category) params.category = filters.category;
       if (filters.search) params.search = filters.search;
@@ -164,7 +167,7 @@ export default function PartsListPage() {
       setTransferQuantity("");
       setSelectedPart(null);
       // Refetch parts
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (filters.branch) params.branchId = filters.branch;
       if (filters.category) params.category = filters.category;
       if (filters.search) params.search = filters.search;
@@ -228,7 +231,7 @@ export default function PartsListPage() {
           >
             Parts Inventory
           </h1>
-          <a
+          <Link
             href="/parts/new"
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
             style={{
@@ -237,7 +240,7 @@ export default function PartsListPage() {
             }}
           >
             Add New Part
-          </a>
+          </Link>
         </div>
 
         {/* Summary Cards */}
