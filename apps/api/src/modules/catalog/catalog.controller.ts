@@ -75,4 +75,22 @@ export class CatalogController {
 
     return this.catalogService.search(query);
   }
+
+  /**
+   * GET /api/catalog/models
+   * List all bike models
+   */
+  @Get("models")
+  async getModels() {
+    return this.catalogService.getModels();
+  }
+
+  /**
+   * GET /api/catalog/branches
+   * List all branches
+   */
+  @Get("branches")
+  async getBranches() {
+    return this.catalogService.getBranches();
+  }
 }

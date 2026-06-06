@@ -41,10 +41,11 @@ export default function BikesPage() {
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const response = await api.get("/bike-models");
-        setModels(response.data);
+        const response = await api.get("/catalog/models");
+        setModels(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch models:", error);
+        setModels([]);
       }
     };
     fetchModels();
@@ -53,10 +54,11 @@ export default function BikesPage() {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await api.get("/branches");
-        setBranches(response.data);
+        const response = await api.get("/catalog/branches");
+        setBranches(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch branches:", error);
+        setBranches([]);
       }
     };
     fetchBranches();
@@ -238,7 +240,7 @@ export default function BikesPage() {
           {/* Bike Grid */}
           <div className="flex-1">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
+              <div className="flex items-center justify-center py-20" style={{ backgroundColor: theme.backgrounds.primary }}>
                 <div
                   className="animate-spin rounded-full h-12 w-12 border-b-2"
                   style={{ borderColor: theme.accents.primary }}
@@ -274,15 +276,6 @@ export default function BikesPage() {
                     />
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-2">
-                        <span
-                          className="text-xs font-medium px-2 py-1 rounded"
-                          style={{
-                            backgroundColor: `${theme.accents.tertiary}30`,
-                            color: theme.accents.primary,
-                          }}
-                        >
-                          {bike.status}
-                        </span>
                         <span className="text-sm" style={{ color: theme.text.muted }}>
                           {bike.model?.year}
                         </span>

@@ -165,4 +165,22 @@ export class CatalogService {
 
     return { bikes, parts };
   }
+
+  /**
+   * Get all bike models
+   */
+  async getModels() {
+    return this.prisma.client.bikeModel.findMany({
+      orderBy: { modelName: 'asc' },
+    });
+  }
+
+  /**
+   * Get all branches
+   */
+  async getBranches() {
+    return this.prisma.client.branch.findMany({
+      orderBy: { name: 'asc' },
+    });
+  }
 }
