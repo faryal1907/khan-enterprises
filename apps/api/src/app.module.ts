@@ -9,6 +9,7 @@ import { AuditLogsModule } from "./modules/audit-logs/audit-logs.module";
 import { UploadModule } from "./modules/upload/upload.module";
 import { VendorModule } from "./modules/vendor/vendor.module";
 import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
+import { CatalogModule } from "./modules/catalog/catalog.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
     UploadModule,
     VendorModule,
     BikeModelsModule,
+    CatalogModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute
