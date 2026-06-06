@@ -7,7 +7,6 @@ import {
   getParts,
   getBranches,
   adjustStock,
-  getLowStockItems,
 } from "@/lib/api/inventory";
 import type { Branch, PartInventory } from "@/lib/types";
 
@@ -26,7 +25,6 @@ export default function PartsListPage() {
   // Data state
   const [parts, setParts] = useState<PartInventory[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [lowStockCount, setLowStockCount] = useState(0);
 
   // Loading state
   const [loading, setLoading] = useState(true);
@@ -61,7 +59,7 @@ export default function PartsListPage() {
 
   // Fetch parts on mount and filter change
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchParts = async () => {
       setLoading(true);
       try {
         const params: any = {};
@@ -69,20 +67,15 @@ export default function PartsListPage() {
         if (filters.category) params.category = filters.category;
         if (filters.search) params.search = filters.search;
 
-        const [partsResponse, lowStockResponse] = await Promise.all([
-          getParts(params),
-          getLowStockItems(filters.branch),
-        ]);
-
-        setParts(partsResponse.parts);
-        setLowStockCount(lowStockResponse.count);
+        const response = await getParts(params);
+        setParts(response.parts);
       } catch (error) {
         console.error("Failed to fetch parts:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchParts();
   }, [filters]);
 
   const handleFilterChange = (key: string, value: string) => {
@@ -186,41 +179,13 @@ export default function PartsListPage() {
 
   // Compute summary stats
   const totalParts = parts.length;
-  const lowStockItems = lowStockCount;
+  const lowStockItems = parts.filter((p) => p.quantity < p.reorderLevel).length;
   const outOfStockItems = parts.filter((p) => p.quantity === 0).length;
   const totalValue = parts.reduce((sum, p) => sum + (p.part.sellingPrice * p.quantity), 0);
 
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Low Stock Alert Banner */}
-        {lowStockItems > 0 && (
-          <div
-            className="rounded-lg p-4 mb-6 flex items-center justify-between"
-            style={{
-              backgroundColor: "rgba(245, 158, 11, 0.1)",
-              border: `1px solid ${theme.accents.secondary}`,
-            }}
-          >
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: theme.accents.secondary }}
-              ></div>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {lowStockItems} item{lowStockItems !== 1 ? "s" : ""} below reorder level
-              </p>
-            </div>
-            <a
-              href="#parts-table"
-              className="text-sm font-medium transition-colors hover:opacity-70"
-              style={{ color: theme.accents.secondary }}
-            >
-              View Details
-            </a>
-          </div>
-        )}
-
         <div className="flex items-center justify-between mb-6">
           <h1
             className="text-3xl font-bold"
