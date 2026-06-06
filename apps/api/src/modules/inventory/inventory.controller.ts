@@ -103,6 +103,18 @@ export class InventoryController {
   }
 
   /**
+   * GET /api/inventory/parts/low-stock
+   * GET /api/inventory/parts/low-stock?branchId=<id>
+   * Returns PartInventory rows where quantity < reorderLevel.
+   */
+  @Get("parts/low-stock")
+  @Roles("ADMIN", "MANAGER")
+  async getLowStockItems(@Query("branchId") branchId?: string) {
+    const items = await this.inventoryService.getLowStockItems(branchId);
+    return { count: items.length, items };
+  }
+
+  /**
    * GET /api/inventory/parts/:id
    * Returns a single Part with its PartInventory records per branch.
    */
@@ -119,18 +131,6 @@ export class InventoryController {
   @Roles("ADMIN", "MANAGER")
   async updatePart(@Param("id") id: string, @Body() dto: UpdatePartDto) {
     return this.inventoryService.updatePart(id, dto);
-  }
-
-  /**
-   * GET /api/inventory/parts/low-stock
-   * GET /api/inventory/parts/low-stock?branchId=<id>
-   * Returns PartInventory rows where quantity < reorderLevel.
-   */
-  @Get("parts/low-stock")
-  @Roles("ADMIN", "MANAGER")
-  async getLowStockItems(@Query("branchId") branchId?: string) {
-    const items = await this.inventoryService.getLowStockItems(branchId);
-    return { count: items.length, items };
   }
 
   /**
