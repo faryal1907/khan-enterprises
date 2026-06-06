@@ -34,7 +34,7 @@ export const theme = {
   accents: {
     primary: colors.ocean,
     secondary: colors.azure,
-    tertiary: colors.sky,
+    tertiary: colors.azure,
     highlight: colors.navy,
   },
   borders: {

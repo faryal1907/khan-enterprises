@@ -6,12 +6,15 @@ import { api } from "@/lib/api-client";
 
 export default function BikesPage() {
   const [bikes, setBikes] = useState<any[]>([]);
+  const [models, setModels] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     modelId: "",
     priceMin: "",
     priceMax: "",
     branchId: "",
+    availability: "AVAILABLE",
   });
 
   useEffect(() => {
@@ -22,6 +25,7 @@ export default function BikesPage() {
         if (filters.priceMin) params.priceMin = parseFloat(filters.priceMin);
         if (filters.priceMax) params.priceMax = parseFloat(filters.priceMax);
         if (filters.branchId) params.branchId = filters.branchId;
+        if (filters.availability) params.availability = filters.availability;
 
         const response = await api.get("/catalog/bikes", { params });
         setBikes(response.data);
@@ -33,6 +37,30 @@ export default function BikesPage() {
     };
     fetchBikes();
   }, [filters]);
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await api.get("/bike-models");
+        setModels(response.data);
+      } catch (error) {
+        console.error("Failed to fetch models:", error);
+      }
+    };
+    fetchModels();
+  }, []);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await api.get("/branches");
+        setBranches(response.data);
+      } catch (error) {
+        console.error("Failed to fetch branches:", error);
+      }
+    };
+    fetchBranches();
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -66,6 +94,35 @@ export default function BikesPage() {
               >
                 Filters
               </h2>
+
+              {/* Model */}
+              <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Model
+                </label>
+                <select
+                  value={filters.modelId}
+                  onChange={(e) =>
+                    setFilters({ ...filters, modelId: e.target.value })
+                  }
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                >
+                  <option value="">All Models</option>
+                  {models.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.modelName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Price Range */}
               <div className="mb-6">
@@ -128,13 +185,44 @@ export default function BikesPage() {
                   }}
                 >
                   <option value="">All Branches</option>
-                  {/* Will be populated with branches from API */}
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Availability */}
+              <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Availability
+                </label>
+                <select
+                  value={filters.availability}
+                  onChange={(e) =>
+                    setFilters({ ...filters, availability: e.target.value })
+                  }
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                >
+                  <option value="">All</option>
+                  <option value="AVAILABLE">Available</option>
+                  <option value="RESERVED">Reserved</option>
+                  <option value="SOLD">Sold</option>
                 </select>
               </div>
 
               <button
                 onClick={() =>
-                  setFilters({ modelId: "", priceMin: "", priceMax: "", branchId: "" })
+                  setFilters({ modelId: "", priceMin: "", priceMax: "", branchId: "", availability: "AVAILABLE" })
                 }
                 className="w-full px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                 style={{
@@ -171,9 +259,10 @@ export default function BikesPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {bikes.map((bike) => (
-                  <div
+                  <Link
                     key={bike.id}
-                    className="rounded-xl overflow-hidden"
+                    href={`/bikes/${bike.id}`}
+                    className="rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                     style={{
                       backgroundColor: theme.backgrounds.secondary,
                       border: `1px solid ${theme.borders.light}`,
@@ -192,7 +281,7 @@ export default function BikesPage() {
                             color: theme.accents.primary,
                           }}
                         >
-                          Available
+                          {bike.status}
                         </span>
                         <span className="text-sm" style={{ color: theme.text.muted }}>
                           {bike.model?.year}
@@ -204,8 +293,11 @@ export default function BikesPage() {
                       >
                         {bike.model?.modelName}
                       </h3>
-                      <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                      <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
                         {bike.model?.brand}
+                      </p>
+                      <p className="text-sm mb-4" style={{ color: theme.text.muted }}>
+                        {bike.model?.engineCapacity || "N/A"}
                       </p>
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm" style={{ color: theme.text.muted }}>
@@ -219,19 +311,9 @@ export default function BikesPage() {
                         >
                           PKR {bike.model?.basePrice?.toLocaleString()}
                         </span>
-                        <Link
-                          href={`/bikes/${bike.id}`}
-                          className="inline-block px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-                          style={{
-                            backgroundColor: theme.accents.primary,
-                            color: theme.text.inverse,
-                          }}
-                        >
-                          View Details
-                        </Link>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
