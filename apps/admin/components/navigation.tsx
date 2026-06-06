@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { theme } from "@/lib/colors";
+import { getLowStockItems } from "@/lib/api/inventory";
 
 export function Navigation() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [lowStockCount, setLowStockCount] = useState(0);
+
+  // Fetch low stock count on mount
+  useEffect(() => {
+    const fetchLowStockCount = async () => {
+      try {
+        const response = await getLowStockItems(user?.branchId || undefined);
+        setLowStockCount(response.count);
+      } catch (error) {
+        console.error("Failed to fetch low stock count:", error);
+      }
+    };
+    fetchLowStockCount();
+  }, [user?.branchId]);
 
   if (!user) return null;
 
@@ -100,12 +115,24 @@ export function Navigation() {
 
               <a
                 href="/parts"
-                className="text-center p-3 rounded-lg transition-colors hover:opacity-80"
+                className="text-center p-3 rounded-lg transition-colors hover:opacity-80 relative"
                 style={{ backgroundColor: theme.backgrounds.tertiary }}
               >
                 <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
                   Parts
                 </p>
+                {lowStockCount > 0 && (
+                  <span
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{
+                      backgroundColor: theme.accents.secondary,
+                      color: theme.text.inverse,
+                      fontSize: "10px",
+                    }}
+                  >
+                    {lowStockCount > 9 ? "9+" : lowStockCount}
+                  </span>
+                )}
               </a>
 
               <a
