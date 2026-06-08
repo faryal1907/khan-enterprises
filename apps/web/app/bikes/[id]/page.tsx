@@ -5,13 +5,24 @@ import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
+import { createOffer } from "@/lib/api/offers";
 
 export default function BikeDetailPage() {
   const { id } = useParams();
   const { user } = useAuthStore();
   const [bike, setBike] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerCNIC, setCustomerCNIC] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [message, setMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchBike = async () => {
@@ -33,8 +44,43 @@ export default function BikeDetailPage() {
       window.location.href = "/login";
       return;
     }
-    // TODO: Implement offer submission
-    console.log("Making offer:", offerAmount);
+
+    if (!offerAmount || !customerName || !customerPhone) {
+      setErrorMessage("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      await createOffer({
+        bikeId: id as string,
+        customerName,
+        customerPhone,
+        customerEmail: customerEmail || undefined,
+        customerCNIC: customerCNIC || undefined,
+        customerAddress: customerAddress || undefined,
+        offerAmount: parseFloat(offerAmount),
+        message: message || undefined,
+      });
+
+      setSuccessMessage("Your offer has been submitted successfully! We'll get back to you within 24 hours.");
+      setOfferAmount("");
+      setCustomerName("");
+      setCustomerPhone("");
+      setCustomerEmail("");
+      setCustomerCNIC("");
+      setCustomerAddress("");
+      setMessage("");
+      setShowOfferForm(false);
+    } catch (error: any) {
+      console.error("Failed to submit offer:", error);
+      setErrorMessage(error.response?.data?.message || "Failed to submit offer. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -162,35 +208,186 @@ export default function BikeDetailPage() {
               <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
                 Submit your offer and we'll get back to you within 24 hours.
               </p>
-              <form onSubmit={handleMakeOffer}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                    Your Offer (PKR)
-                  </label>
-                  <input
-                    type="number"
-                    value={offerAmount}
-                    onChange={(e) => setOfferAmount(e.target.value)}
-                    placeholder="Enter your offer amount"
-                    className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  />
+
+              {successMessage && (
+                <div
+                  className="mb-4 p-4 rounded-lg"
+                  style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}
+                >
+                  {successMessage}
                 </div>
+              )}
+
+              {errorMessage && (
+                <div
+                  className="mb-4 p-4 rounded-lg"
+                  style={{ backgroundColor: "#FEE2E2", color: "#991B1B" }}
+                >
+                  {errorMessage}
+                </div>
+              )}
+
+              {!showOfferForm ? (
                 <button
-                  type="submit"
+                  onClick={() => setShowOfferForm(true)}
                   className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
                   style={{
                     backgroundColor: theme.accents.primary,
                     color: theme.text.inverse,
                   }}
                 >
-                  Submit Offer
+                  Start Offer Process
                 </button>
-              </form>
+              ) : (
+                <form onSubmit={handleMakeOffer}>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Your Offer (PKR) *
+                      </label>
+                      <input
+                        type="number"
+                        value={offerAmount}
+                        onChange={(e) => setOfferAmount(e.target.value)}
+                        placeholder="Enter your offer amount"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Enter your full name"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        placeholder="Enter your phone number"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Email (Optional)
+                      </label>
+                      <input
+                        type="email"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        CNIC (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={customerCNIC}
+                        onChange={(e) => setCustomerCNIC(e.target.value)}
+                        placeholder="Enter your CNIC number"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Address (Optional)
+                      </label>
+                      <textarea
+                        value={customerAddress}
+                        onChange={(e) => setCustomerAddress(e.target.value)}
+                        rows={2}
+                        placeholder="Enter your address"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Message (Optional)
+                      </label>
+                      <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={2}
+                        placeholder="Add any additional notes"
+                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          border: `1px solid ${theme.borders.medium}`,
+                          color: theme.text.primary,
+                        }}
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowOfferForm(false)}
+                        className="flex-1 px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                        style={{
+                          backgroundColor: theme.backgrounds.tertiary,
+                          color: theme.text.secondary,
+                          border: `1px solid ${theme.borders.medium}`,
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="flex-1 px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                        style={{
+                          backgroundColor: theme.accents.primary,
+                          color: theme.text.inverse,
+                        }}
+                      >
+                        {submitting ? "Submitting..." : "Submit Offer"}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
