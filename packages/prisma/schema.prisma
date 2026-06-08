@@ -332,9 +332,11 @@ model Offer {
   bikeId String
   bike   BikeUnit @relation(fields: [bikeId], references: [id])
 
-  customerName  String
-  customerPhone String
-  customerEmail String?
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  customerCNIC    String?
+  customerAddress String?
 
   offerAmount Decimal @db.Decimal(12, 2)
 

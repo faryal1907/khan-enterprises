@@ -1703,6 +1703,8 @@ export const OfferScalarFieldEnum = {
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   customerEmail: 'customerEmail',
+  customerCNIC: 'customerCNIC',
+  customerAddress: 'customerAddress',
   offerAmount: 'offerAmount',
   counterAmount: 'counterAmount',
   message: 'message',

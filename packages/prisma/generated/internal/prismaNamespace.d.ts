@@ -1438,6 +1438,8 @@ export declare const OfferScalarFieldEnum: {
     readonly customerName: "customerName";
     readonly customerPhone: "customerPhone";
     readonly customerEmail: "customerEmail";
+    readonly customerCNIC: "customerCNIC";
+    readonly customerAddress: "customerAddress";
     readonly offerAmount: "offerAmount";
     readonly counterAmount: "counterAmount";
     readonly message: "message";
