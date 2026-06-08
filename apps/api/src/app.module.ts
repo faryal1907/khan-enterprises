@@ -10,6 +10,8 @@ import { UploadModule } from "./modules/upload/upload.module";
 import { VendorModule } from "./modules/vendor/vendor.module";
 import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
 import { CatalogModule } from "./modules/catalog/catalog.module";
+import { OffersModule } from "./modules/offers/offers.module";
+import { SchedulerModule } from "./modules/scheduler/scheduler.module";
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { CatalogModule } from "./modules/catalog/catalog.module";
     VendorModule,
     BikeModelsModule,
     CatalogModule,
+    OffersModule,
+    SchedulerModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute
