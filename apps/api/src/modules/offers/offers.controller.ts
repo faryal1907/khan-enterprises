@@ -35,11 +35,9 @@ export class OffersController {
 
   /**
    * GET /api/offers/:id
-   * @Roles(ADMIN, MANAGER, SALES_STAFF) OR offer owner by phone
+   * Public (no auth) — customers can view their offer by ID
    */
   @Get(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async getOfferById(@Param("id") id: string) {
     return this.offersService.getOfferById(id);
   }

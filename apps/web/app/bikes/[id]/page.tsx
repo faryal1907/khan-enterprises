@@ -55,7 +55,7 @@ export default function BikeDetailPage() {
       setErrorMessage("");
       setSuccessMessage("");
 
-      await createOffer({
+      const result = await createOffer({
         bikeId: id as string,
         customerName,
         customerPhone,
@@ -66,15 +66,8 @@ export default function BikeDetailPage() {
         message: message || undefined,
       });
 
-      setSuccessMessage("Your offer has been submitted successfully! We'll get back to you within 24 hours.");
-      setOfferAmount("");
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerEmail("");
-      setCustomerCNIC("");
-      setCustomerAddress("");
-      setMessage("");
-      setShowOfferForm(false);
+      // Redirect to offer status page
+      window.location.href = `/offers/${result.id}`;
     } catch (error: any) {
       console.error("Failed to submit offer:", error);
       setErrorMessage(error.response?.data?.message || "Failed to submit offer. Please try again.");
