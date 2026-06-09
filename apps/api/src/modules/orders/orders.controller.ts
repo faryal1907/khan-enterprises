@@ -15,25 +15,33 @@ export class OrdersController {
 
   /**
    * GET /api/orders/number/:orderNumber
-   * @Roles(ADMIN, MANAGER, SALES_STAFF) — for invoice lookup
+   * Public endpoint for customer order status lookup
    * NOTE: Must be defined before GET /orders/:id
    */
   @Get("number/:orderNumber")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async getOrderByNumber(@Param("orderNumber") orderNumber: string) {
     return this.ordersService.getOrderByNumber(orderNumber);
   }
 
   /**
+   * GET /api/orders/customer/:phone
+   * Public endpoint for customers to lookup their orders by phone number
+   */
+  @Get("customer/:phone")
+  async getOrdersByCustomerPhone(@Param("phone") phone: string) {
+    return this.ordersService.getOrdersByCustomerPhone(phone);
+  }
+
+  /**
    * GET /api/orders
-   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
+   * For CUSTOMER: filters by customer phone/CNIC from user profile
    */
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
-  async getOrders(@Query() query: QueryOrdersDto) {
-    return this.ordersService.getOrders(query);
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async getOrders(@Query() query: QueryOrdersDto, @CurrentUser() user: any) {
+    return this.ordersService.getOrders(query, user);
   }
 
   /**
