@@ -4,11 +4,11 @@ import path from "path";
 // Load root .env — seed runs standalone outside NestJS so env vars aren't pre-loaded
 config({ path: path.resolve(process.cwd(), "../../.env") });
 config({ path: path.resolve(process.cwd(), ".env") });
-
-import { prisma } from "./index";
 import bcrypt from "bcrypt";
 
 async function main() {
+  const { prisma } = await import("./index");
+
   console.log("🌱 Starting database seeding...");
 
   // ============================================================================

@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const publicPaths = ["/login", "/", "/bikes", "/parts", "/search", "/orders"];
+const WEB_ACCESS_TOKEN_COOKIE = "webAccessToken";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("accessToken");
+  const token = request.cookies.get(WEB_ACCESS_TOKEN_COOKIE);
 
   // If trying to access public path, allow it
   if (publicPaths.some((path) => pathname.startsWith(path))) {

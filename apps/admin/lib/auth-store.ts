@@ -2,6 +2,8 @@ import { create } from "zustand";
 import Cookies from "js-cookie";
 import type { User } from "./types";
 
+const ADMIN_ACCESS_TOKEN_COOKIE = "adminAccessToken";
+
 interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -15,7 +17,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
 
   setAuth: (user, accessToken) => {
-    Cookies.set("accessToken", accessToken, {
+    Cookies.set(ADMIN_ACCESS_TOKEN_COOKIE, accessToken, {
+      path: "/",
       expires: 7,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -25,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    Cookies.remove("accessToken");
+    Cookies.remove(ADMIN_ACCESS_TOKEN_COOKIE, { path: "/" });
     set({ user: null, accessToken: null });
   },
 }));

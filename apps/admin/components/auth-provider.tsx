@@ -6,6 +6,8 @@ import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import type { User } from "@/lib/types";
 
+const ADMIN_ACCESS_TOKEN_COOKIE = "adminAccessToken";
+
 /**
  * Runs once on mount. If an accessToken cookie exists, calls GET /auth/me
  * to rehydrate the Zustand store with the user. This fixes the "Loading..."
@@ -17,7 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = Cookies.get("accessToken");
+    const token = Cookies.get(ADMIN_ACCESS_TOKEN_COOKIE);
 
     if (!token) {
       setHydrated(true);
