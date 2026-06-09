@@ -8,6 +8,7 @@ export interface JwtPayload {
   email: string;
   role: string;
   branchId: string | null;
+  vendorId: string | null;
 }
 
 @Injectable()
@@ -27,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload) {
     const user = await this.prisma.client.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, role: true, status: true, branchId: true },
+      select: { id: true, email: true, role: true, status: true, branchId: true, vendorId: true },
     });
 
     if (!user || user.status !== "ACTIVE") {

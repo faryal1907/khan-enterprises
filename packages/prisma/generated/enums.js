@@ -4,7 +4,8 @@ exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports
 exports.UserRole = {
     ADMIN: 'ADMIN',
     MANAGER: 'MANAGER',
-    SALES_STAFF: 'SALES_STAFF'
+    SALES_STAFF: 'SALES_STAFF',
+    CUSTOMER: 'CUSTOMER'
 };
 exports.UserStatus = {
     ACTIVE: 'ACTIVE',

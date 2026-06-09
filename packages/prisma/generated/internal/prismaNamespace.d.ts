@@ -1338,6 +1338,7 @@ export declare const UserScalarFieldEnum: {
     readonly role: "role";
     readonly status: "status";
     readonly branchId: "branchId";
+    readonly vendorId: "vendorId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -1438,6 +1439,8 @@ export declare const OfferScalarFieldEnum: {
     readonly customerName: "customerName";
     readonly customerPhone: "customerPhone";
     readonly customerEmail: "customerEmail";
+    readonly customerCNIC: "customerCNIC";
+    readonly customerAddress: "customerAddress";
     readonly offerAmount: "offerAmount";
     readonly counterAmount: "counterAmount";
     readonly message: "message";

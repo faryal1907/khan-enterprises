@@ -93,6 +93,7 @@ export const UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   branchId: 'branchId',
+  vendorId: 'vendorId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -220,6 +221,8 @@ export const OfferScalarFieldEnum = {
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   customerEmail: 'customerEmail',
+  customerCNIC: 'customerCNIC',
+  customerAddress: 'customerAddress',
   offerAmount: 'offerAmount',
   counterAmount: 'counterAmount',
   message: 'message',

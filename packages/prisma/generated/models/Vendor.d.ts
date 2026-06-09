@@ -121,6 +121,7 @@ export type VendorWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     suppliedBikes?: Prisma.BikeUnitListRelationFilter;
+    staff?: Prisma.UserListRelationFilter;
 };
 export type VendorOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -132,6 +133,7 @@ export type VendorOrderByWithRelationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     suppliedBikes?: Prisma.BikeUnitOrderByRelationAggregateInput;
+    staff?: Prisma.UserOrderByRelationAggregateInput;
 };
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -146,6 +148,7 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
     createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     suppliedBikes?: Prisma.BikeUnitListRelationFilter;
+    staff?: Prisma.UserListRelationFilter;
 }, "id">;
 export type VendorOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -183,6 +186,7 @@ export type VendorCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
+    staff?: Prisma.UserCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateInput = {
     id?: string;
@@ -194,6 +198,7 @@ export type VendorUncheckedCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
+    staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -205,6 +210,7 @@ export type VendorUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
+    staff?: Prisma.UserUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -216,6 +222,7 @@ export type VendorUncheckedUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
+    staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateManyInput = {
     id?: string;
@@ -246,6 +253,10 @@ export type VendorUncheckedUpdateManyInput = {
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type VendorNullableScalarRelationFilter = {
+    is?: Prisma.VendorWhereInput | null;
+    isNot?: Prisma.VendorWhereInput | null;
 };
 export type VendorCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -281,6 +292,20 @@ export type VendorScalarRelationFilter = {
     is?: Prisma.VendorWhereInput;
     isNot?: Prisma.VendorWhereInput;
 };
+export type VendorCreateNestedOneWithoutStaffInput = {
+    create?: Prisma.XOR<Prisma.VendorCreateWithoutStaffInput, Prisma.VendorUncheckedCreateWithoutStaffInput>;
+    connectOrCreate?: Prisma.VendorCreateOrConnectWithoutStaffInput;
+    connect?: Prisma.VendorWhereUniqueInput;
+};
+export type VendorUpdateOneWithoutStaffNestedInput = {
+    create?: Prisma.XOR<Prisma.VendorCreateWithoutStaffInput, Prisma.VendorUncheckedCreateWithoutStaffInput>;
+    connectOrCreate?: Prisma.VendorCreateOrConnectWithoutStaffInput;
+    upsert?: Prisma.VendorUpsertWithoutStaffInput;
+    disconnect?: Prisma.VendorWhereInput | boolean;
+    delete?: Prisma.VendorWhereInput | boolean;
+    connect?: Prisma.VendorWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutStaffInput, Prisma.VendorUpdateWithoutStaffInput>, Prisma.VendorUncheckedUpdateWithoutStaffInput>;
+};
 export type VendorCreateNestedOneWithoutSuppliedBikesInput = {
     create?: Prisma.XOR<Prisma.VendorCreateWithoutSuppliedBikesInput, Prisma.VendorUncheckedCreateWithoutSuppliedBikesInput>;
     connectOrCreate?: Prisma.VendorCreateOrConnectWithoutSuppliedBikesInput;
@@ -293,6 +318,63 @@ export type VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput = {
     connect?: Prisma.VendorWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutSuppliedBikesInput, Prisma.VendorUpdateWithoutSuppliedBikesInput>, Prisma.VendorUncheckedUpdateWithoutSuppliedBikesInput>;
 };
+export type VendorCreateWithoutStaffInput = {
+    id?: string;
+    name: string;
+    contactPerson?: string | null;
+    phoneNumber?: string | null;
+    email?: string | null;
+    address?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
+};
+export type VendorUncheckedCreateWithoutStaffInput = {
+    id?: string;
+    name: string;
+    contactPerson?: string | null;
+    phoneNumber?: string | null;
+    email?: string | null;
+    address?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
+};
+export type VendorCreateOrConnectWithoutStaffInput = {
+    where: Prisma.VendorWhereUniqueInput;
+    create: Prisma.XOR<Prisma.VendorCreateWithoutStaffInput, Prisma.VendorUncheckedCreateWithoutStaffInput>;
+};
+export type VendorUpsertWithoutStaffInput = {
+    update: Prisma.XOR<Prisma.VendorUpdateWithoutStaffInput, Prisma.VendorUncheckedUpdateWithoutStaffInput>;
+    create: Prisma.XOR<Prisma.VendorCreateWithoutStaffInput, Prisma.VendorUncheckedCreateWithoutStaffInput>;
+    where?: Prisma.VendorWhereInput;
+};
+export type VendorUpdateToOneWithWhereWithoutStaffInput = {
+    where?: Prisma.VendorWhereInput;
+    data: Prisma.XOR<Prisma.VendorUpdateWithoutStaffInput, Prisma.VendorUncheckedUpdateWithoutStaffInput>;
+};
+export type VendorUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    contactPerson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
+};
+export type VendorUncheckedUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    contactPerson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
+};
 export type VendorCreateWithoutSuppliedBikesInput = {
     id?: string;
     name: string;
@@ -302,6 +384,7 @@ export type VendorCreateWithoutSuppliedBikesInput = {
     address?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    staff?: Prisma.UserCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
     id?: string;
@@ -312,6 +395,7 @@ export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
     address?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutSuppliedBikesInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -335,6 +419,7 @@ export type VendorUpdateWithoutSuppliedBikesInput = {
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    staff?: Prisma.UserUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -345,18 +430,24 @@ export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCountOutputType = {
     suppliedBikes: number;
+    staff: number;
 };
 export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     suppliedBikes?: boolean | VendorCountOutputTypeCountSuppliedBikesArgs;
+    staff?: boolean | VendorCountOutputTypeCountStaffArgs;
 };
 export type VendorCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.VendorCountOutputTypeSelect<ExtArgs> | null;
 };
 export type VendorCountOutputTypeCountSuppliedBikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.BikeUnitWhereInput;
+};
+export type VendorCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.UserWhereInput;
 };
 export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -368,6 +459,7 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt?: boolean;
     updatedAt?: boolean;
     suppliedBikes?: boolean | Prisma.Vendor$suppliedBikesArgs<ExtArgs>;
+    staff?: boolean | Prisma.Vendor$staffArgs<ExtArgs>;
     _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendor"]>;
 export type VendorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -403,6 +495,7 @@ export type VendorSelectScalar = {
 export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "contactPerson" | "phoneNumber" | "email" | "address" | "createdAt" | "updatedAt", ExtArgs["result"]["vendor"]>;
 export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     suppliedBikes?: boolean | Prisma.Vendor$suppliedBikesArgs<ExtArgs>;
+    staff?: boolean | Prisma.Vendor$staffArgs<ExtArgs>;
     _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
@@ -411,6 +504,7 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     name: "Vendor";
     objects: {
         suppliedBikes: Prisma.$BikeUnitPayload<ExtArgs>[];
+        staff: Prisma.$UserPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -474,6 +568,7 @@ export interface VendorDelegate<ExtArgs extends runtime.Types.Extensions.Interna
 export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
     suppliedBikes<T extends Prisma.Vendor$suppliedBikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$suppliedBikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    staff<T extends Prisma.Vendor$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -596,6 +691,17 @@ export type Vendor$suppliedBikesArgs<ExtArgs extends runtime.Types.Extensions.In
     take?: number;
     skip?: number;
     distinct?: Prisma.BikeUnitScalarFieldEnum | Prisma.BikeUnitScalarFieldEnum[];
+};
+export type Vendor$staffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[];
+    cursor?: Prisma.UserWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[];
 };
 export type VendorDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.VendorSelect<ExtArgs> | null;

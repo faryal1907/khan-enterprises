@@ -31,7 +31,9 @@ export class AuthService {
         role: true,
         status: true,
         branchId: true,
+        vendorId: true,
         branch: { select: { id: true, name: true, city: true } },
+        vendor: { select: { id: true, name: true } },
       },
     });
 
@@ -50,7 +52,7 @@ export class AuthService {
     }
 
     // 3. Issue tokens
-    const tokens = await this.issueTokens(user.id, user.email, user.role, user.branchId);
+    const tokens = await this.issueTokens(user.id, user.email, user.role, user.branchId, user.vendorId);
 
     // 4. Return tokens + safe user profile (no passwordHash)
     const { passwordHash: _omit, ...profile } = user;
@@ -67,7 +69,7 @@ export class AuthService {
       where: { tokenHash },
       include: {
         user: {
-          select: { id: true, email: true, role: true, status: true, branchId: true },
+          select: { id: true, email: true, role: true, status: true, branchId: true, vendorId: true },
         },
       },
     });
@@ -94,6 +96,7 @@ export class AuthService {
       stored.user.email,
       stored.user.role,
       stored.user.branchId,
+      stored.user.vendorId,
     );
   }
 
@@ -137,11 +140,130 @@ export class AuthService {
         phoneNumber: true,
         role: true,
         status: true,
+        vendorId: true,
         branch: { select: { id: true, name: true, city: true } },
+        vendor: { select: { id: true, name: true } },
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
     });
+  }
+
+  async getUserById(id: string) {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        branchId: true,
+        vendorId: true,
+        branch: { select: { id: true, name: true, city: true } },
+        vendor: { select: { id: true, name: true } },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException("User not found.");
+    }
+
+    return user;
+  }
+
+  async createUser(dto: {
+    email: string;
+    password: string;
+    fullName: string;
+    phoneNumber: string;
+    role: "ADMIN" | "MANAGER" | "SALES_STAFF";
+    branchId?: string;
+    vendorId?: string;
+  }) {
+    const existingUser = await this.prisma.client.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new ForbiddenException("User with this email already exists.");
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.prisma.client.user.create({
+      data: {
+        email: dto.email,
+        passwordHash,
+        fullName: dto.fullName,
+        phoneNumber: dto.phoneNumber,
+        role: dto.role,
+        branchId: dto.branchId || null,
+        vendorId: dto.vendorId || null,
+        status: "ACTIVE",
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        vendorId: true,
+        branch: { select: { id: true, name: true, city: true } },
+        vendor: { select: { id: true, name: true } },
+        createdAt: true,
+      },
+    });
+
+    return user;
+  }
+
+  async updateUser(id: string, dto: {
+    fullName?: string;
+    phoneNumber?: string;
+    role?: "ADMIN" | "MANAGER" | "SALES_STAFF";
+    branchId?: string | null;
+    vendorId?: string | null;
+    status?: "ACTIVE" | "INACTIVE";
+  }) {
+    const user = await this.prisma.client.user.update({
+      where: { id },
+      data: dto,
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        vendorId: true,
+        branch: { select: { id: true, name: true, city: true } },
+        vendor: { select: { id: true, name: true } },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return user;
+  }
+
+  async deactivateUser(id: string) {
+    const user = await this.prisma.client.user.update({
+      where: { id },
+      data: { status: "INACTIVE" },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        status: true,
+      },
+    });
+
+    return { message: "User deactivated successfully.", user };
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -151,8 +273,9 @@ export class AuthService {
     email: string,
     role: string,
     branchId: string | null,
+    vendorId: string | null = null,
   ) {
-    const payload: JwtPayload = { sub: userId, email, role, branchId };
+    const payload: JwtPayload = { sub: userId, email, role, branchId, vendorId };
 
     const accessToken = this.jwt.sign(payload as object, {
       secret: process.env.JWT_SECRET,

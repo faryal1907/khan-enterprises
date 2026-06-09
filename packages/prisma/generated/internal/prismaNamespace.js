@@ -58,6 +58,7 @@ exports.UserScalarFieldEnum = {
     role: 'role',
     status: 'status',
     branchId: 'branchId',
+    vendorId: 'vendorId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -149,6 +150,8 @@ exports.OfferScalarFieldEnum = {
     customerName: 'customerName',
     customerPhone: 'customerPhone',
     customerEmail: 'customerEmail',
+    customerCNIC: 'customerCNIC',
+    customerAddress: 'customerAddress',
     offerAmount: 'offerAmount',
     counterAmount: 'counterAmount',
     message: 'message',

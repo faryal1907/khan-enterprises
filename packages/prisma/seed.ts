@@ -108,20 +108,25 @@ async function main() {
   await prisma.branch.update({ where: { id: branchHQ.id },      data: { managerId: hqManager.id } });
   await prisma.branch.update({ where: { id: branchTordher.id }, data: { managerId: tordherManager.id } });
 
-  // SALES_STAFF — Tordher Branch
+  // SALES_STAFF — added after vendors are seeded; see below
+  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs (sales staff added after vendors).");
+
+    // TEST CUSTOMER (Non-Admin)
+  const customerPasswordHash = await bcrypt.hash("customer123", 10);
+
   await prisma.user.create({
     data: {
-      email: "tordher.staff@khan.com",
-      passwordHash: salesPasswordHash,
-      fullName: "Siddique Ahmed",
-      phoneNumber: "+923451234567",
-      role: "SALES_STAFF",
+      email: "customer1@khan.com",
+      passwordHash: customerPasswordHash,
+      fullName: "Ahmed Hassan",
+      phoneNumber: "+923001112233",
+      role: "CUSTOMER",           // Important: Use CUSTOMER role
       status: "ACTIVE",
-      branchId: branchTordher.id,
+      // No branchId for regular customers
     },
   });
 
-  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs, 1 SALES_STAFF.");
+  console.log("✅ Seeded 1 Test Customer: customer1@khan.com");
 
   // ============================================================================
   // 3. VENDORS
@@ -148,6 +153,41 @@ async function main() {
   });
 
   console.log("✅ Seeded 2 vendors: Evee Pakistan, Roadking Motors.");
+
+  // ============================================================================
+  // SALES STAFF — assigned after vendors are known
+  // ============================================================================
+  console.log("👷 Seeding Sales Staff...");
+
+  // Tordher Branch — Roadking vendor
+  await prisma.user.create({
+    data: {
+      email: "tordher.staff@khan.com",
+      passwordHash: salesPasswordHash,
+      fullName: "Siddique Ahmed",
+      phoneNumber: "+923451234567",
+      role: "SALES_STAFF",
+      status: "ACTIVE",
+      branchId: branchTordher.id,
+      vendorId: vendorRoadking.id,
+    },
+  });
+
+  // Islamabad HQ — Evee vendor
+  await prisma.user.create({
+    data: {
+      email: "isb.staff@khan.com",
+      passwordHash: salesPasswordHash,
+      fullName: "Zubair Ali",
+      phoneNumber: "+923061234567",
+      role: "SALES_STAFF",
+      status: "ACTIVE",
+      branchId: branchHQ.id,
+      vendorId: vendorEvee.id,
+    },
+  });
+
+  console.log("✅ Seeded 2 SALES_STAFF: tordher.staff (Roadking), isb.staff (Evee).");
 
   // ============================================================================
   // 4. BIKE MODELS
@@ -503,6 +543,60 @@ async function main() {
   await prisma.partInventory.create({ data: { partId: partRKSeatCover.id,   branchId: branchTordher.id, quantity: 15, reservedQuantity: 0, reorderLevel: 4  } });
 
   console.log("✅ Seeded 9 parts with inventory across both branches.");
+
+  // ============================================================================
+  // 8. SAMPLE ORDER & TRANSACTION (for testing transaction detail page)
+  // ============================================================================
+  console.log("💳 Seeding sample order and transaction...");
+
+  const sampleOrder = await prisma.order.create({
+    data: {
+      orderNumber: "ORD-2025-001",
+      bikeId: (await prisma.bikeUnit.findFirst({ where: { status: "SOLD" } }))!.id,
+      branchId: branchHQ.id,
+      customerName: "Ahmed Khan",
+      customerPhone: "+923001234567",
+      customerCNIC: "12345-6789012-3",
+      customerAddress: "House 123, Street 5, F-8 Islamabad",
+      negotiatedAmount: 175000,
+      paymentMethod: "BANK_TRANSFER",
+      status: "PAID",
+    },
+  });
+
+  const sampleTransaction = await prisma.paymentTransaction.create({
+    data: {
+      orderId: sampleOrder.id,
+      gatewayReference: "TXN-2025-001",
+      amount: 175000,
+      method: "BANK_TRANSFER",
+      status: "SUCCESS",
+      gatewayResponse: { status: "success", message: "Payment completed" },
+      webhookReceivedAt: new Date(),
+    },
+  });
+
+  console.log("✅ Seeded sample order and transaction.");
+
+  // ============================================================================
+  // 9. SAMPLE AUDIT LOG (for testing audit log detail page)
+  // ============================================================================
+  console.log("📝 Seeding sample audit log...");
+
+  await prisma.auditLog.create({
+    data: {
+      userId: (await prisma.user.findFirst({ where: { role: "ADMIN" } }))!.id,
+      userRole: "ADMIN",
+      action: "UPDATE",
+      entityType: "BIKE_UNIT",
+      entityId: (await prisma.bikeUnit.findFirst())!.id,
+      oldValue: { status: "AVAILABLE" },
+      newValue: { status: "SOLD" },
+      ipAddress: "192.168.1.100",
+    },
+  });
+
+  console.log("✅ Seeded sample audit log.");
 
   console.log("🚀 Seeding complete! Khan Enterprises database is fully stocked.");
 }

@@ -2,12 +2,16 @@ import {
   Controller,
   Post,
   Get,
+  Put,
+  Delete,
+  Param,
   Body,
   Query,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RefreshDto } from "./dto/refresh.dto";
@@ -20,11 +24,17 @@ import { CurrentUser } from "./decorators/current-user.decorator";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get()
+  getRoot() {
+    return { message: "API is running 🚀" };
+  }
+
   /**
    * POST /api/auth/login
    * Authenticates a staff user and returns access + refresh tokens.
    */
   @Post("login")
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
@@ -82,5 +92,49 @@ export class AuthController {
   async checkUser(@Query("email") email: string) {
     const user = await this.authService.findUserByEmail(email);
     return { exists: true, user };
+  }
+
+  /**
+   * POST /api/auth/users
+   * Create a new staff user. ADMIN only.
+   */
+  @Post("users")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async createUser(@Body() dto: any) {
+    return this.authService.createUser(dto);
+  }
+
+  /**
+   * GET /api/auth/users/:id
+   * Get a single user by ID. ADMIN only.
+   */
+  @Get("users/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async getUser(@Param("id") id: string) {
+    return this.authService.getUserById(id);
+  }
+
+  /**
+   * PUT /api/auth/users/:id
+   * Update a user. ADMIN only.
+   */
+  @Put("users/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async updateUser(@Param("id") id: string, @Body() dto: any) {
+    return this.authService.updateUser(id, dto);
+  }
+
+  /**
+   * DELETE /api/auth/users/:id
+   * Deactivate a user. ADMIN only.
+   */
+  @Delete("users/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async deactivateUser(@Param("id") id: string) {
+    return this.authService.deactivateUser(id);
   }
 }

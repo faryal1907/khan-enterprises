@@ -2,6 +2,7 @@ export declare const UserRole: {
     readonly ADMIN: "ADMIN";
     readonly MANAGER: "MANAGER";
     readonly SALES_STAFF: "SALES_STAFF";
+    readonly CUSTOMER: "CUSTOMER";
 };
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 export declare const UserStatus: {
