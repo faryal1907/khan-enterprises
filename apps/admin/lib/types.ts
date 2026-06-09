@@ -9,6 +9,7 @@ export interface User {
   email: string;
   role: UserRole;
   branchId: string | null;
+  vendorId: string | null;
   status: string;
 }
 

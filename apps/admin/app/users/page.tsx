@@ -20,6 +20,10 @@ type User = {
     name: string;
     city: string;
   } | null;
+  vendor: {
+    id: string;
+    name: string;
+  } | null;
   createdAt: string;
 };
 
@@ -151,6 +155,9 @@ export default function UsersPage() {
                   Branch
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  Vendor
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
@@ -161,7 +168,7 @@ export default function UsersPage() {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                  <td colSpan={7} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
                     No users found
                   </td>
                 </tr>
@@ -183,6 +190,11 @@ export default function UsersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
                       {user.branch ? `${user.branch.name} (${user.branch.city})` : "—"}
+                    </td>
+                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                      {user.role === "SALES_STAFF"
+                        ? (user.vendor ? user.vendor.name : <span style={{ color: theme.accents.secondary }}>Not assigned</span>)
+                        : "—"}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span

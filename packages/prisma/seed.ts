@@ -108,35 +108,8 @@ async function main() {
   await prisma.branch.update({ where: { id: branchHQ.id },      data: { managerId: hqManager.id } });
   await prisma.branch.update({ where: { id: branchTordher.id }, data: { managerId: tordherManager.id } });
 
-  // SALES_STAFF — Tordher Branch — assigned to Roadking vendor
-  await prisma.user.create({
-    data: {
-      email: "tordher.staff@khan.com",
-      passwordHash: salesPasswordHash,
-      fullName: "Siddique Ahmed",
-      phoneNumber: "+923451234567",
-      role: "SALES_STAFF",
-      status: "ACTIVE",
-      branchId: branchTordher.id,
-      vendorId: vendorRoadking.id,
-    },
-  });
-
-  // SALES_STAFF — Islamabad HQ — assigned to Evee vendor
-  await prisma.user.create({
-    data: {
-      email: "isb.staff@khan.com",
-      passwordHash: salesPasswordHash,
-      fullName: "Zubair Ali",
-      phoneNumber: "+923061234567",
-      role: "SALES_STAFF",
-      status: "ACTIVE",
-      branchId: branchHQ.id,
-      vendorId: vendorEvee.id,
-    },
-  });
-
-  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs, 2 SALES_STAFF (1 per vendor).");
+  // SALES_STAFF — added after vendors are seeded; see below
+  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs (sales staff added after vendors).");
 
     // TEST CUSTOMER (Non-Admin)
   const customerPasswordHash = await bcrypt.hash("customer123", 10);
@@ -180,6 +153,41 @@ async function main() {
   });
 
   console.log("✅ Seeded 2 vendors: Evee Pakistan, Roadking Motors.");
+
+  // ============================================================================
+  // SALES STAFF — assigned after vendors are known
+  // ============================================================================
+  console.log("👷 Seeding Sales Staff...");
+
+  // Tordher Branch — Roadking vendor
+  await prisma.user.create({
+    data: {
+      email: "tordher.staff@khan.com",
+      passwordHash: salesPasswordHash,
+      fullName: "Siddique Ahmed",
+      phoneNumber: "+923451234567",
+      role: "SALES_STAFF",
+      status: "ACTIVE",
+      branchId: branchTordher.id,
+      vendorId: vendorRoadking.id,
+    },
+  });
+
+  // Islamabad HQ — Evee vendor
+  await prisma.user.create({
+    data: {
+      email: "isb.staff@khan.com",
+      passwordHash: salesPasswordHash,
+      fullName: "Zubair Ali",
+      phoneNumber: "+923061234567",
+      role: "SALES_STAFF",
+      status: "ACTIVE",
+      branchId: branchHQ.id,
+      vendorId: vendorEvee.id,
+    },
+  });
+
+  console.log("✅ Seeded 2 SALES_STAFF: tordher.staff (Roadking), isb.staff (Evee).");
 
   // ============================================================================
   // 4. BIKE MODELS

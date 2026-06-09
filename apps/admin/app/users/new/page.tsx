@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
+
+type Vendor = { id: string; name: string };
+type Branch = { id: string; name: string; city: string };
 
 export default function CreateUserPage() {
   const router = useRouter();
@@ -15,9 +18,28 @@ export default function CreateUserPage() {
     phoneNumber: "",
     role: "MANAGER",
     branchId: "",
+    vendorId: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+
+  useEffect(() => {
+    const fetchRefData = async () => {
+      try {
+        const [vendorRes, branchRes] = await Promise.all([
+          api.get("/vendors"),
+          api.get("/branches"),
+        ]);
+        setVendors(vendorRes.data.vendors);
+        setBranches(branchRes.data.branches);
+      } catch (err) {
+        console.error("Failed to fetch reference data:", err);
+      }
+    };
+    fetchRefData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +56,9 @@ export default function CreateUserPage() {
       };
       if (formData.branchId) {
         createData.branchId = formData.branchId;
+      }
+      if (formData.role === "SALES_STAFF" && formData.vendorId) {
+        createData.vendorId = formData.vendorId;
       }
 
       await api.post("/auth/users", createData);
@@ -160,7 +185,7 @@ export default function CreateUserPage() {
                 </label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value, vendorId: "" })}
                   className="w-full px-3 py-2 text-sm rounded"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
@@ -190,13 +215,46 @@ export default function CreateUserPage() {
                   }}
                 >
                   <option value="">No Branch (Global)</option>
-                  <option value="1">Islamabad Headquarters</option>
-                  <option value="2">Tordher Branch</option>
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.name} ({branch.city})
+                    </option>
+                  ))}
                 </select>
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
-                  Leave empty for global users (CEO/Admin)
+                  Leave empty for global users (Admin)
                 </p>
               </div>
+
+              {/* Vendor assignment — only for SALES_STAFF */}
+              {formData.role === "SALES_STAFF" && (
+                <div>
+                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+                    Assigned Vendor *
+                  </label>
+                  <select
+                    value={formData.vendorId}
+                    onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
+                    className="w-full px-3 py-2 text-sm rounded"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                    }}
+                    required
+                  >
+                    <option value="">Select vendor</option>
+                    {vendors.map((vendor) => (
+                      <option key={vendor.id} value={vendor.id}>
+                        {vendor.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                    Sales staff can only access bikes and sales from their assigned vendor.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="mt-6 flex gap-3">

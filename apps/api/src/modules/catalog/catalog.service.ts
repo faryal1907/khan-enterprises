@@ -14,6 +14,7 @@ export class CatalogService {
     priceMin?: number;
     priceMax?: number;
     branchId?: string;
+    vendorId?: string;
   }) {
     const where: any = {
       status: "AVAILABLE",
@@ -25,6 +26,10 @@ export class CatalogService {
 
     if (filters.branchId) {
       where.branchId = filters.branchId;
+    }
+
+    if (filters.vendorId) {
+      where.vendorId = filters.vendorId;
     }
 
     if (filters.priceMin || filters.priceMax) {

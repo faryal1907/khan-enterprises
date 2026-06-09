@@ -14,14 +14,22 @@ type User = {
   role: string;
   status: string;
   branchId: string | null;
+  vendorId: string | null;
   branch: {
     id: string;
     name: string;
     city: string;
   } | null;
+  vendor: {
+    id: string;
+    name: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 };
+
+type Vendor = { id: string; name: string };
+type Branch = { id: string; name: string; city: string };
 
 export default function UserDetailPage() {
   const params = useParams<{ id: string }>();
@@ -35,7 +43,26 @@ export default function UserDetailPage() {
     phoneNumber: "",
     role: "",
     branchId: "",
+    vendorId: "",
   });
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+
+  useEffect(() => {
+    const fetchRefData = async () => {
+      try {
+        const [vendorRes, branchRes] = await Promise.all([
+          api.get("/vendors"),
+          api.get("/branches"),
+        ]);
+        setVendors(vendorRes.data.vendors);
+        setBranches(branchRes.data.branches);
+      } catch (err) {
+        console.error("Failed to fetch reference data:", err);
+      }
+    };
+    fetchRefData();
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,6 +74,7 @@ export default function UserDetailPage() {
           phoneNumber: res.data.phoneNumber,
           role: res.data.role,
           branchId: res.data.branchId || "",
+          vendorId: res.data.vendorId || "",
         });
       } catch (err) {
         setError("Failed to load user details");
@@ -66,12 +94,9 @@ export default function UserDetailPage() {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
         role: formData.role,
+        branchId: formData.branchId || null,
+        vendorId: formData.role === "SALES_STAFF" ? (formData.vendorId || null) : null,
       };
-      if (formData.branchId) {
-        updateData.branchId = formData.branchId;
-      } else {
-        updateData.branchId = null;
-      }
 
       const res = await api.put(`/auth/users/${userId}`, updateData);
       setUser(res.data);
@@ -233,7 +258,7 @@ export default function UserDetailPage() {
                   </label>
                   <select
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value, vendorId: "" })}
                     className="w-full px-3 py-2 text-sm rounded"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -262,10 +287,43 @@ export default function UserDetailPage() {
                     }}
                   >
                     <option value="">No Branch (Global)</option>
-                    <option value="1">Islamabad Headquarters</option>
-                    <option value="2">Tordher Branch</option>
+                    {branches.map((branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.name} ({branch.city})
+                      </option>
+                    ))}
                   </select>
                 </div>
+
+                {/* Vendor assignment — only shown for SALES_STAFF */}
+                {formData.role === "SALES_STAFF" && (
+                  <div className="col-span-2">
+                    <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+                      Assigned Vendor *
+                    </label>
+                    <select
+                      value={formData.vendorId}
+                      onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
+                      className="w-full px-3 py-2 text-sm rounded"
+                      style={{
+                        backgroundColor: theme.backgrounds.tertiary,
+                        border: `1px solid ${theme.borders.medium}`,
+                        color: theme.text.primary,
+                      }}
+                      required
+                    >
+                      <option value="">Select vendor</option>
+                      {vendors.map((vendor) => (
+                        <option key={vendor.id} value={vendor.id}>
+                          {vendor.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                      Sales staff can only access bikes and sales from their assigned vendor.
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="mt-4 flex gap-2">
                 <button
@@ -300,6 +358,9 @@ export default function UserDetailPage() {
               <Info label="Phone Number" value={user.phoneNumber} />
               <Info label="Role" value={user.role} />
               <Info label="Branch" value={user.branch ? `${user.branch.name} (${user.branch.city})` : "No Branch (Global)"} />
+              {user.role === "SALES_STAFF" && (
+                <Info label="Assigned Vendor" value={user.vendor ? user.vendor.name : "Not assigned"} />
+              )}
               <Info label="Status" value={user.status} />
               <Info label="Created At" value={new Date(user.createdAt).toLocaleString()} />
             </div>

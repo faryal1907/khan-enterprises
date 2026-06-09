@@ -111,10 +111,14 @@ export class InventoryController {
    * GET /api/inventory/parts/low-stock
    * GET /api/inventory/parts/low-stock?branchId=<id>
    * Returns PartInventory rows where quantity < reorderLevel.
+   * SALES_STAFF: automatically scoped to their assigned branch only.
    */
   @Get("parts/low-stock")
-  @Roles("ADMIN", "MANAGER")
-  async getLowStockItems(@Query("branchId") branchId?: string) {
+  async getLowStockItems(@CurrentUser() user: any, @Query("branchId") branchId?: string) {
+    // Enforce branch scoping for SALES_STAFF
+    if (user.role === "SALES_STAFF") {
+      branchId = user.branchId ?? undefined;
+    }
     const items = await this.inventoryService.getLowStockItems(branchId);
     return { count: items.length, items };
   }

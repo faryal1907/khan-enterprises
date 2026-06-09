@@ -18,6 +18,7 @@ export default function BikesListPage() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
   const isManager = user?.role === UserRole.MANAGER;
+  const isStaff = user?.role === "SALES_STAFF";
 
   const [filters, setFilters] = useState({
     branch: "",
@@ -43,7 +44,7 @@ export default function BikesListPage() {
   const [transferBranchId, setTransferBranchId] = useState("");
   const [statusValue, setStatusValue] = useState("");
 
-  // Adjust state during render when user.branchId changes to avoid synchronous setState in useEffect
+  // Lock branch filter for non-admins and vendor filter for SALES_STAFF
   const [prevUserBranchId, setPrevUserBranchId] = useState(user?.branchId);
   if (user?.branchId !== prevUserBranchId) {
     setPrevUserBranchId(user?.branchId);
@@ -51,8 +52,14 @@ export default function BikesListPage() {
       setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
   }
+  const [prevVendorId, setPrevVendorId] = useState(user?.vendorId);
+  if (user?.vendorId !== prevVendorId) {
+    setPrevVendorId(user?.vendorId ?? null);
+    if (isStaff && user?.vendorId) {
+      setFilters((prev) => ({ ...prev, vendor: user.vendorId || "" }));
+    }
+  }
 
-  // Fetch reference data on mount
   useEffect(() => {
     const fetchReferenceData = async () => {
       try {
@@ -97,6 +104,10 @@ export default function BikesListPage() {
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
     if (key === "branch" && !isAdmin) {
+      return;
+    }
+    // Prevent SALES_STAFF from changing vendor filter
+    if (key === "vendor" && isStaff) {
       return;
     }
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -341,11 +352,13 @@ export default function BikesListPage() {
               <select
                 value={filters.vendor}
                 onChange={(e) => handleFilterChange("vendor", e.target.value)}
+                disabled={isStaff}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
+                  opacity: isStaff ? 0.6 : 1,
                 }}
               >
                 <option value="">All Vendors</option>
@@ -355,6 +368,11 @@ export default function BikesListPage() {
                   </option>
                 ))}
               </select>
+              {isStaff && (
+                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                  Filtered to your vendor
+                </p>
+              )}
             </div>
             <div>
               <label

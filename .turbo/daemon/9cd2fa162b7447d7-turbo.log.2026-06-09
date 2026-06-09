@@ -1,0 +1,19 @@
+2026-06-09T07:19:32.633660Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon"), AnchoredSystemPathBuf(".turbo\\cookies"), AnchoredSystemPathBuf(".turbo"), AnchoredSystemPathBuf(".turbo\\cookies\\.turbo-cookie"), AnchoredSystemPathBuf(".turbo\\cookies\\1.cookie")}
+2026-06-09T07:19:32.634038Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-09T07:19:32.705881Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-06-09T07:19:33.432271Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-09")}
+2026-06-09T07:19:33.432294Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-09T07:19:34.732253Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\cookies")}
+2026-06-09T07:19:34.732313Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-09T07:19:35.440604Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-09")}
+2026-06-09T07:19:35.440658Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-09T07:21:12.742137Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\prisma.config.ts")}
+2026-06-09T07:21:12.742217Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
+2026-06-09T07:22:33.033743Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\seed.ts")}
+2026-06-09T07:22:33.033775Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
+2026-06-09T07:23:41.033958Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\seed.ts")}
+2026-06-09T07:23:41.034026Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
+2026-06-09T07:28:05.832025Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-09")}
+2026-06-09T07:28:05.832062Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-09T07:34:22.538830Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-09")}
+2026-06-09T07:34:22.538869Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))

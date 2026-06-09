@@ -9,6 +9,9 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 export default defineConfig({
   schema: "./schema.prisma",
+  migrations: {
+    seed: "tsx seed.ts",
+  },
   datasource: {
     url: env("DATABASE_URL"),
   },
