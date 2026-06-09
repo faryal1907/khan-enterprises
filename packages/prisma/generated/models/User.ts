@@ -33,6 +33,7 @@ export type UserMinAggregateOutputType = {
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   branchId: string | null
+  vendorId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +47,7 @@ export type UserMaxAggregateOutputType = {
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   branchId: string | null
+  vendorId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +61,7 @@ export type UserCountAggregateOutputType = {
   role: number
   status: number
   branchId: number
+  vendorId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,6 +77,7 @@ export type UserMinAggregateInputType = {
   role?: true
   status?: true
   branchId?: true
+  vendorId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +91,7 @@ export type UserMaxAggregateInputType = {
   role?: true
   status?: true
   branchId?: true
+  vendorId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +105,7 @@ export type UserCountAggregateInputType = {
   role?: true
   status?: true
   branchId?: true
+  vendorId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -186,6 +192,7 @@ export type UserGroupByOutputType = {
   role: $Enums.UserRole
   status: $Enums.UserStatus
   branchId: string | null
+  vendorId: string | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -220,9 +227,11 @@ export type UserWhereInput = {
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   branchId?: Prisma.StringNullableFilter<"User"> | string | null
+  vendorId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   branch?: Prisma.XOR<Prisma.BranchNullableScalarRelationFilter, Prisma.BranchWhereInput> | null
+  vendor?: Prisma.XOR<Prisma.VendorNullableScalarRelationFilter, Prisma.VendorWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
   createdOffers?: Prisma.OfferListRelationFilter
@@ -241,9 +250,11 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   branchId?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   branch?: Prisma.BranchOrderByWithRelationInput
+  vendor?: Prisma.VendorOrderByWithRelationInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   createdOffers?: Prisma.OfferOrderByRelationAggregateInput
@@ -265,9 +276,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   branchId?: Prisma.StringNullableFilter<"User"> | string | null
+  vendorId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   branch?: Prisma.XOR<Prisma.BranchNullableScalarRelationFilter, Prisma.BranchWhereInput> | null
+  vendor?: Prisma.XOR<Prisma.VendorNullableScalarRelationFilter, Prisma.VendorWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
   createdOffers?: Prisma.OfferListRelationFilter
@@ -286,6 +299,7 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   branchId?: Prisma.SortOrderInput | Prisma.SortOrder
+  vendorId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -305,6 +319,7 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   branchId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  vendorId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -320,6 +335,7 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
@@ -338,6 +354,7 @@ export type UserUncheckedCreateInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -360,6 +377,7 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
@@ -378,6 +396,7 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -398,6 +417,7 @@ export type UserCreateManyInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -423,6 +443,7 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -436,6 +457,7 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
+  vendorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -449,6 +471,7 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
+  vendorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -462,6 +485,7 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
+  vendorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -578,6 +602,48 @@ export type UserUncheckedUpdateManyWithoutBranchNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
+export type UserCreateNestedManyWithoutVendorInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorInput, Prisma.UserUncheckedCreateWithoutVendorInput> | Prisma.UserCreateWithoutVendorInput[] | Prisma.UserUncheckedCreateWithoutVendorInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorInput | Prisma.UserCreateOrConnectWithoutVendorInput[]
+  createMany?: Prisma.UserCreateManyVendorInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutVendorInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorInput, Prisma.UserUncheckedCreateWithoutVendorInput> | Prisma.UserCreateWithoutVendorInput[] | Prisma.UserUncheckedCreateWithoutVendorInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorInput | Prisma.UserCreateOrConnectWithoutVendorInput[]
+  createMany?: Prisma.UserCreateManyVendorInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutVendorNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorInput, Prisma.UserUncheckedCreateWithoutVendorInput> | Prisma.UserCreateWithoutVendorInput[] | Prisma.UserUncheckedCreateWithoutVendorInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorInput | Prisma.UserCreateOrConnectWithoutVendorInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutVendorInput | Prisma.UserUpsertWithWhereUniqueWithoutVendorInput[]
+  createMany?: Prisma.UserCreateManyVendorInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutVendorInput | Prisma.UserUpdateWithWhereUniqueWithoutVendorInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutVendorInput | Prisma.UserUpdateManyWithWhereWithoutVendorInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutVendorNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorInput, Prisma.UserUncheckedCreateWithoutVendorInput> | Prisma.UserCreateWithoutVendorInput[] | Prisma.UserUncheckedCreateWithoutVendorInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorInput | Prisma.UserCreateOrConnectWithoutVendorInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutVendorInput | Prisma.UserUpsertWithWhereUniqueWithoutVendorInput[]
+  createMany?: Prisma.UserCreateManyVendorInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutVendorInput | Prisma.UserUpdateWithWhereUniqueWithoutVendorInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutVendorInput | Prisma.UserUpdateManyWithWhereWithoutVendorInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
 export type UserCreateNestedOneWithoutStockMovementsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutStockMovementsInput, Prisma.UserUncheckedCreateWithoutStockMovementsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutStockMovementsInput
@@ -669,6 +735,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
   processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput
@@ -686,6 +753,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -723,6 +791,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
   processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput
@@ -740,6 +809,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -761,6 +831,7 @@ export type UserCreateWithoutManagedBranchesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
@@ -778,6 +849,7 @@ export type UserUncheckedCreateWithoutManagedBranchesInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -803,6 +875,7 @@ export type UserCreateWithoutBranchInput = {
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
@@ -820,6 +893,7 @@ export type UserUncheckedCreateWithoutBranchInput = {
   phoneNumber?: string | null
   role: $Enums.UserRole
   status?: $Enums.UserStatus
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -863,6 +937,7 @@ export type UserUpdateWithoutManagedBranchesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
@@ -880,6 +955,7 @@ export type UserUncheckedUpdateWithoutManagedBranchesInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -918,8 +994,75 @@ export type UserScalarWhereInput = {
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   branchId?: Prisma.StringNullableFilter<"User"> | string | null
+  vendorId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+}
+
+export type UserCreateWithoutVendorInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
+  processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
+}
+
+export type UserUncheckedCreateWithoutVendorInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  branchId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  createdOffers?: Prisma.OfferUncheckedCreateNestedManyWithoutCreatedByInput
+  processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
+}
+
+export type UserCreateOrConnectWithoutVendorInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVendorInput, Prisma.UserUncheckedCreateWithoutVendorInput>
+}
+
+export type UserCreateManyVendorInputEnvelope = {
+  data: Prisma.UserCreateManyVendorInput | Prisma.UserCreateManyVendorInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutVendorInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVendorInput, Prisma.UserUncheckedUpdateWithoutVendorInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVendorInput, Prisma.UserUncheckedCreateWithoutVendorInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutVendorInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVendorInput, Prisma.UserUncheckedUpdateWithoutVendorInput>
+}
+
+export type UserUpdateManyWithWhereWithoutVendorInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutVendorInput>
 }
 
 export type UserCreateWithoutStockMovementsInput = {
@@ -933,6 +1076,7 @@ export type UserCreateWithoutStockMovementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
@@ -950,6 +1094,7 @@ export type UserUncheckedCreateWithoutStockMovementsInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -987,6 +1132,7 @@ export type UserUpdateWithoutStockMovementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
@@ -1004,6 +1150,7 @@ export type UserUncheckedUpdateWithoutStockMovementsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1025,6 +1172,7 @@ export type UserCreateWithoutCreatedOffersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput
@@ -1042,6 +1190,7 @@ export type UserUncheckedCreateWithoutCreatedOffersInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1079,6 +1228,7 @@ export type UserUpdateWithoutCreatedOffersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput
@@ -1096,6 +1246,7 @@ export type UserUncheckedUpdateWithoutCreatedOffersInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1117,6 +1268,7 @@ export type UserCreateWithoutProcessedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
@@ -1134,6 +1286,7 @@ export type UserUncheckedCreateWithoutProcessedOrdersInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1171,6 +1324,7 @@ export type UserUpdateWithoutProcessedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
@@ -1188,6 +1342,7 @@ export type UserUncheckedUpdateWithoutProcessedOrdersInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1209,6 +1364,7 @@ export type UserCreateWithoutDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
@@ -1226,6 +1382,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1263,6 +1420,7 @@ export type UserUpdateWithoutDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
@@ -1280,6 +1438,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1301,6 +1460,7 @@ export type UserCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   createdOffers?: Prisma.OfferCreateNestedManyWithoutCreatedByInput
   processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput
@@ -1318,6 +1478,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   role: $Enums.UserRole
   status?: $Enums.UserStatus
   branchId?: string | null
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1355,6 +1516,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
   processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput
@@ -1372,6 +1534,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1390,6 +1553,7 @@ export type UserCreateManyBranchInput = {
   phoneNumber?: string | null
   role: $Enums.UserRole
   status?: $Enums.UserStatus
+  vendorId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1404,6 +1568,7 @@ export type UserUpdateWithoutBranchInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
@@ -1421,6 +1586,7 @@ export type UserUncheckedUpdateWithoutBranchInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1440,6 +1606,73 @@ export type UserUncheckedUpdateManyWithoutBranchInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserCreateManyVendorInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  branchId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserUpdateWithoutVendorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  createdOffers?: Prisma.OfferUpdateManyWithoutCreatedByNestedInput
+  processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVendorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  createdOffers?: Prisma.OfferUncheckedUpdateManyWithoutCreatedByNestedInput
+  processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutVendorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1538,9 +1771,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   status?: boolean
   branchId?: boolean
+  vendorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   branch?: boolean | Prisma.User$branchArgs<ExtArgs>
+  vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   createdOffers?: boolean | Prisma.User$createdOffersArgs<ExtArgs>
@@ -1560,9 +1795,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   status?: boolean
   branchId?: boolean
+  vendorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   branch?: boolean | Prisma.User$branchArgs<ExtArgs>
+  vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1574,9 +1811,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   status?: boolean
   branchId?: boolean
+  vendorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   branch?: boolean | Prisma.User$branchArgs<ExtArgs>
+  vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1588,13 +1827,15 @@ export type UserSelectScalar = {
   role?: boolean
   status?: boolean
   branchId?: boolean
+  vendorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "phoneNumber" | "role" | "status" | "branchId" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "fullName" | "phoneNumber" | "role" | "status" | "branchId" | "vendorId" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branch?: boolean | Prisma.User$branchArgs<ExtArgs>
+  vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   createdOffers?: boolean | Prisma.User$createdOffersArgs<ExtArgs>
@@ -1606,15 +1847,18 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branch?: boolean | Prisma.User$branchArgs<ExtArgs>
+  vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>
 }
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branch?: boolean | Prisma.User$branchArgs<ExtArgs>
+  vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>
 }
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
     branch: Prisma.$BranchPayload<ExtArgs> | null
+    vendor: Prisma.$VendorPayload<ExtArgs> | null
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     createdOffers: Prisma.$OfferPayload<ExtArgs>[]
@@ -1632,6 +1876,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: $Enums.UserRole
     status: $Enums.UserStatus
     branchId: string | null
+    vendorId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -2029,6 +2274,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   branch<T extends Prisma.User$branchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$branchArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  vendor<T extends Prisma.User$vendorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vendorArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdOffers<T extends Prisma.User$createdOffersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdOffersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2073,6 +2319,7 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
   readonly branchId: Prisma.FieldRef<"User", 'String'>
+  readonly vendorId: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -2492,6 +2739,25 @@ export type User$branchArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   include?: Prisma.BranchInclude<ExtArgs> | null
   where?: Prisma.BranchWhereInput
+}
+
+/**
+ * User.vendor
+ */
+export type User$vendorArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Vendor
+   */
+  select?: Prisma.VendorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Vendor
+   */
+  omit?: Prisma.VendorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorInclude<ExtArgs> | null
+  where?: Prisma.VendorWhereInput
 }
 
 /**

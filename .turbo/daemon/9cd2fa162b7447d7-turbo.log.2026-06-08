@@ -153,3 +153,18 @@
 2026-06-08T15:30:17.737656Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }, WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
 2026-06-08T15:30:17.737772Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
 2026-06-08T15:30:19.404557Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-06-08T15:31:18.251740Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-08")}
+2026-06-08T15:31:18.251818Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-08T15:34:53.052794Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\web\\app\\offers\\[id]"), AnchoredSystemPathBuf("apps\\web\\app\\offers"), AnchoredSystemPathBuf("apps\\web\\app")}
+2026-06-08T15:34:53.052838Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps\\web") }}))
+2026-06-08T15:34:53.444076Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\web\\app\\offers\\[id]\\page.tsx"), AnchoredSystemPathBuf("apps\\web\\app\\offers"), AnchoredSystemPathBuf("apps\\web\\app\\offers\\[id]")}
+2026-06-08T15:34:53.444102Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps\\web") }}))
+2026-06-08T15:34:53.444160Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-06-08T15:35:23.554858Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\web\\app\\bikes\\[id]\\page.tsx")}
+2026-06-08T15:35:23.554894Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps\\web") }}))
+2026-06-08T15:36:03.560057Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\api\\src\\modules\\offers\\offers.controller.ts")}
+2026-06-08T15:36:03.560077Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
+2026-06-08T15:38:56.463668Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-08")}
+2026-06-08T15:38:56.463699Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-08T15:40:19.052239Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-08")}
+2026-06-08T15:40:19.052278Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))

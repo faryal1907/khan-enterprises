@@ -1,0 +1,379 @@
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { QueryOrdersDto } from "./dto/query-orders.dto";
+import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
+import { CancelOrderDto } from "./dto/cancel-order.dto";
+import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
+import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
+
+@Injectable()
+export class OrdersService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Paginated, filtered by status/branchId/date range. Include bike, offer, branch, processedBy
+   */
+  async getOrders(query: QueryOrdersDto) {
+    const where: any = {};
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    if (query.branchId) {
+      where.branchId = query.branchId;
+    }
+
+    if (query.dateFrom || query.dateTo) {
+      where.createdAt = {};
+      if (query.dateFrom) {
+        where.createdAt.gte = new Date(query.dateFrom);
+      }
+      if (query.dateTo) {
+        where.createdAt.lte = new Date(query.dateTo);
+      }
+    }
+
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      this.prisma.client.order.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          bike: {
+            include: {
+              model: true,
+            },
+          },
+          offer: true,
+          branch: true,
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.order.count({ where }),
+    ]);
+
+    return {
+      orders,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
+   * Full detail: bike + model, offer, branch, transactions, delivery, documents
+   */
+  async getOrderById(id: string) {
+    const order = await this.prisma.client.order.findUnique({
+      where: { id },
+      include: {
+        bike: {
+          include: {
+            model: true,
+          },
+        },
+        offer: true,
+        branch: true,
+        transactions: true,
+        delivery: true,
+        documents: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    return order;
+  }
+
+  /**
+   * Used for invoice/customer-facing lookup
+   */
+  async getOrderByNumber(orderNumber: string) {
+    const order = await this.prisma.client.order.findUnique({
+      where: { orderNumber },
+      include: {
+        bike: {
+          include: {
+            model: true,
+          },
+        },
+        offer: true,
+        branch: true,
+        transactions: true,
+        delivery: true,
+        documents: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with number ${orderNumber} not found`);
+    }
+
+    return order;
+  }
+
+  /**
+   * Advance order through valid state transitions only
+   */
+  async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, adminId: string) {
+    const order = await this.getOrderById(id);
+
+    const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+      [OrderStatus.PENDING_PAYMENT]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+      [OrderStatus.PAID]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+      [OrderStatus.CONFIRMED]: [OrderStatus.READY_FOR_DELIVERY, OrderStatus.CANCELLED],
+      [OrderStatus.READY_FOR_DELIVERY]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
+      [OrderStatus.DELIVERED]: [],
+      [OrderStatus.CANCELLED]: [],
+    };
+
+    const currentStatus = order.status as OrderStatus;
+    const newStatus = dto.status;
+
+    if (!validTransitions[currentStatus].includes(newStatus)) {
+      throw new BadRequestException(
+        `Invalid status transition from ${currentStatus} to ${newStatus}`
+      );
+    }
+
+    return this.prisma.client.order.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        processedById: adminId,
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+          },
+        },
+        offer: true,
+        branch: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Atomic: set order → CANCELLED, revert bike → AVAILABLE, clear reservedUntil,
+   * if any transaction is SUCCESS flag for refund
+   */
+  async cancelOrder(id: string, dto: CancelOrderDto, adminId: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch order, verify not already DELIVERED or CANCELLED
+      const order = await tx.order.findUnique({
+        where: { id },
+        include: {
+          transactions: true,
+          processedBy: {
+            select: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${id} not found`);
+      }
+
+      if (order.status === OrderStatus.DELIVERED) {
+        throw new BadRequestException(`Cannot cancel a delivered order`);
+      }
+
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new BadRequestException(`Order is already cancelled`);
+      }
+
+      // 2. Update order: status → CANCELLED
+      const updatedOrder = await tx.order.update({
+        where: { id },
+        data: {
+          status: OrderStatus.CANCELLED,
+          processedById: adminId,
+        },
+      });
+
+      // 3. Update bike: status → AVAILABLE, reservedUntil → null, soldAt → null
+      await tx.bikeUnit.update({
+        where: { id: order.bikeId },
+        data: {
+          status: BikeStatus.AVAILABLE,
+          reservedUntil: null,
+          soldAt: null,
+        },
+      });
+
+      // 4. Check for any SUCCESS transactions → if found, create AuditLog entry flagging refund needed
+      const successTransactions = order.transactions.filter(
+        (t) => t.status === PaymentStatus.SUCCESS
+      );
+
+      if (successTransactions.length > 0) {
+        await tx.auditLog.create({
+          data: {
+            userId: adminId,
+            userRole: order.processedBy?.role || null,
+            action: AuditAction.REFUND,
+            entityType: "Order",
+            entityId: order.id,
+            oldValue: { status: order.status },
+            newValue: { status: OrderStatus.CANCELLED, refundRequired: true },
+          },
+        });
+      }
+
+      return {
+        order: updatedOrder,
+        message: "Order cancelled successfully",
+        refundRequired: successTransactions.length > 0,
+      };
+    });
+  }
+
+  /**
+   * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
+   * + order → PAID + offer → PAID, set bike → SOLD — all in one transaction
+   */
+  async recordPayment(orderId: string, dto: CompleteOrderDetailsDto, adminId?: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch order
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          bike: true,
+          offer: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      if (order.status !== OrderStatus.PENDING_PAYMENT) {
+        throw new BadRequestException(
+          `Order is not in PENDING_PAYMENT status. Current status: ${order.status}`
+        );
+      }
+
+      // 2. Update order with customer details if not already present
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          customerCNIC: dto.customerCNIC,
+          customerAddress: dto.customerAddress,
+          paymentMethod: dto.paymentMethod,
+        },
+      });
+
+      // 3. Create PaymentTransaction
+      const transaction = await tx.paymentTransaction.create({
+        data: {
+          orderId,
+          amount: order.negotiatedAmount,
+          method: dto.paymentMethod,
+          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+        },
+      });
+
+      // 4. If CASH, immediately set order → PAID, offer → PAID, bike → SOLD
+      if (dto.paymentMethod === "CASH") {
+        await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.PAID,
+            processedById: adminId || null,
+          },
+        });
+
+        if (order.offerId) {
+          await tx.offer.update({
+            where: { id: order.offerId },
+            data: {
+              status: "PAID",
+            },
+          });
+        }
+
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
+          },
+        });
+      }
+
+      return {
+        order: updatedOrder,
+        transaction,
+      };
+    });
+  }
+
+  /**
+   * Branch-scoped order list (used by MANAGER)
+   */
+  async getOrdersByBranch(branchId: string) {
+    const orders = await this.prisma.client.order.findMany({
+      where: { branchId },
+      include: {
+        bike: {
+          include: {
+            model: true,
+          },
+        },
+        offer: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return orders;
+  }
+}

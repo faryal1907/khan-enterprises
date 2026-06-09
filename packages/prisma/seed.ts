@@ -108,7 +108,7 @@ async function main() {
   await prisma.branch.update({ where: { id: branchHQ.id },      data: { managerId: hqManager.id } });
   await prisma.branch.update({ where: { id: branchTordher.id }, data: { managerId: tordherManager.id } });
 
-  // SALES_STAFF — Tordher Branch
+  // SALES_STAFF — Tordher Branch — assigned to Roadking vendor
   await prisma.user.create({
     data: {
       email: "tordher.staff@khan.com",
@@ -118,10 +118,25 @@ async function main() {
       role: "SALES_STAFF",
       status: "ACTIVE",
       branchId: branchTordher.id,
+      vendorId: vendorRoadking.id,
     },
   });
 
-  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs, 1 SALES_STAFF.");
+  // SALES_STAFF — Islamabad HQ — assigned to Evee vendor
+  await prisma.user.create({
+    data: {
+      email: "isb.staff@khan.com",
+      passwordHash: salesPasswordHash,
+      fullName: "Zubair Ali",
+      phoneNumber: "+923061234567",
+      role: "SALES_STAFF",
+      status: "ACTIVE",
+      branchId: branchHQ.id,
+      vendorId: vendorEvee.id,
+    },
+  });
+
+  console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs, 2 SALES_STAFF (1 per vendor).");
 
     // TEST CUSTOMER (Non-Admin)
   const customerPasswordHash = await bcrypt.hash("customer123", 10);

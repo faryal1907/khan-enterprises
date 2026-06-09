@@ -11,6 +11,7 @@ import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
+import { QueryBikesDto } from "./dto/query-bikes.dto";
 
 @Controller("inventory")
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -29,12 +30,16 @@ export class InventoryController {
 
   /**
    * GET /api/inventory/bikes
-   * GET /api/inventory/bikes?branchId=<id>
-   * Returns all serialized motorcycle units, optionally filtered by branch.
+   * Returns all serialized motorcycle units, optionally filtered by branch/status/model/vendor/search.
+   * SALES_STAFF: automatically scoped to their assigned vendor only.
    */
   @Get("bikes")
-  async getBikes(@Query("branchId") branchId?: string) {
-    const bikes = await this.inventoryService.getAllBikes(branchId);
+  async getBikes(@Query() query: QueryBikesDto, @CurrentUser() user: any) {
+    // Enforce vendor scoping for SALES_STAFF
+    if (user.role === "SALES_STAFF") {
+      query.vendorId = user.vendorId ?? undefined;
+    }
+    const bikes = await this.inventoryService.getAllBikes(query);
     return { count: bikes.length, bikes };
   }
 

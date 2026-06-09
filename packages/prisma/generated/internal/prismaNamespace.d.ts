@@ -1338,6 +1338,7 @@ export declare const UserScalarFieldEnum: {
     readonly role: "role";
     readonly status: "status";
     readonly branchId: "branchId";
+    readonly vendorId: "vendorId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
