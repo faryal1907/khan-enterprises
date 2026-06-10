@@ -29,7 +29,7 @@ export default function OrdersListPage() {
     const fetchBranches = async () => {
       try {
         const data = await getBranches();
-        setBranches(data);
+        setBranches(data.branches || []);
       } catch (error) {
         console.error("Failed to fetch branches:", error);
       }
@@ -233,7 +233,7 @@ export default function OrdersListPage() {
 
         {/* Table */}
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-hidden overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <table className="w-full">

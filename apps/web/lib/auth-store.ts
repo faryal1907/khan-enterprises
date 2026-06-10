@@ -8,6 +8,7 @@ interface AuthState {
 
   setAuth: (user: User, accessToken: string) => void;
   logout: () => void;
+  initializeAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -20,12 +21,33 @@ export const useAuthStore = create<AuthState>((set) => ({
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
+    Cookies.set("user", JSON.stringify(user), {
+      expires: 7,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
 
     set({ user, accessToken });
   },
 
   logout: () => {
     Cookies.remove("accessToken");
+    Cookies.remove("user");
     set({ user: null, accessToken: null });
+  },
+
+  initializeAuth: () => {
+    const token = Cookies.get("accessToken");
+    const userCookie = Cookies.get("user");
+    if (token && userCookie) {
+      try {
+        const user = JSON.parse(userCookie);
+        set({ user, accessToken: token });
+      } catch (error) {
+        console.error("Failed to parse user from cookie:", error);
+        Cookies.remove("accessToken");
+        Cookies.remove("user");
+      }
+    }
   },
 }));

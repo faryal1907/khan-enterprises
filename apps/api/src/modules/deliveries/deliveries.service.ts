@@ -11,7 +11,7 @@ export class DeliveriesService {
 
   /**
    * Create delivery request for an order
-   * Only allowed when order is in CONFIRMED status
+   * Only allowed when order is in CONFIRMED or PAID status
    */
   async createDeliveryRequest(orderId: string, dto: CreateDeliveryDto) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -32,9 +32,9 @@ export class DeliveriesService {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
 
-      if (order.status !== OrderStatus.CONFIRMED) {
+      if (order.status !== OrderStatus.CONFIRMED && order.status !== OrderStatus.PAID) {
         throw new BadRequestException(
-          `Delivery request can only be created for CONFIRMED orders. Current status: ${order.status}`
+          `Delivery request can only be created for CONFIRMED or PAID orders. Current status: ${order.status}`
         );
       }
 
@@ -253,6 +253,11 @@ export class DeliveriesService {
 
       if (newStatus === DeliveryStatus.DELIVERED) {
         updateData.deliveredAt = new Date();
+      }
+
+      // Save notes if provided
+      if (dto.notes) {
+        updateData.notes = dto.notes;
       }
 
       // Update delivery

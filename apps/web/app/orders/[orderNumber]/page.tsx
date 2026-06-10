@@ -54,6 +54,7 @@ interface Order {
     deliveredAt: string | null;
     createdAt: string;
     updatedAt: string;
+    notes?: string;
   } | null;
 }
 
@@ -180,7 +181,7 @@ export default function OrderStatusPage() {
   }
 
   const isPendingPayment = order.status === "PENDING_PAYMENT";
-  const isConfirmed = order.status === "CONFIRMED";
+  const isConfirmed = order.status === "CONFIRMED" || order.status === "PAID";
   const canRequestDelivery = isConfirmed && !order.delivery;
 
   return (
@@ -463,6 +464,16 @@ export default function OrderStatusPage() {
                     <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
                       Contact: {order.delivery.contactNumber}
                     </p>
+                  )}
+                  {order.delivery.notes && (
+                    <div
+                      className="mt-3 p-3 rounded-lg"
+                      style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
+                    >
+                      <p className="text-sm" style={{ color: "#3730A3" }}>
+                        <span className="font-semibold">Note from admin:</span> {order.delivery.notes}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

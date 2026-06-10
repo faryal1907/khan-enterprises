@@ -80,8 +80,8 @@ export function Navigation() {
                 </Link>
               );
             })}
-            {/* Orders — conditional */}
-            {user && (user.role === UserRole.ADMIN || user.role === UserRole.MANAGER) && (
+            {/* Orders — for all authenticated users */}
+            {user && (
               <Link
                 href="/orders"
                 className="px-3 py-2 rounded-lg text-sm font-medium transition-colors"

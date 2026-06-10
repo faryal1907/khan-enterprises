@@ -1768,6 +1768,7 @@ export const DeliveryRequestScalarFieldEnum = {
   status: 'status',
   approvedAt: 'approvedAt',
   deliveredAt: 'deliveredAt',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

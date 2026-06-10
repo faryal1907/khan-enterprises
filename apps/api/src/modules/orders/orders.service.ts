@@ -320,12 +320,12 @@ export class OrdersService {
         },
       });
 
-      // 4. If CASH, immediately set order → PAID, offer → PAID, bike → SOLD
+      // 4. If CASH, immediately set order → CONFIRMED, offer → PAID, bike → SOLD
       if (dto.paymentMethod === "CASH") {
         await tx.order.update({
           where: { id: orderId },
           data: {
-            status: OrderStatus.PAID,
+            status: OrderStatus.CONFIRMED,
             processedById: adminId || null,
           },
         });
