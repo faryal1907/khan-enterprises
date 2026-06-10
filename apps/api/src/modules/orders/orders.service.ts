@@ -117,8 +117,9 @@ export class OrdersService {
 
   /**
    * Used for invoice/customer-facing lookup
+   * For CUSTOMER role: verifies order belongs to customer
    */
-  async getOrderByNumber(orderNumber: string) {
+  async getOrderByNumber(orderNumber: string, user?: any) {
     const order = await this.prisma.client.order.findUnique({
       where: { orderNumber },
       include: {
@@ -143,6 +144,11 @@ export class OrdersService {
     });
 
     if (!order) {
+      throw new NotFoundException(`Order with number ${orderNumber} not found`);
+    }
+
+    // For CUSTOMER role, verify order belongs to them
+    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
       throw new NotFoundException(`Order with number ${orderNumber} not found`);
     }
 

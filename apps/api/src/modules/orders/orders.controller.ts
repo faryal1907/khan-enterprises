@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards, NotFoundException } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -15,20 +15,30 @@ export class OrdersController {
 
   /**
    * GET /api/orders/number/:orderNumber
-   * Public endpoint for customer order status lookup
+   * Protected endpoint for customer order status lookup
+   * Customers can only view their own orders
    * NOTE: Must be defined before GET /orders/:id
    */
   @Get("number/:orderNumber")
-  async getOrderByNumber(@Param("orderNumber") orderNumber: string) {
-    return this.ordersService.getOrderByNumber(orderNumber);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async getOrderByNumber(@Param("orderNumber") orderNumber: string, @CurrentUser() user: any) {
+    return this.ordersService.getOrderByNumber(orderNumber, user);
   }
 
   /**
    * GET /api/orders/customer/:phone
-   * Public endpoint for customers to lookup their orders by phone number
+   * Protected endpoint for customers to lookup their orders by phone number
+   * Customers can only lookup their own orders
    */
   @Get("customer/:phone")
-  async getOrdersByCustomerPhone(@Param("phone") phone: string) {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async getOrdersByCustomerPhone(@Param("phone") phone: string, @CurrentUser() user: any) {
+    // For CUSTOMER role, verify phone matches their own
+    if (user?.role === "CUSTOMER" && phone !== user.phoneNumber) {
+      throw new NotFoundException("Orders not found");
+    }
     return this.ordersService.getOrdersByCustomerPhone(phone);
   }
 

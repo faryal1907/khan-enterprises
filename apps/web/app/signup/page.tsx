@@ -26,8 +26,8 @@ export default function SignupPage() {
     setError(null);
     try {
       const response = await api.post<LoginResponse>("/auth/register", data);
-      const { accessToken, user } = response.data;
-      setAuth(user, accessToken);
+      const { accessToken, refreshToken, user } = response.data;
+      setAuth(user, accessToken, refreshToken);
       router.push("/");
     } catch (err: unknown) {
       const message =
