@@ -44,6 +44,7 @@ export class OffersService {
         message: dto.message,
         status: OfferStatus.PENDING,
         expiresAt,
+        paymentMethod: dto.paymentMethod,
         createdById: userId,
       },
       include: {
@@ -209,7 +210,7 @@ export class OffersService {
           customerCNIC: offer.customerCNIC || "",
           customerAddress: offer.customerAddress || "",
           negotiatedAmount,
-          paymentMethod: PaymentMethod.CASH,
+          paymentMethod: offer.paymentMethod || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
           processedById: adminId,
         },

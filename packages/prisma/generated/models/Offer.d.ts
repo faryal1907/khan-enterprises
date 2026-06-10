@@ -31,6 +31,7 @@ export type OfferMinAggregateOutputType = {
     adminResponse: string | null;
     status: $Enums.OfferStatus | null;
     expiresAt: Date | null;
+    paymentMethod: $Enums.PaymentMethod | null;
     createdById: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -49,6 +50,7 @@ export type OfferMaxAggregateOutputType = {
     adminResponse: string | null;
     status: $Enums.OfferStatus | null;
     expiresAt: Date | null;
+    paymentMethod: $Enums.PaymentMethod | null;
     createdById: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -67,6 +69,7 @@ export type OfferCountAggregateOutputType = {
     adminResponse: number;
     status: number;
     expiresAt: number;
+    paymentMethod: number;
     createdById: number;
     createdAt: number;
     updatedAt: number;
@@ -94,6 +97,7 @@ export type OfferMinAggregateInputType = {
     adminResponse?: true;
     status?: true;
     expiresAt?: true;
+    paymentMethod?: true;
     createdById?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -112,6 +116,7 @@ export type OfferMaxAggregateInputType = {
     adminResponse?: true;
     status?: true;
     expiresAt?: true;
+    paymentMethod?: true;
     createdById?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -130,6 +135,7 @@ export type OfferCountAggregateInputType = {
     adminResponse?: true;
     status?: true;
     expiresAt?: true;
+    paymentMethod?: true;
     createdById?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -177,6 +183,7 @@ export type OfferGroupByOutputType = {
     adminResponse: string | null;
     status: $Enums.OfferStatus;
     expiresAt: Date | null;
+    paymentMethod: $Enums.PaymentMethod | null;
     createdById: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -206,6 +213,7 @@ export type OfferWhereInput = {
     adminResponse?: Prisma.StringNullableFilter<"Offer"> | string | null;
     status?: Prisma.EnumOfferStatusFilter<"Offer"> | $Enums.OfferStatus;
     expiresAt?: Prisma.DateTimeNullableFilter<"Offer"> | Date | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodNullableFilter<"Offer"> | $Enums.PaymentMethod | null;
     createdById?: Prisma.StringNullableFilter<"Offer"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string;
@@ -227,6 +235,7 @@ export type OfferOrderByWithRelationInput = {
     adminResponse?: Prisma.SortOrderInput | Prisma.SortOrder;
     status?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -251,6 +260,7 @@ export type OfferWhereUniqueInput = Prisma.AtLeast<{
     adminResponse?: Prisma.StringNullableFilter<"Offer"> | string | null;
     status?: Prisma.EnumOfferStatusFilter<"Offer"> | $Enums.OfferStatus;
     expiresAt?: Prisma.DateTimeNullableFilter<"Offer"> | Date | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodNullableFilter<"Offer"> | $Enums.PaymentMethod | null;
     createdById?: Prisma.StringNullableFilter<"Offer"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string;
@@ -272,6 +282,7 @@ export type OfferOrderByWithAggregationInput = {
     adminResponse?: Prisma.SortOrderInput | Prisma.SortOrder;
     status?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -298,6 +309,7 @@ export type OfferScalarWhereWithAggregatesInput = {
     adminResponse?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null;
     status?: Prisma.EnumOfferStatusWithAggregatesFilter<"Offer"> | $Enums.OfferStatus;
     expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Offer"> | Date | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodNullableWithAggregatesFilter<"Offer"> | $Enums.PaymentMethod | null;
     createdById?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"Offer"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Offer"> | Date | string;
@@ -315,6 +327,7 @@ export type OfferCreateInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOffersInput;
@@ -335,6 +348,7 @@ export type OfferUncheckedCreateInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -353,6 +367,7 @@ export type OfferUpdateInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOffersNestedInput;
@@ -373,6 +388,7 @@ export type OfferUncheckedUpdateInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -392,6 +408,7 @@ export type OfferCreateManyInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -409,6 +426,7 @@ export type OfferUpdateManyMutationInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -426,6 +444,7 @@ export type OfferUncheckedUpdateManyInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -452,6 +471,7 @@ export type OfferCountOrderByAggregateInput = {
     adminResponse?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
     createdById?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -474,6 +494,7 @@ export type OfferMaxOrderByAggregateInput = {
     adminResponse?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
     createdById?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -492,6 +513,7 @@ export type OfferMinOrderByAggregateInput = {
     adminResponse?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
     createdById?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -583,6 +605,9 @@ export type OfferUncheckedUpdateManyWithoutBikeNestedInput = {
 export type EnumOfferStatusFieldUpdateOperationsInput = {
     set?: $Enums.OfferStatus;
 };
+export type NullableEnumPaymentMethodFieldUpdateOperationsInput = {
+    set?: $Enums.PaymentMethod | null;
+};
 export type OfferCreateNestedOneWithoutOrderInput = {
     create?: Prisma.XOR<Prisma.OfferCreateWithoutOrderInput, Prisma.OfferUncheckedCreateWithoutOrderInput>;
     connectOrCreate?: Prisma.OfferCreateOrConnectWithoutOrderInput;
@@ -610,6 +635,7 @@ export type OfferCreateWithoutCreatedByInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOffersInput;
@@ -629,6 +655,7 @@ export type OfferUncheckedCreateWithoutCreatedByInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     order?: Prisma.OrderUncheckedCreateNestedOneWithoutOfferInput;
@@ -671,6 +698,7 @@ export type OfferScalarWhereInput = {
     adminResponse?: Prisma.StringNullableFilter<"Offer"> | string | null;
     status?: Prisma.EnumOfferStatusFilter<"Offer"> | $Enums.OfferStatus;
     expiresAt?: Prisma.DateTimeNullableFilter<"Offer"> | Date | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodNullableFilter<"Offer"> | $Enums.PaymentMethod | null;
     createdById?: Prisma.StringNullableFilter<"Offer"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Offer"> | Date | string;
@@ -688,6 +716,7 @@ export type OfferCreateWithoutBikeInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     createdBy?: Prisma.UserCreateNestedOneWithoutCreatedOffersInput;
@@ -706,6 +735,7 @@ export type OfferUncheckedCreateWithoutBikeInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -745,6 +775,7 @@ export type OfferCreateWithoutOrderInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOffersInput;
@@ -764,6 +795,7 @@ export type OfferUncheckedCreateWithoutOrderInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -794,6 +826,7 @@ export type OfferUpdateWithoutOrderInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOffersNestedInput;
@@ -813,6 +846,7 @@ export type OfferUncheckedUpdateWithoutOrderInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -831,6 +865,7 @@ export type OfferCreateManyCreatedByInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -847,6 +882,7 @@ export type OfferUpdateWithoutCreatedByInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOffersNestedInput;
@@ -866,6 +902,7 @@ export type OfferUncheckedUpdateWithoutCreatedByInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     order?: Prisma.OrderUncheckedUpdateOneWithoutOfferNestedInput;
@@ -884,6 +921,7 @@ export type OfferUncheckedUpdateManyWithoutCreatedByInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -900,6 +938,7 @@ export type OfferCreateManyBikeInput = {
     adminResponse?: string | null;
     status?: $Enums.OfferStatus;
     expiresAt?: Date | string | null;
+    paymentMethod?: $Enums.PaymentMethod | null;
     createdById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -917,6 +956,7 @@ export type OfferUpdateWithoutBikeInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     createdBy?: Prisma.UserUpdateOneWithoutCreatedOffersNestedInput;
@@ -935,6 +975,7 @@ export type OfferUncheckedUpdateWithoutBikeInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -953,6 +994,7 @@ export type OfferUncheckedUpdateManyWithoutBikeInput = {
     adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null;
     createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -971,6 +1013,7 @@ export type OfferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     adminResponse?: boolean;
     status?: boolean;
     expiresAt?: boolean;
+    paymentMethod?: boolean;
     createdById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -992,6 +1035,7 @@ export type OfferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     adminResponse?: boolean;
     status?: boolean;
     expiresAt?: boolean;
+    paymentMethod?: boolean;
     createdById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -1012,6 +1056,7 @@ export type OfferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     adminResponse?: boolean;
     status?: boolean;
     expiresAt?: boolean;
+    paymentMethod?: boolean;
     createdById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -1032,11 +1077,12 @@ export type OfferSelectScalar = {
     adminResponse?: boolean;
     status?: boolean;
     expiresAt?: boolean;
+    paymentMethod?: boolean;
     createdById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bikeId" | "customerName" | "customerPhone" | "customerEmail" | "customerCNIC" | "customerAddress" | "offerAmount" | "counterAmount" | "message" | "adminResponse" | "status" | "expiresAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>;
+export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bikeId" | "customerName" | "customerPhone" | "customerEmail" | "customerCNIC" | "customerAddress" | "offerAmount" | "counterAmount" | "message" | "adminResponse" | "status" | "expiresAt" | "paymentMethod" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>;
 export type OfferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
     createdBy?: boolean | Prisma.Offer$createdByArgs<ExtArgs>;
@@ -1071,6 +1117,7 @@ export type $OfferPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
         adminResponse: string | null;
         status: $Enums.OfferStatus;
         expiresAt: Date | null;
+        paymentMethod: $Enums.PaymentMethod | null;
         createdById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -1147,6 +1194,7 @@ export interface OfferFieldRefs {
     readonly adminResponse: Prisma.FieldRef<"Offer", 'String'>;
     readonly status: Prisma.FieldRef<"Offer", 'OfferStatus'>;
     readonly expiresAt: Prisma.FieldRef<"Offer", 'DateTime'>;
+    readonly paymentMethod: Prisma.FieldRef<"Offer", 'PaymentMethod'>;
     readonly createdById: Prisma.FieldRef<"Offer", 'String'>;
     readonly createdAt: Prisma.FieldRef<"Offer", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"Offer", 'DateTime'>;

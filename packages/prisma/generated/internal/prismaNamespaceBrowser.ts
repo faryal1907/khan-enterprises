@@ -231,6 +231,7 @@ export const OfferScalarFieldEnum = {
   adminResponse: 'adminResponse',
   status: 'status',
   expiresAt: 'expiresAt',
+  paymentMethod: 'paymentMethod',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

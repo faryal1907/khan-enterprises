@@ -358,6 +358,8 @@ model Offer {
 
   expiresAt DateTime?
 
+  paymentMethod PaymentMethod?
+
   createdById String?
   createdBy   User?   @relation("OfferCreatedBy", fields: [createdById], references: [id])
 

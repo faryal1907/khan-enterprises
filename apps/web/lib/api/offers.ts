@@ -9,6 +9,7 @@ export interface CreateOfferData {
   customerAddress?: string;
   offerAmount: number;
   message?: string;
+  paymentMethod?: string;
 }
 
 export async function createOffer(data: CreateOfferData, userId?: string) {
