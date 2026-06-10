@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 
 type User = {
@@ -101,9 +102,10 @@ export default function UserDetailPage() {
       const res = await api.put(`/auth/users/${userId}`, updateData);
       setUser(res.data);
       setIsEditing(false);
+      toast.success("User updated successfully");
     } catch (err) {
       console.error("Failed to update user:", err);
-      alert("Failed to update user");
+      toast.error("Failed to update user");
     }
   };
 
@@ -115,9 +117,10 @@ export default function UserDetailPage() {
     try {
       await api.delete(`/auth/users/${userId}`);
       setUser((prev) => (prev ? { ...prev, status: "INACTIVE" } : null));
+      toast.success("User deactivated successfully");
     } catch (err) {
       console.error("Failed to deactivate user:", err);
-      alert("Failed to deactivate user");
+      toast.error("Failed to deactivate user");
     }
   };
 

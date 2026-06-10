@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import {
@@ -107,7 +108,7 @@ export default function PartsListPage() {
         movementType: adjustReason.toUpperCase(),
         reason: adjustReason,
       });
-      alert("Stock adjusted successfully");
+      toast.success("Stock adjusted successfully");
       setShowAdjustModal(false);
       setAdjustQuantity("");
       setAdjustReason("");
@@ -121,7 +122,7 @@ export default function PartsListPage() {
       setParts(response.parts);
     } catch (error) {
       console.error("Failed to adjust stock:", error);
-      alert("Failed to adjust stock");
+      toast.error("Failed to adjust stock");
     }
   };
 
@@ -140,7 +141,7 @@ export default function PartsListPage() {
       );
 
       if (!sourceInventory) {
-        alert("Source inventory not found");
+        toast.error("Source inventory not found");
         return;
       }
 
@@ -160,7 +161,7 @@ export default function PartsListPage() {
         });
       }
 
-      alert("Stock transferred successfully");
+      toast.success("Stock transferred successfully");
       setShowTransferModal(false);
       setTransferFromBranch("");
       setTransferToBranch("");
@@ -175,7 +176,7 @@ export default function PartsListPage() {
       setParts(response.parts);
     } catch (error) {
       console.error("Failed to transfer stock:", error);
-      alert("Failed to transfer stock");
+      toast.error("Failed to transfer stock");
     }
   };
 

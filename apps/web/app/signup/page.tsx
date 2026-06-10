@@ -7,9 +7,9 @@ import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { theme } from "@/lib/colors";
 import type { LoginResponse } from "@/lib/types";
-import { loginSchema, type LoginFormValues } from "@/lib/validation/login";
+import { registerSchema, type RegisterFormValues } from "@/lib/validation/register";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
@@ -18,21 +18,21 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     setError(null);
     try {
-      const response = await api.post<LoginResponse>("/auth/login", data);
+      const response = await api.post<LoginResponse>("/auth/register", data);
       const { accessToken, user } = response.data;
       setAuth(user, accessToken);
       router.push("/");
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-        ?? "Invalid email or password.";
+        ?? "Registration failed. Please try again.";
       setError(message);
     }
   };
@@ -66,11 +66,38 @@ export default function LoginPage() {
             Khan Enterprises
           </h1>
           <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
-            Sign in to your account
+            Create your account
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Full name field */}
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              style={{ color: theme.text.secondary }}
+            >
+              Full Name
+            </label>
+            <input
+              {...register("fullName")}
+              type="text"
+              autoComplete="name"
+              placeholder="John Doe"
+              className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+            />
+            {errors.fullName && (
+              <p className="mt-1 text-xs" style={{ color: theme.accents.secondary }}>
+                {errors.fullName.message}
+              </p>
+            )}
+          </div>
+
           {/* Email field */}
           <div>
             <label
@@ -83,7 +110,7 @@ export default function LoginPage() {
               {...register("email")}
               type="email"
               autoComplete="email"
-              placeholder="you@khan.com"
+              placeholder="you@example.com"
               className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
               style={{
                 backgroundColor: theme.backgrounds.tertiary,
@@ -94,6 +121,60 @@ export default function LoginPage() {
             {errors.email && (
               <p className="mt-1 text-xs" style={{ color: theme.accents.secondary }}>
                 {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* Phone number field */}
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              style={{ color: theme.text.secondary }}
+            >
+              Phone Number
+            </label>
+            <input
+              {...register("phoneNumber")}
+              type="tel"
+              autoComplete="tel"
+              placeholder="03XXXXXXXXX"
+              className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+            />
+            {errors.phoneNumber && (
+              <p className="mt-1 text-xs" style={{ color: theme.accents.secondary }}>
+                {errors.phoneNumber.message}
+              </p>
+            )}
+          </div>
+
+          {/* Address field (optional) */}
+          <div>
+            <label
+              className="block text-sm font-medium mb-1"
+              style={{ color: theme.text.secondary }}
+            >
+              Address (Optional)
+            </label>
+            <input
+              {...register("address")}
+              type="text"
+              autoComplete="street-address"
+              placeholder="Your address"
+              className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+            />
+            {errors.address && (
+              <p className="mt-1 text-xs" style={{ color: theme.accents.secondary }}>
+                {errors.address.message}
               </p>
             )}
           </div>
@@ -109,7 +190,7 @@ export default function LoginPage() {
             <input
               {...register("password")}
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               placeholder="••••••••"
               className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
               style={{
@@ -149,16 +230,16 @@ export default function LoginPage() {
               color: theme.text.inverse,
             }}
           >
-            {isSubmitting ? "Signing in…" : "Sign in"}
+            {isSubmitting ? "Creating account…" : "Sign up"}
           </button>
         </form>
 
-        {/* Link to sign-up */}
+        {/* Link to login */}
         <div className="mt-6 text-center">
           <p className="text-sm" style={{ color: theme.text.muted }}>
-            Don't have an account?{" "}
-            <a href="/signup" className="font-semibold hover:underline" style={{ color: theme.accents.primary }}>
-              Sign up
+            Already have an account?{" "}
+            <a href="/login" className="font-semibold hover:underline" style={{ color: theme.accents.primary }}>
+              Sign in
             </a>
           </p>
         </div>

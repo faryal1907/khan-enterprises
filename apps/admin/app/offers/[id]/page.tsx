@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import {
   getOfferById,
   acceptOffer,
@@ -78,9 +79,10 @@ export default function OfferDetailPage() {
       setActionLoading(true);
       await acceptOffer(offerId);
       await fetchOffer();
+      toast.success("Offer accepted successfully");
     } catch (error) {
       console.error("Failed to accept offer:", error);
-      alert("Failed to accept offer. Please try again.");
+      toast.error("Failed to accept offer. Please try again.");
     } finally {
       setActionLoading(false);
     }
@@ -88,7 +90,7 @@ export default function OfferDetailPage() {
 
   const handleReject = async () => {
     if (!adminResponse.trim()) {
-      alert("Please provide a reason for rejection");
+      toast.error("Please provide a reason for rejection");
       return;
     }
 
@@ -98,9 +100,10 @@ export default function OfferDetailPage() {
       setShowRejectModal(false);
       setAdminResponse("");
       await fetchOffer();
+      toast.success("Offer rejected successfully");
     } catch (error) {
       console.error("Failed to reject offer:", error);
-      alert("Failed to reject offer. Please try again.");
+      toast.error("Failed to reject offer. Please try again.");
     } finally {
       setActionLoading(false);
     }
@@ -108,7 +111,7 @@ export default function OfferDetailPage() {
 
   const handleCounter = async () => {
     if (!counterAmount.trim() || !adminResponse.trim()) {
-      alert("Please provide both counter amount and response message");
+      toast.error("Please provide both counter amount and response message");
       return;
     }
 
@@ -122,9 +125,10 @@ export default function OfferDetailPage() {
       setCounterAmount("");
       setAdminResponse("");
       await fetchOffer();
+      toast.success("Counter offer sent successfully");
     } catch (error) {
       console.error("Failed to counter offer:", error);
-      alert("Failed to counter offer. Please try again.");
+      toast.error("Failed to counter offer. Please try again.");
     } finally {
       setActionLoading(false);
     }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -65,9 +66,10 @@ export default function UsersPage() {
     try {
       await api.delete(`/auth/users/${userId}`);
       setUsers(users.map((u) => u.id === userId ? { ...u, status: "DEACTIVATED" } : u));
+      toast.success("User deactivated successfully");
     } catch (err) {
       console.error("Failed to deactivate user:", err);
-      alert("Failed to deactivate user");
+      toast.error("Failed to deactivate user");
     }
   };
 
@@ -79,9 +81,10 @@ export default function UsersPage() {
     try {
       await api.post(`/auth/users/${userId}/activate`);
       setUsers(users.map((u) => u.id === userId ? { ...u, status: "ACTIVE" } : u));
+      toast.success("User activated successfully");
     } catch (err) {
       console.error("Failed to activate user:", err);
-      alert("Failed to activate user");
+      toast.error("Failed to activate user");
     }
   };
 

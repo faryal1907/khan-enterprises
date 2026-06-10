@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -78,10 +79,11 @@ export default function TransactionsPage() {
 
     try {
       await api.post(`/transactions/${transactionId}/refund`);
-      alert("Refund initiated successfully");
+      toast.success("Refund initiated successfully");
+      setTransactions(transactions.map((t) => t.id === transactionId ? { ...t, status: "REFUNDED" } : t));
     } catch (err) {
       console.error("Failed to initiate refund:", err);
-      alert("Failed to initiate refund");
+      toast.error("Failed to initiate refund");
     }
   };
 
@@ -97,9 +99,10 @@ export default function TransactionsPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      toast.success("Receipt downloaded successfully");
     } catch (err) {
       console.error("Failed to download receipt:", err);
-      alert("Failed to download receipt");
+      toast.error("Failed to download receipt");
     }
   };
 

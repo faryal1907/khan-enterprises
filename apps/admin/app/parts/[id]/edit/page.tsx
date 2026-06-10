@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import { getPartById, updatePart } from "@/lib/api/inventory";
 import { getBranches, getVendors } from "@/lib/api/inventory";
 import type { Branch, Vendor } from "@/lib/types";
@@ -60,10 +61,11 @@ export default function EditPartPage() {
         description: formData.description,
       });
 
+      toast.success("Part updated successfully");
       router.push(`/parts/${partId}`);
     } catch (error) {
       console.error("Failed to update part:", error);
-      alert("Failed to update part");
+      toast.error("Failed to update part");
     } finally {
       setSubmitting(false);
     }

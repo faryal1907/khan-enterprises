@@ -8,6 +8,7 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { PrismaService } from "../../prisma/prisma.service";
 import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { JwtPayload } from "./strategies/jwt.strategy";
 
 @Injectable()
@@ -57,6 +58,52 @@ export class AuthService {
     // 4. Return tokens + safe user profile (no passwordHash)
     const { passwordHash: _omit, ...profile } = user;
     return { ...tokens, user: profile };
+  }
+
+  // ─── Register Customer ─────────────────────────────────────────────────────
+
+  async registerCustomer(dto: RegisterDto) {
+    // 1. Check if user already exists
+    const existingUser = await this.prisma.client.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new ForbiddenException("User with this email already exists.");
+    }
+
+    // 2. Hash password
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    // 3. Create customer user
+    const user = await this.prisma.client.user.create({
+      data: {
+        email: dto.email,
+        passwordHash,
+        fullName: dto.fullName,
+        phoneNumber: dto.phoneNumber,
+        role: "CUSTOMER",
+        status: "ACTIVE",
+        branchId: null,
+        vendorId: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phoneNumber: true,
+        role: true,
+        status: true,
+        branchId: true,
+        vendorId: true,
+        createdAt: true,
+      },
+    });
+
+    // 4. Issue tokens
+    const tokens = await this.issueTokens(user.id, user.email, user.role, null, null);
+
+    return { ...tokens, user };
   }
 
   // ─── Refresh ──────────────────────────────────────────────────────────────

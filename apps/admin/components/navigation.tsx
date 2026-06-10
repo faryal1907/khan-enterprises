@@ -13,9 +13,14 @@ export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lowStockCount, setLowStockCount] = useState(0);
 
-  // Fetch low stock count on mount
+  // Fetch low stock count on mount (only for admin roles)
   useEffect(() => {
     const fetchLowStockCount = async () => {
+      // Don't fetch if user is not an admin role
+      if (!user || !["ADMIN", "MANAGER", "SALES_STAFF"].includes(user.role)) {
+        return;
+      }
+      
       try {
         const response = await getLowStockItems(user?.branchId || undefined);
         setLowStockCount(response.count);
@@ -24,9 +29,14 @@ export function Navigation() {
       }
     };
     fetchLowStockCount();
-  }, [user?.branchId]);
+  }, [user?.branchId, user?.role]);
 
   if (!user) return null;
+
+  // Block customers from seeing admin navigation
+  if (!["ADMIN", "MANAGER", "SALES_STAFF"].includes(user.role)) {
+    return null;
+  }
 
   const isAdmin = user.role === UserRole.ADMIN;
   const isManager = user.role === UserRole.MANAGER;

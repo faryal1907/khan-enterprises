@@ -14,6 +14,7 @@ import {
 import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { RefreshDto } from "./dto/refresh.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { RolesGuard } from "./guards/roles.guard";
@@ -38,6 +39,17 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  /**
+   * POST /api/auth/register
+   * Public endpoint for customer registration
+   */
+  @Post("register")
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.registerCustomer(dto);
   }
 
   /**
