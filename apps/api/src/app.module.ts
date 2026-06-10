@@ -12,6 +12,7 @@ import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
 import { CatalogModule } from "./modules/catalog/catalog.module";
 import { OffersModule } from "./modules/offers/offers.module";
 import { OrdersModule } from "./modules/orders/orders.module";
+import { DeliveriesModule } from "./modules/deliveries/deliveries.module";
 import { SchedulerModule } from "./modules/scheduler/scheduler.module";
 
 @Module({
@@ -28,6 +29,7 @@ import { SchedulerModule } from "./modules/scheduler/scheduler.module";
     CatalogModule,
     OffersModule,
     OrdersModule,
+    DeliveriesModule,
     SchedulerModule,
     ThrottlerModule.forRoot([
       {

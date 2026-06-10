@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { getOrderByNumber } from "@/lib/api/orders";
+import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
 
 interface Order {
   id: string;
@@ -46,9 +47,13 @@ interface Order {
   delivery: {
     id: string;
     deliveryAddress: string;
+    preferredTimeWindow?: string;
+    contactNumber: string;
     status: string;
     approvedAt: string | null;
     deliveredAt: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
 }
 
@@ -57,6 +62,14 @@ export default function OrderStatusPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showDeliveryForm, setShowDeliveryForm] = useState(false);
+  const [deliveryForm, setDeliveryForm] = useState({
+    deliveryAddress: "",
+    preferredTimeWindow: "",
+    contactNumber: "",
+  });
+  const [submittingDelivery, setSubmittingDelivery] = useState(false);
+  const [deliveryError, setDeliveryError] = useState("");
 
   useEffect(() => {
     fetchOrder();
@@ -72,6 +85,25 @@ export default function OrderStatusPage() {
       setError(err.response?.data?.message || "Failed to load order details");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeliveryRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!order) return;
+    try {
+      setSubmittingDelivery(true);
+      setDeliveryError("");
+      await createDeliveryRequest(order.id, deliveryForm);
+      // Refresh order data to show delivery status
+      await fetchOrder();
+      setShowDeliveryForm(false);
+      setDeliveryForm({ deliveryAddress: "", preferredTimeWindow: "", contactNumber: "" });
+    } catch (err: any) {
+      console.error("Failed to create delivery request:", err);
+      setDeliveryError(err.response?.data?.message || "Failed to create delivery request");
+    } finally {
+      setSubmittingDelivery(false);
     }
   };
 
@@ -148,6 +180,8 @@ export default function OrderStatusPage() {
   }
 
   const isPendingPayment = order.status === "PENDING_PAYMENT";
+  const isConfirmed = order.status === "CONFIRMED";
+  const canRequestDelivery = isConfirmed && !order.delivery;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -193,6 +227,154 @@ export default function OrderStatusPage() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Delivery Request Section */}
+        {canRequestDelivery && !showDeliveryForm && (
+          <div
+            className="rounded-xl p-6 mb-6"
+            style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6" style={{ color: "#3730A3" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold mb-2" style={{ color: "#3730A3" }}>
+                  Request Delivery
+                </h2>
+                <p className="text-sm mb-4" style={{ color: "#3730A3" }}>
+                  Your order is confirmed! Request delivery to have your bike delivered to your location.
+                </p>
+                <button
+                  onClick={() => setShowDeliveryForm(true)}
+                  className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                  style={{
+                    backgroundColor: "#6366F1",
+                    color: "white",
+                  }}
+                >
+                  Request Delivery
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delivery Request Form */}
+        {showDeliveryForm && (
+          <div
+            className="rounded-xl p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>
+                Delivery Details
+              </h2>
+              <button
+                onClick={() => setShowDeliveryForm(false)}
+                className="text-sm hover:opacity-70"
+                style={{ color: theme.text.secondary }}
+              >
+                Cancel
+              </button>
+            </div>
+
+            {deliveryError && (
+              <div
+                className="rounded-lg p-4 mb-4"
+                style={{ backgroundColor: "#FEE2E2", border: "1px solid #EF4444" }}
+              >
+                <p className="text-sm" style={{ color: "#991B1B" }}>{deliveryError}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleDeliveryRequest} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
+                  Delivery Address *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={deliveryForm.deliveryAddress}
+                  onChange={(e) => setDeliveryForm({ ...deliveryForm, deliveryAddress: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Enter your complete delivery address"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
+                  Preferred Time Window (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={deliveryForm.preferredTimeWindow}
+                  onChange={(e) => setDeliveryForm({ ...deliveryForm, preferredTimeWindow: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="e.g., 9AM - 12PM, Weekdays"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
+                  Contact Number *
+                </label>
+                <input
+                  required
+                  type="tel"
+                  value={deliveryForm.contactNumber}
+                  onChange={(e) => setDeliveryForm({ ...deliveryForm, contactNumber: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Enter your contact number for delivery coordination"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowDeliveryForm(false)}
+                  className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.primary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingDelivery}
+                  className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  {submittingDelivery ? "Submitting..." : "Submit Request"}
+                </button>
+              </div>
+            </form>
           </div>
         )}
 
@@ -254,7 +436,7 @@ export default function OrderStatusPage() {
             )}
 
             {/* Delivery Status */}
-            {order.delivery && order.delivery.approvedAt && (
+            {order.delivery && (
               <div className="flex gap-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -266,14 +448,22 @@ export default function OrderStatusPage() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold" style={{ color: theme.text.primary }}>Ready for Delivery</h3>
+                    <h3 className="font-semibold" style={{ color: theme.text.primary }}>
+                      Delivery {order.delivery.status.replace(/_/g, " ")}
+                    </h3>
                     <span className="text-xs" style={{ color: theme.text.muted }}>
-                      {new Date(order.delivery.approvedAt).toLocaleString()}
+                      {new Date(order.delivery.createdAt).toLocaleString()}
                     </span>
                   </div>
                   <p className="text-sm" style={{ color: theme.text.secondary }}>
-                    Your order is ready for delivery to: {order.delivery.deliveryAddress}
+                    Delivery to: {order.delivery.deliveryAddress}
+                    {order.delivery.preferredTimeWindow && ` (${order.delivery.preferredTimeWindow})`}
                   </p>
+                  {order.delivery.contactNumber && (
+                    <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
+                      Contact: {order.delivery.contactNumber}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
