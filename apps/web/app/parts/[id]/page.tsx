@@ -51,6 +51,10 @@ export default function PartDetailPage() {
   }, [user]);
 
   const handleOrderClick = (inventory: any) => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
     setSelectedInventory(inventory);
     setShowOrderForm(true);
     setOrderError("");

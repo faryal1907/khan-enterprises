@@ -222,7 +222,13 @@ export default function BikeDetailPage() {
 
               {!showOfferForm ? (
                 <button
-                  onClick={() => setShowOfferForm(true)}
+                  onClick={() => {
+                    if (!user) {
+                      window.location.href = "/login";
+                      return;
+                    }
+                    setShowOfferForm(true);
+                  }}
                   className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
                   style={{
                     backgroundColor: theme.accents.primary,
