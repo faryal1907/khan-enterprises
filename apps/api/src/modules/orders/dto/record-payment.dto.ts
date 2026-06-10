@@ -1,8 +1,9 @@
-import { IsNumber, IsString, IsEnum, IsOptional } from "class-validator";
+import { IsNumber, IsString, IsIn, IsOptional } from "class-validator";
 import { PaymentMethod } from "@khan/prisma";
 
 export class RecordPaymentDto {
-  @IsEnum(PaymentMethod)
+  @IsString()
+  @IsIn(Object.values(PaymentMethod))
   method: PaymentMethod;
 
   @IsNumber()

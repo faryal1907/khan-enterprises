@@ -79,12 +79,20 @@ export default function OrderDetailPage() {
 
   const handleRecordPayment = async () => {
     try {
-      await recordPayment(orderId, paymentData);
+      console.log("Recording payment with data:", paymentData);
+      // Ensure amount is a number
+      const paymentPayload = {
+        ...paymentData,
+        amount: Number(paymentData.amount),
+      };
+      await recordPayment(orderId, paymentPayload);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
       setShowPaymentModal(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to record payment:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
     }
   };
 
