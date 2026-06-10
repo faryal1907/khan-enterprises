@@ -109,8 +109,8 @@ export class OffersController {
    * Public (no auth) — customer accepts counter
    */
   @Post(":id/accept-counter")
-  async acceptCounter(@Param("id") id: string) {
-    return this.offersService.acceptCounter(id);
+  async acceptCounter(@Param("id") id: string, @Body() body: { paymentMethod?: string }) {
+    return this.offersService.acceptCounter(id, body.paymentMethod);
   }
 
   /**

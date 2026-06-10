@@ -168,7 +168,9 @@ export declare const ModelName: {
     readonly StockMovement: "StockMovement";
     readonly Offer: "Offer";
     readonly Order: "Order";
+    readonly PartOrder: "PartOrder";
     readonly PaymentTransaction: "PaymentTransaction";
+    readonly PartPaymentTransaction: "PartPaymentTransaction";
     readonly DeliveryRequest: "DeliveryRequest";
     readonly Document: "Document";
     readonly AuditLog: "AuditLog";
@@ -184,7 +186,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "paymentTransaction" | "deliveryRequest" | "document" | "auditLog";
+        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryRequest" | "document" | "auditLog";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1002,6 +1004,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        PartOrder: {
+            payload: Prisma.$PartOrderPayload<ExtArgs>;
+            fields: Prisma.PartOrderFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PartOrderFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PartOrderFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>;
+                };
+                findFirst: {
+                    args: Prisma.PartOrderFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PartOrderFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>;
+                };
+                findMany: {
+                    args: Prisma.PartOrderFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>[];
+                };
+                create: {
+                    args: Prisma.PartOrderCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>;
+                };
+                createMany: {
+                    args: Prisma.PartOrderCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.PartOrderCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>[];
+                };
+                delete: {
+                    args: Prisma.PartOrderDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>;
+                };
+                update: {
+                    args: Prisma.PartOrderUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PartOrderDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PartOrderUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.PartOrderUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>[];
+                };
+                upsert: {
+                    args: Prisma.PartOrderUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>;
+                };
+                aggregate: {
+                    args: Prisma.PartOrderAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePartOrder>;
+                };
+                groupBy: {
+                    args: Prisma.PartOrderGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PartOrderGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PartOrderCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PartOrderCountAggregateOutputType> | number;
+                };
+            };
+        };
         PaymentTransaction: {
             payload: Prisma.$PaymentTransactionPayload<ExtArgs>;
             fields: Prisma.PaymentTransactionFieldRefs;
@@ -1073,6 +1149,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 count: {
                     args: Prisma.PaymentTransactionCountArgs<ExtArgs>;
                     result: runtime.Types.Utils.Optional<Prisma.PaymentTransactionCountAggregateOutputType> | number;
+                };
+            };
+        };
+        PartPaymentTransaction: {
+            payload: Prisma.$PartPaymentTransactionPayload<ExtArgs>;
+            fields: Prisma.PartPaymentTransactionFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PartPaymentTransactionFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PartPaymentTransactionFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>;
+                };
+                findFirst: {
+                    args: Prisma.PartPaymentTransactionFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PartPaymentTransactionFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>;
+                };
+                findMany: {
+                    args: Prisma.PartPaymentTransactionFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>[];
+                };
+                create: {
+                    args: Prisma.PartPaymentTransactionCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>;
+                };
+                createMany: {
+                    args: Prisma.PartPaymentTransactionCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.PartPaymentTransactionCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>[];
+                };
+                delete: {
+                    args: Prisma.PartPaymentTransactionDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>;
+                };
+                update: {
+                    args: Prisma.PartPaymentTransactionUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PartPaymentTransactionDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PartPaymentTransactionUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.PartPaymentTransactionUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>[];
+                };
+                upsert: {
+                    args: Prisma.PartPaymentTransactionUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>;
+                };
+                aggregate: {
+                    args: Prisma.PartPaymentTransactionAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePartPaymentTransaction>;
+                };
+                groupBy: {
+                    args: Prisma.PartPaymentTransactionGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PartPaymentTransactionGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PartPaymentTransactionCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PartPaymentTransactionCountAggregateOutputType> | number;
                 };
             };
         };
@@ -1470,6 +1620,24 @@ export declare const OrderScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum];
+export declare const PartOrderScalarFieldEnum: {
+    readonly id: "id";
+    readonly orderNumber: "orderNumber";
+    readonly partId: "partId";
+    readonly partInventoryId: "partInventoryId";
+    readonly branchId: "branchId";
+    readonly customerName: "customerName";
+    readonly customerPhone: "customerPhone";
+    readonly customerAddress: "customerAddress";
+    readonly quantity: "quantity";
+    readonly amount: "amount";
+    readonly paymentMethod: "paymentMethod";
+    readonly status: "status";
+    readonly processedById: "processedById";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type PartOrderScalarFieldEnum = (typeof PartOrderScalarFieldEnum)[keyof typeof PartOrderScalarFieldEnum];
 export declare const PaymentTransactionScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
@@ -1485,6 +1653,21 @@ export declare const PaymentTransactionScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum];
+export declare const PartPaymentTransactionScalarFieldEnum: {
+    readonly id: "id";
+    readonly partOrderId: "partOrderId";
+    readonly gatewayReference: "gatewayReference";
+    readonly idempotencyKey: "idempotencyKey";
+    readonly amount: "amount";
+    readonly method: "method";
+    readonly status: "status";
+    readonly gatewayResponse: "gatewayResponse";
+    readonly failureReason: "failureReason";
+    readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum];
 export declare const DeliveryRequestScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
@@ -1621,7 +1804,9 @@ export type GlobalOmitConfig = {
     stockMovement?: Prisma.StockMovementOmit;
     offer?: Prisma.OfferOmit;
     order?: Prisma.OrderOmit;
+    partOrder?: Prisma.PartOrderOmit;
     paymentTransaction?: Prisma.PaymentTransactionOmit;
+    partPaymentTransaction?: Prisma.PartPaymentTransactionOmit;
     deliveryRequest?: Prisma.DeliveryRequestOmit;
     document?: Prisma.DocumentOmit;
     auditLog?: Prisma.AuditLogOmit;

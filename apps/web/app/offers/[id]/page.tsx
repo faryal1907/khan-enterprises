@@ -48,6 +48,8 @@ export default function OfferStatusPage() {
   const [rejecting, setRejecting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState("");
+  const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("CASH");
 
   useEffect(() => {
     fetchOffer();
@@ -67,9 +69,15 @@ export default function OfferStatusPage() {
   };
 
   const handleAcceptCounter = async () => {
+    // Show payment method selection modal first
+    setShowPaymentMethodModal(true);
+  };
+
+  const confirmAcceptCounter = async () => {
     try {
       setAccepting(true);
-      await acceptCounterOffer(id as string);
+      setShowPaymentMethodModal(false);
+      await acceptCounterOffer(id as string, selectedPaymentMethod);
       await fetchOffer();
     } catch (err: any) {
       console.error("Failed to accept counter offer:", err);
@@ -448,6 +456,80 @@ export default function OfferStatusPage() {
           </p>
         </div>
       </div>
+
+      {/* Payment Method Selection Modal */}
+      {showPaymentMethodModal && (
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 50 }}>
+          <div
+            className="rounded-xl p-6 max-w-md w-full"
+            style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Select Payment Method
+            </h2>
+            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+              Please choose your preferred payment method before accepting the counter offer.
+            </p>
+
+            <div className="space-y-3 mb-6">
+              <label className="flex items-center p-4 rounded-lg cursor-pointer" style={{ backgroundColor: theme.backgrounds.tertiary, border: selectedPaymentMethod === "CASH" ? `2px solid ${theme.accents.primary}` : `1px solid ${theme.borders.medium}` }}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="CASH"
+                  checked={selectedPaymentMethod === "CASH"}
+                  onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                  className="mr-3"
+                />
+                <div>
+                  <p className="font-medium" style={{ color: theme.text.primary }}>Cash</p>
+                  <p className="text-xs" style={{ color: theme.text.secondary }}>Pay at your nearest branch</p>
+                </div>
+              </label>
+
+              <label className="flex items-center p-4 rounded-lg cursor-pointer" style={{ backgroundColor: theme.backgrounds.tertiary, border: selectedPaymentMethod === "BANK_TRANSFER" ? `2px solid ${theme.accents.primary}` : `1px solid ${theme.borders.medium}` }}>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="BANK_TRANSFER"
+                  checked={selectedPaymentMethod === "BANK_TRANSFER"}
+                  onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                  className="mr-3"
+                />
+                <div>
+                  <p className="font-medium" style={{ color: theme.text.primary }}>Bank Transfer</p>
+                  <p className="text-xs" style={{ color: theme.text.secondary }}>Transfer via online banking</p>
+                </div>
+              </label>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowPaymentMethodModal(false)}
+                className="flex-1 px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.primary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAcceptCounter}
+                disabled={accepting}
+                className="flex-1 px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.primary,
+                  color: theme.text.inverse,
+                }}
+              >
+                {accepting ? "Processing..." : "Confirm & Accept"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

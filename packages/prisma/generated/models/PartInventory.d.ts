@@ -143,6 +143,7 @@ export type PartInventoryWhereInput = {
     part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
     branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
     stockMovements?: Prisma.StockMovementListRelationFilter;
+    partOrders?: Prisma.PartOrderListRelationFilter;
 };
 export type PartInventoryOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -155,6 +156,7 @@ export type PartInventoryOrderByWithRelationInput = {
     part?: Prisma.PartOrderByWithRelationInput;
     branch?: Prisma.BranchOrderByWithRelationInput;
     stockMovements?: Prisma.StockMovementOrderByRelationAggregateInput;
+    partOrders?: Prisma.PartOrderOrderByRelationAggregateInput;
 };
 export type PartInventoryWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -171,6 +173,7 @@ export type PartInventoryWhereUniqueInput = Prisma.AtLeast<{
     part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
     branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
     stockMovements?: Prisma.StockMovementListRelationFilter;
+    partOrders?: Prisma.PartOrderListRelationFilter;
 }, "id" | "partId_branchId">;
 export type PartInventoryOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -207,6 +210,7 @@ export type PartInventoryCreateInput = {
     part: Prisma.PartCreateNestedOneWithoutInventoriesInput;
     branch: Prisma.BranchCreateNestedOneWithoutPartInventoryInput;
     stockMovements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryUncheckedCreateInput = {
     id?: string;
@@ -217,6 +221,7 @@ export type PartInventoryUncheckedCreateInput = {
     reorderLevel?: number;
     updatedAt?: Date | string;
     stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -227,6 +232,7 @@ export type PartInventoryUpdateInput = {
     part?: Prisma.PartUpdateOneRequiredWithoutInventoriesNestedInput;
     branch?: Prisma.BranchUpdateOneRequiredWithoutPartInventoryNestedInput;
     stockMovements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -237,6 +243,7 @@ export type PartInventoryUncheckedUpdateInput = {
     reorderLevel?: Prisma.IntFieldUpdateOperationsInput | number;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryCreateManyInput = {
     id?: string;
@@ -404,6 +411,18 @@ export type PartInventoryUpdateOneRequiredWithoutStockMovementsNestedInput = {
     connect?: Prisma.PartInventoryWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.PartInventoryUpdateToOneWithWhereWithoutStockMovementsInput, Prisma.PartInventoryUpdateWithoutStockMovementsInput>, Prisma.PartInventoryUncheckedUpdateWithoutStockMovementsInput>;
 };
+export type PartInventoryCreateNestedOneWithoutPartOrdersInput = {
+    create?: Prisma.XOR<Prisma.PartInventoryCreateWithoutPartOrdersInput, Prisma.PartInventoryUncheckedCreateWithoutPartOrdersInput>;
+    connectOrCreate?: Prisma.PartInventoryCreateOrConnectWithoutPartOrdersInput;
+    connect?: Prisma.PartInventoryWhereUniqueInput;
+};
+export type PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput = {
+    create?: Prisma.XOR<Prisma.PartInventoryCreateWithoutPartOrdersInput, Prisma.PartInventoryUncheckedCreateWithoutPartOrdersInput>;
+    connectOrCreate?: Prisma.PartInventoryCreateOrConnectWithoutPartOrdersInput;
+    upsert?: Prisma.PartInventoryUpsertWithoutPartOrdersInput;
+    connect?: Prisma.PartInventoryWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.PartInventoryUpdateToOneWithWhereWithoutPartOrdersInput, Prisma.PartInventoryUpdateWithoutPartOrdersInput>, Prisma.PartInventoryUncheckedUpdateWithoutPartOrdersInput>;
+};
 export type PartInventoryCreateWithoutBranchInput = {
     id?: string;
     quantity?: number;
@@ -412,6 +431,7 @@ export type PartInventoryCreateWithoutBranchInput = {
     updatedAt?: Date | string;
     part: Prisma.PartCreateNestedOneWithoutInventoriesInput;
     stockMovements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryUncheckedCreateWithoutBranchInput = {
     id?: string;
@@ -421,6 +441,7 @@ export type PartInventoryUncheckedCreateWithoutBranchInput = {
     reorderLevel?: number;
     updatedAt?: Date | string;
     stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryCreateOrConnectWithoutBranchInput = {
     where: Prisma.PartInventoryWhereUniqueInput;
@@ -463,6 +484,7 @@ export type PartInventoryCreateWithoutPartInput = {
     updatedAt?: Date | string;
     branch: Prisma.BranchCreateNestedOneWithoutPartInventoryInput;
     stockMovements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryUncheckedCreateWithoutPartInput = {
     id?: string;
@@ -472,6 +494,7 @@ export type PartInventoryUncheckedCreateWithoutPartInput = {
     reorderLevel?: number;
     updatedAt?: Date | string;
     stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryCreateOrConnectWithoutPartInput = {
     where: Prisma.PartInventoryWhereUniqueInput;
@@ -502,6 +525,7 @@ export type PartInventoryCreateWithoutStockMovementsInput = {
     updatedAt?: Date | string;
     part: Prisma.PartCreateNestedOneWithoutInventoriesInput;
     branch: Prisma.BranchCreateNestedOneWithoutPartInventoryInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryUncheckedCreateWithoutStockMovementsInput = {
     id?: string;
@@ -511,6 +535,7 @@ export type PartInventoryUncheckedCreateWithoutStockMovementsInput = {
     reservedQuantity?: number;
     reorderLevel?: number;
     updatedAt?: Date | string;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInventoryInput;
 };
 export type PartInventoryCreateOrConnectWithoutStockMovementsInput = {
     where: Prisma.PartInventoryWhereUniqueInput;
@@ -533,6 +558,7 @@ export type PartInventoryUpdateWithoutStockMovementsInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     part?: Prisma.PartUpdateOneRequiredWithoutInventoriesNestedInput;
     branch?: Prisma.BranchUpdateOneRequiredWithoutPartInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryUncheckedUpdateWithoutStockMovementsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -542,6 +568,60 @@ export type PartInventoryUncheckedUpdateWithoutStockMovementsInput = {
     reservedQuantity?: Prisma.IntFieldUpdateOperationsInput | number;
     reorderLevel?: Prisma.IntFieldUpdateOperationsInput | number;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartInventoryNestedInput;
+};
+export type PartInventoryCreateWithoutPartOrdersInput = {
+    id?: string;
+    quantity?: number;
+    reservedQuantity?: number;
+    reorderLevel?: number;
+    updatedAt?: Date | string;
+    part: Prisma.PartCreateNestedOneWithoutInventoriesInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartInventoryInput;
+    stockMovements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput;
+};
+export type PartInventoryUncheckedCreateWithoutPartOrdersInput = {
+    id?: string;
+    partId: string;
+    branchId: string;
+    quantity?: number;
+    reservedQuantity?: number;
+    reorderLevel?: number;
+    updatedAt?: Date | string;
+    stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput;
+};
+export type PartInventoryCreateOrConnectWithoutPartOrdersInput = {
+    where: Prisma.PartInventoryWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartInventoryCreateWithoutPartOrdersInput, Prisma.PartInventoryUncheckedCreateWithoutPartOrdersInput>;
+};
+export type PartInventoryUpsertWithoutPartOrdersInput = {
+    update: Prisma.XOR<Prisma.PartInventoryUpdateWithoutPartOrdersInput, Prisma.PartInventoryUncheckedUpdateWithoutPartOrdersInput>;
+    create: Prisma.XOR<Prisma.PartInventoryCreateWithoutPartOrdersInput, Prisma.PartInventoryUncheckedCreateWithoutPartOrdersInput>;
+    where?: Prisma.PartInventoryWhereInput;
+};
+export type PartInventoryUpdateToOneWithWhereWithoutPartOrdersInput = {
+    where?: Prisma.PartInventoryWhereInput;
+    data: Prisma.XOR<Prisma.PartInventoryUpdateWithoutPartOrdersInput, Prisma.PartInventoryUncheckedUpdateWithoutPartOrdersInput>;
+};
+export type PartInventoryUpdateWithoutPartOrdersInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    reservedQuantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    reorderLevel?: Prisma.IntFieldUpdateOperationsInput | number;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    part?: Prisma.PartUpdateOneRequiredWithoutInventoriesNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartInventoryNestedInput;
+    stockMovements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput;
+};
+export type PartInventoryUncheckedUpdateWithoutPartOrdersInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    reservedQuantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    reorderLevel?: Prisma.IntFieldUpdateOperationsInput | number;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput;
 };
 export type PartInventoryCreateManyBranchInput = {
     id?: string;
@@ -559,6 +639,7 @@ export type PartInventoryUpdateWithoutBranchInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     part?: Prisma.PartUpdateOneRequiredWithoutInventoriesNestedInput;
     stockMovements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryUncheckedUpdateWithoutBranchInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -568,6 +649,7 @@ export type PartInventoryUncheckedUpdateWithoutBranchInput = {
     reorderLevel?: Prisma.IntFieldUpdateOperationsInput | number;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryUncheckedUpdateManyWithoutBranchInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -593,6 +675,7 @@ export type PartInventoryUpdateWithoutPartInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     branch?: Prisma.BranchUpdateOneRequiredWithoutPartInventoryNestedInput;
     stockMovements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryUncheckedUpdateWithoutPartInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -602,6 +685,7 @@ export type PartInventoryUncheckedUpdateWithoutPartInput = {
     reorderLevel?: Prisma.IntFieldUpdateOperationsInput | number;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartInventoryNestedInput;
 };
 export type PartInventoryUncheckedUpdateManyWithoutPartInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -613,15 +697,20 @@ export type PartInventoryUncheckedUpdateManyWithoutPartInput = {
 };
 export type PartInventoryCountOutputType = {
     stockMovements: number;
+    partOrders: number;
 };
 export type PartInventoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     stockMovements?: boolean | PartInventoryCountOutputTypeCountStockMovementsArgs;
+    partOrders?: boolean | PartInventoryCountOutputTypeCountPartOrdersArgs;
 };
 export type PartInventoryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PartInventoryCountOutputTypeSelect<ExtArgs> | null;
 };
 export type PartInventoryCountOutputTypeCountStockMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.StockMovementWhereInput;
+};
+export type PartInventoryCountOutputTypeCountPartOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PartOrderWhereInput;
 };
 export type PartInventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -634,6 +723,7 @@ export type PartInventorySelect<ExtArgs extends runtime.Types.Extensions.Interna
     part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
     branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
     stockMovements?: boolean | Prisma.PartInventory$stockMovementsArgs<ExtArgs>;
+    partOrders?: boolean | Prisma.PartInventory$partOrdersArgs<ExtArgs>;
     _count?: boolean | Prisma.PartInventoryCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["partInventory"]>;
 export type PartInventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -672,6 +762,7 @@ export type PartInventoryInclude<ExtArgs extends runtime.Types.Extensions.Intern
     part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
     branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
     stockMovements?: boolean | Prisma.PartInventory$stockMovementsArgs<ExtArgs>;
+    partOrders?: boolean | Prisma.PartInventory$partOrdersArgs<ExtArgs>;
     _count?: boolean | Prisma.PartInventoryCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type PartInventoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -688,6 +779,7 @@ export type $PartInventoryPayload<ExtArgs extends runtime.Types.Extensions.Inter
         part: Prisma.$PartPayload<ExtArgs>;
         branch: Prisma.$BranchPayload<ExtArgs>;
         stockMovements: Prisma.$StockMovementPayload<ExtArgs>[];
+        partOrders: Prisma.$PartOrderPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -752,6 +844,7 @@ export interface Prisma__PartInventoryClient<T, Null = never, ExtArgs extends ru
     part<T extends Prisma.PartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartDefaultArgs<ExtArgs>>): Prisma.Prisma__PartClient<runtime.Types.Result.GetResult<Prisma.$PartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     stockMovements<T extends Prisma.PartInventory$stockMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartInventory$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    partOrders<T extends Prisma.PartInventory$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartInventory$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -875,6 +968,17 @@ export type PartInventory$stockMovementsArgs<ExtArgs extends runtime.Types.Exten
     take?: number;
     skip?: number;
     distinct?: Prisma.StockMovementScalarFieldEnum | Prisma.StockMovementScalarFieldEnum[];
+};
+export type PartInventory$partOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where?: Prisma.PartOrderWhereInput;
+    orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[];
+    cursor?: Prisma.PartOrderWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[];
 };
 export type PartInventoryDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PartInventorySelect<ExtArgs> | null;

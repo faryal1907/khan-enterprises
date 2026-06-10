@@ -287,7 +287,7 @@ export class OffersService {
   /**
    * Customer accepts the counter — set offer → ACCEPTED, run same atomic reservation + order creation as acceptOffer
    */
-  async acceptCounter(id: string) {
+  async acceptCounter(id: string, paymentMethod?: string) {
     // This is essentially the same as acceptOffer but without adminId
     // We'll use a system user ID or null for processedById
     return this.prisma.client.$transaction(async (tx) => {
@@ -352,7 +352,7 @@ export class OffersService {
           customerCNIC: offer.customerCNIC || "",
           customerAddress: offer.customerAddress || "",
           negotiatedAmount,
-          paymentMethod: PaymentMethod.CASH,
+          paymentMethod: (paymentMethod as PaymentMethod) || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
           processedById: null,
         },

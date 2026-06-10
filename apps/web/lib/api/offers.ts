@@ -21,8 +21,8 @@ export async function getOfferById(id: string) {
   return response.data;
 }
 
-export async function acceptCounterOffer(id: string) {
-  const response = await api.post(`/offers/${id}/accept-counter`);
+export async function acceptCounterOffer(id: string, paymentMethod?: string) {
+  const response = await api.post(`/offers/${id}/accept-counter`, { paymentMethod });
   return response.data;
 }
 

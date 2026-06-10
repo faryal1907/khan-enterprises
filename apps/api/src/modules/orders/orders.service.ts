@@ -53,6 +53,7 @@ export class OrdersService {
           bike: {
             include: {
               model: true,
+              branch: true,
             },
           },
           offer: true,
@@ -91,6 +92,7 @@ export class OrdersService {
         bike: {
           include: {
             model: true,
+            branch: true,
           },
         },
         offer: true,
@@ -126,6 +128,7 @@ export class OrdersService {
         bike: {
           include: {
             model: true,
+            branch: true,
           },
         },
         offer: true,
@@ -189,6 +192,7 @@ export class OrdersService {
         bike: {
           include: {
             model: true,
+            branch: true,
           },
         },
         offer: true,
@@ -372,6 +376,7 @@ export class OrdersService {
         bike: {
           include: {
             model: true,
+            branch: true,
           },
         },
         offer: true,
@@ -399,6 +404,7 @@ export class OrdersService {
         bike: {
           include: {
             model: true,
+            branch: true,
           },
         },
         branch: true,

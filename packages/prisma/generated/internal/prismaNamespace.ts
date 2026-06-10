@@ -395,7 +395,9 @@ export const ModelName = {
   StockMovement: 'StockMovement',
   Offer: 'Offer',
   Order: 'Order',
+  PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
+  PartPaymentTransaction: 'PartPaymentTransaction',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
   AuditLog: 'AuditLog'
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "paymentTransaction" | "deliveryRequest" | "document" | "auditLog"
+    modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryRequest" | "document" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1232,6 +1234,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PartOrder: {
+      payload: Prisma.$PartOrderPayload<ExtArgs>
+      fields: Prisma.PartOrderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartOrderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartOrderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>
+        }
+        findFirst: {
+          args: Prisma.PartOrderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartOrderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>
+        }
+        findMany: {
+          args: Prisma.PartOrderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>[]
+        }
+        create: {
+          args: Prisma.PartOrderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>
+        }
+        createMany: {
+          args: Prisma.PartOrderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartOrderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>[]
+        }
+        delete: {
+          args: Prisma.PartOrderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>
+        }
+        update: {
+          args: Prisma.PartOrderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>
+        }
+        deleteMany: {
+          args: Prisma.PartOrderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartOrderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartOrderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>[]
+        }
+        upsert: {
+          args: Prisma.PartOrderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartOrderPayload>
+        }
+        aggregate: {
+          args: Prisma.PartOrderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartOrder>
+        }
+        groupBy: {
+          args: Prisma.PartOrderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartOrderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartOrderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartOrderCountAggregateOutputType> | number
+        }
+      }
+    }
     PaymentTransaction: {
       payload: Prisma.$PaymentTransactionPayload<ExtArgs>
       fields: Prisma.PaymentTransactionFieldRefs
@@ -1303,6 +1379,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PaymentTransactionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PaymentTransactionCountAggregateOutputType> | number
+        }
+      }
+    }
+    PartPaymentTransaction: {
+      payload: Prisma.$PartPaymentTransactionPayload<ExtArgs>
+      fields: Prisma.PartPaymentTransactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartPaymentTransactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartPaymentTransactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>
+        }
+        findFirst: {
+          args: Prisma.PartPaymentTransactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartPaymentTransactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>
+        }
+        findMany: {
+          args: Prisma.PartPaymentTransactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>[]
+        }
+        create: {
+          args: Prisma.PartPaymentTransactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>
+        }
+        createMany: {
+          args: Prisma.PartPaymentTransactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartPaymentTransactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>[]
+        }
+        delete: {
+          args: Prisma.PartPaymentTransactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>
+        }
+        update: {
+          args: Prisma.PartPaymentTransactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PartPaymentTransactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartPaymentTransactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartPaymentTransactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PartPaymentTransactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartPaymentTransactionPayload>
+        }
+        aggregate: {
+          args: Prisma.PartPaymentTransactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartPaymentTransaction>
+        }
+        groupBy: {
+          args: Prisma.PartPaymentTransactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartPaymentTransactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartPaymentTransactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartPaymentTransactionCountAggregateOutputType> | number
         }
       }
     }
@@ -1741,6 +1891,27 @@ export const OrderScalarFieldEnum = {
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
 
 
+export const PartOrderScalarFieldEnum = {
+  id: 'id',
+  orderNumber: 'orderNumber',
+  partId: 'partId',
+  partInventoryId: 'partInventoryId',
+  branchId: 'branchId',
+  customerName: 'customerName',
+  customerPhone: 'customerPhone',
+  customerAddress: 'customerAddress',
+  quantity: 'quantity',
+  amount: 'amount',
+  paymentMethod: 'paymentMethod',
+  status: 'status',
+  processedById: 'processedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartOrderScalarFieldEnum = (typeof PartOrderScalarFieldEnum)[keyof typeof PartOrderScalarFieldEnum]
+
+
 export const PaymentTransactionScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
@@ -1757,6 +1928,24 @@ export const PaymentTransactionScalarFieldEnum = {
 } as const
 
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum]
+
+
+export const PartPaymentTransactionScalarFieldEnum = {
+  id: 'id',
+  partOrderId: 'partOrderId',
+  gatewayReference: 'gatewayReference',
+  idempotencyKey: 'idempotencyKey',
+  amount: 'amount',
+  method: 'method',
+  status: 'status',
+  gatewayResponse: 'gatewayResponse',
+  failureReason: 'failureReason',
+  webhookReceivedAt: 'webhookReceivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
 
 
 export const DeliveryRequestScalarFieldEnum = {
@@ -2213,7 +2402,9 @@ export type GlobalOmitConfig = {
   stockMovement?: Prisma.StockMovementOmit
   offer?: Prisma.OfferOmit
   order?: Prisma.OrderOmit
+  partOrder?: Prisma.PartOrderOmit
   paymentTransaction?: Prisma.PaymentTransactionOmit
+  partPaymentTransaction?: Prisma.PartPaymentTransactionOmit
   deliveryRequest?: Prisma.DeliveryRequestOmit
   document?: Prisma.DocumentOmit
   auditLog?: Prisma.AuditLogOmit

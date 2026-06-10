@@ -12,6 +12,7 @@ import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
 import { CatalogModule } from "./modules/catalog/catalog.module";
 import { OffersModule } from "./modules/offers/offers.module";
 import { OrdersModule } from "./modules/orders/orders.module";
+import { PartOrdersModule } from "./modules/part-orders/part-orders.module";
 import { DeliveriesModule } from "./modules/deliveries/deliveries.module";
 import { SchedulerModule } from "./modules/scheduler/scheduler.module";
 
@@ -29,6 +30,7 @@ import { SchedulerModule } from "./modules/scheduler/scheduler.module";
     CatalogModule,
     OffersModule,
     OrdersModule,
+    PartOrdersModule,
     DeliveriesModule,
     SchedulerModule,
     ThrottlerModule.forRoot([

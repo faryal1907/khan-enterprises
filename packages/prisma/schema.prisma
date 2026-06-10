@@ -134,6 +134,7 @@ model User {
 
   createdOffers   Offer[] @relation("OfferCreatedBy")
   processedOrders Order[] @relation("OrderProcessedBy")
+  processedPartOrders PartOrder[] @relation("PartOrderProcessedBy")
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -180,6 +181,7 @@ model Branch {
   partInventory PartInventory[]
 
   orders Order[]
+  partOrders PartOrder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -280,6 +282,7 @@ model Part {
   sellingPrice Decimal @db.Decimal(12, 2)
 
   inventories PartInventory[]
+  partOrders PartOrder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -301,6 +304,7 @@ model PartInventory {
   reorderLevel     Int @default(5)
 
   stockMovements StockMovement[]
+  partOrders PartOrder[]
 
   updatedAt DateTime @updatedAt
 
@@ -413,6 +417,44 @@ model Order {
   @@index([createdAt])
 }
 
+model PartOrder {
+  id String @id @default(uuid())
+
+  orderNumber String @unique
+
+  partId String
+  part   Part @relation(fields: [partId], references: [id])
+
+  partInventoryId String
+  partInventory   PartInventory @relation(fields: [partInventoryId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  customerName    String
+  customerPhone   String
+  customerAddress String
+
+  quantity Int
+  amount Decimal @db.Decimal(12, 2)
+
+  paymentMethod PaymentMethod
+
+  status OrderStatus @default(PENDING_PAYMENT)
+
+  processedById String?
+  processedBy   User?   @relation("PartOrderProcessedBy", fields: [processedById], references: [id])
+
+  transactions PartPaymentTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([branchId])
+  @@index([createdAt])
+}
+
 // ============================================================================
 // PAYMENTS
 // ============================================================================
@@ -422,6 +464,34 @@ model PaymentTransaction {
 
   orderId String
   order   Order  @relation(fields: [orderId], references: [id])
+
+  gatewayReference String? @unique
+  idempotencyKey   String? @unique
+
+  amount Decimal @db.Decimal(12, 2)
+
+  method PaymentMethod
+
+  status PaymentStatus @default(PENDING)
+
+  gatewayResponse Json?
+
+  failureReason String?
+
+  webhookReceivedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([gatewayReference])
+}
+
+model PartPaymentTransaction {
+  id String @id @default(uuid())
+
+  partOrderId String
+  partOrder   PartOrder @relation(fields: [partOrderId], references: [id])
 
   gatewayReference String? @unique
   idempotencyKey   String? @unique
