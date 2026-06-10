@@ -6,8 +6,12 @@ config({ path: path.resolve(process.cwd(), "../../.env") });
 config({ path: path.resolve(process.cwd(), ".env") });
 import bcrypt from "bcrypt";
 
+// expose prisma to the module scope so the finally block can disconnect
+let prisma: any;
+
 async function main() {
-  const { prisma } = await import("./index");
+  const mod = await import("./index.js");
+  prisma = mod.prisma;
 
   console.log("🌱 Starting database seeding...");
 
