@@ -26,8 +26,8 @@ export default function LoginPage() {
     setError(null);
     try {
       const response = await api.post<LoginResponse>("/auth/login", data);
-      const { accessToken, user } = response.data;
-      setAuth(user, accessToken);
+      const { accessToken, refreshToken, user } = response.data;
+      setAuth(user, accessToken, refreshToken);
       router.push("/");
     } catch (err: unknown) {
       const message =
@@ -152,6 +152,16 @@ export default function LoginPage() {
             {isSubmitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        {/* Link to sign-up */}
+        <div className="mt-6 text-center">
+          <p className="text-sm" style={{ color: theme.text.muted }}>
+            Don't have an account?{" "}
+            <a href="/signup" className="font-semibold hover:underline" style={{ color: theme.accents.primary }}>
+              Sign up
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

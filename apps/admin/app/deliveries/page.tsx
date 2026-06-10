@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import { getDeliveries, getDeliveryStats } from "@/lib/api/deliveries";
 
 export default function DeliveryQueuePage() {
   const { user } = useAuthStore();
@@ -12,6 +14,10 @@ export default function DeliveryQueuePage() {
     status: "",
     branch: "",
   });
+  const [deliveries, setDeliveries] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Set branch filter to user's branch if not admin
   useEffect(() => {
@@ -20,12 +26,85 @@ export default function DeliveryQueuePage() {
     }
   }, [isAdmin, user?.branchId]);
 
+  useEffect(() => {
+    fetchDeliveries();
+    fetchStats();
+  }, [filters]);
+
+  const fetchDeliveries = async () => {
+    try {
+      setLoading(true);
+      const params: any = {};
+      if (filters.status) params.status = filters.status;
+      if (filters.branch) params.branchId = filters.branch;
+      
+      const data = await getDeliveries(params);
+      setDeliveries(data.deliveries || []);
+    } catch (err: any) {
+      console.error("Failed to fetch deliveries:", err);
+      setError(err.response?.data?.message || "Failed to load deliveries");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const branchId = isAdmin && filters.branch ? filters.branch : undefined;
+      const data = await getDeliveryStats(branchId);
+      setStats(data);
+    } catch (err: any) {
+      console.error("Failed to fetch delivery stats:", err);
+    }
+  };
+
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
     if (key === "branch" && !isAdmin) {
       return;
     }
     setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const getDeliveryStatusStyle = (status: string) => {
+    switch (status) {
+      case "REQUESTED":
+        return {
+          backgroundColor: "#FEF3C7",
+          color: "#92400E",
+          border: "1px solid #F59E0B",
+        };
+      case "UNDER_REVIEW":
+        return {
+          backgroundColor: "#DBEAFE",
+          color: "#1E40AF",
+          border: "1px solid #3B82F6",
+        };
+      case "APPROVED":
+        return {
+          backgroundColor: "#E0E7FF",
+          color: "#3730A3",
+          border: "1px solid #6366F1",
+        };
+      case "IN_TRANSIT":
+        return {
+          backgroundColor: "#F3E8FF",
+          color: "#6B21A8",
+          border: "1px solid #A855F7",
+        };
+      case "DELIVERED":
+        return {
+          backgroundColor: "#D1FAE5",
+          color: "#065F46",
+          border: "1px solid #10B981",
+        };
+      default:
+        return {
+          backgroundColor: theme.backgrounds.tertiary,
+          color: theme.text.secondary,
+          border: `1px solid ${theme.borders.medium}`,
+        };
+    }
   };
 
   return (
@@ -67,11 +146,11 @@ export default function DeliveryQueuePage() {
                 }}
               >
                 <option value="">All Status</option>
-                <option value="PENDING">Pending</option>
+                <option value="REQUESTED">Requested</option>
+                <option value="UNDER_REVIEW">Under Review</option>
                 <option value="APPROVED">Approved</option>
                 <option value="IN_TRANSIT">In Transit</option>
                 <option value="DELIVERED">Delivered</option>
-                <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
             <div>
@@ -106,80 +185,131 @@ export default function DeliveryQueuePage() {
           </div>
         </div>
 
+        {/* Stats Cards */}
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div
+              className="rounded-lg p-4"
+              style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+            >
+              <p className="text-xs mb-1" style={{ color: theme.text.secondary }}>Total</p>
+              <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>{stats.total}</p>
+            </div>
+            <div
+              className="rounded-lg p-4"
+              style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}
+            >
+              <p className="text-xs mb-1" style={{ color: "#92400E" }}>Requested</p>
+              <p className="text-2xl font-bold" style={{ color: "#92400E" }}>{stats.requested}</p>
+            </div>
+            <div
+              className="rounded-lg p-4"
+              style={{ backgroundColor: "#DBEAFE", border: "1px solid #3B82F6" }}
+            >
+              <p className="text-xs mb-1" style={{ color: "#1E40AF" }}>Under Review</p>
+              <p className="text-2xl font-bold" style={{ color: "#1E40AF" }}>{stats.underReview}</p>
+            </div>
+            <div
+              className="rounded-lg p-4"
+              style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
+            >
+              <p className="text-xs mb-1" style={{ color: "#3730A3" }}>In Transit</p>
+              <p className="text-2xl font-bold" style={{ color: "#3730A3" }}>{stats.inTransit}</p>
+            </div>
+            <div
+              className="rounded-lg p-4"
+              style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}
+            >
+              <p className="text-xs mb-1" style={{ color: "#065F46" }}>Delivered</p>
+              <p className="text-2xl font-bold" style={{ color: "#065F46" }}>{stats.delivered}</p>
+            </div>
+          </div>
+        )}
+
         {/* Table */}
         <div
           className="rounded-lg overflow-hidden"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="w-full">
-            <thead>
-              <tr
-                style={{ backgroundColor: theme.backgrounds.secondary }}
-              >
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Order Number
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Delivery Address
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Branch
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Requested Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span
-                    className="inline-block px-2 py-1 text-xs font-medium rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    —
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <a
-                    href="/deliveries/1"
-                    className="text-sm font-medium transition-colors hover:opacity-70"
-                    style={{ color: theme.accents.primary }}
-                  >
-                    Review
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accents.primary }} />
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p style={{ color: theme.text.secondary }}>{error}</p>
+            </div>
+          ) : deliveries.length === 0 ? (
+            <div className="p-8 text-center">
+              <p style={{ color: theme.text.secondary }}>No delivery requests found</p>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead>
+                <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Order Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Customer
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Delivery Address
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Branch
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Requested Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {deliveries.map((delivery) => (
+                  <tr key={delivery.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                      {delivery.order.orderNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {delivery.order.customerName}
+                    </td>
+                    <td className="px-6 py-4 text-sm max-w-xs truncate" style={{ color: theme.text.primary }}>
+                      {delivery.deliveryAddress}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {delivery.order.branch.name}, {delivery.order.branch.city}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {new Date(delivery.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span
+                        className="inline-block px-2 py-1 text-xs font-medium rounded"
+                        style={getDeliveryStatusStyle(delivery.status)}
+                      >
+                        {delivery.status.replace(/_/g, " ")}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <Link
+                        href={`/deliveries/${delivery.id}`}
+                        className="text-sm font-medium transition-colors hover:opacity-70"
+                        style={{ color: theme.accents.primary }}
+                      >
+                        Review
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

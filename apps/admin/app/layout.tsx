@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navigation } from "@/components/navigation";
 import { AuthProvider } from "@/components/auth-provider";
 import { theme } from "@/lib/colors";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navigation />
           <main className="flex-1">{children}</main>
+          <Toaster />
         </AuthProvider>
       </body>
     </html>

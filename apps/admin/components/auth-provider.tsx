@@ -29,6 +29,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     api
       .get<{ user: User }>("/auth/me")
       .then((res) => {
+        // Check if user is a customer - redirect to web app
+        if (res.data.user.role === "CUSTOMER") {
+          logout();
+          router.push("http://localhost:3000");
+          return;
+        }
         setAuth(res.data.user, token);
       })
       .catch(() => {

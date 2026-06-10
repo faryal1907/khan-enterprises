@@ -1,44 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
-import type { User } from "@/lib/types";
 
 const WEB_ACCESS_TOKEN_COOKIE = "webAccessToken";
 
 /**
- * Runs once on mount. If an accessToken cookie exists, calls GET /auth/me
- * to rehydrate the Zustand store with the user. This fixes the "Loading..."
- * problem caused by Zustand resetting to null on every full page reload.
+ * Runs once on mount. Restores auth state from cookies to fix the
+ * Zustand store resetting to null on every full page reload.
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
-  const { setAuth, logout } = useAuthStore();
-  const router = useRouter();
+  const { initializeAuth } = useAuthStore();
 
   useEffect(() => {
-    const token = Cookies.get(WEB_ACCESS_TOKEN_COOKIE);
-
-    if (!token) {
-      setHydrated(true);
-      return;
-    }
-
-    api
-      .get<{ user: User }>("/auth/me")
-      .then((res) => {
-        setAuth(res.data.user, token);
-      })
-      .catch(() => {
-        // Token is invalid or expired — clear it and let middleware redirect
-        logout();
-        router.push("/login");
-      })
-      .finally(() => {
-        setHydrated(true);
-      });
+    initializeAuth();
+    setHydrated(true);
   }, []);
 
   // Don't render children until we know auth state — prevents flash of wrong content

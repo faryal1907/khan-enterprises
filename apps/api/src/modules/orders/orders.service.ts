@@ -12,8 +12,9 @@ export class OrdersService {
 
   /**
    * Paginated, filtered by status/branchId/date range. Include bike, offer, branch, processedBy
+   * For CUSTOMER role: filters by customer phone/CNIC from user profile
    */
-  async getOrders(query: QueryOrdersDto) {
+  async getOrders(query: QueryOrdersDto, user?: any) {
     const where: any = {};
 
     if (query.status) {
@@ -32,6 +33,11 @@ export class OrdersService {
       if (query.dateTo) {
         where.createdAt.lte = new Date(query.dateTo);
       }
+    }
+
+    // Filter by customer for CUSTOMER role
+    if (user?.role === "CUSTOMER") {
+      where.customerPhone = user.phoneNumber;
     }
 
     const page = query.page || 1;
@@ -111,8 +117,9 @@ export class OrdersService {
 
   /**
    * Used for invoice/customer-facing lookup
+   * For CUSTOMER role: verifies order belongs to customer
    */
-  async getOrderByNumber(orderNumber: string) {
+  async getOrderByNumber(orderNumber: string, user?: any) {
     const order = await this.prisma.client.order.findUnique({
       where: { orderNumber },
       include: {
@@ -137,6 +144,11 @@ export class OrdersService {
     });
 
     if (!order) {
+      throw new NotFoundException(`Order with number ${orderNumber} not found`);
+    }
+
+    // For CUSTOMER role, verify order belongs to them
+    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
       throw new NotFoundException(`Order with number ${orderNumber} not found`);
     }
 
@@ -314,12 +326,12 @@ export class OrdersService {
         },
       });
 
-      // 4. If CASH, immediately set order → PAID, offer → PAID, bike → SOLD
+      // 4. If CASH, immediately set order → CONFIRMED, offer → PAID, bike → SOLD
       if (dto.paymentMethod === "CASH") {
         await tx.order.update({
           where: { id: orderId },
           data: {
-            status: OrderStatus.PAID,
+            status: OrderStatus.CONFIRMED,
             processedById: adminId || null,
           },
         });
@@ -370,6 +382,26 @@ export class OrdersService {
             email: true,
           },
         },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return orders;
+  }
+
+  /**
+   * Customer-scoped order list by phone number (public endpoint)
+   */
+  async getOrdersByCustomerPhone(phone: string) {
+    const orders = await this.prisma.client.order.findMany({
+      where: { customerPhone: phone },
+      include: {
+        bike: {
+          include: {
+            model: true,
+          },
+        },
+        branch: true,
       },
       orderBy: { createdAt: "desc" },
     });

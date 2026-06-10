@@ -1494,6 +1494,7 @@ export declare const DeliveryRequestScalarFieldEnum: {
     readonly status: "status";
     readonly approvedAt: "approvedAt";
     readonly deliveredAt: "deliveredAt";
+    readonly notes: "notes";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };

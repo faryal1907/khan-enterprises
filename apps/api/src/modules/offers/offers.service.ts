@@ -5,6 +5,7 @@ import { CounterOfferDto } from "./dto/counter-offer.dto";
 import { RejectOfferDto } from "./dto/reject-offer.dto";
 import { QueryOffersDto } from "./dto/query-offers.dto";
 import { OfferStatus, BikeStatus, OrderStatus, PaymentMethod } from "@khan/prisma";
+import { generateOrderNumber } from "../../common/utils";
 
 @Injectable()
 export class OffersService {
@@ -194,7 +195,7 @@ export class OffersService {
       });
 
       // 5. Create Order
-      const orderNumber = this.generateOrderNumber();
+      const orderNumber = generateOrderNumber();
       const negotiatedAmount = offer.counterAmount || offer.offerAmount;
 
       const order = await tx.order.create({
@@ -337,7 +338,7 @@ export class OffersService {
       });
 
       // 5. Create Order (without processedById since customer is accepting)
-      const orderNumber = this.generateOrderNumber();
+      const orderNumber = generateOrderNumber();
       const negotiatedAmount = offer.counterAmount || offer.offerAmount;
 
       const order = await tx.order.create({
@@ -394,13 +395,4 @@ export class OffersService {
     });
   }
 
-  /**
-   * Generate order number in format: ORD-YYYYMMDD-XXXX
-   */
-  private generateOrderNumber(): string {
-    const date = new Date();
-    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
-    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `ORD-${dateStr}-${randomStr}`;
-  }
 }

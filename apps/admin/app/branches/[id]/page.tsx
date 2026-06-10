@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -140,9 +141,10 @@ export default function BranchDetailPage() {
       const res = await api.put(`/branches/${branchId}`, updateData);
       setBranch(res.data);
       setIsEditing(false);
+      toast.success("Branch updated successfully");
     } catch (err) {
       console.error("Failed to update branch:", err);
-      alert("Failed to update branch");
+      toast.error("Failed to update branch");
     }
   };
 

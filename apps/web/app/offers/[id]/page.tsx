@@ -333,7 +333,7 @@ export default function OfferStatusPage() {
                 <p className="font-semibold" style={{ color: "#065F46" }}>{offer.order.orderNumber}</p>
               </div>
               <Link
-                href={`/orders/${offer.order.id}`}
+                href={`/orders/${offer.order.orderNumber}`}
                 className="px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                 style={{
                   backgroundColor: "#10B981",
