@@ -15,6 +15,7 @@ import { QueryBikesDto } from "./dto/query-bikes.dto";
 
 @Controller("inventory")
 @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles("ADMIN", "MANAGER", "SALES_STAFF")
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 

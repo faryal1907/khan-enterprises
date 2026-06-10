@@ -395,4 +395,72 @@ export class OffersService {
     });
   }
 
+  /**
+   * Get all offers for a customer by user ID
+   * Also includes offers created by the same customer phone/email for backward compatibility
+   */
+  async getOffersByCustomer(userId: string, query: QueryOffersDto) {
+    // First get the user to find their phone/email
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+      select: { phoneNumber: true, email: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Query offers by createdById OR customer phone/email
+    const where: any = {
+      OR: [
+        { createdById: userId },
+      ],
+    };
+
+    // Add phone/email matching if available
+    if (user.phoneNumber) {
+      where.OR.push({ customerPhone: user.phoneNumber });
+    }
+    if (user.email) {
+      where.OR.push({ customerEmail: user.email });
+    }
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [offers, total] = await Promise.all([
+      this.prisma.client.offer.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          bike: {
+            include: {
+              model: true,
+              branch: true,
+            },
+          },
+          order: true,
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.offer.count({ where }),
+    ]);
+
+    return {
+      offers,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
 }

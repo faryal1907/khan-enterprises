@@ -34,6 +34,27 @@ export class OffersController {
   }
 
   /**
+   * GET /api/offers/customer/:userId
+   * @UseGuards(JwtAuthGuard) — get all offers for a logged-in customer by user ID
+   * NOTE: Must be defined before :id to avoid route conflicts
+   */
+  @Get("customer/:userId")
+  @UseGuards(JwtAuthGuard)
+  async getOffersByCustomer(@Param("userId") userId: string, @Query() query: QueryOffersDto) {
+    return this.offersService.getOffersByCustomer(userId, query);
+  }
+
+  /**
+   * GET /api/offers/bike/:bikeId
+   * Public — negotiation history for a bike
+   * NOTE: Must be defined before :id to avoid route conflicts
+   */
+  @Get("bike/:bikeId")
+  async getOffersByBike(@Param("bikeId") bikeId: string) {
+    return this.offersService.getOffersByBike(bikeId);
+  }
+
+  /**
    * GET /api/offers/:id
    * Public (no auth) — customers can view their offer by ID
    */
@@ -90,14 +111,5 @@ export class OffersController {
   @Post(":id/accept-counter")
   async acceptCounter(@Param("id") id: string) {
     return this.offersService.acceptCounter(id);
-  }
-
-  /**
-   * GET /api/offers/bike/:bikeId
-   * Public — negotiation history for a bike
-   */
-  @Get("bike/:bikeId")
-  async getOffersByBike(@Param("bikeId") bikeId: string) {
-    return this.offersService.getOffersByBike(bikeId);
   }
 }

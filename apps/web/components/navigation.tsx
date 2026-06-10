@@ -82,21 +82,38 @@ export function Navigation() {
             })}
             {/* Orders — for all authenticated users */}
             {user && (
-              <Link
-                href="/orders"
-                className="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                style={{
-                  color: isActive("/orders") ? theme.accents.primary : theme.text.secondary,
-                  backgroundColor: isActive("/orders")
-                    ? `${theme.accents.tertiary}30`
-                    : "transparent",
-                  borderBottom: isActive("/orders")
-                    ? `2px solid ${theme.accents.primary}`
-                    : "2px solid transparent",
-                }}
-              >
-                Orders
-              </Link>
+              <>
+                <Link
+                  href="/offers"
+                  className="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{
+                    color: isActive("/offers") ? theme.accents.primary : theme.text.secondary,
+                    backgroundColor: isActive("/offers")
+                      ? `${theme.accents.tertiary}30`
+                      : "transparent",
+                    borderBottom: isActive("/offers")
+                      ? `2px solid ${theme.accents.primary}`
+                      : "2px solid transparent",
+                  }}
+                >
+                  Negotiations
+                </Link>
+                <Link
+                  href="/orders"
+                  className="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{
+                    color: isActive("/orders") ? theme.accents.primary : theme.text.secondary,
+                    backgroundColor: isActive("/orders")
+                      ? `${theme.accents.tertiary}30`
+                      : "transparent",
+                    borderBottom: isActive("/orders")
+                      ? `2px solid ${theme.accents.primary}`
+                      : "2px solid transparent",
+                  }}
+                >
+                  Orders
+                </Link>
+              </>
             )}
           </div>
         </div>

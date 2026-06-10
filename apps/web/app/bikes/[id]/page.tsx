@@ -64,7 +64,7 @@ export default function BikeDetailPage() {
         customerAddress: customerAddress || undefined,
         offerAmount: parseFloat(offerAmount),
         message: message || undefined,
-      });
+      }, user?.id);
 
       // Redirect to offer status page
       window.location.href = `/offers/${result.id}`;
