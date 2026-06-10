@@ -32,4 +32,8 @@ export class CreateOfferDto {
   @IsString()
   @IsOptional()
   message?: string;
+
+  @IsUUID()
+  @IsOptional()
+  userId?: string;
 }

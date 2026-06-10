@@ -4,6 +4,7 @@ import { QueryOrdersDto } from "./dto/query-orders.dto";
 import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
+import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
@@ -289,7 +290,7 @@ export class OrdersService {
    * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
    * + order → PAID + offer → PAID, set bike → SOLD — all in one transaction
    */
-  async recordPayment(orderId: string, dto: CompleteOrderDetailsDto, adminId?: string) {
+  async recordPayment(orderId: string, dto: RecordPaymentDto, adminId?: string) {
     return this.prisma.client.$transaction(async (tx) => {
       // 1. Fetch order
       const order = await tx.order.findUnique({
@@ -310,13 +311,11 @@ export class OrdersService {
         );
       }
 
-      // 2. Update order with customer details if not already present
+      // 2. Update order with payment method
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
-          customerCNIC: dto.customerCNIC,
-          customerAddress: dto.customerAddress,
-          paymentMethod: dto.paymentMethod,
+          paymentMethod: dto.method,
         },
       });
 
@@ -324,14 +323,15 @@ export class OrdersService {
       const transaction = await tx.paymentTransaction.create({
         data: {
           orderId,
-          amount: order.negotiatedAmount,
-          method: dto.paymentMethod,
-          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          amount: dto.amount,
+          method: dto.method,
+          gatewayReference: dto.referenceNumber || null,
+          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
         },
       });
 
       // 4. If CASH, immediately set order → CONFIRMED, offer → PAID, bike → SOLD
-      if (dto.paymentMethod === "CASH") {
+      if (dto.method === "CASH") {
         await tx.order.update({
           where: { id: orderId },
           data: {

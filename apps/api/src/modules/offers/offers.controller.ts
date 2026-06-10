@@ -19,7 +19,7 @@ export class OffersController {
    */
   @Post()
   async createOffer(@Body() dto: CreateOfferDto) {
-    return this.offersService.createOffer(dto);
+    return this.offersService.createOffer(dto, dto.userId);
   }
 
   /**

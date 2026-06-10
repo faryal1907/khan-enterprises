@@ -20,8 +20,10 @@ export default function BikeDetailPage() {
     const fetchBike = async () => {
       try {
         const response = await getBikeById(bikeId);
-        setBike(response.bike);
-        setStatusValue(response.bike.status);
+        if (response.bike) {
+          setBike(response.bike);
+          setStatusValue(response.bike.status);
+        }
       } catch (error) {
         console.error("Failed to fetch bike:", error);
       } finally {
@@ -42,7 +44,9 @@ export default function BikeDetailPage() {
       setShowStatusModal(false);
       // Refetch bike data
       const response = await getBikeById(bikeId);
-      setBike(response.bike);
+      if (response.bike) {
+        setBike(response.bike);
+      }
     } catch (error) {
       console.error("Failed to update status:", error);
       alert("Failed to update status");
