@@ -112,4 +112,22 @@ export class OffersController {
   async acceptCounter(@Param("id") id: string) {
     return this.offersService.acceptCounter(id);
   }
+
+  /**
+   * POST /api/offers/:id/reject-counter
+   * Public (no auth) — customer rejects counter
+   */
+  @Post(":id/reject-counter")
+  async rejectCounter(@Param("id") id: string, @Body() body: { message?: string }) {
+    return this.offersService.rejectCounterOffer(id, body.message);
+  }
+
+  /**
+   * POST /api/offers/:id/cancel
+   * Public (no auth) — customer cancels overall offer
+   */
+  @Post(":id/cancel")
+  async cancelOffer(@Param("id") id: string) {
+    return this.offersService.cancelOffer(id);
+  }
 }

@@ -26,8 +26,13 @@ export async function acceptCounterOffer(id: string) {
   return response.data;
 }
 
-export async function rejectCounterOffer(id: string, data: { message: string }) {
+export async function rejectCounterOffer(id: string, data: { message?: string }) {
   const response = await api.post(`/offers/${id}/reject-counter`, data);
+  return response.data;
+}
+
+export async function cancelOffer(id: string) {
+  const response = await api.post(`/offers/${id}/cancel`);
   return response.data;
 }
 

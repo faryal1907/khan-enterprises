@@ -178,13 +178,13 @@ export default function CustomerOffersPage() {
   }
 
   return (
-    <div className="p-8" style={{ backgroundColor: theme.backgrounds.primary }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
+    <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ color: theme.text.primary }}>
             My Negotiations
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm" style={{ color: theme.text.secondary }}>
             Track your bike offers and negotiation status
           </p>
         </div>
@@ -223,7 +223,7 @@ export default function CustomerOffersPage() {
         <div
           className="rounded-lg overflow-hidden"
           style={{
-            backgroundColor: theme.backgrounds.primary,
+            backgroundColor: theme.backgrounds.secondary,
             border: `1px solid ${theme.borders.light}`,
           }}
         >

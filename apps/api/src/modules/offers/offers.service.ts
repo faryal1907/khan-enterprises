@@ -463,4 +463,57 @@ export class OffersService {
     };
   }
 
+  /**
+   * Customer rejects counter offer — set offer → REJECTED
+   */
+  async rejectCounterOffer(id: string, message?: string) {
+    const offer = await this.getOfferById(id);
+
+    if (offer.status !== OfferStatus.COUNTERED) {
+      throw new BadRequestException(`Counter offer cannot be rejected. Current status: ${offer.status}`);
+    }
+
+    return this.prisma.client.offer.update({
+      where: { id },
+      data: {
+        status: OfferStatus.REJECTED,
+        message: message || offer.message,
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Customer cancels their overall offer — set offer → REJECTED
+   */
+  async cancelOffer(id: string) {
+    const offer = await this.getOfferById(id);
+
+    if (offer.status !== OfferStatus.PENDING && offer.status !== OfferStatus.COUNTERED) {
+      throw new BadRequestException(`Offer cannot be cancelled. Current status: ${offer.status}`);
+    }
+
+    return this.prisma.client.offer.update({
+      where: { id },
+      data: {
+        status: OfferStatus.REJECTED,
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+      },
+    });
+  }
+
 }

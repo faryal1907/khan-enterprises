@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
-import { getOfferById, acceptCounterOffer } from "@/lib/api/offers";
+import { getOfferById, acceptCounterOffer, rejectCounterOffer, cancelOffer } from "@/lib/api/offers";
 
 interface Offer {
   id: string;
@@ -45,6 +45,8 @@ export default function OfferStatusPage() {
   const [offer, setOffer] = useState<Offer | null>(null);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -74,6 +76,32 @@ export default function OfferStatusPage() {
       setError(err.response?.data?.message || "Failed to accept counter offer");
     } finally {
       setAccepting(false);
+    }
+  };
+
+  const handleRejectCounter = async () => {
+    try {
+      setRejecting(true);
+      await rejectCounterOffer(id as string, { message: "Counter offer rejected by customer" });
+      await fetchOffer();
+    } catch (err: any) {
+      console.error("Failed to reject counter offer:", err);
+      setError(err.response?.data?.message || "Failed to reject counter offer");
+    } finally {
+      setRejecting(false);
+    }
+  };
+
+  const handleCancelOffer = async () => {
+    try {
+      setCancelling(true);
+      await cancelOffer(id as string);
+      await fetchOffer();
+    } catch (err: any) {
+      console.error("Failed to cancel offer:", err);
+      setError(err.response?.data?.message || "Failed to cancel offer");
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -141,6 +169,26 @@ export default function OfferStatusPage() {
 
   const isCountered = offer.status === "COUNTERED";
   const isAccepted = offer.status === "ACCEPTED";
+  const isPending = offer.status === "PENDING";
+  const isRejected = offer.status === "REJECTED";
+  const isExpired = offer.status === "EXPIRED";
+
+  // Calculate time remaining until expiry
+  const getTimeRemaining = () => {
+    if (!offer.expiresAt) return null;
+    const now = new Date();
+    const expiry = new Date(offer.expiresAt);
+    const diff = expiry.getTime() - now.getTime();
+    
+    if (diff <= 0) return null;
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return { hours, minutes };
+  };
+
+  const timeRemaining = getTimeRemaining();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -163,6 +211,11 @@ export default function OfferStatusPage() {
           >
             {offer.status}
           </span>
+          {timeRemaining && (
+            <span className="ml-3 text-sm" style={{ color: theme.text.secondary }}>
+              Expires in {timeRemaining.hours}h {timeRemaining.minutes}m
+            </span>
+          )}
         </div>
 
         {/* Negotiation Timeline */}
@@ -301,16 +354,55 @@ export default function OfferStatusPage() {
             <p className="text-sm mb-4" style={{ color: "#1E40AF" }}>
               The admin has countered your offer with PKR {Number(offer.counterAmount).toLocaleString()}. You can accept this counter offer to proceed.
             </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleAcceptCounter}
+                disabled={accepting}
+                className="flex-1 px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                style={{
+                  backgroundColor: "#3B82F6",
+                  color: "white",
+                }}
+              >
+                {accepting ? "Accepting..." : "Accept Counter Offer"}
+              </button>
+              <button
+                onClick={handleRejectCounter}
+                disabled={rejecting}
+                className="flex-1 px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                style={{
+                  backgroundColor: "#EF4444",
+                  color: "white",
+                }}
+              >
+                {rejecting ? "Rejecting..." : "Reject Counter Offer"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Cancel Offer Button for Pending/Countered offers */}
+        {(isPending || isCountered) && (
+          <div
+            className="rounded-xl p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Cancel Offer
+            </h2>
+            <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+              You can cancel this offer at any time before it's accepted.
+            </p>
             <button
-              onClick={handleAcceptCounter}
-              disabled={accepting}
+              onClick={handleCancelOffer}
+              disabled={cancelling}
               className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
               style={{
-                backgroundColor: "#3B82F6",
+                backgroundColor: "#EF4444",
                 color: "white",
               }}
             >
-              {accepting ? "Accepting..." : "Accept Counter Offer"}
+              {cancelling ? "Cancelling..." : "Cancel Offer"}
             </button>
           </div>
         )}
