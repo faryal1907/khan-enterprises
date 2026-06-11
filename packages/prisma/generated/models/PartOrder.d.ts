@@ -1,0 +1,1577 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as $Enums from "../enums.ts";
+import type * as Prisma from "../internal/prismaNamespace.ts";
+export type PartOrderModel = runtime.Types.Result.DefaultSelection<Prisma.$PartOrderPayload>;
+export type AggregatePartOrder = {
+    _count: PartOrderCountAggregateOutputType | null;
+    _avg: PartOrderAvgAggregateOutputType | null;
+    _sum: PartOrderSumAggregateOutputType | null;
+    _min: PartOrderMinAggregateOutputType | null;
+    _max: PartOrderMaxAggregateOutputType | null;
+};
+export type PartOrderAvgAggregateOutputType = {
+    quantity: number | null;
+    amount: runtime.Decimal | null;
+};
+export type PartOrderSumAggregateOutputType = {
+    quantity: number | null;
+    amount: runtime.Decimal | null;
+};
+export type PartOrderMinAggregateOutputType = {
+    id: string | null;
+    orderNumber: string | null;
+    partId: string | null;
+    partInventoryId: string | null;
+    branchId: string | null;
+    customerName: string | null;
+    customerPhone: string | null;
+    customerAddress: string | null;
+    quantity: number | null;
+    amount: runtime.Decimal | null;
+    paymentMethod: $Enums.PaymentMethod | null;
+    status: $Enums.OrderStatus | null;
+    processedById: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type PartOrderMaxAggregateOutputType = {
+    id: string | null;
+    orderNumber: string | null;
+    partId: string | null;
+    partInventoryId: string | null;
+    branchId: string | null;
+    customerName: string | null;
+    customerPhone: string | null;
+    customerAddress: string | null;
+    quantity: number | null;
+    amount: runtime.Decimal | null;
+    paymentMethod: $Enums.PaymentMethod | null;
+    status: $Enums.OrderStatus | null;
+    processedById: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type PartOrderCountAggregateOutputType = {
+    id: number;
+    orderNumber: number;
+    partId: number;
+    partInventoryId: number;
+    branchId: number;
+    customerName: number;
+    customerPhone: number;
+    customerAddress: number;
+    quantity: number;
+    amount: number;
+    paymentMethod: number;
+    status: number;
+    processedById: number;
+    createdAt: number;
+    updatedAt: number;
+    _all: number;
+};
+export type PartOrderAvgAggregateInputType = {
+    quantity?: true;
+    amount?: true;
+};
+export type PartOrderSumAggregateInputType = {
+    quantity?: true;
+    amount?: true;
+};
+export type PartOrderMinAggregateInputType = {
+    id?: true;
+    orderNumber?: true;
+    partId?: true;
+    partInventoryId?: true;
+    branchId?: true;
+    customerName?: true;
+    customerPhone?: true;
+    customerAddress?: true;
+    quantity?: true;
+    amount?: true;
+    paymentMethod?: true;
+    status?: true;
+    processedById?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type PartOrderMaxAggregateInputType = {
+    id?: true;
+    orderNumber?: true;
+    partId?: true;
+    partInventoryId?: true;
+    branchId?: true;
+    customerName?: true;
+    customerPhone?: true;
+    customerAddress?: true;
+    quantity?: true;
+    amount?: true;
+    paymentMethod?: true;
+    status?: true;
+    processedById?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type PartOrderCountAggregateInputType = {
+    id?: true;
+    orderNumber?: true;
+    partId?: true;
+    partInventoryId?: true;
+    branchId?: true;
+    customerName?: true;
+    customerPhone?: true;
+    customerAddress?: true;
+    quantity?: true;
+    amount?: true;
+    paymentMethod?: true;
+    status?: true;
+    processedById?: true;
+    createdAt?: true;
+    updatedAt?: true;
+    _all?: true;
+};
+export type PartOrderAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PartOrderWhereInput;
+    orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[];
+    cursor?: Prisma.PartOrderWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    _count?: true | PartOrderCountAggregateInputType;
+    _avg?: PartOrderAvgAggregateInputType;
+    _sum?: PartOrderSumAggregateInputType;
+    _min?: PartOrderMinAggregateInputType;
+    _max?: PartOrderMaxAggregateInputType;
+};
+export type GetPartOrderAggregateType<T extends PartOrderAggregateArgs> = {
+    [P in keyof T & keyof AggregatePartOrder]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregatePartOrder[P]> : Prisma.GetScalarType<T[P], AggregatePartOrder[P]>;
+};
+export type PartOrderGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PartOrderWhereInput;
+    orderBy?: Prisma.PartOrderOrderByWithAggregationInput | Prisma.PartOrderOrderByWithAggregationInput[];
+    by: Prisma.PartOrderScalarFieldEnum[] | Prisma.PartOrderScalarFieldEnum;
+    having?: Prisma.PartOrderScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: PartOrderCountAggregateInputType | true;
+    _avg?: PartOrderAvgAggregateInputType;
+    _sum?: PartOrderSumAggregateInputType;
+    _min?: PartOrderMinAggregateInputType;
+    _max?: PartOrderMaxAggregateInputType;
+};
+export type PartOrderGroupByOutputType = {
+    id: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal;
+    paymentMethod: $Enums.PaymentMethod;
+    status: $Enums.OrderStatus;
+    processedById: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    _count: PartOrderCountAggregateOutputType | null;
+    _avg: PartOrderAvgAggregateOutputType | null;
+    _sum: PartOrderSumAggregateOutputType | null;
+    _min: PartOrderMinAggregateOutputType | null;
+    _max: PartOrderMaxAggregateOutputType | null;
+};
+export type GetPartOrderGroupByPayload<T extends PartOrderGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<PartOrderGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof PartOrderGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], PartOrderGroupByOutputType[P]> : Prisma.GetScalarType<T[P], PartOrderGroupByOutputType[P]>;
+}>>;
+export type PartOrderWhereInput = {
+    AND?: Prisma.PartOrderWhereInput | Prisma.PartOrderWhereInput[];
+    OR?: Prisma.PartOrderWhereInput[];
+    NOT?: Prisma.PartOrderWhereInput | Prisma.PartOrderWhereInput[];
+    id?: Prisma.StringFilter<"PartOrder"> | string;
+    orderNumber?: Prisma.StringFilter<"PartOrder"> | string;
+    partId?: Prisma.StringFilter<"PartOrder"> | string;
+    partInventoryId?: Prisma.StringFilter<"PartOrder"> | string;
+    branchId?: Prisma.StringFilter<"PartOrder"> | string;
+    customerName?: Prisma.StringFilter<"PartOrder"> | string;
+    customerPhone?: Prisma.StringFilter<"PartOrder"> | string;
+    customerAddress?: Prisma.StringFilter<"PartOrder"> | string;
+    quantity?: Prisma.IntFilter<"PartOrder"> | number;
+    amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus;
+    processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
+    part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
+    partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
+    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
+    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    transactions?: Prisma.PartPaymentTransactionListRelationFilter;
+};
+export type PartOrderOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    orderNumber?: Prisma.SortOrder;
+    partId?: Prisma.SortOrder;
+    partInventoryId?: Prisma.SortOrder;
+    branchId?: Prisma.SortOrder;
+    customerName?: Prisma.SortOrder;
+    customerPhone?: Prisma.SortOrder;
+    customerAddress?: Prisma.SortOrder;
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    part?: Prisma.PartOrderByWithRelationInput;
+    partInventory?: Prisma.PartInventoryOrderByWithRelationInput;
+    branch?: Prisma.BranchOrderByWithRelationInput;
+    processedBy?: Prisma.UserOrderByWithRelationInput;
+    transactions?: Prisma.PartPaymentTransactionOrderByRelationAggregateInput;
+};
+export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    orderNumber?: string;
+    AND?: Prisma.PartOrderWhereInput | Prisma.PartOrderWhereInput[];
+    OR?: Prisma.PartOrderWhereInput[];
+    NOT?: Prisma.PartOrderWhereInput | Prisma.PartOrderWhereInput[];
+    partId?: Prisma.StringFilter<"PartOrder"> | string;
+    partInventoryId?: Prisma.StringFilter<"PartOrder"> | string;
+    branchId?: Prisma.StringFilter<"PartOrder"> | string;
+    customerName?: Prisma.StringFilter<"PartOrder"> | string;
+    customerPhone?: Prisma.StringFilter<"PartOrder"> | string;
+    customerAddress?: Prisma.StringFilter<"PartOrder"> | string;
+    quantity?: Prisma.IntFilter<"PartOrder"> | number;
+    amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus;
+    processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
+    part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
+    partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
+    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
+    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    transactions?: Prisma.PartPaymentTransactionListRelationFilter;
+}, "id" | "orderNumber">;
+export type PartOrderOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    orderNumber?: Prisma.SortOrder;
+    partId?: Prisma.SortOrder;
+    partInventoryId?: Prisma.SortOrder;
+    branchId?: Prisma.SortOrder;
+    customerName?: Prisma.SortOrder;
+    customerPhone?: Prisma.SortOrder;
+    customerAddress?: Prisma.SortOrder;
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    _count?: Prisma.PartOrderCountOrderByAggregateInput;
+    _avg?: Prisma.PartOrderAvgOrderByAggregateInput;
+    _max?: Prisma.PartOrderMaxOrderByAggregateInput;
+    _min?: Prisma.PartOrderMinOrderByAggregateInput;
+    _sum?: Prisma.PartOrderSumOrderByAggregateInput;
+};
+export type PartOrderScalarWhereWithAggregatesInput = {
+    AND?: Prisma.PartOrderScalarWhereWithAggregatesInput | Prisma.PartOrderScalarWhereWithAggregatesInput[];
+    OR?: Prisma.PartOrderScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.PartOrderScalarWhereWithAggregatesInput | Prisma.PartOrderScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    orderNumber?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    partId?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    partInventoryId?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    branchId?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    customerName?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    customerPhone?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    customerAddress?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string;
+    quantity?: Prisma.IntWithAggregatesFilter<"PartOrder"> | number;
+    amount?: Prisma.DecimalWithAggregatesFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodWithAggregatesFilter<"PartOrder"> | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusWithAggregatesFilter<"PartOrder"> | $Enums.OrderStatus;
+    processedById?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartOrder"> | Date | string;
+    updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PartOrder"> | Date | string;
+};
+export type PartOrderCreateInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUncheckedCreateInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderCreateManyInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PartOrderUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderListRelationFilter = {
+    every?: Prisma.PartOrderWhereInput;
+    some?: Prisma.PartOrderWhereInput;
+    none?: Prisma.PartOrderWhereInput;
+};
+export type PartOrderOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type PartOrderCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    orderNumber?: Prisma.SortOrder;
+    partId?: Prisma.SortOrder;
+    partInventoryId?: Prisma.SortOrder;
+    branchId?: Prisma.SortOrder;
+    customerName?: Prisma.SortOrder;
+    customerPhone?: Prisma.SortOrder;
+    customerAddress?: Prisma.SortOrder;
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    processedById?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type PartOrderAvgOrderByAggregateInput = {
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+};
+export type PartOrderMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    orderNumber?: Prisma.SortOrder;
+    partId?: Prisma.SortOrder;
+    partInventoryId?: Prisma.SortOrder;
+    branchId?: Prisma.SortOrder;
+    customerName?: Prisma.SortOrder;
+    customerPhone?: Prisma.SortOrder;
+    customerAddress?: Prisma.SortOrder;
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    processedById?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type PartOrderMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    orderNumber?: Prisma.SortOrder;
+    partId?: Prisma.SortOrder;
+    partInventoryId?: Prisma.SortOrder;
+    branchId?: Prisma.SortOrder;
+    customerName?: Prisma.SortOrder;
+    customerPhone?: Prisma.SortOrder;
+    customerAddress?: Prisma.SortOrder;
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+    paymentMethod?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    processedById?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type PartOrderSumOrderByAggregateInput = {
+    quantity?: Prisma.SortOrder;
+    amount?: Prisma.SortOrder;
+};
+export type PartOrderScalarRelationFilter = {
+    is?: Prisma.PartOrderWhereInput;
+    isNot?: Prisma.PartOrderWhereInput;
+};
+export type PartOrderCreateNestedManyWithoutProcessedByInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
+    createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUncheckedCreateNestedManyWithoutProcessedByInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
+    createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUpdateManyWithoutProcessedByNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput[];
+    createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput | Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput[];
+    createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput | Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderCreateNestedManyWithoutBranchInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutBranchInput, Prisma.PartOrderUncheckedCreateWithoutBranchInput> | Prisma.PartOrderCreateWithoutBranchInput[] | Prisma.PartOrderUncheckedCreateWithoutBranchInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutBranchInput | Prisma.PartOrderCreateOrConnectWithoutBranchInput[];
+    createMany?: Prisma.PartOrderCreateManyBranchInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutBranchInput, Prisma.PartOrderUncheckedCreateWithoutBranchInput> | Prisma.PartOrderCreateWithoutBranchInput[] | Prisma.PartOrderUncheckedCreateWithoutBranchInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutBranchInput | Prisma.PartOrderCreateOrConnectWithoutBranchInput[];
+    createMany?: Prisma.PartOrderCreateManyBranchInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUpdateManyWithoutBranchNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutBranchInput, Prisma.PartOrderUncheckedCreateWithoutBranchInput> | Prisma.PartOrderCreateWithoutBranchInput[] | Prisma.PartOrderUncheckedCreateWithoutBranchInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutBranchInput | Prisma.PartOrderCreateOrConnectWithoutBranchInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutBranchInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutBranchInput[];
+    createMany?: Prisma.PartOrderCreateManyBranchInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutBranchInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutBranchInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutBranchInput | Prisma.PartOrderUpdateManyWithWhereWithoutBranchInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutBranchInput, Prisma.PartOrderUncheckedCreateWithoutBranchInput> | Prisma.PartOrderCreateWithoutBranchInput[] | Prisma.PartOrderUncheckedCreateWithoutBranchInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutBranchInput | Prisma.PartOrderCreateOrConnectWithoutBranchInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutBranchInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutBranchInput[];
+    createMany?: Prisma.PartOrderCreateManyBranchInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutBranchInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutBranchInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutBranchInput | Prisma.PartOrderUpdateManyWithWhereWithoutBranchInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderCreateNestedManyWithoutPartInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInput, Prisma.PartOrderUncheckedCreateWithoutPartInput> | Prisma.PartOrderCreateWithoutPartInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInput | Prisma.PartOrderCreateOrConnectWithoutPartInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUncheckedCreateNestedManyWithoutPartInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInput, Prisma.PartOrderUncheckedCreateWithoutPartInput> | Prisma.PartOrderCreateWithoutPartInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInput | Prisma.PartOrderCreateOrConnectWithoutPartInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUpdateManyWithoutPartNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInput, Prisma.PartOrderUncheckedCreateWithoutPartInput> | Prisma.PartOrderCreateWithoutPartInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInput | Prisma.PartOrderCreateOrConnectWithoutPartInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutPartInput | Prisma.PartOrderUpdateManyWithWhereWithoutPartInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderUncheckedUpdateManyWithoutPartNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInput, Prisma.PartOrderUncheckedCreateWithoutPartInput> | Prisma.PartOrderCreateWithoutPartInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInput | Prisma.PartOrderCreateOrConnectWithoutPartInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutPartInput | Prisma.PartOrderUpdateManyWithWhereWithoutPartInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderCreateNestedManyWithoutPartInventoryInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInventoryInput, Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput> | Prisma.PartOrderCreateWithoutPartInventoryInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput | Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInventoryInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUncheckedCreateNestedManyWithoutPartInventoryInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInventoryInput, Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput> | Prisma.PartOrderCreateWithoutPartInventoryInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput | Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInventoryInputEnvelope;
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+};
+export type PartOrderUpdateManyWithoutPartInventoryNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInventoryInput, Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput> | Prisma.PartOrderCreateWithoutPartInventoryInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput | Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInventoryInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInventoryInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInventoryInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInventoryInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInventoryInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutPartInventoryInput | Prisma.PartOrderUpdateManyWithWhereWithoutPartInventoryInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderUncheckedUpdateManyWithoutPartInventoryNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInventoryInput, Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput> | Prisma.PartOrderCreateWithoutPartInventoryInput[] | Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput | Prisma.PartOrderCreateOrConnectWithoutPartInventoryInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInventoryInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutPartInventoryInput[];
+    createMany?: Prisma.PartOrderCreateManyPartInventoryInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInventoryInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutPartInventoryInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutPartInventoryInput | Prisma.PartOrderUpdateManyWithWhereWithoutPartInventoryInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderCreateNestedOneWithoutTransactionsInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutTransactionsInput, Prisma.PartOrderUncheckedCreateWithoutTransactionsInput>;
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutTransactionsInput;
+    connect?: Prisma.PartOrderWhereUniqueInput;
+};
+export type PartOrderUpdateOneRequiredWithoutTransactionsNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutTransactionsInput, Prisma.PartOrderUncheckedCreateWithoutTransactionsInput>;
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutTransactionsInput;
+    upsert?: Prisma.PartOrderUpsertWithoutTransactionsInput;
+    connect?: Prisma.PartOrderWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.PartOrderUpdateToOneWithWhereWithoutTransactionsInput, Prisma.PartOrderUpdateWithoutTransactionsInput>, Prisma.PartOrderUncheckedUpdateWithoutTransactionsInput>;
+};
+export type PartOrderCreateWithoutProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUncheckedCreateWithoutProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderCreateOrConnectWithoutProcessedByInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput>;
+};
+export type PartOrderCreateManyProcessedByInputEnvelope = {
+    data: Prisma.PartOrderCreateManyProcessedByInput | Prisma.PartOrderCreateManyProcessedByInput[];
+    skipDuplicates?: boolean;
+};
+export type PartOrderUpsertWithWhereUniqueWithoutProcessedByInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutProcessedByInput, Prisma.PartOrderUncheckedUpdateWithoutProcessedByInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput>;
+};
+export type PartOrderUpdateWithWhereUniqueWithoutProcessedByInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutProcessedByInput, Prisma.PartOrderUncheckedUpdateWithoutProcessedByInput>;
+};
+export type PartOrderUpdateManyWithWhereWithoutProcessedByInput = {
+    where: Prisma.PartOrderScalarWhereInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByInput>;
+};
+export type PartOrderScalarWhereInput = {
+    AND?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+    OR?: Prisma.PartOrderScalarWhereInput[];
+    NOT?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+    id?: Prisma.StringFilter<"PartOrder"> | string;
+    orderNumber?: Prisma.StringFilter<"PartOrder"> | string;
+    partId?: Prisma.StringFilter<"PartOrder"> | string;
+    partInventoryId?: Prisma.StringFilter<"PartOrder"> | string;
+    branchId?: Prisma.StringFilter<"PartOrder"> | string;
+    customerName?: Prisma.StringFilter<"PartOrder"> | string;
+    customerPhone?: Prisma.StringFilter<"PartOrder"> | string;
+    customerAddress?: Prisma.StringFilter<"PartOrder"> | string;
+    quantity?: Prisma.IntFilter<"PartOrder"> | number;
+    amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus;
+    processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
+};
+export type PartOrderCreateWithoutBranchInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUncheckedCreateWithoutBranchInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderCreateOrConnectWithoutBranchInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutBranchInput, Prisma.PartOrderUncheckedCreateWithoutBranchInput>;
+};
+export type PartOrderCreateManyBranchInputEnvelope = {
+    data: Prisma.PartOrderCreateManyBranchInput | Prisma.PartOrderCreateManyBranchInput[];
+    skipDuplicates?: boolean;
+};
+export type PartOrderUpsertWithWhereUniqueWithoutBranchInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutBranchInput, Prisma.PartOrderUncheckedUpdateWithoutBranchInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutBranchInput, Prisma.PartOrderUncheckedCreateWithoutBranchInput>;
+};
+export type PartOrderUpdateWithWhereUniqueWithoutBranchInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutBranchInput, Prisma.PartOrderUncheckedUpdateWithoutBranchInput>;
+};
+export type PartOrderUpdateManyWithWhereWithoutBranchInput = {
+    where: Prisma.PartOrderScalarWhereInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutBranchInput>;
+};
+export type PartOrderCreateWithoutPartInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUncheckedCreateWithoutPartInput = {
+    id?: string;
+    orderNumber: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderCreateOrConnectWithoutPartInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInput, Prisma.PartOrderUncheckedCreateWithoutPartInput>;
+};
+export type PartOrderCreateManyPartInputEnvelope = {
+    data: Prisma.PartOrderCreateManyPartInput | Prisma.PartOrderCreateManyPartInput[];
+    skipDuplicates?: boolean;
+};
+export type PartOrderUpsertWithWhereUniqueWithoutPartInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutPartInput, Prisma.PartOrderUncheckedUpdateWithoutPartInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInput, Prisma.PartOrderUncheckedCreateWithoutPartInput>;
+};
+export type PartOrderUpdateWithWhereUniqueWithoutPartInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutPartInput, Prisma.PartOrderUncheckedUpdateWithoutPartInput>;
+};
+export type PartOrderUpdateManyWithWhereWithoutPartInput = {
+    where: Prisma.PartOrderScalarWhereInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutPartInput>;
+};
+export type PartOrderCreateWithoutPartInventoryInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderCreateOrConnectWithoutPartInventoryInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInventoryInput, Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput>;
+};
+export type PartOrderCreateManyPartInventoryInputEnvelope = {
+    data: Prisma.PartOrderCreateManyPartInventoryInput | Prisma.PartOrderCreateManyPartInventoryInput[];
+    skipDuplicates?: boolean;
+};
+export type PartOrderUpsertWithWhereUniqueWithoutPartInventoryInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutPartInventoryInput, Prisma.PartOrderUncheckedUpdateWithoutPartInventoryInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutPartInventoryInput, Prisma.PartOrderUncheckedCreateWithoutPartInventoryInput>;
+};
+export type PartOrderUpdateWithWhereUniqueWithoutPartInventoryInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutPartInventoryInput, Prisma.PartOrderUncheckedUpdateWithoutPartInventoryInput>;
+};
+export type PartOrderUpdateManyWithWhereWithoutPartInventoryInput = {
+    where: Prisma.PartOrderScalarWhereInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutPartInventoryInput>;
+};
+export type PartOrderCreateWithoutTransactionsInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+};
+export type PartOrderUncheckedCreateWithoutTransactionsInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PartOrderCreateOrConnectWithoutTransactionsInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutTransactionsInput, Prisma.PartOrderUncheckedCreateWithoutTransactionsInput>;
+};
+export type PartOrderUpsertWithoutTransactionsInput = {
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutTransactionsInput, Prisma.PartOrderUncheckedUpdateWithoutTransactionsInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutTransactionsInput, Prisma.PartOrderUncheckedCreateWithoutTransactionsInput>;
+    where?: Prisma.PartOrderWhereInput;
+};
+export type PartOrderUpdateToOneWithWhereWithoutTransactionsInput = {
+    where?: Prisma.PartOrderWhereInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutTransactionsInput, Prisma.PartOrderUncheckedUpdateWithoutTransactionsInput>;
+};
+export type PartOrderUpdateWithoutTransactionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+};
+export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderCreateManyProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PartOrderUpdateWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderCreateManyBranchInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PartOrderUpdateWithoutBranchInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateWithoutBranchInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderCreateManyPartInput = {
+    id?: string;
+    orderNumber: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PartOrderUpdateWithoutPartInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateWithoutPartInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateManyWithoutPartInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderCreateManyPartInventoryInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    processedById?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PartOrderUpdateWithoutPartInventoryInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.StringFieldUpdateOperationsInput | string;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderCountOutputType = {
+    transactions: number;
+};
+export type PartOrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    transactions?: boolean | PartOrderCountOutputTypeCountTransactionsArgs;
+};
+export type PartOrderCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderCountOutputTypeSelect<ExtArgs> | null;
+};
+export type PartOrderCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PartPaymentTransactionWhereInput;
+};
+export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    orderNumber?: boolean;
+    partId?: boolean;
+    partInventoryId?: boolean;
+    branchId?: boolean;
+    customerName?: boolean;
+    customerPhone?: boolean;
+    customerAddress?: boolean;
+    quantity?: boolean;
+    amount?: boolean;
+    paymentMethod?: boolean;
+    status?: boolean;
+    processedById?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+    transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>;
+    _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["partOrder"]>;
+export type PartOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    orderNumber?: boolean;
+    partId?: boolean;
+    partInventoryId?: boolean;
+    branchId?: boolean;
+    customerName?: boolean;
+    customerPhone?: boolean;
+    customerAddress?: boolean;
+    quantity?: boolean;
+    amount?: boolean;
+    paymentMethod?: boolean;
+    status?: boolean;
+    processedById?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+}, ExtArgs["result"]["partOrder"]>;
+export type PartOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    orderNumber?: boolean;
+    partId?: boolean;
+    partInventoryId?: boolean;
+    branchId?: boolean;
+    customerName?: boolean;
+    customerPhone?: boolean;
+    customerAddress?: boolean;
+    quantity?: boolean;
+    amount?: boolean;
+    paymentMethod?: boolean;
+    status?: boolean;
+    processedById?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+}, ExtArgs["result"]["partOrder"]>;
+export type PartOrderSelectScalar = {
+    id?: boolean;
+    orderNumber?: boolean;
+    partId?: boolean;
+    partInventoryId?: boolean;
+    branchId?: boolean;
+    customerName?: boolean;
+    customerPhone?: boolean;
+    customerAddress?: boolean;
+    quantity?: boolean;
+    amount?: boolean;
+    paymentMethod?: boolean;
+    status?: boolean;
+    processedById?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+};
+export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "status" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>;
+export type PartOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+    transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>;
+    _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>;
+};
+export type PartOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+};
+export type PartOrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+};
+export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "PartOrder";
+    objects: {
+        part: Prisma.$PartPayload<ExtArgs>;
+        partInventory: Prisma.$PartInventoryPayload<ExtArgs>;
+        branch: Prisma.$BranchPayload<ExtArgs>;
+        processedBy: Prisma.$UserPayload<ExtArgs> | null;
+        transactions: Prisma.$PartPaymentTransactionPayload<ExtArgs>[];
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        orderNumber: string;
+        partId: string;
+        partInventoryId: string;
+        branchId: string;
+        customerName: string;
+        customerPhone: string;
+        customerAddress: string;
+        quantity: number;
+        amount: runtime.Decimal;
+        paymentMethod: $Enums.PaymentMethod;
+        status: $Enums.OrderStatus;
+        processedById: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }, ExtArgs["result"]["partOrder"]>;
+    composites: {};
+};
+export type PartOrderGetPayload<S extends boolean | null | undefined | PartOrderDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$PartOrderPayload, S>;
+export type PartOrderCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<PartOrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: PartOrderCountAggregateInputType | true;
+};
+export interface PartOrderDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['PartOrder'];
+        meta: {
+            name: 'PartOrder';
+        };
+    };
+    findUnique<T extends PartOrderFindUniqueArgs>(args: Prisma.SelectSubset<T, PartOrderFindUniqueArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    findUniqueOrThrow<T extends PartOrderFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, PartOrderFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    findFirst<T extends PartOrderFindFirstArgs>(args?: Prisma.SelectSubset<T, PartOrderFindFirstArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    findFirstOrThrow<T extends PartOrderFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, PartOrderFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    findMany<T extends PartOrderFindManyArgs>(args?: Prisma.SelectSubset<T, PartOrderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    create<T extends PartOrderCreateArgs>(args: Prisma.SelectSubset<T, PartOrderCreateArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    createMany<T extends PartOrderCreateManyArgs>(args?: Prisma.SelectSubset<T, PartOrderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    createManyAndReturn<T extends PartOrderCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, PartOrderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    delete<T extends PartOrderDeleteArgs>(args: Prisma.SelectSubset<T, PartOrderDeleteArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    update<T extends PartOrderUpdateArgs>(args: Prisma.SelectSubset<T, PartOrderUpdateArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    deleteMany<T extends PartOrderDeleteManyArgs>(args?: Prisma.SelectSubset<T, PartOrderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    updateMany<T extends PartOrderUpdateManyArgs>(args: Prisma.SelectSubset<T, PartOrderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    updateManyAndReturn<T extends PartOrderUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, PartOrderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    upsert<T extends PartOrderUpsertArgs>(args: Prisma.SelectSubset<T, PartOrderUpsertArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    count<T extends PartOrderCountArgs>(args?: Prisma.Subset<T, PartOrderCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], PartOrderCountAggregateOutputType> : number>;
+    aggregate<T extends PartOrderAggregateArgs>(args: Prisma.Subset<T, PartOrderAggregateArgs>): Prisma.PrismaPromise<GetPartOrderAggregateType<T>>;
+    groupBy<T extends PartOrderGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: PartOrderGroupByArgs['orderBy'];
+    } : {
+        orderBy?: PartOrderGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, PartOrderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPartOrderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    readonly fields: PartOrderFieldRefs;
+}
+export interface Prisma__PartOrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    part<T extends Prisma.PartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartDefaultArgs<ExtArgs>>): Prisma.Prisma__PartClient<runtime.Types.Result.GetResult<Prisma.$PartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    partInventory<T extends Prisma.PartInventoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartInventoryDefaultArgs<ExtArgs>>): Prisma.Prisma__PartInventoryClient<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    processedBy<T extends Prisma.PartOrder$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    transactions<T extends Prisma.PartOrder$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+export interface PartOrderFieldRefs {
+    readonly id: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly orderNumber: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly partId: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly partInventoryId: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly branchId: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly customerName: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly customerPhone: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly customerAddress: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly quantity: Prisma.FieldRef<"PartOrder", 'Int'>;
+    readonly amount: Prisma.FieldRef<"PartOrder", 'Decimal'>;
+    readonly paymentMethod: Prisma.FieldRef<"PartOrder", 'PaymentMethod'>;
+    readonly status: Prisma.FieldRef<"PartOrder", 'OrderStatus'>;
+    readonly processedById: Prisma.FieldRef<"PartOrder", 'String'>;
+    readonly createdAt: Prisma.FieldRef<"PartOrder", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"PartOrder", 'DateTime'>;
+}
+export type PartOrderFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where: Prisma.PartOrderWhereUniqueInput;
+};
+export type PartOrderFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where: Prisma.PartOrderWhereUniqueInput;
+};
+export type PartOrderFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where?: Prisma.PartOrderWhereInput;
+    orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[];
+    cursor?: Prisma.PartOrderWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[];
+};
+export type PartOrderFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where?: Prisma.PartOrderWhereInput;
+    orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[];
+    cursor?: Prisma.PartOrderWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[];
+};
+export type PartOrderFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where?: Prisma.PartOrderWhereInput;
+    orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[];
+    cursor?: Prisma.PartOrderWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[];
+};
+export type PartOrderCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    data: Prisma.XOR<Prisma.PartOrderCreateInput, Prisma.PartOrderUncheckedCreateInput>;
+};
+export type PartOrderCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    data: Prisma.PartOrderCreateManyInput | Prisma.PartOrderCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+export type PartOrderCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelectCreateManyAndReturn<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    data: Prisma.PartOrderCreateManyInput | Prisma.PartOrderCreateManyInput[];
+    skipDuplicates?: boolean;
+    include?: Prisma.PartOrderIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+export type PartOrderUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    data: Prisma.XOR<Prisma.PartOrderUpdateInput, Prisma.PartOrderUncheckedUpdateInput>;
+    where: Prisma.PartOrderWhereUniqueInput;
+};
+export type PartOrderUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyInput>;
+    where?: Prisma.PartOrderWhereInput;
+    limit?: number;
+};
+export type PartOrderUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelectUpdateManyAndReturn<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyInput>;
+    where?: Prisma.PartOrderWhereInput;
+    limit?: number;
+    include?: Prisma.PartOrderIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+export type PartOrderUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where: Prisma.PartOrderWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PartOrderCreateInput, Prisma.PartOrderUncheckedCreateInput>;
+    update: Prisma.XOR<Prisma.PartOrderUpdateInput, Prisma.PartOrderUncheckedUpdateInput>;
+};
+export type PartOrderDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+    where: Prisma.PartOrderWhereUniqueInput;
+};
+export type PartOrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PartOrderWhereInput;
+    limit?: number;
+};
+export type PartOrder$processedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+};
+export type PartOrder$transactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartPaymentTransactionSelect<ExtArgs> | null;
+    omit?: Prisma.PartPaymentTransactionOmit<ExtArgs> | null;
+    include?: Prisma.PartPaymentTransactionInclude<ExtArgs> | null;
+    where?: Prisma.PartPaymentTransactionWhereInput;
+    orderBy?: Prisma.PartPaymentTransactionOrderByWithRelationInput | Prisma.PartPaymentTransactionOrderByWithRelationInput[];
+    cursor?: Prisma.PartPaymentTransactionWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PartPaymentTransactionScalarFieldEnum | Prisma.PartPaymentTransactionScalarFieldEnum[];
+};
+export type PartOrderDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PartOrderSelect<ExtArgs> | null;
+    omit?: Prisma.PartOrderOmit<ExtArgs> | null;
+    include?: Prisma.PartOrderInclude<ExtArgs> | null;
+};
