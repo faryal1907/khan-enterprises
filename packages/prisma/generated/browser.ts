@@ -73,10 +73,20 @@ export type Offer = Prisma.OfferModel
  */
 export type Order = Prisma.OrderModel
 /**
+ * Model PartOrder
+ * 
+ */
+export type PartOrder = Prisma.PartOrderModel
+/**
  * Model PaymentTransaction
  * 
  */
 export type PaymentTransaction = Prisma.PaymentTransactionModel
+/**
+ * Model PartPaymentTransaction
+ * 
+ */
+export type PartPaymentTransaction = Prisma.PartPaymentTransactionModel
 /**
  * Model DeliveryRequest
  * 

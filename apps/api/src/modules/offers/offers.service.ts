@@ -44,6 +44,7 @@ export class OffersService {
         message: dto.message,
         status: OfferStatus.PENDING,
         expiresAt,
+        paymentMethod: dto.paymentMethod,
         createdById: userId,
       },
       include: {
@@ -209,7 +210,7 @@ export class OffersService {
           customerCNIC: offer.customerCNIC || "",
           customerAddress: offer.customerAddress || "",
           negotiatedAmount,
-          paymentMethod: PaymentMethod.CASH,
+          paymentMethod: offer.paymentMethod || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
           processedById: adminId,
         },
@@ -287,7 +288,7 @@ export class OffersService {
   /**
    * Customer accepts the counter — set offer → ACCEPTED, run same atomic reservation + order creation as acceptOffer
    */
-  async acceptCounter(id: string) {
+  async acceptCounter(id: string, paymentMethod?: string) {
     // This is essentially the same as acceptOffer but without adminId
     // We'll use a system user ID or null for processedById
     return this.prisma.client.$transaction(async (tx) => {
@@ -352,7 +353,7 @@ export class OffersService {
           customerCNIC: offer.customerCNIC || "",
           customerAddress: offer.customerAddress || "",
           negotiatedAmount,
-          paymentMethod: PaymentMethod.CASH,
+          paymentMethod: (paymentMethod as PaymentMethod) || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
           processedById: null,
         },
@@ -392,6 +393,127 @@ export class OffersService {
         },
       },
       orderBy: { createdAt: "desc" },
+    });
+  }
+
+  /**
+   * Get all offers for a customer by user ID
+   * Also includes offers created by the same customer phone/email for backward compatibility
+   */
+  async getOffersByCustomer(userId: string, query: QueryOffersDto) {
+    // First get the user to find their phone/email
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+      select: { phoneNumber: true, email: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Query offers by createdById OR customer phone/email
+    const where: any = {
+      OR: [
+        { createdById: userId },
+      ],
+    };
+
+    // Add phone/email matching if available
+    if (user.phoneNumber) {
+      where.OR.push({ customerPhone: user.phoneNumber });
+    }
+    if (user.email) {
+      where.OR.push({ customerEmail: user.email });
+    }
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [offers, total] = await Promise.all([
+      this.prisma.client.offer.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          bike: {
+            include: {
+              model: true,
+              branch: true,
+            },
+          },
+          order: true,
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.offer.count({ where }),
+    ]);
+
+    return {
+      offers,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
+   * Customer rejects counter offer — set offer → REJECTED
+   */
+  async rejectCounterOffer(id: string, message?: string) {
+    const offer = await this.getOfferById(id);
+
+    if (offer.status !== OfferStatus.COUNTERED) {
+      throw new BadRequestException(`Counter offer cannot be rejected. Current status: ${offer.status}`);
+    }
+
+    return this.prisma.client.offer.update({
+      where: { id },
+      data: {
+        status: OfferStatus.REJECTED,
+        message: message || offer.message,
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Customer cancels their overall offer — set offer → REJECTED
+   */
+  async cancelOffer(id: string) {
+    const offer = await this.getOfferById(id);
+
+    if (offer.status !== OfferStatus.PENDING && offer.status !== OfferStatus.COUNTERED) {
+      throw new BadRequestException(`Offer cannot be cancelled. Current status: ${offer.status}`);
+    }
+
+    return this.prisma.client.offer.update({
+      where: { id },
+      data: {
+        status: OfferStatus.REJECTED,
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+      },
     });
   }
 

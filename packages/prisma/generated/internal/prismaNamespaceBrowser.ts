@@ -62,7 +62,9 @@ export const ModelName = {
   StockMovement: 'StockMovement',
   Offer: 'Offer',
   Order: 'Order',
+  PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
+  PartPaymentTransaction: 'PartPaymentTransaction',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
   AuditLog: 'AuditLog'
@@ -229,6 +231,7 @@ export const OfferScalarFieldEnum = {
   adminResponse: 'adminResponse',
   status: 'status',
   expiresAt: 'expiresAt',
+  paymentMethod: 'paymentMethod',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -258,6 +261,27 @@ export const OrderScalarFieldEnum = {
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
 
 
+export const PartOrderScalarFieldEnum = {
+  id: 'id',
+  orderNumber: 'orderNumber',
+  partId: 'partId',
+  partInventoryId: 'partInventoryId',
+  branchId: 'branchId',
+  customerName: 'customerName',
+  customerPhone: 'customerPhone',
+  customerAddress: 'customerAddress',
+  quantity: 'quantity',
+  amount: 'amount',
+  paymentMethod: 'paymentMethod',
+  status: 'status',
+  processedById: 'processedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartOrderScalarFieldEnum = (typeof PartOrderScalarFieldEnum)[keyof typeof PartOrderScalarFieldEnum]
+
+
 export const PaymentTransactionScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
@@ -274,6 +298,24 @@ export const PaymentTransactionScalarFieldEnum = {
 } as const
 
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum]
+
+
+export const PartPaymentTransactionScalarFieldEnum = {
+  id: 'id',
+  partOrderId: 'partOrderId',
+  gatewayReference: 'gatewayReference',
+  idempotencyKey: 'idempotencyKey',
+  amount: 'amount',
+  method: 'method',
+  status: 'status',
+  gatewayResponse: 'gatewayResponse',
+  failureReason: 'failureReason',
+  webhookReceivedAt: 'webhookReceivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
 
 
 export const DeliveryRequestScalarFieldEnum = {

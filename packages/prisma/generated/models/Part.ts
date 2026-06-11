@@ -241,6 +241,7 @@ export type PartWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   inventories?: Prisma.PartInventoryListRelationFilter
+  partOrders?: Prisma.PartOrderListRelationFilter
 }
 
 export type PartOrderByWithRelationInput = {
@@ -253,6 +254,7 @@ export type PartOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   inventories?: Prisma.PartInventoryOrderByRelationAggregateInput
+  partOrders?: Prisma.PartOrderOrderByRelationAggregateInput
 }
 
 export type PartWhereUniqueInput = Prisma.AtLeast<{
@@ -268,6 +270,7 @@ export type PartWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   inventories?: Prisma.PartInventoryListRelationFilter
+  partOrders?: Prisma.PartOrderListRelationFilter
 }, "id" | "sku">
 
 export type PartOrderByWithAggregationInput = {
@@ -310,6 +313,7 @@ export type PartCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
+  partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
 }
 
 export type PartUncheckedCreateInput = {
@@ -322,6 +326,7 @@ export type PartUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
+  partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
 }
 
 export type PartUpdateInput = {
@@ -334,6 +339,7 @@ export type PartUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
+  partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
 }
 
 export type PartUncheckedUpdateInput = {
@@ -346,6 +352,7 @@ export type PartUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
+  partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
 }
 
 export type PartCreateManyInput = {
@@ -441,6 +448,20 @@ export type PartUpdateOneRequiredWithoutInventoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartUpdateToOneWithWhereWithoutInventoriesInput, Prisma.PartUpdateWithoutInventoriesInput>, Prisma.PartUncheckedUpdateWithoutInventoriesInput>
 }
 
+export type PartCreateNestedOneWithoutPartOrdersInput = {
+  create?: Prisma.XOR<Prisma.PartCreateWithoutPartOrdersInput, Prisma.PartUncheckedCreateWithoutPartOrdersInput>
+  connectOrCreate?: Prisma.PartCreateOrConnectWithoutPartOrdersInput
+  connect?: Prisma.PartWhereUniqueInput
+}
+
+export type PartUpdateOneRequiredWithoutPartOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.PartCreateWithoutPartOrdersInput, Prisma.PartUncheckedCreateWithoutPartOrdersInput>
+  connectOrCreate?: Prisma.PartCreateOrConnectWithoutPartOrdersInput
+  upsert?: Prisma.PartUpsertWithoutPartOrdersInput
+  connect?: Prisma.PartWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartUpdateToOneWithWhereWithoutPartOrdersInput, Prisma.PartUpdateWithoutPartOrdersInput>, Prisma.PartUncheckedUpdateWithoutPartOrdersInput>
+}
+
 export type PartCreateWithoutInventoriesInput = {
   id?: string
   name: string
@@ -450,6 +471,7 @@ export type PartCreateWithoutInventoriesInput = {
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
 }
 
 export type PartUncheckedCreateWithoutInventoriesInput = {
@@ -461,6 +483,7 @@ export type PartUncheckedCreateWithoutInventoriesInput = {
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
 }
 
 export type PartCreateOrConnectWithoutInventoriesInput = {
@@ -488,6 +511,7 @@ export type PartUpdateWithoutInventoriesInput = {
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
 }
 
 export type PartUncheckedUpdateWithoutInventoriesInput = {
@@ -499,6 +523,71 @@ export type PartUncheckedUpdateWithoutInventoriesInput = {
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
+}
+
+export type PartCreateWithoutPartOrdersInput = {
+  id?: string
+  name: string
+  sku: string
+  category: string
+  description?: string | null
+  sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
+}
+
+export type PartUncheckedCreateWithoutPartOrdersInput = {
+  id?: string
+  name: string
+  sku: string
+  category: string
+  description?: string | null
+  sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
+}
+
+export type PartCreateOrConnectWithoutPartOrdersInput = {
+  where: Prisma.PartWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartCreateWithoutPartOrdersInput, Prisma.PartUncheckedCreateWithoutPartOrdersInput>
+}
+
+export type PartUpsertWithoutPartOrdersInput = {
+  update: Prisma.XOR<Prisma.PartUpdateWithoutPartOrdersInput, Prisma.PartUncheckedUpdateWithoutPartOrdersInput>
+  create: Prisma.XOR<Prisma.PartCreateWithoutPartOrdersInput, Prisma.PartUncheckedCreateWithoutPartOrdersInput>
+  where?: Prisma.PartWhereInput
+}
+
+export type PartUpdateToOneWithWhereWithoutPartOrdersInput = {
+  where?: Prisma.PartWhereInput
+  data: Prisma.XOR<Prisma.PartUpdateWithoutPartOrdersInput, Prisma.PartUncheckedUpdateWithoutPartOrdersInput>
+}
+
+export type PartUpdateWithoutPartOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
+}
+
+export type PartUncheckedUpdateWithoutPartOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
 }
 
 
@@ -508,10 +597,12 @@ export type PartUncheckedUpdateWithoutInventoriesInput = {
 
 export type PartCountOutputType = {
   inventories: number
+  partOrders: number
 }
 
 export type PartCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inventories?: boolean | PartCountOutputTypeCountInventoriesArgs
+  partOrders?: boolean | PartCountOutputTypeCountPartOrdersArgs
 }
 
 /**
@@ -531,6 +622,13 @@ export type PartCountOutputTypeCountInventoriesArgs<ExtArgs extends runtime.Type
   where?: Prisma.PartInventoryWhereInput
 }
 
+/**
+ * PartCountOutputType without action
+ */
+export type PartCountOutputTypeCountPartOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PartOrderWhereInput
+}
+
 
 export type PartSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -542,6 +640,7 @@ export type PartSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   inventories?: boolean | Prisma.Part$inventoriesArgs<ExtArgs>
+  partOrders?: boolean | Prisma.Part$partOrdersArgs<ExtArgs>
   _count?: boolean | Prisma.PartCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["part"]>
 
@@ -581,6 +680,7 @@ export type PartSelectScalar = {
 export type PartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sku" | "category" | "description" | "sellingPrice" | "createdAt" | "updatedAt", ExtArgs["result"]["part"]>
 export type PartInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inventories?: boolean | Prisma.Part$inventoriesArgs<ExtArgs>
+  partOrders?: boolean | Prisma.Part$partOrdersArgs<ExtArgs>
   _count?: boolean | Prisma.PartCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -590,6 +690,7 @@ export type $PartPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "Part"
   objects: {
     inventories: Prisma.$PartInventoryPayload<ExtArgs>[]
+    partOrders: Prisma.$PartOrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -995,6 +1096,7 @@ readonly fields: PartFieldRefs;
 export interface Prisma__PartClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   inventories<T extends Prisma.Part$inventoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Part$inventoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  partOrders<T extends Prisma.Part$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Part$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1446,6 +1548,30 @@ export type Part$inventoriesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.PartInventoryScalarFieldEnum | Prisma.PartInventoryScalarFieldEnum[]
+}
+
+/**
+ * Part.partOrders
+ */
+export type Part$partOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartOrder
+   */
+  select?: Prisma.PartOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartOrder
+   */
+  omit?: Prisma.PartOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartOrderInclude<ExtArgs> | null
+  where?: Prisma.PartOrderWhereInput
+  orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[]
+  cursor?: Prisma.PartOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[]
 }
 
 /**

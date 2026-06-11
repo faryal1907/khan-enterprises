@@ -1,9 +1,12 @@
 import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
 
 @Controller("transactions")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles("ADMIN", "MANAGER", "SALES_STAFF")
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 

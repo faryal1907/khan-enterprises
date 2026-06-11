@@ -8,6 +8,7 @@ import { QueryOrdersDto } from "./dto/query-orders.dto";
 import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
+import { RecordPaymentDto } from "./dto/record-payment.dto";
 
 @Controller("orders")
 export class OrdersController {
@@ -104,7 +105,7 @@ export class OrdersController {
   @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async recordPayment(
     @Param("id") id: string,
-    @Body() dto: CompleteOrderDetailsDto,
+    @Body() dto: RecordPaymentDto,
     @CurrentUser() user: any,
   ) {
     return this.ordersService.recordPayment(id, dto, user.id);

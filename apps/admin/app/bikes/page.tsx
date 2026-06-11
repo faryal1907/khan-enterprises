@@ -485,13 +485,13 @@ export default function BikesListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex space-x-2">
-                        <a
+                        {/* <a
                           href={`/bikes/${bike.id}`}
                           className="text-sm font-medium transition-colors hover:opacity-70"
                           style={{ color: theme.accents.primary }}
                         >
                           View
-                        </a>
+                        </a> */}
                         {(isAdmin || isManager) && (
                           <>
                             <button

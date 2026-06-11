@@ -283,12 +283,12 @@ export default function PartsListPage() {
             className="rounded-lg p-4"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
+            {/* <p className="text-sm" style={{ color: theme.text.secondary }}>
               Total Inventory Value
             </p>
             <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
               ${totalValue.toLocaleString()}
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -468,13 +468,13 @@ export default function PartsListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex space-x-2">
-                        <a
+                        {/* <a
                           href={`/parts/${part.id}`}
                           className="text-sm font-medium transition-colors hover:opacity-70"
                           style={{ color: theme.text.secondary }}
                         >
                           History
-                        </a>
+                        </a> */}
                         <button
                           onClick={() => openAdjustModal(part)}
                           className="text-sm font-medium transition-colors hover:opacity-70"

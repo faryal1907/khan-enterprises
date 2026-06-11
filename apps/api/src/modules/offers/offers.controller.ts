@@ -19,7 +19,7 @@ export class OffersController {
    */
   @Post()
   async createOffer(@Body() dto: CreateOfferDto) {
-    return this.offersService.createOffer(dto);
+    return this.offersService.createOffer(dto, dto.userId);
   }
 
   /**
@@ -31,6 +31,27 @@ export class OffersController {
   @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async getOffers(@Query() query: QueryOffersDto) {
     return this.offersService.getOffers(query);
+  }
+
+  /**
+   * GET /api/offers/customer/:userId
+   * @UseGuards(JwtAuthGuard) — get all offers for a logged-in customer by user ID
+   * NOTE: Must be defined before :id to avoid route conflicts
+   */
+  @Get("customer/:userId")
+  @UseGuards(JwtAuthGuard)
+  async getOffersByCustomer(@Param("userId") userId: string, @Query() query: QueryOffersDto) {
+    return this.offersService.getOffersByCustomer(userId, query);
+  }
+
+  /**
+   * GET /api/offers/bike/:bikeId
+   * Public — negotiation history for a bike
+   * NOTE: Must be defined before :id to avoid route conflicts
+   */
+  @Get("bike/:bikeId")
+  async getOffersByBike(@Param("bikeId") bikeId: string) {
+    return this.offersService.getOffersByBike(bikeId);
   }
 
   /**
@@ -88,16 +109,25 @@ export class OffersController {
    * Public (no auth) — customer accepts counter
    */
   @Post(":id/accept-counter")
-  async acceptCounter(@Param("id") id: string) {
-    return this.offersService.acceptCounter(id);
+  async acceptCounter(@Param("id") id: string, @Body() body: { paymentMethod?: string }) {
+    return this.offersService.acceptCounter(id, body.paymentMethod);
   }
 
   /**
-   * GET /api/offers/bike/:bikeId
-   * Public — negotiation history for a bike
+   * POST /api/offers/:id/reject-counter
+   * Public (no auth) — customer rejects counter
    */
-  @Get("bike/:bikeId")
-  async getOffersByBike(@Param("bikeId") bikeId: string) {
-    return this.offersService.getOffersByBike(bikeId);
+  @Post(":id/reject-counter")
+  async rejectCounter(@Param("id") id: string, @Body() body: { message?: string }) {
+    return this.offersService.rejectCounterOffer(id, body.message);
+  }
+
+  /**
+   * POST /api/offers/:id/cancel
+   * Public (no auth) — customer cancels overall offer
+   */
+  @Post(":id/cancel")
+  async cancelOffer(@Param("id") id: string) {
+    return this.offersService.cancelOffer(id);
   }
 }

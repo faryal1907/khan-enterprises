@@ -21,6 +21,7 @@ export default function BikeDetailPage() {
   const [customerCNIC, setCustomerCNIC] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [message, setMessage] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -64,7 +65,8 @@ export default function BikeDetailPage() {
         customerAddress: customerAddress || undefined,
         offerAmount: parseFloat(offerAmount),
         message: message || undefined,
-      });
+        paymentMethod: paymentMethod as any,
+      }, user?.id);
 
       // Redirect to offer status page
       window.location.href = `/offers/${result.id}`;
@@ -222,7 +224,13 @@ export default function BikeDetailPage() {
 
               {!showOfferForm ? (
                 <button
-                  onClick={() => setShowOfferForm(true)}
+                  onClick={() => {
+                    if (!user) {
+                      window.location.href = "/login";
+                      return;
+                    }
+                    setShowOfferForm(true);
+                  }}
                   className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
                   style={{
                     backgroundColor: theme.accents.primary,
@@ -352,6 +360,42 @@ export default function BikeDetailPage() {
                           color: theme.text.primary,
                         }}
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                        Payment Method *
+                      </label>
+                      <div className="space-y-3">
+                        <label className="flex items-center p-4 rounded-lg cursor-pointer" style={{ backgroundColor: theme.backgrounds.tertiary, border: paymentMethod === "CASH" ? `2px solid ${theme.accents.primary}` : `1px solid ${theme.borders.medium}` }}>
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="CASH"
+                            checked={paymentMethod === "CASH"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="mr-3"
+                          />
+                          <div>
+                            <p className="font-medium" style={{ color: theme.text.primary }}>Cash</p>
+                            <p className="text-xs" style={{ color: theme.text.secondary }}>Pay at your nearest branch</p>
+                          </div>
+                        </label>
+
+                        <label className="flex items-center p-4 rounded-lg cursor-pointer" style={{ backgroundColor: theme.backgrounds.tertiary, border: paymentMethod === "BANK_TRANSFER" ? `2px solid ${theme.accents.primary}` : `1px solid ${theme.borders.medium}` }}>
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="BANK_TRANSFER"
+                            checked={paymentMethod === "BANK_TRANSFER"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="mr-3"
+                          />
+                          <div>
+                            <p className="font-medium" style={{ color: theme.text.primary }}>Bank Transfer</p>
+                            <p className="text-xs" style={{ color: theme.text.secondary }}>Transfer via online banking</p>
+                          </div>
+                        </label>
+                      </div>
                     </div>
                     <div className="flex gap-3">
                       <button
