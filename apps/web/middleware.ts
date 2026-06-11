@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+
+const WEB_ACCESS_TOKEN_COOKIE = "webAccessToken";
 import type { NextRequest } from "next/server";
 
 const publicPaths = ["/login", "/signup", "/", "/bikes", "/parts", "/search", "/orders"];
