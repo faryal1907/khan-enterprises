@@ -33,12 +33,12 @@ export class CatalogService {
     }
 
     if (filters.priceMin || filters.priceMax) {
-      where.model = {};
+      where.price = {};
       if (filters.priceMin) {
-        where.model.basePrice = { ...where.model.basePrice, gte: filters.priceMin };
+        where.price = { ...where.price, gte: filters.priceMin };
       }
       if (filters.priceMax) {
-        where.model.basePrice = { ...where.model.basePrice, lte: filters.priceMax };
+        where.price = { ...where.price, lte: filters.priceMax };
       }
     }
 

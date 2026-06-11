@@ -247,6 +247,10 @@ model BikeUnit {
 
   status BikeStatus @default(AVAILABLE)
 
+  price Decimal? @db.Decimal(12, 2)
+  color String?
+  media String[] @default([])
+
   negotiatedPrice Decimal? @db.Decimal(12, 2)
 
   reservedUntil DateTime?

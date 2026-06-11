@@ -338,7 +338,7 @@ export default function OfferStatusPage() {
             <div>
               <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Listed Price</p>
               <p className="font-medium" style={{ color: theme.text.primary }}>
-                PKR {Number(offer.bike.model.basePrice).toLocaleString()}
+                PKR {Number(offer.bike.price || offer.bike.model.basePrice).toLocaleString()}
               </p>
             </div>
             <div>

@@ -5,35 +5,46 @@ import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { getOrders } from "@/lib/api/orders";
+import { getPartOrders } from "@/lib/api/part-orders";
 
-interface Order {
+interface UnifiedOrder {
   id: string;
   orderNumber: string;
   status: string;
-  customerName: string;
-  customerPhone: string;
-  negotiatedAmount: number;
-  paymentMethod: string;
   createdAt: string;
-  bike: {
-    id: string;
-    chassisNumber: string;
+  type: "BIKE" | "PART";
+  
+  // Bike order fields
+  bike?: {
     model: {
       brand: string;
       modelName: string;
       year: number;
     };
-    branch: {
+    branch?: {
       name: string;
       city: string;
     };
+  };
+  negotiatedAmount?: number;
+  
+  // Part order fields
+  part?: {
+    name: string;
+    sku: string;
+  };
+  quantity?: number;
+  amount?: number;
+  branch?: {
+    name: string;
+    city: string;
   };
 }
 
 export default function CustomerOrdersPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<UnifiedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -48,11 +59,29 @@ export default function CustomerOrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const data = await getOrders();
-      setOrders(data.orders || []);
+      const [bikesRes, partsRes] = await Promise.all([
+        getOrders().catch(err => ({ orders: [] })),
+        getPartOrders().catch(err => [])
+      ]);
+      
+      const bikes: UnifiedOrder[] = (bikesRes.orders || []).map((o: any) => ({
+        ...o,
+        type: "BIKE"
+      }));
+      
+      const parts: UnifiedOrder[] = (partsRes.orders || partsRes || []).map((o: any) => ({
+        ...o,
+        type: "PART"
+      }));
+
+      const merged = [...bikes, ...parts].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      setOrders(merged);
     } catch (err: any) {
       console.error("Failed to fetch orders:", err);
-      setError(err.response?.data?.message || "Failed to load your orders");
+      setError("Failed to load your orders");
     } finally {
       setLoading(false);
     }
@@ -155,7 +184,7 @@ export default function CustomerOrdersPage() {
                 color: theme.text.inverse,
               }}
             >
-              Browse Bikes
+              Browse Shop
             </Link>
           </div>
         ) : (
@@ -170,6 +199,15 @@ export default function CustomerOrdersPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <span
+                        className="inline-block px-3 py-1 text-xs font-medium rounded-full uppercase"
+                        style={{
+                          backgroundColor: order.type === "BIKE" ? theme.accents.tertiary : theme.accents.primary,
+                          color: theme.text.inverse,
+                        }}
+                      >
+                        {order.type}
+                      </span>
+                      <span
                         className="inline-block px-3 py-1 text-xs font-medium rounded-full"
                         style={getStatusBadgeStyle(order.status)}
                       >
@@ -179,31 +217,58 @@ export default function CustomerOrdersPage() {
                         {new Date(order.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text.primary }}>
-                      {order.bike.model.brand} {order.bike.model.modelName} ({order.bike.model.year})
-                    </h3>
-                    <div className="space-y-1 text-sm">
-                      <p style={{ color: theme.text.secondary }}>
-                        <span className="font-medium" style={{ color: theme.text.primary }}>Order Number:</span> {order.orderNumber}
-                      </p>
-                      <p style={{ color: theme.text.secondary }}>
-                        <span className="font-medium" style={{ color: theme.text.primary }}>Amount:</span> PKR {Number(order.negotiatedAmount).toLocaleString()}
-                      </p>
-                      <p style={{ color: theme.text.secondary }}>
-                        <span className="font-medium" style={{ color: theme.text.primary }}>Branch:</span> {order.bike.branch?.name || "N/A"}, {order.bike.branch?.city || "N/A"}
-                      </p>
-                    </div>
+                    
+                    {order.type === "BIKE" && order.bike ? (
+                      <>
+                        <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text.primary }}>
+                          {order.bike.model.brand} {order.bike.model.modelName} ({order.bike.model.year})
+                        </h3>
+                        <div className="space-y-1 text-sm">
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>Order Number:</span> {order.orderNumber}
+                          </p>
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>Amount:</span> PKR {Number(order.negotiatedAmount).toLocaleString()}
+                          </p>
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>Branch:</span> {order.bike.branch?.name || "N/A"}, {order.bike.branch?.city || "N/A"}
+                          </p>
+                        </div>
+                      </>
+                    ) : order.type === "PART" && order.part ? (
+                      <>
+                        <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text.primary }}>
+                          {order.part.name} (Qty: {order.quantity})
+                        </h3>
+                        <div className="space-y-1 text-sm">
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>Order Number:</span> {order.orderNumber}
+                          </p>
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>Amount:</span> PKR {Number(order.amount).toLocaleString()}
+                          </p>
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>SKU:</span> {order.part.sku}
+                          </p>
+                          <p style={{ color: theme.text.secondary }}>
+                            <span className="font-medium" style={{ color: theme.text.primary }}>Branch:</span> {order.branch?.name || "N/A"}, {order.branch?.city || "N/A"}
+                          </p>
+                        </div>
+                      </>
+                    ) : null}
                   </div>
-                  <Link
-                    href={`/orders/${order.orderNumber}`}
-                    className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity text-center"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    View Details
-                  </Link>
+                  {order.type === "BIKE" ? (
+                    <Link
+                      href={`/orders/${order.orderNumber}`}
+                      className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity text-center"
+                      style={{
+                        backgroundColor: theme.accents.primary,
+                        color: theme.text.inverse,
+                      }}
+                    >
+                      View Details
+                    </Link>
+                  ) : null}
                 </div>
               </div>
             ))}

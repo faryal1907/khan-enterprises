@@ -1545,6 +1545,9 @@ export declare const BikeUnitScalarFieldEnum: {
     readonly engineNumber: "engineNumber";
     readonly serialNumber: "serialNumber";
     readonly status: "status";
+    readonly price: "price";
+    readonly color: "color";
+    readonly media: "media";
     readonly negotiatedPrice: "negotiatedPrice";
     readonly reservedUntil: "reservedUntil";
     readonly soldAt: "soldAt";

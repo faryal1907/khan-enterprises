@@ -8,6 +8,7 @@ import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
+import { UpdateBikeUnitDto } from "./dto/update-bike-unit.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
@@ -51,6 +52,16 @@ export class InventoryController {
   @Get("bikes/:id")
   async getBikeById(@Param("id") id: string) {
     return this.inventoryService.getBikeById(id);
+  }
+
+  /**
+   * PUT /api/inventory/bikes/:id
+   * Updates properties of an existing bike unit.
+   */
+  @Put("bikes/:id")
+  @Roles("ADMIN", "MANAGER")
+  async updateBike(@Param("id") id: string, @Body() dto: UpdateBikeUnitDto) {
+    return this.inventoryService.updateBike(id, dto);
   }
 
   /**

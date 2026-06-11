@@ -5,7 +5,7 @@ import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole, OrderStatus, Order } from "@/lib/types";
 import { getBranches } from "@/lib/api/inventory";
-import { getOrders as fetchOrders } from "@/lib/api/orders";
+import { getOrders as fetchOrders, getPartOrders as fetchPartOrders } from "@/lib/api/orders";
 
 export default function OrdersListPage() {
   const router = useRouter();
@@ -49,8 +49,19 @@ export default function OrdersListPage() {
     const fetchOrdersData = async () => {
       setLoading(true);
       try {
-        const data = await fetchOrders(filters);
-        setOrders(data.orders || data);
+        const [bikesRes, partsRes] = await Promise.all([
+          fetchOrders(filters).catch(() => ({ orders: [] })),
+          fetchPartOrders(filters).catch(() => ({ orders: [] }))
+        ]);
+        
+        const bikes = (bikesRes.orders || []).map((o: any) => ({ ...o, type: "BIKE" }));
+        const parts = (partsRes.orders || []).map((o: any) => ({ ...o, type: "PART" }));
+        
+        const merged = [...bikes, ...parts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        setOrders(merged);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -248,7 +259,10 @@ export default function OrdersListPage() {
                   Customer Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Bike Model
+                  Type
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  Item
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Branch
@@ -285,7 +299,13 @@ export default function OrdersListPage() {
                   <tr
                     key={order.id}
                     style={{ borderBottom: `1px solid ${theme.borders.light}`, cursor: "pointer" }}
-                    onClick={() => router.push(`/orders/${order.id}`)}
+                    onClick={() => {
+                      if ((order as any).type === "BIKE") {
+                        router.push(`/orders/${order.id}`);
+                      } else {
+                        alert("Part order details page not yet implemented");
+                      }
+                    }}
                     className="hover:opacity-80"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
@@ -294,14 +314,19 @@ export default function OrdersListPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {order.customerName}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                      <span className="px-2 py-1 text-xs rounded uppercase" style={{ backgroundColor: (order as any).type === "BIKE" ? theme.accents.tertiary : theme.accents.primary, color: theme.text.inverse }}>
+                        {(order as any).type}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {order.bike?.model?.brand} {order.bike?.model?.modelName}
+                      {(order as any).type === "BIKE" ? `${order.bike?.model?.brand} ${order.bike?.model?.modelName}` : `${(order as any).part?.name} (x${(order as any).quantity})`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {order.branch?.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      Rs. {order.negotiatedAmount?.toLocaleString()}
+                      Rs. {((order as any).type === "BIKE" ? order.negotiatedAmount : (order as any).amount)?.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {order.paymentMethod}

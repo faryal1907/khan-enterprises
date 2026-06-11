@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
+import { UpdateBikeUnitDto } from "./dto/update-bike-unit.dto";
 import { QueryBikesDto } from "./dto/query-bikes.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
@@ -139,6 +140,15 @@ export class InventoryService {
       throw new ConflictException(`Bike with engine number ${dto.engineNumber} already exists`);
     }
 
+    // Fetch the bike model to use its default basePrice if price is not provided
+    const bikeModel = await this.prisma.client.bikeModel.findUnique({
+      where: { id: dto.modelId },
+    });
+    if (!bikeModel) {
+      throw new NotFoundException(`Bike model with id ${dto.modelId} not found`);
+    }
+    const finalPrice = dto.price !== undefined && dto.price !== null ? dto.price : bikeModel.basePrice;
+
     return this.prisma.client.bikeUnit.create({
       data: {
         chassisNumber: dto.chassisNumber,
@@ -148,6 +158,31 @@ export class InventoryService {
         vendorId: dto.vendorId,
         serialNumber: dto.serialNumber,
         status: "AVAILABLE",
+        price: finalPrice,
+        color: dto.color,
+        media: dto.media || [],
+      },
+      include: {
+        model: true,
+        vendor: true,
+        branch: true,
+      },
+    });
+  }
+
+  /** Update an existing bike unit's properties. */
+  async updateBike(id: string, dto: UpdateBikeUnitDto) {
+    await this.getBikeById(id);
+
+    return this.prisma.client.bikeUnit.update({
+      where: { id },
+      data: {
+        branchId: dto.branchId,
+        vendorId: dto.vendorId,
+        status: dto.status,
+        price: dto.price,
+        color: dto.color,
+        media: dto.media,
       },
       include: {
         model: true,

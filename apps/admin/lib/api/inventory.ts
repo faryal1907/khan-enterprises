@@ -21,8 +21,23 @@ export async function createBike(data: {
   modelId: string;
   vendorId: string;
   branchId: string;
+  price?: number;
+  color?: string;
+  media?: string[];
 }) {
   const response = await api.post("/inventory/bikes", data);
+  return response.data;
+}
+
+export async function updateBike(id: string, data: {
+  branchId?: string;
+  vendorId?: string;
+  status?: string;
+  price?: number;
+  color?: string;
+  media?: string[];
+}) {
+  const response = await api.put(`/inventory/bikes/${id}`, data);
   return response.data;
 }
 

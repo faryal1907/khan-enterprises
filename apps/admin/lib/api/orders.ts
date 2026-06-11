@@ -24,6 +24,20 @@ export async function getOrders(filters: OrderFilters = {}) {
   return response.data;
 }
 
+export async function getPartOrders(filters: OrderFilters = {}) {
+  const params: any = {};
+  if (filters.status) params.status = filters.status;
+  if (filters.branchId) params.branchId = filters.branchId;
+  if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+  if (filters.dateTo) params.dateTo = filters.dateTo;
+  if (filters.search) params.search = filters.search;
+  if (filters.page) params.page = filters.page;
+  if (filters.limit) params.limit = filters.limit;
+
+  const response = await api.get("/part-orders", { params });
+  return response.data;
+}
+
 export async function getOrderById(id: string) {
   const response = await api.get(`/orders/${id}`);
   return response.data;

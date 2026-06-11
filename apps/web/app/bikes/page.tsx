@@ -271,9 +271,17 @@ export default function BikesPage() {
                     }}
                   >
                     <div
-                      className="aspect-video"
+                      className="aspect-video w-full overflow-hidden"
                       style={{ backgroundColor: theme.backgrounds.tertiary }}
-                    />
+                    >
+                      {bike.media && bike.media.length > 0 && (
+                        bike.media[0].match(/\.(mp4|webm|ogg)$/i) ? (
+                          <video src={bike.media[0]} className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={bike.media[0]} alt={bike.model?.modelName || "Bike"} className="w-full h-full object-cover" />
+                        )
+                      )}
+                    </div>
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm" style={{ color: theme.text.muted }}>
@@ -302,7 +310,7 @@ export default function BikesPage() {
                           className="text-2xl font-bold"
                           style={{ color: theme.text.primary }}
                         >
-                          PKR {bike.model?.basePrice?.toLocaleString()}
+                          PKR {(bike.price || bike.model?.basePrice)?.toLocaleString()}
                         </span>
                       </div>
                     </div>

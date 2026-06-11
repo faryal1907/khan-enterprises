@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsUUID, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsUUID } from "class-validator";
 
 export class CreateBikeUnitDto {
   @IsString()
@@ -13,15 +13,28 @@ export class CreateBikeUnitDto {
   @IsNotEmpty()
   branchId: string;
 
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   modelId: string;
 
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   vendorId: string;
 
   @IsString()
   @IsOptional()
   serialNumber?: string;
+
+  @IsNumber()
+  @IsOptional()
+  price?: number;
+
+  @IsString()
+  @IsOptional()
+  color?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  media?: string[];
 }

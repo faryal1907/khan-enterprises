@@ -152,6 +152,84 @@ export class PartOrdersService {
   }
 
   /**
+   * Paginated, filtered by status/branchId/date range. Include part, inventory, branch, processedBy
+   * For CUSTOMER role: filters by customer phone/CNIC from user profile
+   */
+  async getPartOrders(query: any, user?: any) {
+    const where: any = {};
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    if (query.branchId) {
+      where.branchId = query.branchId;
+    }
+
+    if (query.dateFrom || query.dateTo) {
+      where.createdAt = {};
+      if (query.dateFrom) {
+        where.createdAt.gte = new Date(query.dateFrom);
+      }
+      if (query.dateTo) {
+        where.createdAt.lte = new Date(query.dateTo);
+      }
+    }
+
+    if (query.search) {
+      where.OR = [
+        { orderNumber: { contains: query.search, mode: "insensitive" } },
+        { customerName: { contains: query.search, mode: "insensitive" } },
+      ];
+    }
+
+    // Filter by customer for CUSTOMER role
+    if (user?.role === "CUSTOMER") {
+      where.customerPhone = user.phoneNumber;
+    }
+
+    const page = query.page ? Number(query.page) : 1;
+    const limit = query.limit ? Number(query.limit) : 20;
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      this.prisma.client.partOrder.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          part: true,
+          partInventory: {
+            include: {
+              branch: true,
+            },
+          },
+          branch: true,
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.partOrder.count({ where }),
+    ]);
+
+    return {
+      orders,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
    * Get part orders for a customer (by phone number)
    */
   async getPartOrdersByCustomerPhone(phone: string) {

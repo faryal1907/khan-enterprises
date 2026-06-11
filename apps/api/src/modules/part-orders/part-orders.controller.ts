@@ -29,12 +29,12 @@ export class PartOrdersController {
 
   /**
    * GET /api/part-orders
-   * Get part orders for authenticated customer
+   * Get part orders (paginated, filtered)
    */
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getPartOrdersByCustomer(@CurrentUser() user: any) {
-    return this.partOrdersService.getPartOrdersByCustomerPhone(user.phoneNumber);
+  async getPartOrders(@Query() query: any, @CurrentUser() user: any) {
+    return this.partOrdersService.getPartOrders(query, user);
   }
 
   /**

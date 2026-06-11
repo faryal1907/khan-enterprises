@@ -12,11 +12,11 @@ export class QueryBikesDto {
   status?: BikeStatus;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   modelId?: string;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   vendorId?: string;
 
   @IsOptional()

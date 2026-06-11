@@ -88,24 +88,20 @@ export class UploadService {
    * @returns True if valid, false otherwise
    */
   isValidMimeType(mimeType: string): boolean {
-    const validTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-    ];
-    return validTypes.includes(mimeType);
+    if (!mimeType) return false;
+    if (mimeType === "application/pdf") return true;
+    if (mimeType.startsWith("image/")) return true;
+    if (mimeType.startsWith("video/")) return true;
+    return false;
   }
 
   /**
-   * Validate file size (max 10MB).
+   * Validate file size (max 50MB).
    * @param size - File size in bytes
    * @returns True if valid, false otherwise
    */
   isValidFileSize(size: number): boolean {
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 50 * 1024 * 1024; // 50MB
     return size <= maxSize;
   }
 }

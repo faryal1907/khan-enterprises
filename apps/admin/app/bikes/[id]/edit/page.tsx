@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import {
   getBranches,
   getVendors,
   getBikeModels,
-  createBike,
+  getBikeById,
+  updateBike,
   attachDocument,
   uploadFile,
 } from "@/lib/api/inventory";
@@ -138,8 +139,10 @@ function FileUploadZone({
   );
 }
 
-export default function AddBikePage() {
+export default function EditBikePage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
 
   // Form fields
   const [chassisNumber, setChassisNumber] = useState("");
@@ -170,24 +173,53 @@ export default function AddBikePage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch reference data on mount
+  // Fetch reference data and bike on mount
   useEffect(() => {
-    const fetchReferenceData = async () => {
+    const fetchData = async () => {
       try {
-        const [branchesRes, vendorsRes, modelsRes] = await Promise.all([
+        const [branchesRes, vendorsRes, modelsRes, bike] = await Promise.all([
           getBranches(),
           getVendors(),
           getBikeModels(),
+          getBikeById(id),
         ]);
         setBranches(branchesRes.branches);
         setVendors(vendorsRes.vendors);
         setBikeModels(modelsRes.bikeModels);
+
+        // Populate bike state
+        setChassisNumber(bike.chassisNumber);
+        setEngineNumber(bike.engineNumber);
+        setSerialNumber(bike.serialNumber || "");
+        setBranchId(bike.branch?.id || "");
+        setModelId(bike.model?.id || "");
+        setVendorId(bike.vendor?.id || "");
+        setStatus(bike.status || "AVAILABLE");
+        setPrice(bike.price ? bike.price.toString() : "");
+        setColor(bike.color || "");
+        setMedia(bike.media || []);
+
+        // Populate documents if any exist
+        if (bike.documents) {
+          bike.documents.forEach((doc: any) => {
+            const uploadedDoc = {
+              fileName: doc.fileName,
+              fileUrl: doc.fileUrl,
+              mimeType: doc.mimeType,
+              fileSize: doc.fileSize,
+              fileType: doc.fileType,
+            };
+            if (doc.fileType === "SUPPLIER_INVOICE") setSupplierInvoice(uploadedDoc);
+            if (doc.fileType === "WARRANTY_DOCUMENT") setWarrantyDocument(uploadedDoc);
+            if (doc.fileType === "REGISTRATION_DOCUMENT") setRegistrationPapers(uploadedDoc);
+          });
+        }
       } catch (error) {
-        console.error("Failed to fetch reference data:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
-    fetchReferenceData();
-  }, []);
+    if (id) fetchData();
+  }, [id]);
 
   // Handle file upload
   const handleFileUpload = async (
@@ -247,17 +279,14 @@ export default function AddBikePage() {
 
     setSubmitting(true);
     try {
-      // Create bike
-      const bike = await createBike({
-        chassisNumber,
-        engineNumber,
-        serialNumber: serialNumber || chassisNumber,
-        modelId,
-        vendorId,
+      // Update bike
+      await updateBike(id, {
         branchId,
+        vendorId,
         price: price ? parseFloat(price) : undefined,
         color: color || undefined,
         media,
+        status,
       });
 
       // Attach documents
@@ -266,7 +295,10 @@ export default function AddBikePage() {
       );
 
       for (const doc of documents) {
-        await attachDocument(bike.id, doc);
+        // Only attach if it's a new upload (doesn't have an ID from DB yet)
+        if (!(doc as any).id) {
+          await attachDocument(id, doc);
+        }
       }
 
       // Redirect to bikes page
@@ -301,10 +333,10 @@ export default function AddBikePage() {
             className="text-3xl font-bold mb-2"
             style={{ color: theme.text.primary }}
           >
-            Add New Bike
+            Edit Bike
           </h1>
           <p style={{ color: theme.text.secondary }}>
-            Enter the details for the new bike unit
+            Update the details for this bike unit
           </p>
         </div>
 
@@ -332,6 +364,7 @@ export default function AddBikePage() {
                   placeholder="Enter chassis number"
                   value={chassisNumber}
                   onChange={(e) => setChassisNumber(e.target.value)}
+                  disabled
                 />
               </div>
               <div>
@@ -352,6 +385,7 @@ export default function AddBikePage() {
                   placeholder="Enter engine number"
                   value={engineNumber}
                   onChange={(e) => setEngineNumber(e.target.value)}
+                  disabled
                 />
               </div>
             </div>
@@ -406,6 +440,7 @@ export default function AddBikePage() {
                       setPrice(selectedModel.basePrice.toString());
                     }
                   }}
+                  disabled
                 >
                   <option value="">Select model</option>
                   {bikeModels.map((model) => (
@@ -637,7 +672,7 @@ export default function AddBikePage() {
                   color: theme.text.inverse,
                 }}
               >
-                {submitting ? "Adding..." : "Add Bike"}
+                {submitting ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>

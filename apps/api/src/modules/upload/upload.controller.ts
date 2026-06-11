@@ -27,13 +27,13 @@ export class UploadController {
     // Validate MIME type
     if (!this.uploadService.isValidMimeType(file.mimetype)) {
       throw new BadRequestException(
-        "Invalid file type. Only PDF and images (JPEG, PNG, GIF, WebP) are allowed.",
+        "Invalid file type. Only PDF, images (JPEG, PNG, GIF, WebP), and videos (MP4, WebM, OGG) are allowed.",
       );
     }
 
-    // Validate file size (10MB max)
+    // Validate file size (50MB max)
     if (!this.uploadService.isValidFileSize(file.size)) {
-      throw new BadRequestException("File size exceeds 10MB limit");
+      throw new BadRequestException("File size exceeds 50MB limit");
     }
 
     try {

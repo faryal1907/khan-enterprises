@@ -23,6 +23,7 @@ export default function BikeDetailPage() {
   const [message, setMessage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [successMessage, setSuccessMessage] = useState("");
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -109,22 +110,58 @@ export default function BikeDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left: Image Gallery */}
           <div>
-            <div
-              className="rounded-xl overflow-hidden mb-4"
-              style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <div className="aspect-video" style={{ backgroundColor: theme.backgrounds.tertiary }} />
-            </div>
-            {/* Thumbnail gallery */}
-            <div className="grid grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
+            {bike.media && bike.media.length > 0 ? (
+              <>
                 <div
-                  key={i}
-                  className="rounded-lg aspect-video cursor-pointer hover:opacity-80 transition-opacity"
+                  className="rounded-xl overflow-hidden mb-4 border aspect-video"
+                  style={{ borderColor: theme.borders.light, backgroundColor: theme.backgrounds.tertiary }}
+                >
+                  {bike.media[activeMediaIndex].match(/\.(mp4|webm|ogg)$/i) ? (
+                    <video src={bike.media[activeMediaIndex]} controls className="w-full h-full object-cover" />
+                  ) : (
+                    <img src={bike.media[activeMediaIndex]} alt="Main Image" className="w-full h-full object-cover" />
+                  )}
+                </div>
+                {bike.media.length > 1 && (
+                  <div className="grid grid-cols-4 gap-4">
+                    {bike.media.map((url: string, i: number) => (
+                      <div
+                        key={i}
+                        onClick={() => setActiveMediaIndex(i)}
+                        className={`rounded-lg aspect-video cursor-pointer hover:opacity-80 transition-opacity overflow-hidden border ${activeMediaIndex === i ? 'ring-2' : ''}`}
+                        style={{ 
+                          borderColor: activeMediaIndex === i ? theme.accents.primary : theme.borders.light, 
+                          backgroundColor: theme.backgrounds.tertiary 
+                        }}
+                      >
+                        {url.match(/\.(mp4|webm|ogg)$/i) ? (
+                          <video src={url} className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={url} alt={`Thumbnail ${i}`} className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div
+                  className="rounded-xl overflow-hidden mb-4 aspect-video"
                   style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}
                 />
-              ))}
-            </div>
+                {/* Thumbnail gallery */}
+                <div className="grid grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="rounded-lg aspect-video cursor-pointer hover:opacity-80 transition-opacity"
+                      style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Right: Bike Information */}
@@ -153,7 +190,7 @@ export default function BikeDetailPage() {
             {/* Price */}
             <div className="mb-6">
               <span className="text-4xl font-bold" style={{ color: theme.text.primary }}>
-                PKR {bike.model?.basePrice?.toLocaleString()}
+                PKR {(bike.price || bike.model?.basePrice)?.toLocaleString()}
               </span>
             </div>
 
@@ -179,7 +216,7 @@ export default function BikeDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Color</p>
-                  <p className="font-medium" style={{ color: theme.text.primary }}>{bike.model?.color || "N/A"}</p>
+                  <p className="font-medium" style={{ color: theme.text.primary }}>{bike.color || bike.model?.color || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Chassis Number</p>
