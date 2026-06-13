@@ -41,6 +41,15 @@ export default function BikeDetailPage() {
     fetchBike();
   }, [id]);
 
+  // Pre-fill customer details if logged in
+  useEffect(() => {
+    if (user) {
+      if (!customerName) setCustomerName(user.fullName || "");
+      if (!customerPhone) setCustomerPhone(user.phoneNumber || "");
+      if (!customerEmail) setCustomerEmail(user.email || "");
+    }
+  }, [user]);
+
   const handleMakeOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -74,7 +83,12 @@ export default function BikeDetailPage() {
       window.location.href = `/offers/${result.id}`;
     } catch (error: any) {
       console.error("Failed to submit offer:", error);
-      setErrorMessage(error.response?.data?.message || "Failed to submit offer. Please try again.");
+      const data = error.response?.data;
+      if (data?.message && Array.isArray(data.message)) {
+        setErrorMessage(data.message.join(", "));
+      } else {
+        setErrorMessage(data?.message || "Failed to submit offer. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }

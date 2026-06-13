@@ -7,6 +7,7 @@ import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import { toast } from "sonner";
 
 type Branch = {
   id: string;
@@ -34,6 +35,8 @@ export default function BranchesPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [branchToDelete, setBranchToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isAdmin = user?.role === UserRole.ADMIN;
   const isManager = user?.role === UserRole.MANAGER;
@@ -68,17 +71,20 @@ export default function BranchesPage() {
     fetchBranches();
   }, [isManager, user?.branchId]);
 
-  const handleDelete = async (branchId: string) => {
-    if (!confirm("Are you sure you want to delete this branch?")) {
-      return;
-    }
+  const confirmDelete = async () => {
+    if (!branchToDelete) return;
+    setIsDeleting(true);
 
     try {
-      await api.delete(`/branches/${branchId}`);
-      setBranches(branches.filter((b) => b.id !== branchId));
+      await api.delete(`/branches/${branchToDelete}`);
+      setBranches(branches.filter((b) => b.id !== branchToDelete));
+      toast.success("Branch deleted successfully");
     } catch (err) {
       console.error("Failed to delete branch:", err);
-      alert("Failed to delete branch");
+      toast.error("Failed to delete branch");
+    } finally {
+      setIsDeleting(false);
+      setBranchToDelete(null);
     }
   };
 
@@ -202,7 +208,7 @@ export default function BranchesPage() {
                         </Link>
                         {isAdmin && (
                           <button
-                            onClick={() => handleDelete(branch.id)}
+                            onClick={() => setBranchToDelete(branch.id)}
                             className="font-medium hover:opacity-70 ml-4"
                             style={{ color: theme.accents.secondary }}
                           >
@@ -218,6 +224,55 @@ export default function BranchesPage() {
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {branchToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setBranchToDelete(null)}
+          ></div>
+          <div
+            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
+            style={{
+              backgroundColor: theme.backgrounds.primary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
+              Confirm Deletion
+            </h3>
+            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+              Are you sure you want to delete this branch? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setBranchToDelete(null)}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: "#fff",
+                  opacity: isDeleting ? 0.7 : 1,
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Branch"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

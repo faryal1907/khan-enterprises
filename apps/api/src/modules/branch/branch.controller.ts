@@ -3,6 +3,7 @@ import { BranchService } from "./branch.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
+import { CurrentUser } from "../auth/decorators/current-user.decorator";
 
 @Controller("branches")
 @UseGuards(JwtAuthGuard)
@@ -36,8 +37,8 @@ export class BranchController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async createBranch(@Body() dto: any) {
-    return this.branchService.createBranch(dto);
+  async createBranch(@Body() dto: any, @CurrentUser() admin: any) {
+    return this.branchService.createBranch(dto, admin.sub);
   }
 
   /**
@@ -47,8 +48,8 @@ export class BranchController {
   @Put(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async updateBranch(@Param("id") id: string, @Body() dto: any) {
-    return this.branchService.updateBranch(id, dto);
+  async updateBranch(@Param("id") id: string, @Body() dto: any, @CurrentUser() admin: any) {
+    return this.branchService.updateBranch(id, dto, admin.sub);
   }
 
   /**
@@ -58,19 +59,19 @@ export class BranchController {
   @Delete(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async deleteBranch(@Param("id") id: string) {
-    return this.branchService.deleteBranch(id);
+  async deleteBranch(@Param("id") id: string, @CurrentUser() admin: any) {
+    return this.branchService.deleteBranch(id, admin.sub);
   }
 
   /**
    * GET /api/branches/:id/metrics
-   * Get branch performance metrics. ADMIN only.
+   * Get branch performance metrics. ADMIN, MANAGER.
    */
   @Get(":id/metrics")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN")
-  async getBranchMetrics(@Param("id") id: string) {
-    return this.branchService.getBranchMetrics(id);
+  @Roles("ADMIN", "MANAGER")
+  async getBranchMetrics(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.branchService.getBranchMetrics(id, user);
   }
 
   /**
@@ -80,7 +81,7 @@ export class BranchController {
   @Post("transfer")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async transferStock(@Body() dto: any) {
-    return this.branchService.transferStock(dto);
+  async transferStock(@Body() dto: any, @CurrentUser() admin: any) {
+    return this.branchService.transferStock(dto, admin.sub);
   }
 }

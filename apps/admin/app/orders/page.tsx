@@ -6,6 +6,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { UserRole, OrderStatus, Order } from "@/lib/types";
 import { getBranches } from "@/lib/api/inventory";
 import { getOrders as fetchOrders, getPartOrders as fetchPartOrders } from "@/lib/api/orders";
+import { toast } from "sonner";
 
 export default function OrdersListPage() {
   const router = useRouter();
@@ -319,7 +320,7 @@ export default function OrdersListPage() {
                       if ((order as any).type === "BIKE") {
                         router.push(`/orders/${order.id}`);
                       } else {
-                        alert("Part order details page not yet implemented");
+                        toast.info("Part order details page not yet implemented");
                       }
                     }}
                     className="hover:opacity-80"

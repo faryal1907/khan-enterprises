@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import {
   getBranches,
   getVendors,
@@ -207,7 +208,7 @@ export default function AddBikePage() {
       });
     } catch (error) {
       console.error("File upload failed:", error);
-      alert("Failed to upload file");
+      toast.error("Failed to upload file");
     } finally {
       setUploading(null);
     }
@@ -229,7 +230,7 @@ export default function AddBikePage() {
       console.error("Media upload failed:", error);
       const errorMessage = error.response?.data?.message || error.message || "Failed to upload media files";
       const formattedMessage = Array.isArray(errorMessage) ? errorMessage.join(", ") : errorMessage;
-      alert(`Upload failed: ${formattedMessage}`);
+      toast.error(`Upload failed: ${formattedMessage}`);
     } finally {
       setUploadingMedia(false);
     }
@@ -241,7 +242,7 @@ export default function AddBikePage() {
 
     // Validate required fields
     if (!chassisNumber || !engineNumber || !branchId || !modelId || !vendorId) {
-      alert("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -269,6 +270,7 @@ export default function AddBikePage() {
         await attachDocument(bike.id, doc);
       }
 
+      toast.success("Bike added successfully");
       // Redirect to bikes page
       router.push("/bikes");
     } catch (error: any) {
@@ -284,7 +286,7 @@ export default function AddBikePage() {
         ? errorMessage.join(", ") 
         : errorMessage;
         
-      alert(`Validation Error: ${formattedMessage}`);
+      toast.error(`Validation Error: ${formattedMessage}`);
     } finally {
       setSubmitting(false);
     }

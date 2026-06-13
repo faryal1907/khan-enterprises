@@ -71,6 +71,7 @@ export default function BranchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [managers, setManagers] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     city: "",
@@ -112,6 +113,12 @@ export default function BranchDetailPage() {
           phoneNumber: branchRes.data.branch.phoneNumber,
           managerId: branchRes.data.branch.manager?.id || "",
         });
+
+        if (isAdmin) {
+          const usersRes = await api.get("/auth/users");
+          const managerUsers = usersRes.data.users.filter((u: any) => u.role === "MANAGER");
+          setManagers(managerUsers);
+        }
       } catch (err) {
         setError("Failed to load branch details");
         console.error(err);
@@ -302,6 +309,28 @@ export default function BranchDetailPage() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+                    Manager
+                  </label>
+                  <select
+                    value={formData.managerId}
+                    onChange={(e) => setFormData({ ...formData, managerId: e.target.value })}
+                    className="w-full px-3 py-2 text-sm rounded"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                    }}
+                  >
+                    <option value="">No Manager</option>
+                    {managers.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.fullName} ({m.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className="mt-4 flex gap-2">
                 <button
@@ -336,7 +365,7 @@ export default function BranchDetailPage() {
               <Info label="Address" value={branch.address} />
               <Info label="Phone Number" value={branch.phoneNumber} />
               <Info label="Manager" value={branch.manager ? branch.manager.fullName : "—"} />
-              <Info label="Staff Count" value={branch._count.orders.toString()} />
+              <Info label="Staff Count" value={branch.users.length.toString()} />
               <Info label="Created At" value={new Date(branch.createdAt).toLocaleString()} />
             </div>
           )}

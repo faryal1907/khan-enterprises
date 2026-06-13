@@ -30,6 +30,7 @@ export class AuthService {
         email: true,
         passwordHash: true,
         fullName: true,
+        phoneNumber: true,
         role: true,
         status: true,
         branchId: true,
@@ -117,7 +118,7 @@ export class AuthService {
       where: { tokenHash },
       include: {
         user: {
-          select: { id: true, email: true, role: true, status: true, branchId: true, vendorId: true },
+          select: { id: true, email: true, fullName: true, phoneNumber: true, role: true, status: true, branchId: true, vendorId: true },
         },
       },
     });

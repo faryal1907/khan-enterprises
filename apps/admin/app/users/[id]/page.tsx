@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
 import { api } from "@/lib/api-client";
+import { useAuthStore } from "@/lib/auth-store";
 
 type User = {
   id: string;
@@ -34,11 +35,15 @@ type Branch = { id: string; name: string; city: string };
 
 export default function UserDetailPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
+  const { user: currentUser } = useAuthStore();
   const userId = typeof params?.id === "string" ? params.id : "UNKNOWN";
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
@@ -109,10 +114,8 @@ export default function UserDetailPage() {
     }
   };
 
-  const handleDeactivate = async () => {
-    if (!confirm("Are you sure you want to deactivate this user?")) {
-      return;
-    }
+  const confirmDeactivate = async () => {
+    setIsProcessing(true);
 
     try {
       await api.delete(`/auth/users/${userId}`);
@@ -121,6 +124,9 @@ export default function UserDetailPage() {
     } catch (err) {
       console.error("Failed to deactivate user:", err);
       toast.error("Failed to deactivate user");
+    } finally {
+      setIsProcessing(false);
+      setShowDeactivateModal(false);
     }
   };
 
@@ -182,9 +188,9 @@ export default function UserDetailPage() {
               Back
             </Link>
 
-            {user.status === "ACTIVE" && (
+            {user.status === "ACTIVE" && user.id !== currentUser?.id && (
               <button
-                onClick={handleDeactivate}
+                onClick={() => setShowDeactivateModal(true)}
                 className="px-4 py-2 text-sm font-medium rounded"
                 style={{
                   backgroundColor: theme.accents.secondary,
@@ -370,6 +376,56 @@ export default function UserDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Deactivate Confirmation Modal */}
+      {showDeactivateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !isProcessing && setShowDeactivateModal(false)}
+          ></div>
+          <div
+            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
+            style={{
+              backgroundColor: theme.backgrounds.primary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
+              Confirm Deactivation
+            </h3>
+            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+              Are you sure you want to deactivate this user? They will immediately lose access to the system.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeactivateModal(false)}
+                disabled={isProcessing}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeactivate}
+                disabled={isProcessing}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: "#fff",
+                  opacity: isProcessing ? 0.7 : 1,
+                }}
+              >
+                {isProcessing ? "Processing..." : "Deactivate User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

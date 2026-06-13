@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { getBikeById, updateBikeStatus } from "@/lib/api/inventory";
 import type { BikeUnit } from "@/lib/types";
+import { toast } from "sonner";
 
 export default function BikeDetailPage() {
   const params = useParams();
@@ -40,7 +41,7 @@ export default function BikeDetailPage() {
 
     try {
       await updateBikeStatus(bike.id, statusValue);
-      alert("Status updated successfully");
+      toast.success("Status updated successfully");
       setShowStatusModal(false);
       // Refetch bike data
       const response = await getBikeById(bikeId);
@@ -49,7 +50,7 @@ export default function BikeDetailPage() {
       }
     } catch (error) {
       console.error("Failed to update status:", error);
-      alert("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
 

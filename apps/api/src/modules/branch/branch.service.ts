@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
+import { AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class BranchService {
@@ -63,72 +64,138 @@ export class BranchService {
     return branch;
   }
 
-  async createBranch(dto: {
-    name: string;
-    city: string;
-    address: string;
-    phoneNumber: string;
-    managerId?: string;
-  }) {
-    const branch = await this.prisma.client.branch.create({
-      data: {
-        name: dto.name,
-        city: dto.city,
-        address: dto.address,
-        phoneNumber: dto.phoneNumber,
-        managerId: dto.managerId || null,
-      },
-      select: {
-        id: true,
-        name: true,
-        city: true,
-        address: true,
-        phoneNumber: true,
-        createdAt: true,
-        manager: {
-          select: { id: true, fullName: true, email: true },
+  async createBranch(
+    dto: {
+      name: string;
+      city: string;
+      address: string;
+      phoneNumber: string;
+      managerId?: string;
+    },
+    adminId: string
+  ) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const branch = await tx.branch.create({
+        data: {
+          name: dto.name,
+          city: dto.city,
+          address: dto.address,
+          phoneNumber: dto.phoneNumber,
+          managerId: dto.managerId || null,
         },
-      },
-    });
-
-    return branch;
-  }
-
-  async updateBranch(id: string, dto: {
-    name?: string;
-    city?: string;
-    address?: string;
-    phoneNumber?: string;
-    managerId?: string | null;
-  }) {
-    const branch = await this.prisma.client.branch.update({
-      where: { id },
-      data: dto,
-      select: {
-        id: true,
-        name: true,
-        city: true,
-        address: true,
-        phoneNumber: true,
-        updatedAt: true,
-        manager: {
-          select: { id: true, fullName: true, email: true },
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          address: true,
+          phoneNumber: true,
+          createdAt: true,
+          manager: {
+            select: { id: true, fullName: true, email: true },
+          },
         },
-      },
-    });
+      });
 
-    return branch;
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.CREATE,
+          entityType: "BRANCH",
+          entityId: branch.id,
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return branch;
+    });
   }
 
-  async deleteBranch(id: string) {
-    await this.prisma.client.branch.delete({
-      where: { id },
-    });
+  async updateBranch(
+    id: string,
+    dto: {
+      name?: string;
+      city?: string;
+      address?: string;
+      phoneNumber?: string;
+      managerId?: string | null;
+    },
+    adminId: string
+  ) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const oldBranch = await tx.branch.findUnique({
+        where: { id },
+        select: { name: true, city: true, address: true, phoneNumber: true, managerId: true },
+      });
 
-    return { message: "Branch deleted successfully." };
+      if (!oldBranch) {
+        throw new NotFoundException(`Branch with id "${id}" not found.`);
+      }
+
+      const branch = await tx.branch.update({
+        where: { id },
+        data: dto,
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          address: true,
+          phoneNumber: true,
+          updatedAt: true,
+          manager: {
+            select: { id: true, fullName: true, email: true },
+          },
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.UPDATE,
+          entityType: "BRANCH",
+          entityId: branch.id,
+          oldValue: JSON.stringify(oldBranch),
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return branch;
+    });
   }
 
-  async getBranchMetrics(id: string) {
+  async deleteBranch(id: string, adminId: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const oldBranch = await tx.branch.findUnique({
+        where: { id },
+      });
+
+      if (!oldBranch) {
+        throw new NotFoundException(`Branch with id "${id}" not found.`);
+      }
+
+      await tx.branch.delete({ where: { id } });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.DELETE,
+          entityType: "BRANCH",
+          entityId: id,
+          oldValue: JSON.stringify({ name: oldBranch.name, city: oldBranch.city }),
+        },
+      });
+
+      return { message: "Branch deleted successfully." };
+    });
+  }
+
+  async getBranchMetrics(id: string, user: any) {
+    if (user.role === "MANAGER" && user.branchId !== id) {
+      throw new ForbiddenException("You can only view metrics for your own branch.");
+    }
+
     const branch = await this.prisma.client.branch.findUnique({
       where: { id },
       select: {
@@ -193,13 +260,17 @@ export class BranchService {
     };
   }
 
-  async transferStock(dto: {
-    type: "bike" | "part";
-    itemId: string;
-    fromBranchId: string;
-    toBranchId: string;
-    quantity?: number;
-  }) {
+  async transferStock(
+    dto: {
+      type: "bike" | "part";
+      itemId: string;
+      fromBranchId: string;
+      toBranchId: string;
+      quantity?: number;
+    },
+    adminId: string
+  ) {
+    return this.prisma.client.$transaction(async (tx) => {
     if (dto.type === "bike") {
       // Transfer a single bike unit
       const bikeUnit = await this.prisma.client.bikeUnit.findUnique({
@@ -214,9 +285,21 @@ export class BranchService {
         throw new Error("Bike unit is not in the source branch.");
       }
 
-      await this.prisma.client.bikeUnit.update({
+      await tx.bikeUnit.update({
         where: { id: dto.itemId },
         data: { branchId: dto.toBranchId },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.UPDATE,
+          entityType: "INVENTORY",
+          entityId: dto.itemId,
+          oldValue: JSON.stringify({ branchId: dto.fromBranchId }),
+          newValue: JSON.stringify({ branchId: dto.toBranchId, transferType: "bike" }),
+        },
       });
 
       return { message: "Bike transferred successfully." };
@@ -226,7 +309,7 @@ export class BranchService {
         throw new Error("Quantity must be greater than 0 for part transfers.");
       }
 
-      const fromInventory = await this.prisma.client.partInventory.findUnique({
+      const fromInventory = await tx.partInventory.findUnique({
         where: {
           partId_branchId: {
             partId: dto.itemId,
@@ -244,7 +327,7 @@ export class BranchService {
       }
 
       // Update source inventory
-      await this.prisma.client.partInventory.update({
+      await tx.partInventory.update({
         where: {
           partId_branchId: {
             partId: dto.itemId,
@@ -257,7 +340,7 @@ export class BranchService {
       });
 
       // Update or create destination inventory
-      const toInventory = await this.prisma.client.partInventory.findUnique({
+      const toInventory = await tx.partInventory.findUnique({
         where: {
           partId_branchId: {
             partId: dto.itemId,
@@ -267,7 +350,7 @@ export class BranchService {
       });
 
       if (toInventory) {
-        await this.prisma.client.partInventory.update({
+        await tx.partInventory.update({
           where: {
             partId_branchId: {
               partId: dto.itemId,
@@ -279,7 +362,7 @@ export class BranchService {
           },
         });
       } else {
-        await this.prisma.client.partInventory.create({
+        await tx.partInventory.create({
           data: {
             partId: dto.itemId,
             branchId: dto.toBranchId,
@@ -290,7 +373,24 @@ export class BranchService {
         });
       }
 
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.UPDATE,
+          entityType: "INVENTORY",
+          entityId: dto.itemId,
+          newValue: JSON.stringify({ 
+            transferType: "part", 
+            quantity: dto.quantity, 
+            fromBranchId: dto.fromBranchId, 
+            toBranchId: dto.toBranchId 
+          }),
+        },
+      });
+
       return { message: "Parts transferred successfully." };
     }
+    });
   }
 }
