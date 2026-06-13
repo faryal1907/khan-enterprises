@@ -11,20 +11,16 @@ import { UserRole } from "@/lib/types";
 
 type Transaction = {
   id: string;
-  orderId: string;
   amount: number;
   currency: string;
   status: string;
-  gateway: string;
+  method: string;
   createdAt: string;
-  order: {
+  order?: {
     id: string;
-    customer: {
-      id: string;
-      name: string;
-      email: string;
-      phoneNumber: string;
-    };
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
   };
 };
 
@@ -39,8 +35,20 @@ export default function TransactionsPage() {
     dateTo: "",
   });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal state
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
+
+  // Fetch branches
+  useEffect(() => {
+    import("@/lib/api/inventory").then(({ getBranches }) => {
+      getBranches().then((data: any) => setBranches(data.branches || []));
+    }).catch(console.error);
+  }, []);
 
   // Role check: Admin only
   useEffect(() => {
@@ -59,7 +67,15 @@ export default function TransactionsPage() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await api.get("/transactions");
+        setLoading(true);
+        const params: any = {};
+        if (filters.status) params.status = filters.status;
+        if (filters.gateway) params.method = filters.gateway;
+        if (filters.branch) params.branchId = filters.branch;
+        if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+        if (filters.dateTo) params.dateTo = filters.dateTo;
+
+        const res = await api.get("/transactions", { params });
         setTransactions(res.data.transactions || []);
       } catch (err) {
         setError("Failed to load transactions");
@@ -70,21 +86,26 @@ export default function TransactionsPage() {
     };
 
     fetchTransactions();
-  }, []);
+  }, [filters]);
 
-  const handleRefund = async (transactionId: string) => {
-    if (!confirm("Are you sure you want to initiate a refund for this transaction?")) {
-      return;
-    }
-
+  const executeRefund = async () => {
+    if (!selectedTransactionId) return;
     try {
-      await api.post(`/transactions/${transactionId}/refund`);
+      await api.post(`/transactions/${selectedTransactionId}/refund`);
       toast.success("Refund initiated successfully");
-      setTransactions(transactions.map((t) => t.id === transactionId ? { ...t, status: "REFUNDED" } : t));
+      setTransactions((prev) => prev.map((t) => t.id === selectedTransactionId ? { ...t, status: "REFUNDED" } : t));
     } catch (err) {
       console.error("Failed to initiate refund:", err);
       toast.error("Failed to initiate refund");
+    } finally {
+      setIsRefundModalOpen(false);
+      setSelectedTransactionId(null);
     }
+  };
+
+  const handleRefund = (transactionId: string) => {
+    setSelectedTransactionId(transactionId);
+    setIsRefundModalOpen(true);
   };
 
   const handleDownloadReceipt = async (transactionId: string) => {
@@ -133,7 +154,7 @@ export default function TransactionsPage() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {[
-            { label: "Total Revenue", value: `PKR ${transactions.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}` },
+            { label: "Total Revenue", value: `PKR ${transactions.filter(t => t.status === "SUCCESS").reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}` },
             { label: "Successful", value: transactions.filter((t) => t.status === "SUCCESS").length.toString() },
             { label: "Pending", value: transactions.filter((t) => t.status === "PENDING").length.toString() },
             { label: "Refunded", value: transactions.filter((t) => t.status === "REFUNDED").length.toString() },
@@ -250,8 +271,9 @@ export default function TransactionsPage() {
                 }}
               >
                 <option value="">All Branches</option>
-                <option value="ISB">Islamabad HQ</option>
-                <option value="TRD">Tordher Branch</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
               </select>
             </div>
 
@@ -374,16 +396,16 @@ export default function TransactionsPage() {
                       {transaction.id}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {transaction.orderId}
+                      {transaction.order?.orderNumber || "—"}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {transaction.order?.customer?.name || "—"}
+                      {transaction.order?.customerName || "—"}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
                       PKR {transaction.amount.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {transaction.gateway}
+                      {transaction.method}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span
@@ -436,6 +458,55 @@ export default function TransactionsPage() {
           </table>
         </div>
       </div>
+
+      {/* Refund Confirmation Modal */}
+      {isRefundModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="w-full max-w-md rounded-lg p-6 shadow-xl"
+            style={{
+              backgroundColor: theme.backgrounds.primary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-2"
+              style={{ color: theme.text.primary }}
+            >
+              Confirm Refund
+            </h3>
+            <p
+              className="text-sm mb-6"
+              style={{ color: theme.text.secondary }}
+            >
+              Are you sure you want to initiate a refund for this transaction? This action cannot be easily undone and will be permanently logged.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setIsRefundModalOpen(false);
+                  setSelectedTransactionId(null);
+                }}
+                className="px-4 py-2 rounded font-medium transition-opacity hover:opacity-80"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.primary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeRefund}
+                className="px-4 py-2 rounded font-medium text-white transition-opacity hover:opacity-80"
+                style={{ backgroundColor: theme.accents.secondary }}
+              >
+                Yes, Refund
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

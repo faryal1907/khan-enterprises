@@ -18,6 +18,14 @@ export default function DeliveryQueuePage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [branches, setBranches] = useState<any[]>([]);
+
+  // Fetch branches
+  useEffect(() => {
+    import("@/lib/api/inventory").then(({ getBranches }) => {
+      getBranches().then((data: any) => setBranches(data.branches || []));
+    }).catch(console.error);
+  }, []);
 
   // Set branch filter to user's branch if not admin
   useEffect(() => {
@@ -173,8 +181,9 @@ export default function DeliveryQueuePage() {
                 }}
               >
                 <option value="">All Branches</option>
-                <option value="1">Islamabad HQ</option>
-                <option value="2">Tordher Branch</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
               </select>
               {!isAdmin && (
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
