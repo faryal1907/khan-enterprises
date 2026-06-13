@@ -5,6 +5,7 @@ import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
+import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
@@ -413,5 +414,68 @@ export class OrdersService {
     });
 
     return orders;
+  }
+
+  /**
+   * Manual sale registration (admin bypasses offer workflow)
+   */
+  async createManualOrder(dto: CreateManualOrderDto, adminId: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Find bike
+      const bike = await tx.bikeUnit.findUnique({
+        where: { chassisNumber: dto.chassisNumber },
+        include: { branch: true },
+      });
+
+      if (!bike) {
+        throw new NotFoundException(`Bike with chassis ${dto.chassisNumber} not found`);
+      }
+
+      if (bike.status !== BikeStatus.AVAILABLE) {
+        throw new BadRequestException(`Bike is not available for sale`);
+      }
+
+      // 2. Generate order number
+      const orderNumber = `ORD-MAN-${Date.now()}`;
+
+      // 3. Create Order
+      const order = await tx.order.create({
+        data: {
+          orderNumber,
+          bikeId: bike.id,
+          branchId: bike.branchId,
+          customerName: dto.customerName,
+          customerPhone: dto.customerPhone,
+          customerCNIC: dto.customerCNIC,
+          customerAddress: dto.customerAddress,
+          negotiatedAmount: dto.salePrice,
+          paymentMethod: dto.paymentMethod,
+          status: OrderStatus.CONFIRMED,
+          processedById: adminId,
+        },
+      });
+
+      // 4. Update Bike
+      await tx.bikeUnit.update({
+        where: { id: bike.id },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
+
+      // 5. Create PaymentTransaction
+      await tx.paymentTransaction.create({
+        data: {
+          orderId: order.id,
+          amount: dto.salePrice,
+          method: dto.paymentMethod,
+          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+        },
+      });
+
+      return order;
+    });
   }
 }

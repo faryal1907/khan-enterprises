@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import { getOrders, getPartOrders } from "@/lib/api/orders";
 
 export default function SalesRecordsPage() {
   const { user } = useAuthStore();
@@ -17,12 +18,52 @@ export default function SalesRecordsPage() {
     search: "",
   });
 
+  const [sales, setSales] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   // Set branch filter to user's branch if not admin
   useEffect(() => {
     if (!isAdmin && user?.branchId) {
       setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
   }, [isAdmin, user?.branchId]);
+
+  // Fetch sales data
+  useEffect(() => {
+    const fetchSales = async () => {
+      setLoading(true);
+      try {
+        const [ordersRes, partOrdersRes] = await Promise.all([
+          getOrders({
+            branchId: filters.branch,
+            search: filters.search
+          }).catch(() => ({ orders: [] })),
+          getPartOrders({
+            branchId: filters.branch,
+            search: filters.search
+          }).catch(() => ({ orders: [] })),
+        ]);
+        
+        const allOrders = [
+          ...(ordersRes.orders || []).map((o: any) => ({ ...o, type: "BIKE" })),
+          ...(partOrdersRes.orders || []).map((o: any) => ({ ...o, type: "PART" }))
+        ];
+        
+        // Filter out incomplete orders to show only actual sales
+        const completedStatuses = ["PAID", "CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"];
+        const completed = allOrders
+          .filter((o) => completedStatuses.includes(o.status))
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        
+        setSales(completed);
+      } catch (error) {
+        console.error("Failed to fetch sales:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSales();
+  }, [filters]);
 
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
@@ -203,59 +244,73 @@ export default function SalesRecordsPage() {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span
-                    className="inline-block px-2 py-1 text-xs font-medium rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    —
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span
-                    className="inline-block px-2 py-1 text-xs font-medium rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    —
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <a
-                    href="/orders/1"
-                    className="text-sm font-medium transition-colors hover:opacity-70"
-                    style={{ color: theme.accents.primary }}
-                  >
-                    View Order
-                  </a>
-                </td>
-              </tr>
+              {loading ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                    Loading sales records...
+                  </td>
+                </tr>
+              ) : sales.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                    No completed sales found
+                  </td>
+                </tr>
+              ) : sales.map((sale) => (
+                <tr key={sale.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                    {sale.orderNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {sale.customerName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {sale.type === "BIKE" ? `${sale.bike?.model?.brand} ${sale.bike?.model?.modelName}` : `${sale.part?.name} (x${sale.quantity})`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    Rs. {(sale.negotiatedAmount || sale.totalAmount || 0).toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span
+                      className="inline-block px-2 py-1 text-xs font-medium rounded"
+                      style={{
+                        backgroundColor: theme.backgrounds.tertiary,
+                        color: theme.text.secondary,
+                        border: `1px solid ${theme.borders.medium}`,
+                      }}
+                    >
+                      {sale.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span
+                      className="inline-block px-2 py-1 text-xs font-medium rounded uppercase"
+                      style={{
+                        backgroundColor: "#22c55e20",
+                        color: "#22c55e",
+                        border: `1px solid #22c55e`,
+                      }}
+                    >
+                      {sale.status.replace(/_/g, " ")}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {sale.processedBy?.fullName || "—"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {new Date(sale.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <a
+                      href={`/orders/${sale.id}`}
+                      className="text-sm font-medium transition-colors hover:opacity-70"
+                      style={{ color: theme.accents.primary }}
+                    >
+                      View Order
+                    </a>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

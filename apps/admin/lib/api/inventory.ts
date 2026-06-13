@@ -4,7 +4,15 @@ import { api } from "../api-client";
 // BIKES
 // ============================================================================
 
-export async function getBikes(params?: { branchId?: string }) {
+export async function getBikes(params?: {
+  branchId?: string;
+  search?: string;
+  status?: string;
+  modelId?: string;
+  vendorId?: string;
+  page?: number;
+  limit?: number;
+}) {
   const response = await api.get("/inventory/bikes", { params });
   return response.data;
 }

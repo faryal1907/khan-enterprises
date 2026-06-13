@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
+import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
 import { OrderStatus, PaymentStatus, BikeStatus } from "@khan/prisma";
 
 @Injectable()
@@ -146,6 +147,38 @@ export class PartOrdersService {
 
     if (!order) {
       throw new NotFoundException(`Part order with number ${orderNumber} not found`);
+    }
+
+    return order;
+  }
+
+  /**
+   * Get part order by ID
+   */
+  async getPartOrderById(id: string) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id },
+      include: {
+        part: true,
+        partInventory: {
+          include: {
+            branch: true,
+          },
+        },
+        branch: true,
+        transactions: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Part order with ID ${id} not found`);
     }
 
     return order;
@@ -356,6 +389,70 @@ export class PartOrdersService {
         order: updatedOrder,
         message: "Part order cancelled successfully",
       };
+    });
+  }
+
+  /**
+   * Manual part sale registration (admin bypasses offer workflow)
+   */
+  async createManualPartOrder(dto: CreateManualPartOrderDto, adminId: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch branch inventory
+      const inventory = await tx.partInventory.findFirst({
+        where: { partId: dto.partId }, // In a real app we'd scope this to the admin's branch
+        include: { branch: true },
+      });
+
+      if (!inventory) {
+        throw new NotFoundException(`Part inventory not found`);
+      }
+
+      // 2. Ensure stock
+      if (inventory.quantity < dto.quantity) {
+        throw new BadRequestException(`Insufficient stock. Available: ${inventory.quantity}`);
+      }
+
+      // 3. Deduct stock immediately
+      await tx.partInventory.update({
+        where: { id: inventory.id },
+        data: {
+          quantity: { decrement: dto.quantity },
+        },
+      });
+
+      // 4. Generate order number
+      const orderNumber = this.generateOrderNumber();
+
+      // 5. Create PartOrder
+      const partOrder = await tx.partOrder.create({
+        data: {
+          orderNumber,
+          partId: dto.partId,
+          partInventoryId: inventory.id,
+          branchId: inventory.branchId,
+          customerName: dto.customerName,
+          customerPhone: dto.customerPhone,
+          customerAddress: dto.customerAddress,
+          quantity: dto.quantity,
+          amount: dto.amount,
+          paymentMethod: dto.paymentMethod,
+          status: OrderStatus.DELIVERED, // Manual sale assumes immediate delivery
+          processedById: adminId,
+        },
+      });
+
+      // 6. Record StockMovement
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: inventory.id,
+          movementType: "STOCK_OUT",
+          quantity: dto.quantity,
+          reason: `Manual sale: ${orderNumber}`,
+          performedById: adminId,
+        },
+      });
+
+      return partOrder;
     });
   }
 

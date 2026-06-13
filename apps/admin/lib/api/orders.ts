@@ -61,3 +61,25 @@ export async function recordPayment(id: string, data: {
   const response = await api.post(`/orders/${id}/payment`, data);
   return response.data;
 }
+
+export async function createManualOrder(data: any) {
+  const response = await api.post("/orders/manual", data);
+  return response.data;
+}
+
+export async function createManualPartOrder(data: any) {
+  const response = await api.post("/part-orders/manual", data);
+  return response.data;
+}
+
+export async function downloadInvoice(id: string, isPart: boolean = false) {
+  const endpoint = isPart ? `/part-orders/${id}/invoice` : `/orders/${id}/invoice`;
+  const response = await api.get(endpoint, { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `invoice-${id}.pdf`);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+}

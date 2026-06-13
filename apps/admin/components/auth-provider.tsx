@@ -32,18 +32,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Check if user is a customer - redirect to web app
         if (res.data.user.role === "CUSTOMER") {
           logout();
-          router.push("http://localhost:3000");
+          window.location.href = "http://localhost:3000";
           return;
         }
         setAuth(res.data.user, token);
+        setHydrated(true);
       })
       .catch(() => {
         // Token is invalid or expired — clear it and let middleware redirect
         logout();
-        router.push("/login");
-      })
-      .finally(() => {
-        setHydrated(true);
+        window.location.href = "/login";
       });
   }, []);
 

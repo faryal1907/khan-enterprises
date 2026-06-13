@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards, NotFoundException } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards, NotFoundException, Res } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -9,10 +9,16 @@ import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
+import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
+import { PdfService } from "../pdf/pdf.service";
+import { Response } from "express";
 
 @Controller("orders")
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly pdfService: PdfService
+  ) {}
 
   /**
    * GET /api/orders/number/:orderNumber
@@ -120,5 +126,41 @@ export class OrdersController {
   @Roles("ADMIN", "MANAGER")
   async getOrdersByBranch(@Param("branchId") branchId: string) {
     return this.ordersService.getOrdersByBranch(branchId);
+  }
+
+  /**
+   * POST /api/orders/manual
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   */
+  @Post("manual")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async createManualOrder(
+    @Body() dto: CreateManualOrderDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.createManualOrder(dto, user.id);
+  }
+
+  /**
+   * GET /api/orders/:id/invoice
+   * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
+   */
+  @Get(":id/invoice")
+  @UseGuards(JwtAuthGuard)
+  async downloadInvoice(@Param("id") id: string, @Res() res: Response) {
+    const order = await this.ordersService.getOrderById(id);
+    if (!order) {
+      throw new NotFoundException("Order not found");
+    }
+
+    const pdfStream = this.pdfService.generateInvoice(order);
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="invoice-${order.orderNumber}.pdf"`,
+    });
+
+    pdfStream.pipe(res);
   }
 }

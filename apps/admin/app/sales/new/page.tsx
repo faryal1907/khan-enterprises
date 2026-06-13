@@ -1,8 +1,14 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
+import { getBikes } from "@/lib/api/inventory";
+import { createManualOrder, createManualPartOrder } from "@/lib/api/orders";
+import { numberToWords } from "@repo/utils";
 
 export default function ManualOrderPage() {
+  const router = useRouter();
   const [saleType, setSaleType] = useState<"BIKE" | "PART">("BIKE");
   const [formData, setFormData] = useState({
     chassisNumber: "",
@@ -26,20 +32,129 @@ export default function ManualOrderPage() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRegisterSale = async () => {
+    try {
+      if (!formData.customerName || !formData.customerPhone || !formData.customerAddress || !formData.paymentMethod) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      if (saleType === "BIKE") {
+        if (!formData.chassisNumber || !bikeDetails) {
+          toast.error("Please lookup and select an available bike");
+          return;
+        }
+        if (!formData.customerCNIC) {
+          toast.error("CNIC is required for bike sales");
+          return;
+        }
+
+        const salePriceClean = Number(formData.salePrice.replace(/,/g, ""));
+        if (!salePriceClean || salePriceClean <= 0) {
+          toast.error("Please enter a valid sale price");
+          return;
+        }
+
+        const payload = {
+          chassisNumber: formData.chassisNumber,
+          customerName: formData.customerName,
+          customerCNIC: formData.customerCNIC,
+          customerPhone: formData.customerPhone,
+          customerAddress: formData.customerAddress,
+          salePrice: salePriceClean,
+          paymentMethod: formData.paymentMethod,
+        };
+
+        const res = await createManualOrder(payload);
+        toast.success("Bike sale registered successfully!");
+        router.push(`/orders/${res.id}`);
+      } else {
+        if (!formData.partId || !formData.partQuantity || !formData.partPrice) {
+          toast.error("Please fill in all part details");
+          return;
+        }
+
+        const quantityClean = Number(formData.partQuantity);
+        const priceClean = Number(formData.partPrice);
+
+        if (quantityClean <= 0 || priceClean < 0) {
+          toast.error("Please enter valid quantity and price");
+          return;
+        }
+
+        const payload = {
+          partId: formData.partId,
+          quantity: quantityClean,
+          amount: quantityClean * priceClean,
+          customerName: formData.customerName,
+          customerPhone: formData.customerPhone,
+          customerAddress: formData.customerAddress,
+          paymentMethod: formData.paymentMethod,
+        };
+
+        const res = await createManualPartOrder(payload);
+        toast.success("Part sale registered successfully!");
+        router.push(`/orders`); // Part orders don't have dedicated details page yet, go to list
+      }
+    } catch (error: any) {
+      console.error("Sale registration failed:", error);
+      toast.error(error.response?.data?.message || "Failed to register sale");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleChassisLookup = async () => {
-    // TODO: Implement chassis lookup API call
-    // For now, just simulate autofill
-    if (formData.chassisNumber) {
+    if (!formData.chassisNumber.trim()) {
+      toast.error("Please enter a chassis number");
+      return;
+    }
+
+    try {
+      setLookupLoading(true);
+      const res = await getBikes({ search: formData.chassisNumber.trim() });
+      const bikes = res.bikes || [];
+      const exactBike = bikes.find(
+        (b: any) => b.chassisNumber.toUpperCase() === formData.chassisNumber.trim().toUpperCase()
+      );
+
+      if (!exactBike) {
+        toast.error("No bike found with this chassis number");
+        return;
+      }
+
+      if (exactBike.status !== "AVAILABLE") {
+        toast.error(`Bike cannot be sold. Current status is ${exactBike.status}`);
+        return;
+      }
+
+      const modelName = `${exactBike.model.brand} ${exactBike.model.modelName}`;
+      const price = exactBike.price || exactBike.model.basePrice || 0;
+
       setBikeDetails({
-        model: "Honda CD 70",
-        price: "85000",
+        id: exactBike.id,
+        model: modelName,
+        price: price.toString(),
       });
+
       setFormData((prev) => ({
         ...prev,
-        bikeModel: "Honda CD 70",
-        bikePrice: "85000",
-        salePrice: "85000",
+        bikeModel: modelName,
+        bikePrice: Number(price).toLocaleString(),
+        salePrice: Number(price).toLocaleString(),
       }));
+
+      toast.success("Bike found and available");
+    } catch (error) {
+      console.error("Lookup failed:", error);
+      toast.error("Failed to lookup chassis number");
+    } finally {
+      setLookupLoading(false);
     }
   };
 
@@ -134,13 +249,14 @@ export default function ManualOrderPage() {
                   />
                   <button
                     onClick={handleChassisLookup}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                    disabled={lookupLoading}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                     style={{
                       backgroundColor: theme.accents.primary,
                       color: theme.text.inverse,
                     }}
                   >
-                    Lookup
+                    {lookupLoading ? "Looking up..." : "Lookup"}
                   </button>
                 </div>
               </div>
@@ -388,11 +504,16 @@ export default function ManualOrderPage() {
                 Sale Price *
               </label>
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
                 value={formData.salePrice}
-                onChange={(e) => handleInputChange("salePrice", e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  if (val) {
+                    handleInputChange("salePrice", Number(val).toLocaleString());
+                  } else {
+                    handleInputChange("salePrice", "");
+                  }
+                }}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -401,6 +522,11 @@ export default function ManualOrderPage() {
                 }}
                 placeholder="Final sale price"
               />
+              {formData.salePrice && (
+                <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
+                  {numberToWords(parseFloat(formData.salePrice.replace(/,/g, "")))}
+                </p>
+              )}
             </div>
             <div>
               <label
@@ -458,13 +584,15 @@ export default function ManualOrderPage() {
             Cancel
           </a>
           <button
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            onClick={handleRegisterSale}
+            disabled={isSubmitting}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
             }}
           >
-            Register Sale
+            {isSubmitting ? "Registering..." : "Register Sale"}
           </button>
         </div>
       </div>
