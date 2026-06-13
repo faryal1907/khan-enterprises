@@ -1,19 +1,47 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
+import { QueryAuditLogsDto } from "./dto/query-audit-logs.dto";
 
 @Injectable()
 export class AuditLogsService {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Return all audit logs with user details. */
-  async getAllAuditLogs() {
+  async getAllAuditLogs(query: QueryAuditLogsDto) {
+    const where: any = {};
+
+    if (query.action) {
+      where.action = query.action;
+    }
+    if (query.entity) {
+      where.entityType = query.entity;
+    }
+    if (query.dateFrom || query.dateTo) {
+      where.createdAt = {};
+      if (query.dateFrom) {
+        where.createdAt.gte = new Date(query.dateFrom);
+      }
+      if (query.dateTo) {
+        where.createdAt.lte = new Date(query.dateTo);
+      }
+    }
+    if (query.user) {
+      where.OR = [
+        { user: { email: { contains: query.user, mode: "insensitive" } } },
+        { user: { fullName: { contains: query.user, mode: "insensitive" } } },
+      ];
+    }
+
     return this.prisma.client.auditLog.findMany({
+      where,
       select: {
         id: true,
         action: true,
         entityType: true,
         entityId: true,
         ipAddress: true,
+        oldValue: true,
+        newValue: true,
         createdAt: true,
         user: {
           select: {

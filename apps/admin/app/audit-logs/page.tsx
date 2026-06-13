@@ -8,18 +8,29 @@ import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import { toast } from "sonner";
 
 type AuditLog = {
   id: string;
-  timestamp: string;
-  userId: string | null;
-  userEmail: string | null;
-  userRole: string | null;
   action: string;
   entityType: string | null;
   entityId: string | null;
   ipAddress: string | null;
-  details: any;
+  createdAt?: string;
+  timestamp?: string;
+  oldValue?: any;
+  newValue?: any;
+  user?: {
+    id: string;
+    email: string;
+    fullName: string;
+    role: string;
+  };
+  // Fallbacks for older mapped records
+  userId?: string | null;
+  userEmail?: string | null;
+  userRole?: string | null;
+  details?: any;
 };
 
 export default function AuditLogsPage() {
@@ -35,6 +46,10 @@ export default function AuditLogsPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+  const [logDetails, setLogDetails] = useState<any>(null);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
   // Role check: Admin only
   useEffect(() => {
@@ -53,7 +68,15 @@ export default function AuditLogsPage() {
   useEffect(() => {
     const fetchAuditLogs = async () => {
       try {
-        const res = await api.get("/audit-logs");
+        setLoading(true);
+        const params: any = {};
+        if (filters.user) params.user = filters.user;
+        if (filters.action) params.action = filters.action;
+        if (filters.entity) params.entity = filters.entity;
+        if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+        if (filters.dateTo) params.dateTo = filters.dateTo;
+
+        const res = await api.get("/audit-logs", { params });
         setAuditLogs(res.data.auditLogs || []);
       } catch (err) {
         setError("Failed to load audit logs");
@@ -64,20 +87,43 @@ export default function AuditLogsPage() {
     };
 
     fetchAuditLogs();
-  }, []);
+  }, [filters]);
+
+  const handleViewDetails = async (logId: string) => {
+    setSelectedLogId(logId);
+    setIsDetailsLoading(true);
+    setLogDetails(null);
+    try {
+      const res = await api.get(`/audit-logs/${logId}`);
+      setLogDetails(res.data);
+    } catch (err) {
+      console.error("Failed to fetch audit log details:", err);
+      toast.error("Failed to load audit log details");
+    } finally {
+      setIsDetailsLoading(false);
+    }
+  };
 
   const handleExportCSV = () => {
     const headers = ["Timestamp", "User", "Role", "Action", "Entity", "Entity ID", "IP Address", "Details"];
-    const rows = auditLogs.map((log) => [
-      new Date(log.timestamp).toLocaleString(),
-      log.userEmail || "—",
-      log.userRole || "—",
-      log.action,
-      log.entityType || "—",
-      log.entityId || "—",
-      log.ipAddress || "—",
-      JSON.stringify(log.details),
-    ]);
+    const rows = auditLogs.map((log: any) => {
+      // Create a simplified details string from oldValue/newValue if present
+      let detailsString = "—";
+      if (log.oldValue || log.newValue) {
+         detailsString = `Old: ${JSON.stringify(log.oldValue)} | New: ${JSON.stringify(log.newValue)}`;
+      }
+
+      return [
+        new Date(log.timestamp || log.createdAt).toLocaleString(),
+        log.user?.email || log.userEmail || "—",
+        log.user?.role || log.userRole || "—",
+        log.action,
+        log.entityType || "—",
+        log.entityId || "—",
+        log.ipAddress || "—",
+        `"${detailsString.replace(/"/g, '""')}"`, // Quote it for CSV
+      ];
+    });
 
     const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
@@ -366,21 +412,21 @@ export default function AuditLogsPage() {
                       className="px-6 py-4 text-sm"
                       style={{ color: theme.text.primary }}
                     >
-                      {new Date(log.timestamp).toLocaleString()}
+                      {new Date((log.createdAt || log.timestamp) as string).toLocaleString()}
                     </td>
 
                     <td
                       className="px-6 py-4 text-sm"
                       style={{ color: theme.text.primary }}
                     >
-                      {log.userEmail || "—"}
+                      {log.user?.email || log.userEmail || "—"}
                     </td>
 
                     <td
                       className="px-6 py-4 text-sm"
                       style={{ color: theme.text.primary }}
                     >
-                      {log.userRole || "—"}
+                      {log.user?.role || log.userRole || "—"}
                     </td>
 
                     <td
@@ -416,6 +462,7 @@ export default function AuditLogsPage() {
                   style={{ color: theme.text.primary }}
                 >
                   <button
+                    onClick={() => handleViewDetails(log.id)}
                     className="font-medium hover:opacity-70"
                     style={{ color: theme.accents.primary }}
                   >
@@ -430,6 +477,99 @@ export default function AuditLogsPage() {
           </table>
         </div>
       </div>
+
+      {/* Details Modal */}
+      {selectedLogId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div
+            className="w-full max-w-2xl rounded-lg p-6 shadow-xl max-h-[80vh] overflow-y-auto"
+            style={{
+              backgroundColor: theme.backgrounds.primary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Audit Log Details
+            </h3>
+
+            {isDetailsLoading ? (
+              <p className="text-center py-8" style={{ color: theme.text.secondary }}>Loading details...</p>
+            ) : logDetails ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>Timestamp</span>
+                    <p className="text-sm mt-1" style={{ color: theme.text.primary }}>{new Date(logDetails.timestamp).toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>User</span>
+                    <p className="text-sm mt-1" style={{ color: theme.text.primary }}>{logDetails.userEmail || "System"} ({logDetails.userRole || "—"})</p>
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>Action</span>
+                    <p className="text-sm mt-1" style={{ color: theme.text.primary }}>{logDetails.action}</p>
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>Entity</span>
+                    <p className="text-sm mt-1" style={{ color: theme.text.primary }}>{logDetails.entityType} ({logDetails.entityId})</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-2" style={{ color: theme.text.primary }}>Changes</h4>
+                  {logDetails.changes && logDetails.changes.length > 0 ? (
+                    <div className="rounded border overflow-hidden" style={{ borderColor: theme.borders.light }}>
+                      <table className="w-full text-sm">
+                        <thead style={{ backgroundColor: theme.backgrounds.secondary }}>
+                          <tr>
+                            <th className="px-4 py-2 text-left font-medium" style={{ color: theme.text.secondary }}>Field</th>
+                            <th className="px-4 py-2 text-left font-medium" style={{ color: theme.text.secondary }}>Old Value</th>
+                            <th className="px-4 py-2 text-left font-medium" style={{ color: theme.text.secondary }}>New Value</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y" style={{ borderColor: theme.borders.light }}>
+                          {logDetails.changes.map((change: any, idx: number) => (
+                            <tr key={idx}>
+                              <td className="px-4 py-2 font-mono text-xs" style={{ color: theme.text.primary }}>{change.field}</td>
+                              <td className="px-4 py-2" style={{ color: theme.text.secondary }}>
+                                <pre className="whitespace-pre-wrap font-sans max-h-24 overflow-y-auto">{change.oldValue}</pre>
+                              </td>
+                              <td className="px-4 py-2" style={{ color: theme.text.primary }}>
+                                <pre className="whitespace-pre-wrap font-sans max-h-24 overflow-y-auto">{change.newValue}</pre>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-sm italic" style={{ color: theme.text.secondary }}>No state changes recorded.</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p className="text-center py-8 text-red-500">Failed to load details.</p>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setSelectedLogId(null)}
+                className="px-4 py-2 rounded font-medium transition-opacity hover:opacity-80"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.primary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
