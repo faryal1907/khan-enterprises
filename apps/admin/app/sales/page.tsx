@@ -73,6 +73,44 @@ export default function SalesRecordsPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleExportCSV = () => {
+    const headers = [
+      "Order Number",
+      "Customer",
+      "Items",
+      "Total (Rs)",
+      "Source",
+      "Status",
+      "Staff",
+      "Date",
+    ];
+
+    const csvRows = sales.map((sale) => [
+      sale.orderNumber,
+      `"${sale.customerName}"`,
+      `"${sale.type === "BIKE" ? `${sale.bike?.model?.brand} ${sale.bike?.model?.modelName}` : `${sale.part?.name} (x${sale.quantity})`}"`,
+      sale.negotiatedAmount || sale.totalAmount || sale.amount || 0,
+      sale.type,
+      sale.status,
+      `"${sale.processedBy?.fullName || ""}"`,
+      new Date(sale.createdAt).toLocaleDateString(),
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...csvRows.map((row) => row.join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `sales_export_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -257,7 +295,12 @@ export default function SalesRecordsPage() {
                   </td>
                 </tr>
               ) : sales.map((sale) => (
-                <tr key={sale.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                <tr 
+                  key={sale.id} 
+                  onClick={() => router.push(`/orders/${sale.id}`)}
+                  className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  style={{ borderBottom: `1px solid ${theme.borders.light}` }}
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
                     {sale.orderNumber}
                   </td>
@@ -268,7 +311,7 @@ export default function SalesRecordsPage() {
                     {sale.type === "BIKE" ? `${sale.bike?.model?.brand} ${sale.bike?.model?.modelName}` : `${sale.part?.name} (x${sale.quantity})`}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                    Rs. {(sale.negotiatedAmount || sale.totalAmount || 0).toLocaleString()}
+                    Rs. {(sale.negotiatedAmount || sale.totalAmount || sale.amount || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span
@@ -318,7 +361,9 @@ export default function SalesRecordsPage() {
         {/* Export CSV */}
         <div className="flex justify-end mt-4">
           <button
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            onClick={handleExportCSV}
+            disabled={sales.length === 0}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: theme.backgrounds.tertiary,
               color: theme.text.secondary,
