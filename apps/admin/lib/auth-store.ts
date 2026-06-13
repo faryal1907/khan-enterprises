@@ -22,13 +22,17 @@ export const useAuthStore = create<AuthState>((set) => ({
       expires: 7,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      domain: process.env.NODE_ENV === "production" ? undefined : "localhost",
     });
 
     set({ user, accessToken });
   },
 
   logout: () => {
-    Cookies.remove(ADMIN_ACCESS_TOKEN_COOKIE, { path: "/" });
+    Cookies.remove(ADMIN_ACCESS_TOKEN_COOKIE, { 
+      path: "/",
+      domain: process.env.NODE_ENV === "production" ? undefined : "localhost",
+    });
     set({ user: null, accessToken: null });
   },
 }));
