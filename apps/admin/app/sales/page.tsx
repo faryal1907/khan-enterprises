@@ -25,13 +25,15 @@ export default function SalesRecordsPage() {
 
   // Fetch branches
   useEffect(() => {
+    if (!user) return;
     import("@/lib/api/inventory").then(({ getBranches }) => {
-      getBranches().then((data: any) => setBranches(data.branches || []));
+      getBranches().then((data: any) => setBranches(data.branches || [])).catch(console.warn);
     }).catch(console.warn);
-  }, []);
+  }, [user?.id]);
 
   // Fetch staff list (only admins and managers can access /auth/users)
   useEffect(() => {
+    if (!user) return;
     if (!isAdmin && user?.role !== UserRole.MANAGER) return;
     import("@/lib/api-client").then(({ api }) => {
       api.get("/auth/users")
@@ -43,7 +45,7 @@ export default function SalesRecordsPage() {
         })
         .catch(console.warn);
     });
-  }, [isAdmin, user?.role]);
+  }, [isAdmin, user?.role, user?.id]);
 
   // Set branch filter to user's branch if not admin
   useEffect(() => {
@@ -54,6 +56,7 @@ export default function SalesRecordsPage() {
 
   // Fetch sales data
   useEffect(() => {
+    if (!user) return;
     const fetchSales = async () => {
       setLoading(true);
       try {

@@ -90,7 +90,8 @@ export default function BranchDetailPage() {
     }
   }, [user, router]);
 
-  // Role check: Manager can only view their own branch
+  // Role check: Manager scoped to a branch can only view their own branch.
+  // Global managers (no branchId) can view any branch.
   useEffect(() => {
     if (isManager && user?.branchId && branchId !== user.branchId) {
       router.push("/branches");
@@ -98,6 +99,10 @@ export default function BranchDetailPage() {
   }, [isManager, user?.branchId, branchId, router]);
 
   useEffect(() => {
+    // Don't fetch until user is loaded, and don't attempt if manager is on wrong branch
+    if (!user) return;
+    if (isManager && user.branchId && branchId !== user.branchId) return;
+
     const fetchData = async () => {
       try {
         const [branchRes, metricsRes] = await Promise.all([
@@ -121,14 +126,14 @@ export default function BranchDetailPage() {
         }
       } catch (err) {
         setError("Failed to load branch details");
-        console.error(err);
+        console.warn(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [branchId]);
+  }, [branchId, user?.id]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();

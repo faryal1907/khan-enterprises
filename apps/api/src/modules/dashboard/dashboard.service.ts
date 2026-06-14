@@ -98,9 +98,13 @@ export class DashboardService {
       }
     });
 
-    // 9. Issues (e.g. FAILED payments, cancelled orders recently?)
-    // Let's just use 0 for now
-    const issues = 0;
+    // 9. Issues: Cancelled orders in the branch that need review
+    const issues = await this.prisma.client.order.count({
+      where: {
+        ...branchFilter,
+        status: OrderStatus.CANCELLED,
+      }
+    });
 
     return {
       pendingOrders,

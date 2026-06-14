@@ -192,7 +192,9 @@ export class BranchService {
   }
 
   async getBranchMetrics(id: string, user: any) {
-    if (user.role === "MANAGER" && user.branchId !== id) {
+    // A manager scoped to a branch can only view their own branch's metrics.
+    // A manager with no branchId (global manager) can view any branch, like an admin.
+    if (user.role === "MANAGER" && user.branchId && user.branchId !== id) {
       throw new ForbiddenException("You can only view metrics for your own branch.");
     }
 

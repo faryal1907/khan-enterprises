@@ -25,7 +25,7 @@ export function Navigation() {
         const response = await getLowStockItems(user?.branchId || undefined);
         setLowStockCount(response.count);
       } catch (error) {
-        console.error("Failed to fetch low stock count:", error);
+        console.warn("Failed to fetch low stock count:", error);
       }
     };
     fetchLowStockCount();
@@ -123,15 +123,17 @@ export function Navigation() {
                 </p>
               </a>
 
-              <a
-                href="/models"
-                className="text-center p-3 rounded-lg transition-colors hover:opacity-80"
-                style={{ backgroundColor: theme.backgrounds.tertiary }}
-              >
-                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                  Models
-                </p>
-              </a>
+              {!isStaff && (
+                <a
+                  href="/models"
+                  className="text-center p-3 rounded-lg transition-colors hover:opacity-80"
+                  style={{ backgroundColor: theme.backgrounds.tertiary }}
+                >
+                  <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                    Models
+                  </p>
+                </a>
+              )}
 
               <a
                 href="/parts"

@@ -21,12 +21,13 @@ export default function DeliveryQueuePage() {
   const [error, setError] = useState("");
   const [branches, setBranches] = useState<any[]>([]);
 
-  // Fetch branches
+  // Fetch branches (only after user is available to ensure token is in cookie)
   useEffect(() => {
+    if (!user) return;
     import("@/lib/api/inventory").then(({ getBranches }) => {
-      getBranches().then((data: any) => setBranches(data.branches || []));
-    }).catch(console.error);
-  }, []);
+      getBranches().then((data: any) => setBranches(data.branches || [])).catch(console.warn);
+    }).catch(console.warn);
+  }, [user?.id]);
 
   // Set branch filter to user's branch if not admin
   useEffect(() => {
@@ -36,12 +37,13 @@ export default function DeliveryQueuePage() {
   }, [isAdmin, user?.branchId]);
 
   useEffect(() => {
+    if (!user) return;
     fetchDeliveries();
     // SALES_STAFF do not have access to the /deliveries/stats endpoint
     if (!isStaff) {
       fetchStats();
     }
-  }, [filters]);
+  }, [filters, user?.id]);
 
   const fetchDeliveries = async () => {
     try {

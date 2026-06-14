@@ -163,8 +163,9 @@ function BranchManagerDashboard({ stats }: { stats: any }) {
             {stats ? `Rs ${stats.branchRevenue.toLocaleString()}` : "—"}
           </p>
         </div>
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/sales"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
@@ -173,7 +174,7 @@ function BranchManagerDashboard({ stats }: { stats: any }) {
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
             {stats?.bikesSold ?? "—"}
           </p>
-        </div>
+        </Link>
         <Link
           href="/bikes"
           className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
@@ -226,17 +227,18 @@ function BranchManagerDashboard({ stats }: { stats: any }) {
             {stats?.pendingDeliveries ?? "—"}
             </p>
         </Link>
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/orders?status=CANCELLED"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Issues
+            Cancelled Orders
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
             {stats?.issues ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
     </>
   );
