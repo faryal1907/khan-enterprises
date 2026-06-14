@@ -315,7 +315,7 @@ export class AuthService {
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  private async issueTokens(
+  async issueTokens(
     userId: string,
     email: string,
     role: string,

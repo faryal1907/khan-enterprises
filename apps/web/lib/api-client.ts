@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 const WEB_ACCESS_TOKEN_COOKIE = "webAccessToken";
 
 export const api = axios.create({
-  baseURL: "http://localhost:4000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api",
 });
 
 let isRefreshing = false;
@@ -59,7 +59,7 @@ api.interceptors.response.use(
           throw new Error("No refresh token available");
         }
 
-        const response = await axios.post("http://localhost:4000/api/auth/refresh", {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"}/auth/refresh`, {
           refreshToken,
         });
 
