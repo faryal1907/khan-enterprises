@@ -104,3 +104,5 @@
 2026-06-14T11:07:09.039076Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin"), path: AnchoredSystemPathBuf("apps\\admin") }}))
 2026-06-14T11:07:33.134160Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\admin\\app\\bikes\\[id]\\edit\\page.tsx")}
 2026-06-14T11:07:33.134185Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin"), path: AnchoredSystemPathBuf("apps\\admin") }}))
+2026-06-14T11:10:27.037816Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\bdb19216f1d5907b-turbo.log.2026-06-14")}
+2026-06-14T11:10:27.037840Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
