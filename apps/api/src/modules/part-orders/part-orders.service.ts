@@ -199,6 +199,10 @@ export class PartOrdersService {
       where.branchId = query.branchId;
     }
 
+    if (query.partId) {
+      where.partId = query.partId;
+    }
+
     if (query.dateFrom || query.dateTo) {
       where.createdAt = {};
       if (query.dateFrom) {

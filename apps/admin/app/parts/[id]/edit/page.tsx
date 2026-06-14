@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { getPartById, updatePart } from "@/lib/api/inventory";
+import { getPartById, updatePart, deletePart } from "@/lib/api/inventory";
 import { getBranches, getVendors } from "@/lib/api/inventory";
 import type { Branch, Vendor } from "@/lib/types";
 
@@ -14,6 +14,9 @@ export default function EditPartPage() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -31,9 +34,8 @@ export default function EditPartPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const partResponse = await getPartById(partId);
+        const part = await getPartById(partId);
 
-        const part = partResponse.part;
         setFormData({
           name: part.name,
           sku: part.sku,
@@ -69,6 +71,24 @@ export default function EditPartPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    try {
+      await deletePart(partId);
+      toast.success("Part deleted successfully");
+      router.push("/parts");
+    } catch (error: any) {
+      setDeleteError(error.response?.data?.message || "Failed to delete part. It may have associated orders.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDelete = () => {
+    setDeleteError("");
+    setShowDeleteModal(true);
   };
 
   if (loading) {
@@ -200,34 +220,116 @@ export default function EditPartPage() {
               </div>
             </div>
 
-            <div className="flex justify-end space-x-4 pt-6">
-              <a
-                href={`/parts/${partId}`}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </a>
+            <div className="flex justify-between items-center pt-6">
               <button
-                type="submit"
-                disabled={submitting}
+                type="button"
+                onClick={handleDelete}
                 className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
                 style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                  opacity: submitting ? 0.7 : 1,
+                  backgroundColor: "#ef4444",
+                  color: "#ffffff",
                 }}
               >
-                {submitting ? "Saving..." : "Save Changes"}
+                Delete Part
               </button>
+              <div className="flex space-x-4">
+                <a
+                  href={`/parts/${partId}`}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Cancel
+                </a>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                    opacity: submitting ? 0.7 : 1,
+                  }}
+                >
+                  {submitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
             </div>
           </form>
         </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
+          <div
+            className="rounded-lg shadow-lg p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: theme.backgrounds.primary }}
+          >
+            <h3
+              className="text-xl font-bold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              {deleteError ? "Action Required" : "Delete Part"}
+            </h3>
+            {deleteError ? (
+              <div className="mb-6 p-4 rounded bg-red-50 text-red-700 border border-red-200">
+                <p className="text-sm font-medium">{deleteError}</p>
+              </div>
+            ) : (
+              <p
+                className="text-sm mb-6"
+                style={{ color: theme.text.secondary }}
+              >
+                Are you sure you want to delete this part? This action cannot be undone. All current stock level tracking for this part will also be permanently removed.
+              </p>
+            )}
+            <div className="flex justify-end space-x-4">
+              {deleteError ? (
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Okay
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    disabled={deleting}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 disabled:opacity-50"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      color: theme.text.secondary,
+                      border: `1px solid ${theme.borders.medium}`,
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    disabled={deleting}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                    style={{
+                      backgroundColor: "#ef4444",
+                      color: "#ffffff",
+                    }}
+                  >
+                    {deleting ? "Deleting..." : "Yes, Delete Part"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

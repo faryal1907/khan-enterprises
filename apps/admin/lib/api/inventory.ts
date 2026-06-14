@@ -120,6 +120,11 @@ export async function updatePart(
   return response.data;
 }
 
+export async function deletePart(id: string) {
+  const response = await api.delete(`/inventory/parts/${id}`);
+  return response.data;
+}
+
 export async function adjustStock(
   inventoryId: string,
   data: {
@@ -129,6 +134,16 @@ export async function adjustStock(
   },
 ) {
   const response = await api.post(`/inventory/parts/${inventoryId}/adjust-stock`, data);
+  return response.data;
+}
+
+export async function transferPart(data: {
+  partId: string;
+  fromBranchId: string;
+  toBranchId: string;
+  quantity: number;
+}) {
+  const response = await api.post(`/inventory/parts/transfer`, data);
   return response.data;
 }
 

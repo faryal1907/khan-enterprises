@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { UserRole, OrderStatus, BikeStatus, DeliveryStatus, OfferStatus } from '@khan/prisma';
+import { UserRole, OrderStatus, BikeStatus, DeliveryStatus, OfferStatus, PaymentStatus } from '@khan/prisma';
 
 @Injectable()
 export class DashboardService {
@@ -21,16 +21,17 @@ export class DashboardService {
     });
 
     // 2. Total Sales / Branch Revenue
-    const completedOrders = await this.prisma.client.order.findMany({
+    // Sum only successful payment transactions to properly handle refunded amounts
+    const successfulPayments = await this.prisma.client.paymentTransaction.findMany({
       where: {
-        ...branchFilter,
-        status: { in: [OrderStatus.DELIVERED, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] }
+        status: PaymentStatus.SUCCESS,
+        order: branchId ? { branchId } : undefined,
       },
-      select: { negotiatedAmount: true }
+      select: { amount: true }
     });
     
-    const totalSalesAmount = completedOrders.reduce((sum, order) => {
-      return sum + Number(order.negotiatedAmount || 0);
+    const totalSalesAmount = successfulPayments.reduce((sum, payment) => {
+      return sum + Number(payment.amount || 0);
     }, 0);
 
     const bikesSold = await this.prisma.client.order.count({

@@ -11,6 +11,7 @@ import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
 import { UpdateBikeUnitDto } from "./dto/update-bike-unit.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
+import { TransferPartDto } from "./dto/transfer-part.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { QueryBikesDto } from "./dto/query-bikes.dto";
 
@@ -114,8 +115,12 @@ export class InventoryController {
    * Returns all parts inventory records, optionally filtered by branch.
    */
   @Get("parts")
-  async getParts(@Query("branchId") branchId?: string) {
-    const parts = await this.inventoryService.getAllParts(branchId);
+  async getParts(
+    @Query("branchId") branchId?: string,
+    @Query("search") search?: string,
+    @Query("category") category?: string,
+  ) {
+    const parts = await this.inventoryService.getAllParts(branchId, search, category);
     return { count: parts.length, parts };
   }
 
@@ -165,6 +170,16 @@ export class InventoryController {
   }
 
   /**
+   * DELETE /api/inventory/parts/:id
+   * Deletes a Part if it has no associated orders.
+   */
+  @Delete("parts/:id")
+  @Roles("ADMIN", "MANAGER")
+  async deletePart(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.inventoryService.deletePart(id, user);
+  }
+
+  /**
    * GET /api/inventory/parts/:id/branch-stock
    * Returns all PartInventory rows for a given Part.
    */
@@ -185,6 +200,19 @@ export class InventoryController {
     @CurrentUser() user: any,
   ) {
     return this.inventoryService.adjustStock(inventoryId, dto, user.id);
+  }
+
+  /**
+   * POST /api/inventory/parts/transfer
+   * Atomically transfers part stock between branches.
+   */
+  @Post("parts/transfer")
+  @Roles("ADMIN", "MANAGER")
+  async transferPart(
+    @Body() dto: TransferPartDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.inventoryService.transferPart(dto, user);
   }
 
   /**

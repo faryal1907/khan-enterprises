@@ -1,10 +1,11 @@
-import { Injectable, ConflictException, NotFoundException } from "@nestjs/common";
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
 import { UpdateBikeUnitDto } from "./dto/update-bike-unit.dto";
 import { QueryBikesDto } from "./dto/query-bikes.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
+import { TransferPartDto } from "./dto/transfer-part.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
@@ -335,9 +336,22 @@ export class InventoryService {
   }
 
   /** Return all part inventory records with part details and branch info. */
-  async getAllParts(branchId?: string) {
+  async getAllParts(branchId?: string, search?: string, category?: string) {
+    const where: any = {};
+    if (branchId) where.branchId = branchId;
+    if (search || category) {
+      where.part = {};
+      if (category) where.part.category = category;
+      if (search) {
+        where.part.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { sku: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+    }
+
     return this.prisma.client.partInventory.findMany({
-      where: branchId ? { branchId } : undefined,
+      where,
       select: {
         id: true,
         quantity: true,
@@ -490,6 +504,61 @@ export class InventoryService {
     });
   }
 
+  /** Delete a Part. Fails if the part is referenced by any PartOrder. */
+  async deletePart(id: string, user: any) {
+    const oldPart = await this.getPartById(id);
+
+    // Check if there are any PartOrders linked to this part.
+    // If there are, we cannot safely delete it.
+    const partOrderExists = await this.prisma.client.partOrder.findFirst({
+      where: { partId: id },
+    });
+
+    if (partOrderExists) {
+      throw new BadRequestException("Cannot delete this part because it is referenced in past orders.");
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // Find all part inventories to delete their stock movements first
+      const inventories = await tx.partInventory.findMany({
+        where: { partId: id },
+      });
+
+      const inventoryIds = inventories.map(i => i.id);
+
+      if (inventoryIds.length > 0) {
+        // Delete all stock movements tied to these inventories
+        await tx.stockMovement.deleteMany({
+          where: { inventoryId: { in: inventoryIds } },
+        });
+
+        // Delete the part inventories
+        await tx.partInventory.deleteMany({
+          where: { partId: id },
+        });
+      }
+
+      // Finally, delete the part
+      const deletedPart = await tx.part.delete({
+        where: { id },
+      });
+
+      // Log the deletion
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.DELETE,
+          entityType: "PART",
+          entityId: id,
+          oldValue: JSON.stringify(oldPart),
+        },
+      });
+
+      return deletedPart;
+    });
+  }
+
   /** Update quantity by signed delta AND create StockMovement record with performedById, reason, and movementType — all in one transaction. */
   async adjustStock(inventoryId: string, dto: AdjustStockDto, userId?: string) {
     const inventory = await this.prisma.client.partInventory.findUnique({
@@ -539,6 +608,93 @@ export class InventoryService {
       }
 
       return { inventory: updatedInventory, movement: stockMovement };
+    });
+  }
+
+  /** Transfer part stock between branches atomically. */
+  async transferPart(dto: TransferPartDto, user: any) {
+    if (dto.fromBranchId === dto.toBranchId) {
+      throw new BadRequestException("Source and destination branches cannot be the same");
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Get source inventory
+      const sourceInventory = await tx.partInventory.findUnique({
+        where: {
+          partId_branchId: {
+            partId: dto.partId,
+            branchId: dto.fromBranchId,
+          },
+        },
+      });
+
+      if (!sourceInventory) {
+        throw new NotFoundException(`Source inventory not found for part ${dto.partId} in branch ${dto.fromBranchId}`);
+      }
+
+      if (sourceInventory.quantity < dto.quantity) {
+        throw new BadRequestException(`Insufficient stock in source branch. Available: ${sourceInventory.quantity}`);
+      }
+
+      // 2. Decrement source inventory
+      const updatedSource = await tx.partInventory.update({
+        where: { id: sourceInventory.id },
+        data: { quantity: { decrement: dto.quantity } },
+      });
+
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: sourceInventory.id,
+          movementType: "STOCK_OUT",
+          quantity: -dto.quantity,
+          reason: `Transfer to branch ${dto.toBranchId}`,
+          performedById: user?.id,
+        },
+      });
+
+      // 3. Increment or create destination inventory
+      const updatedDest = await tx.partInventory.upsert({
+        where: {
+          partId_branchId: {
+            partId: dto.partId,
+            branchId: dto.toBranchId,
+          },
+        },
+        create: {
+          partId: dto.partId,
+          branchId: dto.toBranchId,
+          quantity: dto.quantity,
+          reorderLevel: sourceInventory.reorderLevel,
+        },
+        update: {
+          quantity: { increment: dto.quantity },
+        },
+      });
+
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: updatedDest.id,
+          movementType: "STOCK_IN",
+          quantity: dto.quantity,
+          reason: `Transfer from branch ${dto.fromBranchId}`,
+          performedById: user?.id,
+        },
+      });
+
+      if (user?.id) {
+        await tx.auditLog.create({
+          data: {
+            userId: user.id,
+            userRole: user.role,
+            action: AuditAction.UPDATE,
+            entityType: "PART_INVENTORY",
+            entityId: dto.partId,
+            newValue: JSON.stringify({ type: 'TRANSFER', ...dto }),
+          },
+        });
+      }
+
+      return { source: updatedSource, destination: updatedDest };
     });
   }
 

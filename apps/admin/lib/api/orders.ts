@@ -8,6 +8,7 @@ export interface OrderFilters {
   search?: string;
   page?: number;
   limit?: number;
+  partId?: string;
 }
 
 export async function getOrders(filters: OrderFilters = {}) {
@@ -33,6 +34,7 @@ export async function getPartOrders(filters: OrderFilters = {}) {
   if (filters.search) params.search = filters.search;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
+  if (filters.partId) params.partId = filters.partId;
 
   const response = await api.get("/part-orders", { params });
   return response.data;

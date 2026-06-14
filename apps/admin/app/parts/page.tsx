@@ -10,6 +10,7 @@ import {
   getBranches,
   adjustStock,
   getLowStockItems,
+  transferPart,
 } from "@/lib/api/inventory";
 import type { Branch, PartInventory } from "@/lib/types";
 
@@ -36,10 +37,14 @@ export default function PartsListPage() {
   // Modal state
   const [selectedPart, setSelectedPart] = useState<PartInventory | null>(null);
   const [adjustQuantity, setAdjustQuantity] = useState("");
+  const [adjustMovementType, setAdjustMovementType] = useState("");
   const [adjustReason, setAdjustReason] = useState("");
   const [transferFromBranch, setTransferFromBranch] = useState("");
   const [transferToBranch, setTransferToBranch] = useState("");
   const [transferQuantity, setTransferQuantity] = useState("");
+  
+  const [isAdjusting, setIsAdjusting] = useState(false);
+  const [isTransferring, setIsTransferring] = useState(false);
 
   // Adjust state during render when user.branchId changes to avoid synchronous setState in useEffect
   const [prevUserBranchId, setPrevUserBranchId] = useState(user?.branchId);
@@ -97,20 +102,32 @@ export default function PartsListPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Handle adjust stock
   const handleAdjustStock = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPart || !adjustQuantity || !adjustReason) return;
+    if (!selectedPart || !adjustQuantity || !adjustMovementType) return;
 
+    let qty = parseInt(adjustQuantity);
+    if (isNaN(qty)) return;
+
+    // Automatically enforce the correct math sign based on movement type
+    if (adjustMovementType === "STOCK_OUT") {
+      qty = -Math.abs(qty); // Always subtract
+    } else if (adjustMovementType === "STOCK_IN") {
+      qty = Math.abs(qty); // Always add
+    }
+    // For ADJUSTMENT, we respect the sign the user provided (+ or -)
+
+    setIsAdjusting(true);
     try {
       await adjustStock(selectedPart.id, {
-        quantity: parseInt(adjustQuantity),
-        movementType: adjustReason.toUpperCase(),
+        quantity: qty,
+        movementType: adjustMovementType,
         reason: adjustReason,
       });
       toast.success("Stock adjusted successfully");
       setShowAdjustModal(false);
       setAdjustQuantity("");
+      setAdjustMovementType("");
       setAdjustReason("");
       setSelectedPart(null);
       // Refetch parts
@@ -123,6 +140,8 @@ export default function PartsListPage() {
     } catch (error) {
       console.error("Failed to adjust stock:", error);
       toast.error("Failed to adjust stock");
+    } finally {
+      setIsAdjusting(false);
     }
   };
 
@@ -130,36 +149,21 @@ export default function PartsListPage() {
   const handleTransferStock = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!transferFromBranch || !transferToBranch || !transferQuantity) return;
+    if (!selectedPart) return;
 
+    if (transferFromBranch === transferToBranch) {
+      toast.error("Source and destination branches must be different");
+      return;
+    }
+
+    setIsTransferring(true);
     try {
-      // Find source inventory
-      const sourceInventory = parts.find(
-        (p) => p.branch.id === transferFromBranch && p.part.id === selectedPart?.part.id
-      );
-      const destInventory = parts.find(
-        (p) => p.branch.id === transferToBranch && p.part.id === selectedPart?.part.id
-      );
-
-      if (!sourceInventory) {
-        toast.error("Source inventory not found");
-        return;
-      }
-
-      // Stock out from source
-      await adjustStock(sourceInventory.id, {
-        quantity: -parseInt(transferQuantity),
-        movementType: "STOCK_OUT",
-        reason: "Transfer",
+      await transferPart({
+        partId: selectedPart.part.id,
+        fromBranchId: transferFromBranch,
+        toBranchId: transferToBranch,
+        quantity: parseInt(transferQuantity),
       });
-
-      // Stock in to destination
-      if (destInventory) {
-        await adjustStock(destInventory.id, {
-          quantity: parseInt(transferQuantity),
-          movementType: "STOCK_IN",
-          reason: "Transfer",
-        });
-      }
 
       toast.success("Stock transferred successfully");
       setShowTransferModal(false);
@@ -174,9 +178,9 @@ export default function PartsListPage() {
       if (filters.search) params.search = filters.search;
       const response = await getParts(params);
       setParts(response.parts);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to transfer stock:", error);
-      toast.error("Failed to transfer stock");
+      toast.error(error.response?.data?.message || "Failed to transfer stock");
     }
   };
 
@@ -184,8 +188,18 @@ export default function PartsListPage() {
   const openAdjustModal = (part: PartInventory) => {
     setSelectedPart(part);
     setAdjustQuantity("");
+    setAdjustMovementType("");
     setAdjustReason("");
     setShowAdjustModal(true);
+  };
+
+  // Open transfer modal
+  const openTransferModal = (part: PartInventory) => {
+    setSelectedPart(part);
+    setTransferFromBranch(part.branch.id);
+    setTransferToBranch("");
+    setTransferQuantity("");
+    setShowTransferModal(true);
   };
 
   // Compute summary stats
@@ -433,13 +447,15 @@ export default function PartsListPage() {
                       backgroundColor: part.quantity < part.reorderLevel ? "rgba(245, 158, 11, 0.1)" : undefined,
                     }}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      <div>
-                        <p className="font-medium">{part.part.name}</p>
-                        <p className="text-xs" style={{ color: theme.text.secondary }}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <Link href={`/parts/${part.part.id}`} className="block group">
+                        <p className="font-medium group-hover:underline transition-all" style={{ color: theme.accents.primary }}>
+                          {part.part.name}
+                        </p>
+                        <p className="text-xs group-hover:underline transition-all" style={{ color: theme.text.secondary }}>
                           SKU: {part.part.sku}
                         </p>
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {part.branch.name}
@@ -482,8 +498,15 @@ export default function PartsListPage() {
                         >
                           Adjust
                         </button>
+                        <button
+                          onClick={() => openTransferModal(part)}
+                          className="text-sm font-medium transition-colors hover:opacity-70"
+                          style={{ color: theme.accents.secondary }}
+                        >
+                          Transfer
+                        </button>
                         <a
-                          href={`/parts/${part.id}/edit`}
+                          href={`/parts/${part.part.id}/edit`}
                           className="text-sm font-medium transition-colors hover:opacity-70"
                           style={{ color: theme.text.secondary }}
                         >
@@ -531,10 +554,11 @@ export default function PartsListPage() {
                     className="block text-sm font-medium mb-1"
                     style={{ color: theme.text.secondary }}
                   >
-                    Quantity Change (+/-)
+                    {adjustMovementType === "ADJUSTMENT" ? "Quantity Change (+/-)" : "Quantity"}
                   </label>
                   <input
                     type="number"
+                    min={adjustMovementType === "ADJUSTMENT" ? undefined : "0"}
                     value={adjustQuantity}
                     onChange={(e) => setAdjustQuantity(e.target.value)}
                     className="w-full px-3 py-2 rounded text-sm"
@@ -551,9 +575,33 @@ export default function PartsListPage() {
                     className="block text-sm font-medium mb-1"
                     style={{ color: theme.text.secondary }}
                   >
-                    Reason
+                    Movement Type
                   </label>
                   <select
+                    value={adjustMovementType}
+                    onChange={(e) => setAdjustMovementType(e.target.value)}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                    }}
+                  >
+                    <option value="">Select type</option>
+                    <option value="STOCK_IN">Stock In (+)</option>
+                    <option value="STOCK_OUT">Stock Out (-)</option>
+                    <option value="ADJUSTMENT">Adjustment</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Reason
+                  </label>
+                  <input
+                    type="text"
                     value={adjustReason}
                     onChange={(e) => setAdjustReason(e.target.value)}
                     className="w-full px-3 py-2 rounded text-sm"
@@ -562,14 +610,8 @@ export default function PartsListPage() {
                       border: `1px solid ${theme.borders.medium}`,
                       color: theme.text.primary,
                     }}
-                  >
-                    <option value="">Select reason</option>
-                    <option value="restock">Restock</option>
-                    <option value="sale">Sale</option>
-                    <option value="damage">Damage</option>
-                    <option value="adjustment">Adjustment</option>
-                    <option value="transfer">Transfer</option>
-                  </select>
+                    placeholder="Enter reason (optional)"
+                  />
                 </div>
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
@@ -577,6 +619,7 @@ export default function PartsListPage() {
                     onClick={() => {
                       setShowAdjustModal(false);
                       setAdjustQuantity("");
+                      setAdjustMovementType("");
                       setAdjustReason("");
                       setSelectedPart(null);
                     }}
@@ -591,13 +634,14 @@ export default function PartsListPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                    disabled={isAdjusting}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       backgroundColor: theme.accents.primary,
                       color: theme.text.inverse,
                     }}
                   >
-                    Save
+                    {isAdjusting ? "Saving..." : "Save"}
                   </button>
                 </div>
               </form>
@@ -643,7 +687,8 @@ export default function PartsListPage() {
                   <select
                     value={transferFromBranch}
                     onChange={(e) => setTransferFromBranch(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm"
+                    disabled
+                    className="w-full px-3 py-2 rounded text-sm opacity-70 cursor-not-allowed"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
                       border: `1px solid ${theme.borders.medium}`,
@@ -725,13 +770,14 @@ export default function PartsListPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                    disabled={isTransferring}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       backgroundColor: theme.accents.primary,
                       color: theme.text.inverse,
                     }}
                   >
-                    Transfer
+                    {isTransferring ? "Transferring..." : "Transfer"}
                   </button>
                 </div>
               </form>
