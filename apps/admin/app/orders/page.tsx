@@ -320,7 +320,7 @@ export default function OrdersListPage() {
                       if ((order as any).type === "BIKE") {
                         router.push(`/orders/${order.id}`);
                       } else {
-                        toast.info("Part order details page not yet implemented");
+                        router.push(`/part-orders/${order.id}`);
                       }
                     }}
                     className="hover:opacity-80"

@@ -36,6 +36,16 @@ export class PartOrdersController {
   }
 
   /**
+   * GET /api/part-orders/id/:id
+   * Get part order by ID
+   */
+  @Get("id/:id")
+  @UseGuards(JwtAuthGuard)
+  async getPartOrderById(@Param("id") id: string) {
+    return this.partOrdersService.getPartOrderById(id);
+  }
+
+  /**
    * GET /api/part-orders
    * Get part orders (paginated, filtered)
    */

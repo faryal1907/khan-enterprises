@@ -82,7 +82,7 @@ export async function attachDocument(
 // PARTS
 // ============================================================================
 
-export async function getParts(params?: { branchId?: string }) {
+export async function getParts(params?: { branchId?: string; search?: string }) {
   const response = await api.get("/inventory/parts", { params });
   return response.data;
 }

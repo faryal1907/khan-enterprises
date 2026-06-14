@@ -45,6 +45,11 @@ export async function getOrderById(id: string) {
   return response.data;
 }
 
+export async function getPartOrderById(id: string) {
+  const response = await api.get(`/part-orders/id/${id}`);
+  return response.data;
+}
+
 export async function updateOrderStatus(id: string, status: string) {
   const response = await api.patch(`/orders/${id}/status`, { status });
   return response.data;
@@ -52,6 +57,16 @@ export async function updateOrderStatus(id: string, status: string) {
 
 export async function cancelOrder(id: string, reason: string) {
   const response = await api.post(`/orders/${id}/cancel`, { reason });
+  return response.data;
+}
+
+export async function updatePartOrderStatus(id: string, status: string) {
+  const response = await api.patch(`/part-orders/${id}/status`, { status });
+  return response.data;
+}
+
+export async function cancelPartOrder(id: string) {
+  const response = await api.patch(`/part-orders/${id}/cancel`);
   return response.data;
 }
 

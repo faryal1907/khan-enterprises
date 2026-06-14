@@ -73,6 +73,21 @@ export class OrdersController {
   }
 
   /**
+   * PATCH /api/orders/:id/complete-details
+   * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
+   */
+  @Patch(":id/complete-details")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async completeOrderDetails(
+    @Param("id") id: string,
+    @Body() dto: CompleteOrderDetailsDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.completeOrderDetails(id, dto, user);
+  }
+
+  /**
    * PATCH /api/orders/:id/status
    * @Roles(ADMIN, MANAGER)
    */

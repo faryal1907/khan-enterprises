@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { getBikes } from "@/lib/api/inventory";
+import { getBikes, getParts } from "@/lib/api/inventory";
 import { createManualOrder, createManualPartOrder } from "@/lib/api/orders";
 import { numberToWords } from "@repo/utils";
 
@@ -18,6 +18,7 @@ export default function ManualOrderPage() {
     partName: "",
     partQuantity: "",
     partPrice: "",
+    partMaxQuantity: "",
     customerName: "",
     customerCNIC: "",
     customerPhone: "",
@@ -27,6 +28,52 @@ export default function ManualOrderPage() {
   });
 
   const [bikeDetails, setBikeDetails] = useState<any>(null);
+
+  const [allParts, setAllParts] = useState<any[]>([]);
+  const [partSearchTerm, setPartSearchTerm] = useState("");
+  const [isFetchingParts, setIsFetchingParts] = useState(false);
+  const [showPartDropdown, setShowPartDropdown] = useState(false);
+
+  useEffect(() => {
+    if (saleType !== "PART") return;
+    
+    const fetchAllParts = async () => {
+      setIsFetchingParts(true);
+      try {
+        const res = await getParts();
+        setAllParts(res.parts || []);
+      } catch (error) {
+        console.error("Failed to fetch parts:", error);
+      } finally {
+        setIsFetchingParts(false);
+      }
+    };
+
+    if (allParts.length === 0) {
+      fetchAllParts();
+    }
+  }, [saleType]);
+
+  const partSearchResults = partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
+    ? allParts.filter((p: any) => 
+        p.part?.name?.toLowerCase().includes(partSearchTerm.toLowerCase()) || 
+        p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
+      )
+    : allParts;
+
+  // Auto-fill sale price for parts
+  useEffect(() => {
+    if (saleType === "PART") {
+      const q = Number(formData.partQuantity);
+      const p = Number(formData.partPrice);
+      if (!isNaN(q) && !isNaN(p) && q > 0 && p >= 0) {
+        setFormData((prev) => ({
+          ...prev,
+          salePrice: (q * p).toLocaleString(),
+        }));
+      }
+    }
+  }, [formData.partQuantity, formData.partPrice, saleType]);
 
   const handleInputChange = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -81,16 +128,28 @@ export default function ManualOrderPage() {
 
         const quantityClean = Number(formData.partQuantity);
         const priceClean = Number(formData.partPrice);
+        const maxClean = Number(formData.partMaxQuantity || 0);
 
         if (quantityClean <= 0 || priceClean < 0) {
           toast.error("Please enter valid quantity and price");
           return;
         }
 
+        if (quantityClean > maxClean) {
+          toast.error(`Quantity cannot exceed available stock (${maxClean})`);
+          return;
+        }
+
+        const salePriceClean = Number(formData.salePrice.replace(/,/g, ""));
+        if (!salePriceClean || salePriceClean <= 0) {
+          toast.error("Please enter a valid sale price");
+          return;
+        }
+
         const payload = {
           partId: formData.partId,
           quantity: quantityClean,
-          amount: quantityClean * priceClean,
+          amount: salePriceClean,
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           customerAddress: formData.customerAddress,
@@ -319,28 +378,79 @@ export default function ManualOrderPage() {
               Part Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
+              <div className="relative">
                 <label
                   className="block text-sm font-medium mb-1"
                   style={{ color: theme.text.secondary }}
                 >
                   Part *
                 </label>
-                <select
-                  value={formData.partId}
-                  onChange={(e) => handleInputChange("partId", e.target.value)}
+                <input
+                  type="text"
+                  value={partSearchTerm}
+                  onChange={(e) => {
+                    setPartSearchTerm(e.target.value);
+                    if (formData.partId) {
+                      handleInputChange("partId", "");
+                      handleInputChange("partName", "");
+                      handleInputChange("partPrice", "");
+                    }
+                    setShowPartDropdown(true);
+                  }}
+                  onFocus={() => setShowPartDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowPartDropdown(false), 200)}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
-                >
-                  <option value="">Select part</option>
-                  <option value="1">Brake Pad</option>
-                  <option value="2">Chain Kit</option>
-                  <option value="3">Oil Filter</option>
-                </select>
+                  placeholder="Search for a part..."
+                />
+                {showPartDropdown && (
+                  <div
+                    className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto"
+                    style={{
+                      backgroundColor: theme.backgrounds.primary,
+                      border: `1px solid ${theme.borders.medium}`,
+                    }}
+                  >
+                    {isFetchingParts ? (
+                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>
+                        Loading parts...
+                      </div>
+                    ) : partSearchResults.length > 0 ? (
+                      partSearchResults.map((p: any) => (
+                        <div
+                          key={p.id}
+                          className="px-3 py-2 text-sm cursor-pointer hover:opacity-80"
+                          style={{
+                            color: theme.text.primary,
+                            backgroundColor: theme.backgrounds.tertiary,
+                            borderBottom: `1px solid ${theme.borders.light}`,
+                          }}
+                          onClick={() => {
+                            setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`);
+                            handleInputChange("partId", p.part?.id);
+                            handleInputChange("partName", p.part?.name);
+                            handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0");
+                            handleInputChange("partMaxQuantity", p.quantity?.toString() || "0");
+                            setShowPartDropdown(false);
+                          }}
+                        >
+                          <div className="font-medium">{p.part?.name}</div>
+                          <div className="text-xs" style={{ color: theme.text.secondary }}>
+                            SKU: {p.part?.sku} | Rs. {Number(p.part?.sellingPrice || 0).toLocaleString()} | Stock: {p.quantity}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>
+                        No part found
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <label
@@ -352,8 +462,20 @@ export default function ManualOrderPage() {
                 <input
                   type="number"
                   min="1"
+                  max={formData.partMaxQuantity || undefined}
                   value={formData.partQuantity}
-                  onChange={(e) => handleInputChange("partQuantity", e.target.value)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (formData.partMaxQuantity && val) {
+                      const maxVal = parseInt(formData.partMaxQuantity, 10);
+                      const numVal = parseInt(val, 10);
+                      if (!isNaN(numVal) && numVal > maxVal) {
+                        val = formData.partMaxQuantity;
+                        toast.error(`Only ${maxVal} units available in stock`);
+                      }
+                    }
+                    handleInputChange("partQuantity", val);
+                  }}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,

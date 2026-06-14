@@ -161,6 +161,52 @@ export class OrdersService {
   }
 
   /**
+   * Complete missing details of an order before payment
+   */
+  async completeOrderDetails(id: string, dto: CompleteOrderDetailsDto, user: any) {
+    const order = await this.getOrderById(id);
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Cannot complete details for order in ${order.status} status`
+      );
+    }
+
+    // For CUSTOMER role, verify order belongs to them
+    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    return this.prisma.client.order.update({
+      where: { id },
+      data: {
+        customerCNIC: dto.customerCNIC,
+        customerAddress: dto.customerAddress,
+        paymentMethod: dto.paymentMethod,
+        // Only update processedById if the action is taken by a staff member
+        ...(user?.role !== "CUSTOMER" && { processedById: user.id }),
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+        offer: true,
+        branch: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * Advance order through valid state transitions only
    */
   async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, user: any) {
