@@ -69,6 +69,7 @@ export default function BranchDetailPage() {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [managers, setManagers] = useState<any[]>([]);
@@ -137,6 +138,7 @@ export default function BranchDetailPage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUpdating(true);
     try {
       const updateData: any = {
         name: formData.name,
@@ -150,13 +152,18 @@ export default function BranchDetailPage() {
         updateData.managerId = null;
       }
 
-      const res = await api.put(`/branches/${branchId}`, updateData);
-      setBranch(res.data);
+      await api.patch(`/branches/${branchId}`, updateData);
+      
+      const res = await api.get(`/branches/${branchId}`);
+      setBranch(res.data.branch);
       setIsEditing(false);
       toast.success("Branch updated successfully");
     } catch (err) {
-      console.error("Failed to update branch:", err);
+      console.error(err);
+      setError("Failed to update branch details");
       toast.error("Failed to update branch");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -340,18 +347,20 @@ export default function BranchDetailPage() {
               <div className="mt-4 flex gap-2">
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium rounded"
+                  disabled={updating}
+                  className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
                   style={{
                     backgroundColor: theme.accents.primary,
                     color: theme.text.inverse,
                   }}
                 >
-                  Save Changes
+                  {updating ? "Saving..." : "Save Changes"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 text-sm font-medium rounded"
+                  disabled={updating}
+                  className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     color: theme.text.secondary,

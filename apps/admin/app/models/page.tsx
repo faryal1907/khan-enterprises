@@ -20,9 +20,9 @@ export default function ModelsListPage() {
   const [models, setModels] = useState<BikeModel[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedModel, setSelectedModel] = useState<BikeModel | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [errorModalInfo, setErrorModalInfo] = useState<{ show: boolean; message: string; modelId?: string }>({ show: false, message: "" });
 
   const fetchModels = async () => {
@@ -45,6 +45,7 @@ export default function ModelsListPage() {
   const handleDelete = async () => {
     if (!selectedModel) return;
 
+    setDeleting(true);
     try {
       await deleteBikeModel(selectedModel.id);
       toast.success("Model deleted successfully");
@@ -60,6 +61,8 @@ export default function ModelsListPage() {
         toast.error(message);
         setShowDeleteModal(false);
       }
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -212,7 +215,8 @@ export default function ModelsListPage() {
                 <button
                   type="button"
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 disabled:opacity-50"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     color: theme.text.secondary,
@@ -223,13 +227,14 @@ export default function ModelsListPage() {
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                   style={{
                     backgroundColor: "red",
                     color: "white",
                   }}
                 >
-                  Delete
+                  {deleting ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </div>
