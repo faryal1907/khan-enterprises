@@ -9,6 +9,7 @@ import { getDeliveries, getDeliveryStats } from "@/lib/api/deliveries";
 export default function DeliveryQueuePage() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
+  const isStaff = user?.role === UserRole.SALES_STAFF;
 
   const [filters, setFilters] = useState({
     status: "",
@@ -36,7 +37,10 @@ export default function DeliveryQueuePage() {
 
   useEffect(() => {
     fetchDeliveries();
-    fetchStats();
+    // SALES_STAFF do not have access to the /deliveries/stats endpoint
+    if (!isStaff) {
+      fetchStats();
+    }
   }, [filters]);
 
   const fetchDeliveries = async () => {
@@ -49,8 +53,8 @@ export default function DeliveryQueuePage() {
       const data = await getDeliveries(params);
       setDeliveries(data.deliveries || []);
     } catch (err: any) {
-      console.error("Failed to fetch deliveries:", err);
-      setError(err.response?.data?.message || "Failed to load deliveries");
+      console.warn("Failed to fetch deliveries:", err?.message || err);
+      setError(err.message || "Failed to load deliveries");
     } finally {
       setLoading(false);
     }
@@ -62,7 +66,7 @@ export default function DeliveryQueuePage() {
       const data = await getDeliveryStats(branchId);
       setStats(data);
     } catch (err: any) {
-      console.error("Failed to fetch delivery stats:", err);
+      console.warn("Failed to fetch delivery stats:", err?.message || err);
     }
   };
 

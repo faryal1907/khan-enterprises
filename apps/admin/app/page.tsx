@@ -17,7 +17,7 @@ export default function Dashboard() {
         const response = await api.get("/dashboard/stats");
         setStats(response.data);
       } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.warn("Error fetching stats:", error);
       }
     }
     fetchStats();
@@ -131,17 +131,18 @@ function SalesStaffDashboard({ stats }: { stats: any }) {
             {stats?.pendingSales ?? "—"}
           </p>
         </Link>
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/offers"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Alerts
+            Offers
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats?.alerts ?? "—"}
+            {stats?.pendingSales ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
     </>
   );

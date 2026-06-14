@@ -21,13 +21,29 @@ export default function SalesRecordsPage() {
   const [sales, setSales] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [branches, setBranches] = useState<any[]>([]);
+  const [staffList, setStaffList] = useState<any[]>([]);
 
   // Fetch branches
   useEffect(() => {
     import("@/lib/api/inventory").then(({ getBranches }) => {
       getBranches().then((data: any) => setBranches(data.branches || []));
-    }).catch(console.error);
+    }).catch(console.warn);
   }, []);
+
+  // Fetch staff list (only admins and managers can access /auth/users)
+  useEffect(() => {
+    if (!isAdmin && user?.role !== UserRole.MANAGER) return;
+    import("@/lib/api-client").then(({ api }) => {
+      api.get("/auth/users")
+        .then((res: any) => {
+          const salesStaff = (res.data.users || []).filter(
+            (u: any) => u.role === "SALES_STAFF" || u.role === "MANAGER"
+          );
+          setStaffList(salesStaff);
+        })
+        .catch(console.warn);
+    });
+  }, [isAdmin, user?.role]);
 
   // Set branch filter to user's branch if not admin
   useEffect(() => {
@@ -59,13 +75,18 @@ export default function SalesRecordsPage() {
         
         // Filter out incomplete orders to show only actual sales
         const completedStatuses = ["PAID", "CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"];
-        const completed = allOrders
+        let completed = allOrders
           .filter((o) => completedStatuses.includes(o.status))
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        // Client-side staff filter
+        if (filters.staff) {
+          completed = completed.filter((o) => o.processedBy?.id === filters.staff);
+        }
         
         setSales(completed);
       } catch (error) {
-        console.error("Failed to fetch sales:", error);
+        console.warn("Failed to fetch sales:", error);
       } finally {
         setLoading(false);
       }
@@ -194,8 +215,11 @@ export default function SalesRecordsPage() {
                 }}
               >
                 <option value="">All Staff</option>
-                <option value="1">Staff Member 1</option>
-                <option value="2">Staff Member 2</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.fullName} ({s.role.replace(/_/g, " ")})
+                  </option>
+                ))}
               </select>
             </div>
             <div>
