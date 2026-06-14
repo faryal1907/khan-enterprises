@@ -192,6 +192,15 @@ export class InventoryService {
     });
   }
 
+  /** Delete a bike unit. */
+  async deleteBike(id: string) {
+    await this.getBikeById(id);
+
+    return this.prisma.client.bikeUnit.delete({
+      where: { id },
+    });
+  }
+
   /** Update status of a bike unit. */
   async updateBikeStatus(id: string, dto: UpdateBikeStatusDto) {
     await this.getBikeById(id);

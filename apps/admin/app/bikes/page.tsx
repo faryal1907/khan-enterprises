@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
@@ -21,10 +22,12 @@ export default function BikesListPage() {
   const isManager = user?.role === UserRole.MANAGER;
   const isStaff = user?.role === "SALES_STAFF";
 
+  const searchParams = useSearchParams();
+
   const [filters, setFilters] = useState({
     branch: "",
     status: "",
-    model: "",
+    model: searchParams.get("model") || "",
     vendor: "",
     search: "",
   });

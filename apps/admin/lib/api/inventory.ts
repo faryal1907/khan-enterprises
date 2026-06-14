@@ -37,6 +37,11 @@ export async function createBike(data: {
   return response.data;
 }
 
+export async function deleteBike(id: string) {
+  const response = await api.delete(`/inventory/bikes/${id}`);
+  return response.data;
+}
+
 export async function updateBike(id: string, data: {
   branchId?: string;
   vendorId?: string;
@@ -177,5 +182,44 @@ export async function getVendors() {
 
 export async function getBikeModels() {
   const response = await api.get("/bike-models");
+  return response.data;
+}
+
+export async function getBikeModelById(id: string) {
+  const response = await api.get(`/bike-models/${id}`);
+  return response.data;
+}
+
+export async function createBikeModel(data: {
+  brand: string;
+  modelName: string;
+  year: number;
+  engineCapacity?: string;
+  color?: string;
+  description?: string;
+  basePrice: number;
+}) {
+  const response = await api.post("/bike-models", data);
+  return response.data;
+}
+
+export async function updateBikeModel(
+  id: string,
+  data: {
+    brand?: string;
+    modelName?: string;
+    year?: number;
+    engineCapacity?: string;
+    color?: string;
+    description?: string;
+    basePrice?: number;
+  }
+) {
+  const response = await api.put(`/bike-models/${id}`, data);
+  return response.data;
+}
+
+export async function deleteBikeModel(id: string) {
+  const response = await api.delete(`/bike-models/${id}`);
   return response.data;
 }

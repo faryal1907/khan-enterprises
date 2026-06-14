@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Put, Query, Param, Body, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Put, Delete, Query, Param, Body, UseGuards } from "@nestjs/common";
 import { InventoryService } from "./inventory.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -62,6 +62,16 @@ export class InventoryController {
   @Roles("ADMIN", "MANAGER")
   async updateBike(@Param("id") id: string, @Body() dto: UpdateBikeUnitDto) {
     return this.inventoryService.updateBike(id, dto);
+  }
+
+  /**
+   * DELETE /api/inventory/bikes/:id
+   * Deletes a bike unit.
+   */
+  @Delete("bikes/:id")
+  @Roles("ADMIN")
+  async deleteBike(@Param("id") id: string) {
+    return this.inventoryService.deleteBike(id);
   }
 
   /**

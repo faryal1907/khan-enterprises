@@ -124,6 +124,16 @@ export function Navigation() {
               </a>
 
               <a
+                href="/models"
+                className="text-center p-3 rounded-lg transition-colors hover:opacity-80"
+                style={{ backgroundColor: theme.backgrounds.tertiary }}
+              >
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  Models
+                </p>
+              </a>
+
+              <a
                 href="/parts"
                 className="text-center p-3 rounded-lg transition-colors hover:opacity-80 relative"
                 style={{ backgroundColor: theme.backgrounds.tertiary }}

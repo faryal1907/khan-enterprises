@@ -1,6 +1,8 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { BikeModelsService } from "./bike-models.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CreateBikeModelDto } from "./dto/create-bike-model.dto";
+import { UpdateBikeModelDto } from "./dto/update-bike-model.dto";
 
 @Controller("bike-models")
 @UseGuards(JwtAuthGuard)
@@ -16,4 +18,49 @@ export class BikeModelsController {
     const bikeModels = await this.bikeModelsService.getAllBikeModels();
     return { count: bikeModels.length, bikeModels };
   }
+
+  /**
+   * GET /api/bike-models/:id
+   * Returns a specific bike model.
+   */
+  @Get(":id")
+  async getBikeModelById(@Param("id") id: string) {
+    const bikeModel = await this.bikeModelsService.getBikeModelById(id);
+    return { bikeModel };
+  }
+
+  /**
+   * POST /api/bike-models
+   * Create a new bike model.
+   */
+  @Post()
+  async createBikeModel(@Body() data: CreateBikeModelDto) {
+    const bikeModel = await this.bikeModelsService.createBikeModel(data);
+    return { bikeModel };
+  }
+
+  /**
+   * PUT /api/bike-models/:id
+   * Update an existing bike model.
+   */
+  @Put(":id")
+  async updateBikeModel(
+    @Param("id") id: string,
+    @Body() data: UpdateBikeModelDto
+  ) {
+    const bikeModel = await this.bikeModelsService.updateBikeModel(id, data);
+    return { bikeModel };
+  }
+
+  /**
+   * DELETE /api/bike-models/:id
+   * Delete a bike model if not associated with any bikes.
+   */
+  @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBikeModel(@Param("id") id: string) {
+    await this.bikeModelsService.deleteBikeModel(id);
+  }
 }
+// Trigger rebuild
+
