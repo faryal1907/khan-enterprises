@@ -26,8 +26,8 @@ export class InventoryController {
    */
   @Post("bikes")
   @Roles("ADMIN")
-  async createBike(@Body() dto: CreateBikeUnitDto) {
-    return this.inventoryService.createBike(dto);
+  async createBike(@Body() dto: CreateBikeUnitDto, @CurrentUser() user: any) {
+    return this.inventoryService.createBike(dto, user);
   }
 
   /**
@@ -60,8 +60,8 @@ export class InventoryController {
    */
   @Put("bikes/:id")
   @Roles("ADMIN", "MANAGER")
-  async updateBike(@Param("id") id: string, @Body() dto: UpdateBikeUnitDto) {
-    return this.inventoryService.updateBike(id, dto);
+  async updateBike(@Param("id") id: string, @Body() dto: UpdateBikeUnitDto, @CurrentUser() user: any) {
+    return this.inventoryService.updateBike(id, dto, user);
   }
 
   /**
@@ -70,8 +70,8 @@ export class InventoryController {
    */
   @Delete("bikes/:id")
   @Roles("ADMIN")
-  async deleteBike(@Param("id") id: string) {
-    return this.inventoryService.deleteBike(id);
+  async deleteBike(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.inventoryService.deleteBike(id, user);
   }
 
   /**
@@ -80,8 +80,8 @@ export class InventoryController {
    */
   @Patch("bikes/:id/status")
   @Roles("ADMIN", "MANAGER")
-  async updateBikeStatus(@Param("id") id: string, @Body() dto: UpdateBikeStatusDto) {
-    return this.inventoryService.updateBikeStatus(id, dto);
+  async updateBikeStatus(@Param("id") id: string, @Body() dto: UpdateBikeStatusDto, @CurrentUser() user: any) {
+    return this.inventoryService.updateBikeStatus(id, dto, user);
   }
 
   /**
@@ -90,8 +90,8 @@ export class InventoryController {
    */
   @Patch("bikes/:id/branch")
   @Roles("ADMIN")
-  async transferBike(@Param("id") id: string, @Body() dto: TransferBikeDto) {
-    return this.inventoryService.transferBike(id, dto);
+  async transferBike(@Param("id") id: string, @Body() dto: TransferBikeDto, @CurrentUser() user: any) {
+    return this.inventoryService.transferBike(id, dto, user);
   }
 
   /**
@@ -125,8 +125,8 @@ export class InventoryController {
    */
   @Post("parts")
   @Roles("ADMIN", "MANAGER")
-  async createPart(@Body() dto: CreatePartDto) {
-    return this.inventoryService.createPart(dto);
+  async createPart(@Body() dto: CreatePartDto, @CurrentUser() user: any) {
+    return this.inventoryService.createPart(dto, user);
   }
 
   /**
@@ -160,8 +160,8 @@ export class InventoryController {
    */
   @Put("parts/:id")
   @Roles("ADMIN", "MANAGER")
-  async updatePart(@Param("id") id: string, @Body() dto: UpdatePartDto) {
-    return this.inventoryService.updatePart(id, dto);
+  async updatePart(@Param("id") id: string, @Body() dto: UpdatePartDto, @CurrentUser() user: any) {
+    return this.inventoryService.updatePart(id, dto, user);
   }
 
   /**

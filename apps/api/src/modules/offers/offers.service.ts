@@ -4,7 +4,7 @@ import { CreateOfferDto } from "./dto/create-offer.dto";
 import { CounterOfferDto } from "./dto/counter-offer.dto";
 import { RejectOfferDto } from "./dto/reject-offer.dto";
 import { QueryOffersDto } from "./dto/query-offers.dto";
-import { OfferStatus, BikeStatus, OrderStatus, PaymentMethod } from "@khan/prisma";
+import { OfferStatus, BikeStatus, OrderStatus, PaymentMethod, AuditAction } from "@khan/prisma";
 import { generateOrderNumber } from "../../common/utils";
 
 @Injectable()
@@ -147,7 +147,7 @@ export class OffersService {
    * Critical path — atomic transaction: set offer → ACCEPTED, bike → RESERVED,
    * reservedUntil = now + 24h, create Order record
    */
-  async acceptOffer(id: string, adminId: string) {
+  async acceptOffer(id: string, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
       // 1. Fetch offer, verify status === PENDING or COUNTERED
       const offer = await tx.offer.findUnique({
@@ -212,11 +212,24 @@ export class OffersService {
           negotiatedAmount,
           paymentMethod: offer.paymentMethod || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
-          processedById: adminId,
+          processedById: user.id,
         },
       });
 
-      // 6. Return { offer, bike, order }
+      // 6. Create Audit Log
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.APPROVE,
+          entityType: "OFFER",
+          entityId: id,
+          oldValue: JSON.stringify({ status: offer.status }),
+          newValue: JSON.stringify({ status: OfferStatus.ACCEPTED }),
+        },
+      });
+
+      // 7. Return { offer, bike, order }
       return {
         offer: updatedOffer,
         bike: updatedBike,
@@ -228,34 +241,50 @@ export class OffersService {
   /**
    * Set offer → REJECTED, store adminResponse
    */
-  async rejectOffer(id: string, dto: RejectOfferDto, adminId: string) {
+  async rejectOffer(id: string, dto: RejectOfferDto, user: any) {
     const offer = await this.getOfferById(id);
 
     if (offer.status !== OfferStatus.PENDING && offer.status !== OfferStatus.COUNTERED) {
       throw new BadRequestException(`Offer cannot be rejected. Current status: ${offer.status}`);
     }
 
-    return this.prisma.client.offer.update({
-      where: { id },
-      data: {
-        status: OfferStatus.REJECTED,
-        adminResponse: dto.adminResponse,
-      },
-      include: {
-        bike: {
-          include: {
-            model: true,
-            branch: true,
+    return this.prisma.client.$transaction(async (tx) => {
+      const rejectedOffer = await tx.offer.update({
+        where: { id },
+        data: {
+          status: OfferStatus.REJECTED,
+          adminResponse: dto.adminResponse,
+        },
+        include: {
+          bike: {
+            include: {
+              model: true,
+              branch: true,
+            },
           },
         },
-      },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.REJECT,
+          entityType: "OFFER",
+          entityId: id,
+          oldValue: JSON.stringify({ status: offer.status }),
+          newValue: JSON.stringify({ status: OfferStatus.REJECTED, adminResponse: dto.adminResponse }),
+        },
+      });
+
+      return rejectedOffer;
     });
   }
 
   /**
    * Set offer → COUNTERED, store counterAmount + adminResponse, reset expiresAt = now + 48h
    */
-  async counterOffer(id: string, dto: CounterOfferDto, adminId: string) {
+  async counterOffer(id: string, dto: CounterOfferDto, user: any) {
     const offer = await this.getOfferById(id);
 
     if (offer.status !== OfferStatus.PENDING) {
@@ -266,22 +295,38 @@ export class OffersService {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
 
-    return this.prisma.client.offer.update({
-      where: { id },
-      data: {
-        status: OfferStatus.COUNTERED,
-        counterAmount: dto.counterAmount,
-        adminResponse: dto.adminResponse,
-        expiresAt,
-      },
-      include: {
-        bike: {
-          include: {
-            model: true,
-            branch: true,
+    return this.prisma.client.$transaction(async (tx) => {
+      const counteredOffer = await tx.offer.update({
+        where: { id },
+        data: {
+          status: OfferStatus.COUNTERED,
+          counterAmount: dto.counterAmount,
+          adminResponse: dto.adminResponse,
+          expiresAt,
+        },
+        include: {
+          bike: {
+            include: {
+              model: true,
+              branch: true,
+            },
           },
         },
-      },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "OFFER",
+          entityId: id,
+          oldValue: JSON.stringify({ status: offer.status }),
+          newValue: JSON.stringify({ status: OfferStatus.COUNTERED, counterAmount: dto.counterAmount }),
+        },
+      });
+
+      return counteredOffer;
     });
   }
 

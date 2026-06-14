@@ -56,7 +56,7 @@ export class PartOrdersController {
     @Body("status") status: OrderStatus,
     @CurrentUser() user: any
   ) {
-    return this.partOrdersService.updatePartOrderStatus(id, status, user.id);
+    return this.partOrdersService.updatePartOrderStatus(id, status, user);
   }
 
   /**
@@ -66,7 +66,7 @@ export class PartOrdersController {
   @Patch(":id/cancel")
   @UseGuards(JwtAuthGuard)
   async cancelPartOrder(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.partOrdersService.cancelPartOrder(id, user.id);
+    return this.partOrdersService.cancelPartOrder(id, user);
   }
 
   /**
@@ -80,7 +80,7 @@ export class PartOrdersController {
     @Body() dto: CreateManualPartOrderDto,
     @CurrentUser() user: any
   ) {
-    return this.partOrdersService.createManualPartOrder(dto, user.id);
+    return this.partOrdersService.createManualPartOrder(dto, user);
   }
 
   /**

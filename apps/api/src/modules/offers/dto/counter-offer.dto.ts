@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsNotEmpty, Min } from "class-validator";
+import { IsNumber, IsString, IsOptional, Min } from "class-validator";
 
 export class CounterOfferDto {
   @IsNumber()
@@ -6,6 +6,6 @@ export class CounterOfferDto {
   counterAmount: number;
 
   @IsString()
-  @IsNotEmpty()
-  adminResponse: string;
+  @IsOptional()
+  adminResponse?: string;
 }

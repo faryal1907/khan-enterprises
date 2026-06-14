@@ -9,6 +9,7 @@ import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
+import { AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class InventoryService {
@@ -123,7 +124,7 @@ export class InventoryService {
   }
 
   /** Create a new BikeUnit with default AVAILABLE status. Checks for duplicate chassis/engine numbers. */
-  async createBike(dto: CreateBikeUnitDto) {
+  async createBike(dto: CreateBikeUnitDto, user: any) {
     // Check chassis number uniqueness
     const existingChassis = await this.prisma.client.bikeUnit.findUnique({
       where: { chassisNumber: dto.chassisNumber },
@@ -149,76 +150,138 @@ export class InventoryService {
     }
     const finalPrice = dto.price !== undefined && dto.price !== null ? dto.price : bikeModel.basePrice;
 
-    return this.prisma.client.bikeUnit.create({
-      data: {
-        chassisNumber: dto.chassisNumber,
-        engineNumber: dto.engineNumber,
-        branchId: dto.branchId,
-        modelId: dto.modelId,
-        vendorId: dto.vendorId,
-        serialNumber: dto.serialNumber,
-        status: "AVAILABLE",
-        price: finalPrice,
-        color: dto.color,
-        media: dto.media || [],
-      },
-      include: {
-        model: true,
-        vendor: true,
-        branch: true,
-      },
+    return this.prisma.client.$transaction(async (tx) => {
+      const bike = await tx.bikeUnit.create({
+        data: {
+          chassisNumber: dto.chassisNumber,
+          engineNumber: dto.engineNumber,
+          branchId: dto.branchId,
+          modelId: dto.modelId,
+          vendorId: dto.vendorId,
+          serialNumber: dto.serialNumber,
+          status: "AVAILABLE",
+          price: finalPrice,
+          color: dto.color,
+          media: dto.media || [],
+        },
+        include: {
+          model: true,
+          vendor: true,
+          branch: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.CREATE,
+          entityType: "BIKE",
+          entityId: bike.id,
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return bike;
     });
   }
 
   /** Update an existing bike unit's properties. */
-  async updateBike(id: string, dto: UpdateBikeUnitDto) {
-    await this.getBikeById(id);
+  async updateBike(id: string, dto: UpdateBikeUnitDto, user: any) {
+    const oldBike = await this.getBikeById(id);
 
-    return this.prisma.client.bikeUnit.update({
-      where: { id },
-      data: {
-        branchId: dto.branchId,
-        vendorId: dto.vendorId,
-        status: dto.status,
-        price: dto.price,
-        color: dto.color,
-        media: dto.media,
-      },
-      include: {
-        model: true,
-        vendor: true,
-        branch: true,
-      },
+    return this.prisma.client.$transaction(async (tx) => {
+      const bike = await tx.bikeUnit.update({
+        where: { id },
+        data: {
+          branchId: dto.branchId,
+          vendorId: dto.vendorId,
+          status: dto.status,
+          price: dto.price,
+          color: dto.color,
+          media: dto.media,
+        },
+        include: {
+          model: true,
+          vendor: true,
+          branch: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "BIKE",
+          entityId: id,
+          oldValue: JSON.stringify(oldBike),
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return bike;
     });
   }
 
   /** Delete a bike unit. */
-  async deleteBike(id: string) {
-    await this.getBikeById(id);
+  async deleteBike(id: string, user: any) {
+    const oldBike = await this.getBikeById(id);
 
-    return this.prisma.client.bikeUnit.delete({
-      where: { id },
+    return this.prisma.client.$transaction(async (tx) => {
+      const deletedBike = await tx.bikeUnit.delete({
+        where: { id },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.DELETE,
+          entityType: "BIKE",
+          entityId: id,
+          oldValue: JSON.stringify(oldBike),
+        },
+      });
+
+      return deletedBike;
     });
   }
 
   /** Update status of a bike unit. */
-  async updateBikeStatus(id: string, dto: UpdateBikeStatusDto) {
-    await this.getBikeById(id);
+  async updateBikeStatus(id: string, dto: UpdateBikeStatusDto, user: any) {
+    const oldBike = await this.getBikeById(id);
 
-    return this.prisma.client.bikeUnit.update({
-      where: { id },
-      data: { status: dto.status },
-      include: {
-        model: true,
-        vendor: true,
-        branch: true,
-      },
+    return this.prisma.client.$transaction(async (tx) => {
+      const bike = await tx.bikeUnit.update({
+        where: { id },
+        data: { status: dto.status },
+        include: {
+          model: true,
+          vendor: true,
+          branch: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "BIKE",
+          entityId: id,
+          oldValue: JSON.stringify({ status: oldBike.status }),
+          newValue: JSON.stringify({ status: dto.status }),
+        },
+      });
+
+      return bike;
     });
   }
 
   /** Transfer a bike unit to a different branch. */
-  async transferBike(id: string, dto: TransferBikeDto) {
-    await this.getBikeById(id);
+  async transferBike(id: string, dto: TransferBikeDto, user: any) {
+    const oldBike = await this.getBikeById(id);
 
     const targetBranch = await this.prisma.client.branch.findUnique({
       where: { id: dto.branchId },
@@ -227,14 +290,30 @@ export class InventoryService {
       throw new NotFoundException(`Destination branch with ID ${dto.branchId} not found`);
     }
 
-    return this.prisma.client.bikeUnit.update({
-      where: { id },
-      data: { branchId: dto.branchId },
-      include: {
-        model: true,
-        vendor: true,
-        branch: true,
-      },
+    return this.prisma.client.$transaction(async (tx) => {
+      const bike = await tx.bikeUnit.update({
+        where: { id },
+        data: { branchId: dto.branchId },
+        include: {
+          model: true,
+          vendor: true,
+          branch: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "BIKE",
+          entityId: id,
+          oldValue: JSON.stringify({ branchId: oldBike.branchId }),
+          newValue: JSON.stringify({ branchId: dto.branchId }),
+        },
+      });
+
+      return bike;
     });
   }
 
@@ -284,7 +363,7 @@ export class InventoryService {
   }
 
   /** Create a new Part and PartInventory atomically using prisma.$transaction(). */
-  async createPart(dto: CreatePartDto) {
+  async createPart(dto: CreatePartDto, user: any) {
     // Check SKU uniqueness
     const existingSku = await this.prisma.client.part.findUnique({
       where: { sku: dto.sku },
@@ -325,6 +404,17 @@ export class InventoryService {
         },
       });
 
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.CREATE,
+          entityType: "PART",
+          entityId: part.id,
+          newValue: JSON.stringify(dto),
+        },
+      });
+
       return inventory;
     });
   }
@@ -350,8 +440,8 @@ export class InventoryService {
   }
 
   /** Update Part metadata (name, sku, price, etc.). */
-  async updatePart(id: string, dto: UpdatePartDto) {
-    await this.getPartById(id);
+  async updatePart(id: string, dto: UpdatePartDto, user: any) {
+    const oldPart = await this.getPartById(id);
 
     // Check SKU uniqueness if being updated
     if (dto.sku) {
@@ -366,16 +456,37 @@ export class InventoryService {
       }
     }
 
-    return this.prisma.client.part.update({
-      where: { id },
-      data: dto,
-      include: {
-        inventories: {
-          include: {
-            branch: true,
+    return this.prisma.client.$transaction(async (tx) => {
+      const part = await tx.part.update({
+        where: { id },
+        data: dto,
+        include: {
+          inventories: {
+            include: {
+              branch: true,
+            },
           },
         },
-      },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART",
+          entityId: id,
+          oldValue: JSON.stringify({
+            name: oldPart.name,
+            sku: oldPart.sku,
+            category: oldPart.category,
+            sellingPrice: oldPart.sellingPrice,
+          }),
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return part;
     });
   }
 
@@ -414,6 +525,18 @@ export class InventoryService {
           performedBy: true,
         },
       });
+
+      if (userId) {
+        await tx.auditLog.create({
+          data: {
+            userId: userId,
+            action: AuditAction.UPDATE,
+            entityType: "PART_INVENTORY",
+            entityId: inventoryId,
+            newValue: JSON.stringify(dto),
+          },
+        });
+      }
 
       return { inventory: updatedInventory, movement: stockMovement };
     });

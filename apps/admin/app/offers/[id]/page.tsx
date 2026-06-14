@@ -113,8 +113,8 @@ export default function OfferDetailPage() {
   };
 
   const handleCounter = async () => {
-    if (!counterAmount.trim() || !adminResponse.trim()) {
-      toast.error("Please provide both counter amount and response message");
+    if (!counterAmount.trim()) {
+      toast.error("Please provide a counter amount");
       return;
     }
 

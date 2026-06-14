@@ -84,7 +84,7 @@ export class OrdersController {
     @Body() dto: UpdateOrderStatusDto,
     @CurrentUser() user: any,
   ) {
-    return this.ordersService.updateOrderStatus(id, dto, user.id);
+    return this.ordersService.updateOrderStatus(id, dto, user);
   }
 
   /**
@@ -99,7 +99,7 @@ export class OrdersController {
     @Body() dto: CancelOrderDto,
     @CurrentUser() user: any,
   ) {
-    return this.ordersService.cancelOrder(id, dto, user.id);
+    return this.ordersService.cancelOrder(id, dto, user);
   }
 
   /**
@@ -114,7 +114,7 @@ export class OrdersController {
     @Body() dto: RecordPaymentDto,
     @CurrentUser() user: any,
   ) {
-    return this.ordersService.recordPayment(id, dto, user.id);
+    return this.ordersService.recordPayment(id, dto, user);
   }
 
   /**
@@ -139,7 +139,7 @@ export class OrdersController {
     @Body() dto: CreateManualOrderDto,
     @CurrentUser() user: any,
   ) {
-    return this.ordersService.createManualOrder(dto, user.id);
+    return this.ordersService.createManualOrder(dto, user);
   }
 
   /**

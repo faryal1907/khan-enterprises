@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { BikeModelsService } from "./bike-models.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { CreateBikeModelDto } from "./dto/create-bike-model.dto";
 import { UpdateBikeModelDto } from "./dto/update-bike-model.dto";
 
@@ -34,8 +35,11 @@ export class BikeModelsController {
    * Create a new bike model.
    */
   @Post()
-  async createBikeModel(@Body() data: CreateBikeModelDto) {
-    const bikeModel = await this.bikeModelsService.createBikeModel(data);
+  async createBikeModel(
+    @Body() data: CreateBikeModelDto,
+    @CurrentUser() user: any
+  ) {
+    const bikeModel = await this.bikeModelsService.createBikeModel(data, user);
     return { bikeModel };
   }
 
@@ -46,9 +50,10 @@ export class BikeModelsController {
   @Put(":id")
   async updateBikeModel(
     @Param("id") id: string,
-    @Body() data: UpdateBikeModelDto
+    @Body() data: UpdateBikeModelDto,
+    @CurrentUser() user: any
   ) {
-    const bikeModel = await this.bikeModelsService.updateBikeModel(id, data);
+    const bikeModel = await this.bikeModelsService.updateBikeModel(id, data, user);
     return { bikeModel };
   }
 
@@ -58,8 +63,11 @@ export class BikeModelsController {
    */
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBikeModel(@Param("id") id: string) {
-    await this.bikeModelsService.deleteBikeModel(id);
+  async deleteBikeModel(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    await this.bikeModelsService.deleteBikeModel(id, user);
   }
 }
 // Trigger rebuild
