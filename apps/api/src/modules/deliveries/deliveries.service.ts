@@ -196,6 +196,12 @@ export class DeliveriesService {
               },
             },
           },
+          partOrder: {
+            include: {
+              part: true,
+              branch: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       }),
@@ -238,6 +244,12 @@ export class DeliveriesService {
                 email: true,
               },
             },
+          },
+        },
+        partOrder: {
+          include: {
+            part: true,
+            branch: true,
           },
         },
       },

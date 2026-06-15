@@ -181,7 +181,7 @@ export default function DeliveryDetailPage() {
                 Order Number
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.orderNumber || "N/A"}
+                {delivery.order?.orderNumber || delivery.partOrder?.orderNumber || "N/A"}
               </p>
             </div>
             <div>
@@ -192,7 +192,8 @@ export default function DeliveryDetailPage() {
                 Order Date
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.createdAt ? new Date(delivery.order.createdAt).toLocaleDateString() : "N/A"}
+                {delivery.order?.createdAt ? new Date(delivery.order.createdAt).toLocaleDateString() :
+                 delivery.partOrder?.createdAt ? new Date(delivery.partOrder.createdAt).toLocaleDateString() : "N/A"}
               </p>
             </div>
             <div>
@@ -210,7 +211,7 @@ export default function DeliveryDetailPage() {
                   border: "1px solid #6366F1",
                 }}
               >
-                {delivery.order?.status?.replace(/_/g, " ") || "N/A"}
+                {delivery.order?.status?.replace(/_/g, " ") || delivery.partOrder?.status?.replace(/_/g, " ") || "N/A"}
               </span>
             </div>
           </div>
@@ -236,7 +237,7 @@ export default function DeliveryDetailPage() {
                 Name
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.customerName || "N/A"}
+                {delivery.order?.customerName || delivery.partOrder?.customerName || "N/A"}
               </p>
             </div>
             <div>
@@ -247,7 +248,7 @@ export default function DeliveryDetailPage() {
                 Phone
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.customerPhone || "N/A"}
+                {delivery.order?.customerPhone || delivery.partOrder?.customerPhone || "N/A"}
               </p>
             </div>
             <div>
@@ -258,7 +259,7 @@ export default function DeliveryDetailPage() {
                 Address
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.customerAddress || "N/A"}
+                {delivery.order?.customerAddress || delivery.partOrder?.customerAddress || "N/A"}
               </p>
             </div>
           </div>
@@ -342,105 +343,14 @@ export default function DeliveryDetailPage() {
                 Branch
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.branch ? `${delivery.order.branch.name}, ${delivery.order.branch.city}` : "N/A"}
+                {delivery.order?.branch ? `${delivery.order.branch.name}, ${delivery.order.branch.city}` :
+                 delivery.partOrder?.branch ? `${delivery.partOrder.branch.name}, ${delivery.partOrder.branch.city}` : "N/A"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Delivery Timeline */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Delivery Timeline
-          </h3>
-          <div
-            className="rounded-lg overflow-hidden"
-            style={{ backgroundColor: theme.backgrounds.tertiary }}
-          >
-            <table className="w-full">
-              <thead>
-                <tr
-                  style={{ backgroundColor: theme.backgrounds.primary, borderBottom: `1px solid ${theme.borders.light}` }}
-                >
-                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                    Date
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                    Status
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                    Notes
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                  <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                    —
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                    —
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                    —
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Actions
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {getNextStatuses(delivery.status).map((nextStatus) => (
-              <button
-                key={nextStatus}
-                onClick={() => handleStatusUpdate(nextStatus)}
-                disabled={updating}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: nextStatus === "APPROVED" || nextStatus === "DELIVERED" 
-                    ? theme.accents.primary 
-                    : theme.backgrounds.tertiary,
-                  color: nextStatus === "APPROVED" || nextStatus === "DELIVERED"
-                    ? theme.text.inverse
-                    : theme.text.secondary,
-                  border: nextStatus === "APPROVED" || nextStatus === "DELIVERED"
-                    ? "none"
-                    : `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                {nextStatus.replace(/_/g, " ")}
-              </button>
-            ))}
-            <a
-              href={`tel:${delivery.contactNumber}`}
-              className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 inline-flex items-center"
-              style={{
-                backgroundColor: "#10B981",
-                color: "white",
-              }}
-            >
-              Contact Customer
-            </a>
-          </div>
-        </div>
+        
 
         {/* Notes Modal */}
         {showNotesModal && (
@@ -510,8 +420,11 @@ export default function DeliveryDetailPage() {
             Back to Delivery Queue
           </button>
           <button
-            onClick={() => delivery.order?.id && router.push(`/orders/${delivery.order.id}`)}
-            disabled={!delivery.order?.id}
+            onClick={() => {
+              if (delivery.order?.id) router.push(`/orders/${delivery.order.id}`);
+              else if (delivery.partOrder?.id) router.push(`/part-orders/${delivery.partOrder.id}`);
+            }}
+            disabled={!delivery.order?.id && !delivery.partOrder?.id}
             className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
