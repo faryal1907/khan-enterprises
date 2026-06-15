@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { BikeModelsService } from "./bike-models.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { CreateBikeModelDto } from "./dto/create-bike-model.dto";
 import { UpdateBikeModelDto } from "./dto/update-bike-model.dto";
@@ -35,6 +37,8 @@ export class BikeModelsController {
    * Create a new bike model.
    */
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
   async createBikeModel(
     @Body() data: CreateBikeModelDto,
     @CurrentUser() user: any
@@ -48,6 +52,8 @@ export class BikeModelsController {
    * Update an existing bike model.
    */
   @Put(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
   async updateBikeModel(
     @Param("id") id: string,
     @Body() data: UpdateBikeModelDto,
@@ -62,6 +68,8 @@ export class BikeModelsController {
    * Delete a bike model if not associated with any bikes.
    */
   @Delete(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBikeModel(
     @Param("id") id: string,
@@ -70,5 +78,4 @@ export class BikeModelsController {
     await this.bikeModelsService.deleteBikeModel(id, user);
   }
 }
-// Trigger rebuild
 

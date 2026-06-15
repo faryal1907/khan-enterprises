@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
 import {
   getBikeModels,
   deleteBikeModel,
@@ -19,6 +21,7 @@ export default function ModelsListPage() {
   // Data state
   const [models, setModels] = useState<BikeModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedModel, setSelectedModel] = useState<BikeModel | null>(null);
@@ -27,19 +30,21 @@ export default function ModelsListPage() {
 
   const fetchModels = async () => {
     setLoading(true);
+    setLoadError("");
     try {
       const response = await getBikeModels();
       setModels(response.bikeModels);
     } catch (error) {
       console.error("Failed to fetch models:", error);
-      toast.error("Failed to load bike models");
+      setLoadError(error instanceof Error ? error.message : "Failed to load bike models");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchModels();
+    const timeout = window.setTimeout(() => void fetchModels(), 0);
+    return () => window.clearTimeout(timeout);
   }, []);
 
   const handleDelete = async () => {
@@ -52,9 +57,9 @@ export default function ModelsListPage() {
       setShowDeleteModal(false);
       setSelectedModel(null);
       fetchModels();
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to delete model";
-      if (error.response?.status === 400) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete model";
+      if (message.includes("assigned to")) {
         setErrorModalInfo({ show: true, message, modelId: selectedModel.id });
         setShowDeleteModal(false);
       } else {
@@ -89,16 +94,15 @@ export default function ModelsListPage() {
           >
             Bike Models
           </h1>
-          <Link
-            href="/models/new"
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
-          >
-            Add New Model
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/models/new"
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+            >
+              Add New Model
+            </Link>
+          )}
         </div>
 
         {/* Table */}
@@ -140,6 +144,13 @@ export default function ModelsListPage() {
                     </div>
                   </td>
                 </tr>
+              ) : loadError ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center">
+                    <p className="text-sm mb-4" style={{ color: "red" }}>{loadError}</p>
+                    <AsyncButton onClick={fetchModels}>Retry</AsyncButton>
+                  </td>
+                </tr>
               ) : models.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center">
@@ -167,7 +178,7 @@ export default function ModelsListPage() {
                       Rs {Number(model.basePrice).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex space-x-3">
+                      {isAdmin ? <div className="flex space-x-3">
                         <Link
                           href={`/models/${model.id}/edit`}
                           className="text-sm font-medium transition-colors hover:opacity-70"
@@ -182,7 +193,7 @@ export default function ModelsListPage() {
                         >
                           Delete
                         </button>
-                      </div>
+                      </div> : <span style={{ color: theme.text.muted }}>View only</span>}
                     </td>
                   </tr>
                 ))
@@ -193,20 +204,7 @@ export default function ModelsListPage() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
-                Delete Bike Model
-              </h3>
+          <ActionModal title="Delete Bike Model" onClose={() => !deleting && setShowDeleteModal(false)}>
               <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
                 Are you sure you want to delete the model <strong>{selectedModel?.brand} {selectedModel?.modelName}</strong>? This action cannot be undone. 
                 If this model is associated with any bikes, the deletion will be rejected.
@@ -225,20 +223,11 @@ export default function ModelsListPage() {
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                  style={{
-                    backgroundColor: "red",
-                    color: "white",
-                  }}
-                >
-                  {deleting ? "Deleting..." : "Delete"}
-                </button>
+                <AsyncButton onClick={handleDelete} loading={deleting} loadingLabel="Deleting..." style={{ backgroundColor: "red" }}>
+                  Delete
+                </AsyncButton>
               </div>
-            </div>
-          </div>
+          </ActionModal>
         )}
 
         {/* Error Modal */}
