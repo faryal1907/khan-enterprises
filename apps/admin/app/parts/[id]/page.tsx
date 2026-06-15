@@ -249,7 +249,7 @@ export default function PartDetailPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                      <Link href={`/orders/parts/${order.orderNumber}`} className="hover:underline" style={{ color: theme.accents.primary }}>
+                      <Link href={`/part-orders/${order.id}`} className="hover:underline" style={{ color: theme.accents.primary }}>
                         {order.orderNumber}
                       </Link>
                     </td>

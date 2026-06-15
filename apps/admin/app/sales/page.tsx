@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
@@ -54,48 +54,60 @@ export default function SalesRecordsPage() {
     }
   }, [isAdmin, user?.branchId]);
 
-  // Fetch sales data
-  useEffect(() => {
-    if (!user) return;
-    const fetchSales = async () => {
-      setLoading(true);
-      try {
-        const [ordersRes, partOrdersRes] = await Promise.all([
-          getOrders({
-            branchId: filters.branch,
-            search: filters.search
-          }).catch(() => ({ orders: [] })),
-          getPartOrders({
-            branchId: filters.branch,
-            search: filters.search
-          }).catch(() => ({ orders: [] })),
-        ]);
-        
-        const allOrders = [
-          ...(ordersRes.orders || []).map((o: any) => ({ ...o, type: "BIKE" })),
-          ...(partOrdersRes.orders || []).map((o: any) => ({ ...o, type: "PART" }))
-        ];
-        
-        // Filter out incomplete orders to show only actual sales
-        const completedStatuses = ["PAID", "CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"];
-        let completed = allOrders
-          .filter((o) => completedStatuses.includes(o.status))
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // Stable fetch function
+  const doFetch = useCallback(async (branch: string, search: string, staff: string) => {
+    setLoading(true);
+    try {
+      const [ordersRes, partOrdersRes] = await Promise.all([
+        getOrders({ branchId: branch, search }).catch(() => ({ orders: [] })),
+        getPartOrders({ branchId: branch, search }).catch(() => ({ orders: [] })),
+      ]);
+      
+      const allOrders = [
+        ...(ordersRes.orders || []).map((o: any) => ({ ...o, type: "BIKE" })),
+        ...(partOrdersRes.orders || []).map((o: any) => ({ ...o, type: "PART" }))
+      ];
+      
+      const completedStatuses = ["PAID", "CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"];
+      let completed = allOrders
+        .filter((o) => completedStatuses.includes(o.status) || (o.status === "CANCELLED" && o.transactions?.some((t: any) => t.status === "REFUNDED")))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-        // Client-side staff filter
-        if (filters.staff) {
-          completed = completed.filter((o) => o.processedBy?.id === filters.staff);
-        }
-        
-        setSales(completed);
-      } catch (error) {
-        console.warn("Failed to fetch sales:", error);
-      } finally {
-        setLoading(false);
+      if (staff) {
+        completed = completed.filter((o) => o.processedBy?.id === staff);
       }
+      
+      setSales(completed);
+    } catch (error) {
+      console.warn("Failed to fetch sales:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Keep a ref to current filter values so pageshow handler always uses latest
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+
+  // Fetch on mount and when filters change
+  useEffect(() => {
+    doFetch(filters.branch, filters.search, filters.staff);
+  }, [filters.branch, filters.search, filters.staff, doFetch]);
+
+  // When Next.js restores this page from its client-side cache on browser back button,
+  // the component doesn't remount and useEffects don't re-fire by default.
+  // If the user left while loading=true, it stays stuck forever.
+  // The popstate listener catches browser back/forward and forces a refetch.
+  useEffect(() => {
+    const handlePopState = () => {
+      const f = filtersRef.current;
+      doFetch(f.branch, f.search, f.staff);
     };
-    fetchSales();
-  }, [filters]);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [doFetch]);
+
+
 
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
@@ -280,7 +292,7 @@ export default function SalesRecordsPage() {
 
         {/* Table */}
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <table className="w-full">
@@ -333,7 +345,7 @@ export default function SalesRecordsPage() {
               ) : sales.map((sale) => (
                 <tr 
                   key={sale.id} 
-                  onClick={() => router.push(`/orders/${sale.id}`)}
+                  onClick={() => router.push(sale.type === "PART" ? `/part-orders/${sale.id}` : `/orders/${sale.id}`)}
                   className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                   style={{ borderBottom: `1px solid ${theme.borders.light}` }}
                 >
@@ -362,16 +374,24 @@ export default function SalesRecordsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span
-                      className="inline-block px-2 py-1 text-xs font-medium rounded uppercase"
-                      style={{
-                        backgroundColor: "#22c55e20",
-                        color: "#22c55e",
-                        border: `1px solid #22c55e`,
-                      }}
-                    >
-                      {sale.status.replace(/_/g, " ")}
-                    </span>
+                    {(() => {
+                      const isRefunded = sale.status === "CANCELLED" && sale.transactions?.some((t: any) => t.status === "REFUNDED");
+                      const displayStatus = isRefunded ? "REFUNDED" : sale.status.replace(/_/g, " ");
+                      const statusColor = isRefunded ? "#ef4444" : "#22c55e";
+
+                      return (
+                        <span
+                          className="inline-block px-2 py-1 text-xs font-medium rounded uppercase"
+                          style={{
+                            backgroundColor: `${statusColor}20`,
+                            color: statusColor,
+                            border: `1px solid ${statusColor}`,
+                          }}
+                        >
+                          {displayStatus}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {sale.processedBy?.fullName || "—"}
@@ -380,13 +400,16 @@ export default function SalesRecordsPage() {
                     {new Date(sale.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <a
-                      href={`/orders/${sale.id}`}
-                      className="text-sm font-medium transition-colors hover:opacity-70"
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(sale.type === "PART" ? `/part-orders/${sale.id}` : `/orders/${sale.id}`);
+                      }}
+                      className="text-sm font-medium transition-colors hover:opacity-70 bg-transparent border-none p-0 cursor-pointer"
                       style={{ color: theme.accents.primary }}
                     >
                       View Order
-                    </a>
+                    </button>
                   </td>
                 </tr>
               ))}

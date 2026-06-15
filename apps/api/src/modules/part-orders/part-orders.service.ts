@@ -249,6 +249,7 @@ export class PartOrdersService {
               email: true,
             },
           },
+          transactions: true,
         },
         orderBy: { createdAt: "desc" },
       }),
@@ -480,6 +481,16 @@ export class PartOrdersService {
           quantity: dto.quantity,
           reason: `Manual sale: ${orderNumber}`,
           performedById: user.id,
+        },
+      });
+
+      // 7. Create Payment Transaction
+      await tx.partPaymentTransaction.create({
+        data: {
+          partOrderId: partOrder.id,
+          amount: dto.amount,
+          method: dto.paymentMethod,
+          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
         },
       });
 
