@@ -276,6 +276,9 @@ export class PartOrdersService {
   async updatePartOrderStatus(id: string, status: OrderStatus, user: any) {
     const order = await this.prisma.client.partOrder.findUnique({
       where: { id },
+      include: {
+        partInventory: true,
+      },
     });
 
     if (!order) {
@@ -315,6 +318,32 @@ export class PartOrdersService {
           branch: true,
         },
       });
+
+      // When order is confirmed, deduct the actual inventory quantity
+      if (status === OrderStatus.CONFIRMED && currentStatus === OrderStatus.PAID) {
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            quantity: {
+              decrement: order.quantity,
+            },
+            reservedQuantity: {
+              decrement: order.quantity,
+            },
+          },
+        });
+
+        // Create stock movement record
+        await tx.stockMovement.create({
+          data: {
+            inventoryId: order.partInventoryId,
+            movementType: "STOCK_OUT",
+            quantity: -order.quantity,
+            reason: `Part order confirmed: ${updatedOrder.orderNumber}`,
+            performedById: user.id,
+          },
+        });
+      }
 
       await tx.auditLog.create({
         data: {
