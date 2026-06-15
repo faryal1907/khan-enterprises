@@ -111,11 +111,12 @@ export class InventoryController {
    */
   @Get("parts")
   async getParts(
+    @CurrentUser() user: any,
     @Query("branchId") branchId?: string,
     @Query("search") search?: string,
     @Query("category") category?: string,
   ) {
-    const parts = await this.inventoryService.getAllParts(branchId, search, category);
+    const parts = await this.inventoryService.getAllParts(branchId, search, category, user);
     return { count: parts.length, parts };
   }
 
@@ -137,8 +138,7 @@ export class InventoryController {
    */
   @Get("parts/low-stock")
   async getLowStockItems(@CurrentUser() user: any, @Query("branchId") branchId?: string) {
-    // Enforce branch scoping for SALES_STAFF
-    if (user.role === "SALES_STAFF") {
+    if (user.role !== "ADMIN" && user.branchId) {
       branchId = user.branchId ?? undefined;
     }
     const items = await this.inventoryService.getLowStockItems(branchId);
@@ -150,8 +150,8 @@ export class InventoryController {
    * Returns a single Part with its PartInventory records per branch.
    */
   @Get("parts/:id")
-  async getPartById(@Param("id") id: string) {
-    return this.inventoryService.getPartById(id);
+  async getPartById(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.inventoryService.getPartById(id, user);
   }
 
   /**
@@ -169,7 +169,7 @@ export class InventoryController {
    * Deletes a Part if it has no associated orders.
    */
   @Delete("parts/:id")
-  @Roles("ADMIN", "MANAGER")
+  @Roles("ADMIN")
   async deletePart(@Param("id") id: string, @CurrentUser() user: any) {
     return this.inventoryService.deletePart(id, user);
   }
@@ -179,8 +179,8 @@ export class InventoryController {
    * Returns all PartInventory rows for a given Part.
    */
   @Get("parts/:id/branch-stock")
-  async getBranchStockView(@Param("id") id: string) {
-    return this.inventoryService.getBranchStockView(id);
+  async getBranchStockView(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.inventoryService.getBranchStockView(id, user);
   }
 
   /**
@@ -194,7 +194,7 @@ export class InventoryController {
     @Body() dto: AdjustStockDto,
     @CurrentUser() user: any,
   ) {
-    return this.inventoryService.adjustStock(inventoryId, dto, user.id);
+    return this.inventoryService.adjustStock(inventoryId, dto, user);
   }
 
   /**
@@ -217,6 +217,7 @@ export class InventoryController {
   @Get("parts/:inventoryId/movements")
   async getStockMovements(
     @Param("inventoryId") inventoryId: string,
+    @CurrentUser() user: any,
     @Query("page") page: string = "1",
     @Query("limit") limit: string = "20",
   ) {
@@ -224,6 +225,7 @@ export class InventoryController {
       inventoryId,
       parseInt(page),
       parseInt(limit),
+      user,
     );
   }
 }

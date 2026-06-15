@@ -10,11 +10,11 @@ import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
-import { AuditAction, BikeStatus, OfferStatus, OrderStatus } from "@khan/prisma";
+import { AuditAction, BikeStatus, InventoryMovementType, OfferStatus, OrderStatus, UserRole } from "@khan/prisma";
 
 type InventoryUser = {
   id: string;
-  role: string;
+  role: UserRole;
   branchId: string | null;
 };
 
@@ -406,8 +406,9 @@ export class InventoryService {
   }
 
   /** Return all part inventory records with part details and branch info. */
-  async getAllParts(branchId?: string, search?: string, category?: string) {
+  async getAllParts(branchId?: string, search?: string, category?: string, user?: InventoryUser) {
     const where: any = {};
+    if (user?.role !== "ADMIN" && user?.branchId) branchId = user.branchId;
     if (branchId) where.branchId = branchId;
     if (search || category) {
       where.part = {};
@@ -448,6 +449,7 @@ export class InventoryService {
 
   /** Create a new Part and PartInventory atomically using prisma.$transaction(). */
   async createPart(dto: CreatePartDto, user: any) {
+    this.assertBranchAccess(dto.branchId, user);
     // Check SKU uniqueness
     const existingSku = await this.prisma.client.part.findUnique({
       where: { sku: dto.sku },
@@ -504,11 +506,12 @@ export class InventoryService {
   }
 
   /** Fetch a single Part with its PartInventory records per branch. */
-  async getPartById(id: string) {
+  async getPartById(id: string, user?: InventoryUser) {
     const part = await this.prisma.client.part.findUnique({
       where: { id },
       include: {
         inventories: {
+          where: user?.role !== "ADMIN" && user?.branchId ? { branchId: user.branchId } : undefined,
           include: {
             branch: true,
           },
@@ -519,13 +522,16 @@ export class InventoryService {
     if (!part) {
       throw new NotFoundException(`Part with ID ${id} not found`);
     }
+    if (user?.role !== UserRole.ADMIN && user?.branchId && part.inventories.length === 0) {
+      throw new NotFoundException(`Part with ID ${id} not found`);
+    }
 
     return part;
   }
 
   /** Update Part metadata (name, sku, price, etc.). */
   async updatePart(id: string, dto: UpdatePartDto, user: any) {
-    const oldPart = await this.getPartById(id);
+    const oldPart = await this.getPartById(id, user);
 
     // Check SKU uniqueness if being updated
     if (dto.sku) {
@@ -576,7 +582,7 @@ export class InventoryService {
 
   /** Delete a Part. Fails if the part is referenced by any PartOrder. */
   async deletePart(id: string, user: any) {
-    const oldPart = await this.getPartById(id);
+    const oldPart = await this.getPartById(id, user);
 
     // Check if there are any PartOrders linked to this part.
     // If there are, we cannot safely delete it.
@@ -630,12 +636,27 @@ export class InventoryService {
   }
 
   /** Update quantity by signed delta AND create StockMovement record with performedById, reason, and movementType — all in one transaction. */
-  async adjustStock(inventoryId: string, dto: AdjustStockDto, userId?: string) {
+  async adjustStock(inventoryId: string, dto: AdjustStockDto, user: InventoryUser) {
     const inventory = await this.prisma.client.partInventory.findUnique({
       where: { id: inventoryId },
     });
     if (!inventory) {
       throw new NotFoundException(`PartInventory with ID ${inventoryId} not found`);
+    }
+    this.assertBranchAccess(inventory.branchId, user);
+    if (dto.quantity === 0) {
+      throw new BadRequestException("Stock adjustment quantity cannot be zero.");
+    }
+    if (dto.movementType === InventoryMovementType.STOCK_IN && dto.quantity < 0) {
+      throw new BadRequestException("STOCK_IN quantity must be positive.");
+    }
+    if (dto.movementType === InventoryMovementType.STOCK_OUT && dto.quantity > 0) {
+      throw new BadRequestException("STOCK_OUT quantity must be negative.");
+    }
+    if (inventory.quantity + dto.quantity < inventory.reservedQuantity) {
+      throw new BadRequestException(
+        `Adjustment would reduce stock below the reserved quantity. Available to remove: ${inventory.quantity - inventory.reservedQuantity}`,
+      );
     }
 
     return this.prisma.client.$transaction(async (tx) => {
@@ -658,24 +679,23 @@ export class InventoryService {
           movementType: dto.movementType,
           quantity: dto.quantity,
           reason: dto.reason,
-          performedById: userId,
+          performedById: user.id,
         },
         include: {
           performedBy: true,
         },
       });
 
-      if (userId) {
-        await tx.auditLog.create({
-          data: {
-            userId: userId,
-            action: AuditAction.UPDATE,
-            entityType: "PART_INVENTORY",
-            entityId: inventoryId,
-            newValue: JSON.stringify(dto),
-          },
-        });
-      }
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_INVENTORY",
+          entityId: inventoryId,
+          newValue: JSON.stringify(dto),
+        },
+      });
 
       return { inventory: updatedInventory, movement: stockMovement };
     });
@@ -686,6 +706,7 @@ export class InventoryService {
     if (dto.fromBranchId === dto.toBranchId) {
       throw new BadRequestException("Source and destination branches cannot be the same");
     }
+    this.assertBranchAccess(dto.fromBranchId, user);
 
     return this.prisma.client.$transaction(async (tx) => {
       // 1. Get source inventory
@@ -702,8 +723,14 @@ export class InventoryService {
         throw new NotFoundException(`Source inventory not found for part ${dto.partId} in branch ${dto.fromBranchId}`);
       }
 
-      if (sourceInventory.quantity < dto.quantity) {
-        throw new BadRequestException(`Insufficient stock in source branch. Available: ${sourceInventory.quantity}`);
+      const availableQuantity = sourceInventory.quantity - sourceInventory.reservedQuantity;
+      if (availableQuantity < dto.quantity) {
+        throw new BadRequestException(`Insufficient unreserved stock in source branch. Available: ${availableQuantity}`);
+      }
+
+      const destinationBranch = await tx.branch.findUnique({ where: { id: dto.toBranchId } });
+      if (!destinationBranch) {
+        throw new NotFoundException(`Destination branch with ID ${dto.toBranchId} not found`);
       }
 
       // 2. Decrement source inventory
@@ -769,13 +796,14 @@ export class InventoryService {
   }
 
   /** Paginated movement history for a PartInventory. */
-  async getStockMovements(inventoryId: string, page: number = 1, limit: number = 20) {
+  async getStockMovements(inventoryId: string, page: number = 1, limit: number = 20, user?: InventoryUser) {
     const inventory = await this.prisma.client.partInventory.findUnique({
       where: { id: inventoryId },
     });
     if (!inventory) {
       throw new NotFoundException(`PartInventory with ID ${inventoryId} not found`);
     }
+    this.assertBranchAccess(inventory.branchId, user);
 
     const skip = (page - 1) * limit;
 
@@ -842,16 +870,25 @@ export class InventoryService {
   }
 
   /** Return all PartInventory rows for a given Part. */
-  async getBranchStockView(partId: string) {
-    const part = await this.getPartById(partId);
+  async getBranchStockView(partId: string, user?: InventoryUser) {
+    await this.getPartById(partId, user);
 
     return this.prisma.client.partInventory.findMany({
-      where: { partId },
+      where: {
+        partId,
+        ...(user?.role !== "ADMIN" && user?.branchId ? { branchId: user.branchId } : {}),
+      },
       include: {
         branch: true,
         part: true,
       },
       orderBy: { quantity: "desc" },
     });
+  }
+
+  private assertBranchAccess(branchId: string, user?: InventoryUser) {
+    if (user?.role !== "ADMIN" && user?.branchId && user.branchId !== branchId) {
+      throw new NotFoundException("Inventory not found");
+    }
   }
 }
