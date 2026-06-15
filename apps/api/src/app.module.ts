@@ -15,6 +15,8 @@ import { OrdersModule } from "./modules/orders/orders.module";
 import { PartOrdersModule } from "./modules/part-orders/part-orders.module";
 import { DeliveriesModule } from "./modules/deliveries/deliveries.module";
 import { SchedulerModule } from "./modules/scheduler/scheduler.module";
+import { PdfModule } from "./modules/pdf/pdf.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { SchedulerModule } from "./modules/scheduler/scheduler.module";
     PartOrdersModule,
     DeliveriesModule,
     SchedulerModule,
+    PdfModule,
+    DashboardModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute

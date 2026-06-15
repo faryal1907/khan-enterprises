@@ -1,4 +1,4 @@
-import { IsEnum, IsUUID, IsOptional, IsInt, Min } from "class-validator";
+import { IsEnum, IsString, IsOptional, IsInt, Min } from "class-validator";
 import { Type } from "class-transformer";
 import { OfferStatus } from "@khan/prisma";
 
@@ -7,7 +7,7 @@ export class QueryOffersDto {
   @IsOptional()
   status?: OfferStatus;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   bikeId?: string;
 

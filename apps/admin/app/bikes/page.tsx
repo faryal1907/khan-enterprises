@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -20,10 +22,12 @@ export default function BikesListPage() {
   const isManager = user?.role === UserRole.MANAGER;
   const isStaff = user?.role === "SALES_STAFF";
 
+  const searchParams = useSearchParams();
+
   const [filters, setFilters] = useState({
     branch: "",
     status: "",
-    model: "",
+    model: searchParams.get("model") || "",
     vendor: "",
     search: "",
   });
@@ -120,7 +124,7 @@ export default function BikesListPage() {
 
     try {
       await transferBike(selectedBike.id, transferBranchId);
-      alert("Bike transferred successfully");
+      toast.success("Bike transferred successfully");
       setShowTransferModal(false);
       setTransferBranchId("");
       setSelectedBike(null);
@@ -135,7 +139,7 @@ export default function BikesListPage() {
       setBikes(response.bikes);
     } catch (error) {
       console.error("Failed to transfer bike:", error);
-      alert("Failed to transfer bike");
+      toast.error("Failed to transfer bike");
     }
   };
 
@@ -146,7 +150,7 @@ export default function BikesListPage() {
 
     try {
       await updateBikeStatus(selectedBike.id, statusValue);
-      alert("Status updated successfully");
+      toast.success("Status updated successfully");
       setShowStatusModal(false);
       setStatusValue("");
       setSelectedBike(null);
@@ -161,7 +165,7 @@ export default function BikesListPage() {
       setBikes(response.bikes);
     } catch (error) {
       console.error("Failed to update status:", error);
-      alert("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
 

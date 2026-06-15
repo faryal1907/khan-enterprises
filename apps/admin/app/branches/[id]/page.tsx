@@ -69,8 +69,10 @@ export default function BranchDetailPage() {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [managers, setManagers] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     city: "",
@@ -89,7 +91,8 @@ export default function BranchDetailPage() {
     }
   }, [user, router]);
 
-  // Role check: Manager can only view their own branch
+  // Role check: Manager scoped to a branch can only view their own branch.
+  // Global managers (no branchId) can view any branch.
   useEffect(() => {
     if (isManager && user?.branchId && branchId !== user.branchId) {
       router.push("/branches");
@@ -97,6 +100,10 @@ export default function BranchDetailPage() {
   }, [isManager, user?.branchId, branchId, router]);
 
   useEffect(() => {
+    // Don't fetch until user is loaded, and don't attempt if manager is on wrong branch
+    if (!user) return;
+    if (isManager && user.branchId && branchId !== user.branchId) return;
+
     const fetchData = async () => {
       try {
         const [branchRes, metricsRes] = await Promise.all([
@@ -112,19 +119,26 @@ export default function BranchDetailPage() {
           phoneNumber: branchRes.data.branch.phoneNumber,
           managerId: branchRes.data.branch.manager?.id || "",
         });
+
+        if (isAdmin) {
+          const usersRes = await api.get("/auth/users");
+          const managerUsers = usersRes.data.users.filter((u: any) => u.role === "MANAGER");
+          setManagers(managerUsers);
+        }
       } catch (err) {
         setError("Failed to load branch details");
-        console.error(err);
+        console.warn(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [branchId]);
+  }, [branchId, user?.id]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUpdating(true);
     try {
       const updateData: any = {
         name: formData.name,
@@ -138,13 +152,18 @@ export default function BranchDetailPage() {
         updateData.managerId = null;
       }
 
-      const res = await api.put(`/branches/${branchId}`, updateData);
-      setBranch(res.data);
+      await api.patch(`/branches/${branchId}`, updateData);
+      
+      const res = await api.get(`/branches/${branchId}`);
+      setBranch(res.data.branch);
       setIsEditing(false);
       toast.success("Branch updated successfully");
     } catch (err) {
-      console.error("Failed to update branch:", err);
+      console.error(err);
+      setError("Failed to update branch details");
       toast.error("Failed to update branch");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -302,22 +321,46 @@ export default function BranchDetailPage() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+                    Manager
+                  </label>
+                  <select
+                    value={formData.managerId}
+                    onChange={(e) => setFormData({ ...formData, managerId: e.target.value })}
+                    className="w-full px-3 py-2 text-sm rounded"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                    }}
+                  >
+                    <option value="">No Manager</option>
+                    {managers.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.fullName} ({m.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className="mt-4 flex gap-2">
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium rounded"
+                  disabled={updating}
+                  className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
                   style={{
                     backgroundColor: theme.accents.primary,
                     color: theme.text.inverse,
                   }}
                 >
-                  Save Changes
+                  {updating ? "Saving..." : "Save Changes"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 text-sm font-medium rounded"
+                  disabled={updating}
+                  className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     color: theme.text.secondary,
@@ -336,7 +379,7 @@ export default function BranchDetailPage() {
               <Info label="Address" value={branch.address} />
               <Info label="Phone Number" value={branch.phoneNumber} />
               <Info label="Manager" value={branch.manager ? branch.manager.fullName : "—"} />
-              <Info label="Staff Count" value={branch._count.orders.toString()} />
+              <Info label="Staff Count" value={branch.users.length.toString()} />
               <Info label="Created At" value={new Date(branch.createdAt).toLocaleString()} />
             </div>
           )}

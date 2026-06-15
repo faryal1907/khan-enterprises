@@ -2,7 +2,7 @@ import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEmail, IsNumber, Min, IsEnu
 import { PaymentMethod } from "@khan/prisma";
 
 export class CreateOfferDto {
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   bikeId: string;
 
@@ -38,7 +38,7 @@ export class CreateOfferDto {
   @IsOptional()
   paymentMethod?: PaymentMethod;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   userId?: string;
 }

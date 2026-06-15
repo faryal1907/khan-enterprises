@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import { getOrders, getPartOrders } from "@/lib/api/orders";
 
 export default function SalesRecordsPage() {
   const { user } = useAuthStore();
@@ -17,6 +18,35 @@ export default function SalesRecordsPage() {
     search: "",
   });
 
+  const [sales, setSales] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [staffList, setStaffList] = useState<any[]>([]);
+
+  // Fetch branches
+  useEffect(() => {
+    if (!user) return;
+    import("@/lib/api/inventory").then(({ getBranches }) => {
+      getBranches().then((data: any) => setBranches(data.branches || [])).catch(console.warn);
+    }).catch(console.warn);
+  }, [user?.id]);
+
+  // Fetch staff list (only admins and managers can access /auth/users)
+  useEffect(() => {
+    if (!user) return;
+    if (!isAdmin && user?.role !== UserRole.MANAGER) return;
+    import("@/lib/api-client").then(({ api }) => {
+      api.get("/auth/users")
+        .then((res: any) => {
+          const salesStaff = (res.data.users || []).filter(
+            (u: any) => u.role === "SALES_STAFF" || u.role === "MANAGER"
+          );
+          setStaffList(salesStaff);
+        })
+        .catch(console.warn);
+    });
+  }, [isAdmin, user?.role, user?.id]);
+
   // Set branch filter to user's branch if not admin
   useEffect(() => {
     if (!isAdmin && user?.branchId) {
@@ -24,12 +54,93 @@ export default function SalesRecordsPage() {
     }
   }, [isAdmin, user?.branchId]);
 
+  // Fetch sales data
+  useEffect(() => {
+    if (!user) return;
+    const fetchSales = async () => {
+      setLoading(true);
+      try {
+        const [ordersRes, partOrdersRes] = await Promise.all([
+          getOrders({
+            branchId: filters.branch,
+            search: filters.search
+          }).catch(() => ({ orders: [] })),
+          getPartOrders({
+            branchId: filters.branch,
+            search: filters.search
+          }).catch(() => ({ orders: [] })),
+        ]);
+        
+        const allOrders = [
+          ...(ordersRes.orders || []).map((o: any) => ({ ...o, type: "BIKE" })),
+          ...(partOrdersRes.orders || []).map((o: any) => ({ ...o, type: "PART" }))
+        ];
+        
+        // Filter out incomplete orders to show only actual sales
+        const completedStatuses = ["PAID", "CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"];
+        let completed = allOrders
+          .filter((o) => completedStatuses.includes(o.status))
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        // Client-side staff filter
+        if (filters.staff) {
+          completed = completed.filter((o) => o.processedBy?.id === filters.staff);
+        }
+        
+        setSales(completed);
+      } catch (error) {
+        console.warn("Failed to fetch sales:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSales();
+  }, [filters]);
+
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
     if (key === "branch" && !isAdmin) {
       return;
     }
     setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleExportCSV = () => {
+    const headers = [
+      "Order Number",
+      "Customer",
+      "Items",
+      "Total (Rs)",
+      "Source",
+      "Status",
+      "Staff",
+      "Date",
+    ];
+
+    const csvRows = sales.map((sale) => [
+      sale.orderNumber,
+      `"${sale.customerName}"`,
+      `"${sale.type === "BIKE" ? `${sale.bike?.model?.brand} ${sale.bike?.model?.modelName}` : `${sale.part?.name} (x${sale.quantity})`}"`,
+      sale.negotiatedAmount || sale.totalAmount || sale.amount || 0,
+      sale.type,
+      sale.status,
+      `"${sale.processedBy?.fullName || ""}"`,
+      new Date(sale.createdAt).toLocaleDateString(),
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...csvRows.map((row) => row.join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `sales_export_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -107,8 +218,11 @@ export default function SalesRecordsPage() {
                 }}
               >
                 <option value="">All Staff</option>
-                <option value="1">Staff Member 1</option>
-                <option value="2">Staff Member 2</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.fullName} ({s.role.replace(/_/g, " ")})
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -131,8 +245,9 @@ export default function SalesRecordsPage() {
                 }}
               >
                 <option value="">All Branches</option>
-                <option value="1">Islamabad HQ</option>
-                <option value="2">Tordher Branch</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
               </select>
               {!isAdmin && (
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
@@ -203,59 +318,78 @@ export default function SalesRecordsPage() {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span
-                    className="inline-block px-2 py-1 text-xs font-medium rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    —
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span
-                    className="inline-block px-2 py-1 text-xs font-medium rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    —
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  —
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <a
-                    href="/orders/1"
-                    className="text-sm font-medium transition-colors hover:opacity-70"
-                    style={{ color: theme.accents.primary }}
-                  >
-                    View Order
-                  </a>
-                </td>
-              </tr>
+              {loading ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                    Loading sales records...
+                  </td>
+                </tr>
+              ) : sales.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                    No completed sales found
+                  </td>
+                </tr>
+              ) : sales.map((sale) => (
+                <tr 
+                  key={sale.id} 
+                  onClick={() => router.push(`/orders/${sale.id}`)}
+                  className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  style={{ borderBottom: `1px solid ${theme.borders.light}` }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                    {sale.orderNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {sale.customerName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {sale.type === "BIKE" ? `${sale.bike?.model?.brand} ${sale.bike?.model?.modelName}` : `${sale.part?.name} (x${sale.quantity})`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    Rs. {(sale.negotiatedAmount || sale.totalAmount || sale.amount || 0).toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span
+                      className="inline-block px-2 py-1 text-xs font-medium rounded"
+                      style={{
+                        backgroundColor: theme.backgrounds.tertiary,
+                        color: theme.text.secondary,
+                        border: `1px solid ${theme.borders.medium}`,
+                      }}
+                    >
+                      {sale.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span
+                      className="inline-block px-2 py-1 text-xs font-medium rounded uppercase"
+                      style={{
+                        backgroundColor: "#22c55e20",
+                        color: "#22c55e",
+                        border: `1px solid #22c55e`,
+                      }}
+                    >
+                      {sale.status.replace(/_/g, " ")}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {sale.processedBy?.fullName || "—"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {new Date(sale.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <a
+                      href={`/orders/${sale.id}`}
+                      className="text-sm font-medium transition-colors hover:opacity-70"
+                      style={{ color: theme.accents.primary }}
+                    >
+                      View Order
+                    </a>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -263,7 +397,9 @@ export default function SalesRecordsPage() {
         {/* Export CSV */}
         <div className="flex justify-end mt-4">
           <button
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            onClick={handleExportCSV}
+            disabled={sales.length === 0}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: theme.backgrounds.tertiary,
               color: theme.text.secondary,

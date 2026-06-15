@@ -30,17 +30,20 @@ type User = {
 
 export default function UsersPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userToDeactivate, setUserToDeactivate] = useState<string | null>(null);
+  const [userToActivate, setUserToActivate] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Role check: Admin only
   useEffect(() => {
-    if (user && user.role !== UserRole.ADMIN) {
+    if (currentUser && currentUser.role !== UserRole.ADMIN) {
       router.push("/");
     }
-  }, [user, router]);
+  }, [currentUser, router]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -58,33 +61,37 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  const handleDeactivate = async (userId: string) => {
-    if (!confirm("Are you sure you want to deactivate this user?")) {
-      return;
-    }
+  const confirmDeactivate = async () => {
+    if (!userToDeactivate) return;
+    setIsProcessing(true);
 
     try {
-      await api.delete(`/auth/users/${userId}`);
-      setUsers(users.map((u) => u.id === userId ? { ...u, status: "DEACTIVATED" } : u));
+      await api.delete(`/auth/users/${userToDeactivate}`);
+      setUsers(users.map((u) => u.id === userToDeactivate ? { ...u, status: "INACTIVE" } : u));
       toast.success("User deactivated successfully");
     } catch (err) {
       console.error("Failed to deactivate user:", err);
       toast.error("Failed to deactivate user");
+    } finally {
+      setIsProcessing(false);
+      setUserToDeactivate(null);
     }
   };
 
-  const handleActivate = async (userId: string) => {
-    if (!confirm("Are you sure you want to activate this user?")) {
-      return;
-    }
+  const confirmActivate = async () => {
+    if (!userToActivate) return;
+    setIsProcessing(true);
 
     try {
-      await api.post(`/auth/users/${userId}/activate`);
-      setUsers(users.map((u) => u.id === userId ? { ...u, status: "ACTIVE" } : u));
+      await api.post(`/auth/users/${userToActivate}/activate`);
+      setUsers(users.map((u) => u.id === userToActivate ? { ...u, status: "ACTIVE" } : u));
       toast.success("User activated successfully");
     } catch (err) {
       console.error("Failed to activate user:", err);
       toast.error("Failed to activate user");
+    } finally {
+      setIsProcessing(false);
+      setUserToActivate(null);
     }
   };
 
@@ -226,9 +233,16 @@ export default function UsersPage() {
                             View
                           </button>
                         </Link>
-                        {user.status === "ACTIVE" ? (
+                        {user.id === currentUser?.id ? (
+                          <span 
+                            className="text-xs italic ml-4"
+                            style={{ color: theme.text.muted }}
+                          >
+                            Current User
+                          </span>
+                        ) : user.status === "ACTIVE" ? (
                           <button
-                            onClick={() => handleDeactivate(user.id)}
+                            onClick={() => setUserToDeactivate(user.id)}
                             className="font-medium hover:opacity-70 ml-4"
                             style={{ color: theme.accents.secondary }}
                           >
@@ -236,7 +250,7 @@ export default function UsersPage() {
                           </button>
                         ) : (
                           <button
-                            onClick={() => handleActivate(user.id)}
+                            onClick={() => setUserToActivate(user.id)}
                             className="font-medium hover:opacity-70 ml-4"
                             style={{ color: theme.accents.tertiary }}
                           >
@@ -252,6 +266,106 @@ export default function UsersPage() {
           </table>
         </div>
       </div>
+
+      {/* Deactivate Confirmation Modal */}
+      {userToDeactivate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !isProcessing && setUserToDeactivate(null)}
+          ></div>
+          <div
+            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
+            style={{
+              backgroundColor: theme.backgrounds.primary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
+              Confirm Deactivation
+            </h3>
+            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+              Are you sure you want to deactivate this user? They will immediately lose access to the system.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setUserToDeactivate(null)}
+                disabled={isProcessing}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeactivate}
+                disabled={isProcessing}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: "#fff",
+                  opacity: isProcessing ? 0.7 : 1,
+                }}
+              >
+                {isProcessing ? "Processing..." : "Deactivate User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activate Confirmation Modal */}
+      {userToActivate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !isProcessing && setUserToActivate(null)}
+          ></div>
+          <div
+            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
+            style={{
+              backgroundColor: theme.backgrounds.primary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
+              Confirm Activation
+            </h3>
+            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+              Are you sure you want to activate this user? They will be granted access to the system based on their role.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setUserToActivate(null)}
+                disabled={isProcessing}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmActivate}
+                disabled={isProcessing}
+                className="px-4 py-2 text-sm font-medium rounded"
+                style={{
+                  backgroundColor: theme.accents.primary,
+                  color: "#fff",
+                  opacity: isProcessing ? 0.7 : 1,
+                }}
+              >
+                {isProcessing ? "Processing..." : "Activate User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { UserRole, OrderStatus, Order } from "@/lib/types";
 import { getBranches } from "@/lib/api/inventory";
 import { getOrders as fetchOrders, getPartOrders as fetchPartOrders } from "@/lib/api/orders";
+import { toast } from "sonner";
 
 export default function OrdersListPage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function OrdersListPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"BIKE" | "PART">("BIKE");
 
   // Fetch branches on load
   useEffect(() => {
@@ -44,24 +46,18 @@ export default function OrdersListPage() {
     }
   }, [isAdmin, user?.branchId]);
 
-  // Fetch orders when filters change
+  // Fetch orders when filters or tab change
   useEffect(() => {
     const fetchOrdersData = async () => {
       setLoading(true);
       try {
-        const [bikesRes, partsRes] = await Promise.all([
-          fetchOrders(filters).catch(() => ({ orders: [] })),
-          fetchPartOrders(filters).catch(() => ({ orders: [] }))
-        ]);
-        
-        const bikes = (bikesRes.orders || []).map((o: any) => ({ ...o, type: "BIKE" }));
-        const parts = (partsRes.orders || []).map((o: any) => ({ ...o, type: "PART" }));
-        
-        const merged = [...bikes, ...parts].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        
-        setOrders(merged);
+        if (activeTab === "BIKE") {
+          const res = await fetchOrders(filters).catch(() => ({ orders: [] }));
+          setOrders((res.orders || []).map((o: any) => ({ ...o, type: "BIKE" })));
+        } else {
+          const res = await fetchPartOrders(filters).catch(() => ({ orders: [] }));
+          setOrders((res.orders || []).map((o: any) => ({ ...o, type: "PART" })));
+        }
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -69,7 +65,7 @@ export default function OrdersListPage() {
       }
     };
     fetchOrdersData();
-  }, [filters]);
+  }, [filters, activeTab]);
 
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
@@ -115,6 +111,30 @@ export default function OrdersListPage() {
           <p style={{ color: theme.text.secondary }}>
             Manage customer orders and payments
           </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex space-x-6 mb-6 border-b" style={{ borderColor: theme.borders.light }}>
+          <button
+            onClick={() => setActiveTab("BIKE")}
+            className="px-2 py-3 text-sm font-medium border-b-2 transition-colors"
+            style={{
+              borderColor: activeTab === "BIKE" ? theme.accents.primary : "transparent",
+              color: activeTab === "BIKE" ? theme.text.primary : theme.text.secondary,
+            }}
+          >
+            Bike Orders
+          </button>
+          <button
+            onClick={() => setActiveTab("PART")}
+            className="px-2 py-3 text-sm font-medium border-b-2 transition-colors"
+            style={{
+              borderColor: activeTab === "PART" ? theme.accents.primary : "transparent",
+              color: activeTab === "PART" ? theme.text.primary : theme.text.secondary,
+            }}
+          >
+            Part Orders
+          </button>
         </div>
 
         {/* Filters */}
@@ -259,9 +279,6 @@ export default function OrdersListPage() {
                   Customer Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Item
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
@@ -303,7 +320,7 @@ export default function OrdersListPage() {
                       if ((order as any).type === "BIKE") {
                         router.push(`/orders/${order.id}`);
                       } else {
-                        alert("Part order details page not yet implemented");
+                        router.push(`/part-orders/${order.id}`);
                       }
                     }}
                     className="hover:opacity-80"
@@ -313,11 +330,6 @@ export default function OrdersListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {order.customerName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                      <span className="px-2 py-1 text-xs rounded uppercase" style={{ backgroundColor: (order as any).type === "BIKE" ? theme.accents.tertiary : theme.accents.primary, color: theme.text.inverse }}>
-                        {(order as any).type}
-                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {(order as any).type === "BIKE" ? `${order.bike?.model?.brand} ${order.bike?.model?.modelName}` : `${(order as any).part?.name} (x${(order as any).quantity})`}

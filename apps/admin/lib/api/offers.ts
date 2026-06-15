@@ -31,7 +31,7 @@ export async function rejectOffer(id: string, data: { adminResponse: string }) {
 
 export async function counterOffer(
   id: string,
-  data: { counterAmount: number; adminResponse: string },
+  data: { counterAmount: number; adminResponse?: string },
 ) {
   const response = await api.post(`/offers/${id}/counter`, data);
   return response.data;

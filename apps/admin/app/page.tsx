@@ -2,9 +2,26 @@
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { theme } from "@/lib/colors";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api-client";
+import Link from "next/link";
 
 export default function Dashboard() {
   const { user } = useAuthStore();
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchStats() {
+      if (!user) return;
+      try {
+        const response = await api.get("/dashboard/stats");
+        setStats(response.data);
+      } catch (error) {
+        console.warn("Error fetching stats:", error);
+      }
+    }
+    fetchStats();
+  }, [user]);
 
   if (!user) return null;
 
@@ -47,86 +64,91 @@ export default function Dashboard() {
         </div>
 
         {/* Sales Staff Dashboard */}
-        {isStaff && <SalesStaffDashboard />}
+        {isStaff && <SalesStaffDashboard stats={stats} />}
 
         {/* Branch Manager Dashboard */}
-        {isManager && <BranchManagerDashboard />}
+        {isManager && <BranchManagerDashboard stats={stats} />}
 
         {/* Admin Dashboard */}
-        {isAdmin && <AdminDashboard />}
+        {isAdmin && <AdminDashboard stats={stats} />}
       </div>
     </div>
   );
 }
 
-function SalesStaffDashboard() {
+function SalesStaffDashboard({ stats }: { stats: any }) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/deliveries"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Pending Deliveries
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
-            —
+            {stats?.pendingDeliveries ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/bikes"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Available Bikes
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
+            {stats?.availableBikes ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/parts"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Available Parts
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
+            {stats?.availableParts ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/offers"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Pending Sales
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            —
+            {stats?.pendingSales ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/offers"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Alerts
+            Offers
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
+            {stats?.pendingSales ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
     </>
   );
 }
 
-function BranchManagerDashboard() {
+function BranchManagerDashboard({ stats }: { stats: any }) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -138,99 +160,106 @@ function BranchManagerDashboard() {
             Branch Revenue
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            —
+            {stats ? `Rs ${stats.branchRevenue.toLocaleString()}` : "—"}
           </p>
         </div>
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/sales"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Bikes Sold
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
+            {stats?.bikesSold ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/bikes"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Available Bikes
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
+            {stats?.availableBikes ?? "—"}
             </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/parts"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Available Parts
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
+            {stats?.availableParts ?? "—"}
             </p>
-        </div>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/orders"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Orders Waiting Payment
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
+            {stats?.ordersWaitingPayment ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/deliveries"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Pending Deliveries
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
+            {stats?.pendingDeliveries ?? "—"}
             </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/orders?status=CANCELLED"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Issues
+            Cancelled Orders
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
+            {stats?.issues ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
     </>
   );
 }
 
-function AdminDashboard() {
+function AdminDashboard({ stats }: { stats: any }) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/offers"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Pending Orders
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            —
+            {stats?.pendingOrders ?? "—"}
           </p>
-        </div>
+        </Link>
         <div
           className="rounded-lg p-4"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -239,56 +268,60 @@ function AdminDashboard() {
             Total Sales
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
+            {stats ? `Rs ${stats.totalSales.toLocaleString()}` : "—"}
           </p>
         </div>
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/parts"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Available Parts
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            —
+            {stats?.availableParts ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/bikes"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Available Bikes
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
-            —
+            {stats?.availableBikes ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div
-          className="rounded-lg p-4"
+        <Link
+          href="/parts"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Low Stock Alerts
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            —
+            {stats?.lowStockAlerts ?? "—"}
           </p>
-        </div>
-        <div
-          className="rounded-lg p-4"
+        </Link>
+        <Link
+          href="/deliveries"
+          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <p className="text-sm" style={{ color: theme.text.secondary }}>
             Pending Deliveries
           </p>
           <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
-            —
+            {stats?.pendingDeliveries ?? "—"}
           </p>
-        </div>
+        </Link>
       </div>
     </>
   );

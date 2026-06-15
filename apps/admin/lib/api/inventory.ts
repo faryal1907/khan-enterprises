@@ -4,7 +4,15 @@ import { api } from "../api-client";
 // BIKES
 // ============================================================================
 
-export async function getBikes(params?: { branchId?: string }) {
+export async function getBikes(params?: {
+  branchId?: string;
+  search?: string;
+  status?: string;
+  modelId?: string;
+  vendorId?: string;
+  page?: number;
+  limit?: number;
+}) {
   const response = await api.get("/inventory/bikes", { params });
   return response.data;
 }
@@ -26,6 +34,11 @@ export async function createBike(data: {
   media?: string[];
 }) {
   const response = await api.post("/inventory/bikes", data);
+  return response.data;
+}
+
+export async function deleteBike(id: string) {
+  const response = await api.delete(`/inventory/bikes/${id}`);
   return response.data;
 }
 
@@ -69,7 +82,7 @@ export async function attachDocument(
 // PARTS
 // ============================================================================
 
-export async function getParts(params?: { branchId?: string }) {
+export async function getParts(params?: { branchId?: string; search?: string }) {
   const response = await api.get("/inventory/parts", { params });
   return response.data;
 }
@@ -107,6 +120,11 @@ export async function updatePart(
   return response.data;
 }
 
+export async function deletePart(id: string) {
+  const response = await api.delete(`/inventory/parts/${id}`);
+  return response.data;
+}
+
 export async function adjustStock(
   inventoryId: string,
   data: {
@@ -116,6 +134,16 @@ export async function adjustStock(
   },
 ) {
   const response = await api.post(`/inventory/parts/${inventoryId}/adjust-stock`, data);
+  return response.data;
+}
+
+export async function transferPart(data: {
+  partId: string;
+  fromBranchId: string;
+  toBranchId: string;
+  quantity: number;
+}) {
+  const response = await api.post(`/inventory/parts/transfer`, data);
   return response.data;
 }
 
@@ -169,5 +197,44 @@ export async function getVendors() {
 
 export async function getBikeModels() {
   const response = await api.get("/bike-models");
+  return response.data;
+}
+
+export async function getBikeModelById(id: string) {
+  const response = await api.get(`/bike-models/${id}`);
+  return response.data;
+}
+
+export async function createBikeModel(data: {
+  brand: string;
+  modelName: string;
+  year: number;
+  engineCapacity?: string;
+  color?: string;
+  description?: string;
+  basePrice: number;
+}) {
+  const response = await api.post("/bike-models", data);
+  return response.data;
+}
+
+export async function updateBikeModel(
+  id: string,
+  data: {
+    brand?: string;
+    modelName?: string;
+    year?: number;
+    engineCapacity?: string;
+    color?: string;
+    description?: string;
+    basePrice?: number;
+  }
+) {
+  const response = await api.put(`/bike-models/${id}`, data);
+  return response.data;
+}
+
+export async function deleteBikeModel(id: string) {
+  const response = await api.delete(`/bike-models/${id}`);
   return response.data;
 }

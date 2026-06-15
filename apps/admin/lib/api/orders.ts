@@ -8,6 +8,7 @@ export interface OrderFilters {
   search?: string;
   page?: number;
   limit?: number;
+  partId?: string;
 }
 
 export async function getOrders(filters: OrderFilters = {}) {
@@ -33,6 +34,7 @@ export async function getPartOrders(filters: OrderFilters = {}) {
   if (filters.search) params.search = filters.search;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
+  if (filters.partId) params.partId = filters.partId;
 
   const response = await api.get("/part-orders", { params });
   return response.data;
@@ -40,6 +42,11 @@ export async function getPartOrders(filters: OrderFilters = {}) {
 
 export async function getOrderById(id: string) {
   const response = await api.get(`/orders/${id}`);
+  return response.data;
+}
+
+export async function getPartOrderById(id: string) {
+  const response = await api.get(`/part-orders/id/${id}`);
   return response.data;
 }
 
@@ -53,6 +60,16 @@ export async function cancelOrder(id: string, reason: string) {
   return response.data;
 }
 
+export async function updatePartOrderStatus(id: string, status: string) {
+  const response = await api.patch(`/part-orders/${id}/status`, { status });
+  return response.data;
+}
+
+export async function cancelPartOrder(id: string) {
+  const response = await api.patch(`/part-orders/${id}/cancel`);
+  return response.data;
+}
+
 export async function recordPayment(id: string, data: {
   method: string;
   amount: number;
@@ -60,4 +77,26 @@ export async function recordPayment(id: string, data: {
 }) {
   const response = await api.post(`/orders/${id}/payment`, data);
   return response.data;
+}
+
+export async function createManualOrder(data: any) {
+  const response = await api.post("/orders/manual", data);
+  return response.data;
+}
+
+export async function createManualPartOrder(data: any) {
+  const response = await api.post("/part-orders/manual", data);
+  return response.data;
+}
+
+export async function downloadInvoice(id: string, isPart: boolean = false) {
+  const endpoint = isPart ? `/part-orders/${id}/invoice` : `/orders/${id}/invoice`;
+  const response = await api.get(endpoint, { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `invoice-${id}.pdf`);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
 }

@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, Order, PaymentTransaction } from "@/lib/types";
-import { getOrderById, updateOrderStatus, cancelOrder, recordPayment } from "@/lib/api/orders";
+import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice } from "@/lib/api/orders";
+import { toast } from "sonner";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -12,6 +13,7 @@ export default function OrderDetailPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
@@ -57,16 +59,20 @@ export default function OrderDetailPage() {
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
+      setActionLoading(true);
       await updateOrderStatus(orderId, newStatus);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
     } catch (error) {
       console.error("Failed to update status:", error);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleCancelOrder = async () => {
     try {
+      setActionLoading(true);
       await cancelOrder(orderId, cancelReason);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
@@ -74,11 +80,14 @@ export default function OrderDetailPage() {
       setCancelReason("");
     } catch (error) {
       console.error("Failed to cancel order:", error);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleRecordPayment = async () => {
     try {
+      setActionLoading(true);
       console.log("Recording payment with data:", paymentData);
       // Ensure amount is a number
       const paymentPayload = {
@@ -93,6 +102,8 @@ export default function OrderDetailPage() {
       console.error("Failed to record payment:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -104,7 +115,8 @@ export default function OrderDetailPage() {
         return (
           <button
             onClick={() => setShowPaymentModal(true)}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            disabled={actionLoading}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
@@ -117,7 +129,8 @@ export default function OrderDetailPage() {
         return (
           <button
             onClick={() => handleStatusUpdate(OrderStatus.CONFIRMED)}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            disabled={actionLoading}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
@@ -130,7 +143,8 @@ export default function OrderDetailPage() {
         return (
           <button
             onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            disabled={actionLoading}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
@@ -143,7 +157,8 @@ export default function OrderDetailPage() {
         return (
           <button
             onClick={() => handleStatusUpdate(OrderStatus.DELIVERED)}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            disabled={actionLoading}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
@@ -154,6 +169,19 @@ export default function OrderDetailPage() {
         );
       default:
         return null;
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    try {
+      setActionLoading(true);
+      await downloadInvoice(orderId, false);
+      toast.success("Invoice downloaded successfully");
+    } catch (error) {
+      console.error("Failed to download invoice:", error);
+      toast.error("Failed to download invoice");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -180,16 +208,29 @@ export default function OrderDetailPage() {
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: theme.text.primary }}
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1
+              className="text-3xl font-bold mb-2"
+              style={{ color: theme.text.primary }}
+            >
+              Order Details
+            </h1>
+            <p style={{ color: theme.text.secondary }}>
+              Order #{order.orderNumber}
+            </p>
+          </div>
+          <button
+            onClick={handleDownloadInvoice}
+            disabled={actionLoading}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+            style={{
+              backgroundColor: theme.accents.secondary,
+              color: theme.text.inverse,
+            }}
           >
-            Order Details
-          </h1>
-          <p style={{ color: theme.text.secondary }}>
-            Order #{order.orderNumber}
-          </p>
+            Download Invoice
+          </button>
         </div>
 
         {/* Info Cards Grid */}
@@ -462,7 +503,8 @@ export default function OrderDetailPage() {
               {getActionButton()}
               <button
                 onClick={() => setShowCancelModal(true)}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                disabled={actionLoading}
+                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                 style={{
                   backgroundColor: theme.accents.secondary,
                   color: theme.text.inverse,
@@ -533,14 +575,14 @@ export default function OrderDetailPage() {
               </button>
               <button
                 onClick={handleCancelOrder}
-                disabled={!cancelReason.trim()}
+                disabled={!cancelReason.trim() || actionLoading}
                 className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                 style={{
                   backgroundColor: theme.accents.secondary,
                   color: theme.text.inverse,
                 }}
               >
-                Confirm Cancellation
+                {actionLoading ? "Cancelling..." : "Confirm Cancellation"}
               </button>
             </div>
           </div>
@@ -629,14 +671,14 @@ export default function OrderDetailPage() {
               </button>
               <button
                 onClick={handleRecordPayment}
-                disabled={paymentData.amount <= 0}
+                disabled={paymentData.amount <= 0 || actionLoading}
                 className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                 style={{
                   backgroundColor: theme.accents.primary,
                   color: theme.text.inverse,
                 }}
               >
-                Record Payment
+                {actionLoading ? "Recording..." : "Record Payment"}
               </button>
             </div>
           </div>

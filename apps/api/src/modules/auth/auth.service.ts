@@ -10,6 +10,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { JwtPayload } from "./strategies/jwt.strategy";
+import { AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
         email: true,
         passwordHash: true,
         fullName: true,
+        phoneNumber: true,
         role: true,
         status: true,
         branchId: true,
@@ -116,7 +118,7 @@ export class AuthService {
       where: { tokenHash },
       include: {
         user: {
-          select: { id: true, email: true, role: true, status: true, branchId: true, vendorId: true },
+          select: { id: true, email: true, fullName: true, phoneNumber: true, role: true, status: true, branchId: true, vendorId: true },
         },
       },
     });
@@ -222,15 +224,18 @@ export class AuthService {
     return user;
   }
 
-  async createUser(dto: {
-    email: string;
-    password: string;
-    fullName: string;
-    phoneNumber: string;
-    role: "ADMIN" | "MANAGER" | "SALES_STAFF";
-    branchId?: string;
-    vendorId?: string;
-  }) {
+  async createUser(
+    dto: {
+      email: string;
+      password: string;
+      fullName: string;
+      phoneNumber: string;
+      role: "ADMIN" | "MANAGER" | "SALES_STAFF";
+      branchId?: string;
+      vendorId?: string;
+    },
+    adminId: string
+  ) {
     const existingUser = await this.prisma.client.user.findUnique({
       where: { email: dto.email },
     });
@@ -240,77 +245,176 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
+    const resolvedVendorId = dto.role === "SALES_STAFF" ? (dto.vendorId || null) : null;
 
-    const user = await this.prisma.client.user.create({
-      data: {
-        email: dto.email,
-        passwordHash,
-        fullName: dto.fullName,
-        phoneNumber: dto.phoneNumber,
-        role: dto.role,
-        branchId: dto.branchId || null,
-        vendorId: dto.vendorId || null,
-        status: "ACTIVE",
-      },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        phoneNumber: true,
-        role: true,
-        status: true,
-        vendorId: true,
-        branch: { select: { id: true, name: true, city: true } },
-        vendor: { select: { id: true, name: true } },
-        createdAt: true,
-      },
+    return this.prisma.client.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: dto.email,
+          passwordHash,
+          fullName: dto.fullName,
+          phoneNumber: dto.phoneNumber,
+          role: dto.role,
+          branchId: dto.branchId || null,
+          vendorId: resolvedVendorId,
+          status: "ACTIVE",
+        },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          phoneNumber: true,
+          role: true,
+          status: true,
+          vendorId: true,
+          branch: { select: { id: true, name: true, city: true } },
+          vendor: { select: { id: true, name: true } },
+          createdAt: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.CREATE,
+          entityType: "USER",
+          entityId: user.id,
+          newValue: JSON.stringify({ email: user.email, role: user.role, branchId: dto.branchId, vendorId: resolvedVendorId }),
+        },
+      });
+
+      return user;
     });
-
-    return user;
   }
 
-  async updateUser(id: string, dto: {
-    fullName?: string;
-    phoneNumber?: string;
-    role?: "ADMIN" | "MANAGER" | "SALES_STAFF";
-    branchId?: string | null;
-    vendorId?: string | null;
-    status?: "ACTIVE" | "INACTIVE";
-  }) {
-    const user = await this.prisma.client.user.update({
-      where: { id },
-      data: dto,
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        phoneNumber: true,
-        role: true,
-        status: true,
-        vendorId: true,
-        branch: { select: { id: true, name: true, city: true } },
-        vendor: { select: { id: true, name: true } },
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+  async updateUser(
+    id: string,
+    dto: {
+      fullName?: string;
+      phoneNumber?: string;
+      role?: "ADMIN" | "MANAGER" | "SALES_STAFF";
+      branchId?: string | null;
+      vendorId?: string | null;
+      status?: "ACTIVE" | "INACTIVE";
+    },
+    adminId: string
+  ) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const oldUser = await tx.user.findUnique({
+        where: { id },
+        select: { fullName: true, phoneNumber: true, role: true, branchId: true, vendorId: true, status: true },
+      });
 
-    return user;
+      if (!oldUser) {
+        throw new UnauthorizedException("User not found.");
+      }
+
+      const updateData: any = { ...dto };
+      
+      // If role is changing, or if role is already non-SALES_STAFF and not changing
+      const targetRole = dto.role || oldUser.role;
+      if (targetRole !== "SALES_STAFF") {
+        updateData.vendorId = null;
+      }
+
+      const user = await tx.user.update({
+        where: { id },
+        data: updateData,
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          phoneNumber: true,
+          role: true,
+          status: true,
+          vendorId: true,
+          branch: { select: { id: true, name: true, city: true } },
+          vendor: { select: { id: true, name: true } },
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.UPDATE,
+          entityType: "USER",
+          entityId: user.id,
+          oldValue: JSON.stringify(oldUser),
+          newValue: JSON.stringify({
+            fullName: user.fullName,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+            branchId: user.branch?.id || null,
+            vendorId: user.vendor?.id || null,
+            status: user.status,
+          }),
+        },
+      });
+
+      return user;
+    });
   }
 
-  async deactivateUser(id: string) {
-    const user = await this.prisma.client.user.update({
-      where: { id },
-      data: { status: "INACTIVE" },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        status: true,
-      },
-    });
+  async deactivateUser(id: string, adminId: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: { status: "INACTIVE" },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          status: true,
+        },
+      });
 
-    return { message: "User deactivated successfully.", user };
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.UPDATE,
+          entityType: "USER",
+          entityId: user.id,
+          oldValue: JSON.stringify({ status: "ACTIVE" }),
+          newValue: JSON.stringify({ status: "INACTIVE" }),
+        },
+      });
+
+      return { message: "User deactivated successfully.", user };
+    });
+  }
+
+  async activateUser(id: string, adminId: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: { status: "ACTIVE" },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          status: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          userRole: "ADMIN",
+          action: AuditAction.UPDATE,
+          entityType: "USER",
+          entityId: user.id,
+          oldValue: JSON.stringify({ status: "INACTIVE" }),
+          newValue: JSON.stringify({ status: "ACTIVE" }),
+        },
+      });
+
+      return { message: "User activated successfully.", user };
+    });
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────

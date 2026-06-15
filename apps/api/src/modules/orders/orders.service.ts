@@ -5,6 +5,7 @@ import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
+import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
@@ -160,9 +161,55 @@ export class OrdersService {
   }
 
   /**
+   * Complete missing details of an order before payment
+   */
+  async completeOrderDetails(id: string, dto: CompleteOrderDetailsDto, user: any) {
+    const order = await this.getOrderById(id);
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Cannot complete details for order in ${order.status} status`
+      );
+    }
+
+    // For CUSTOMER role, verify order belongs to them
+    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    return this.prisma.client.order.update({
+      where: { id },
+      data: {
+        customerCNIC: dto.customerCNIC,
+        customerAddress: dto.customerAddress,
+        paymentMethod: dto.paymentMethod,
+        // Only update processedById if the action is taken by a staff member
+        ...(user?.role !== "CUSTOMER" && { processedById: user.id }),
+      },
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+        offer: true,
+        branch: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
    * Advance order through valid state transitions only
    */
-  async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, adminId: string) {
+  async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, user: any) {
     const order = await this.getOrderById(id);
 
     const validTransitions: Record<OrderStatus, OrderStatus[]> = {
@@ -187,7 +234,7 @@ export class OrdersService {
       where: { id },
       data: {
         status: newStatus,
-        processedById: adminId,
+        processedById: user.id,
       },
       include: {
         bike: {
@@ -213,7 +260,7 @@ export class OrdersService {
    * Atomic: set order → CANCELLED, revert bike → AVAILABLE, clear reservedUntil,
    * if any transaction is SUCCESS flag for refund
    */
-  async cancelOrder(id: string, dto: CancelOrderDto, adminId: string) {
+  async cancelOrder(id: string, dto: CancelOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
       // 1. Fetch order, verify not already DELIVERED or CANCELLED
       const order = await tx.order.findUnique({
@@ -245,7 +292,7 @@ export class OrdersService {
         where: { id },
         data: {
           status: OrderStatus.CANCELLED,
-          processedById: adminId,
+          processedById: user.id,
         },
       });
 
@@ -267,8 +314,8 @@ export class OrdersService {
       if (successTransactions.length > 0) {
         await tx.auditLog.create({
           data: {
-            userId: adminId,
-            userRole: order.processedBy?.role || null,
+            userId: user.id,
+            userRole: user.role,
             action: AuditAction.REFUND,
             entityType: "Order",
             entityId: order.id,
@@ -277,6 +324,18 @@ export class OrdersService {
           },
         });
       }
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "ORDER",
+          entityId: order.id,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.CANCELLED }),
+        },
+      });
 
       return {
         order: updatedOrder,
@@ -290,7 +349,7 @@ export class OrdersService {
    * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
    * + order → PAID + offer → PAID, set bike → SOLD — all in one transaction
    */
-  async recordPayment(orderId: string, dto: RecordPaymentDto, adminId?: string) {
+  async recordPayment(orderId: string, dto: RecordPaymentDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
       // 1. Fetch order
       const order = await tx.order.findUnique({
@@ -336,7 +395,7 @@ export class OrdersService {
           where: { id: orderId },
           data: {
             status: OrderStatus.CONFIRMED,
-            processedById: adminId || null,
+            processedById: user.id,
           },
         });
 
@@ -358,6 +417,17 @@ export class OrdersService {
           },
         });
       }
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.PAYMENT,
+          entityType: "ORDER",
+          entityId: orderId,
+          newValue: JSON.stringify(dto),
+        },
+      });
 
       return {
         order: updatedOrder,
@@ -413,5 +483,79 @@ export class OrdersService {
     });
 
     return orders;
+  }
+
+  /**
+   * Manual sale registration (admin bypasses offer workflow)
+   */
+  async createManualOrder(dto: CreateManualOrderDto, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Find bike
+      const bike = await tx.bikeUnit.findUnique({
+        where: { chassisNumber: dto.chassisNumber },
+        include: { branch: true },
+      });
+
+      if (!bike) {
+        throw new NotFoundException(`Bike with chassis ${dto.chassisNumber} not found`);
+      }
+
+      if (bike.status !== BikeStatus.AVAILABLE) {
+        throw new BadRequestException(`Bike is not available for sale`);
+      }
+
+      // 2. Generate order number
+      const orderNumber = `ORD-MAN-${Date.now()}`;
+
+      // 3. Create Order
+      const order = await tx.order.create({
+        data: {
+          orderNumber,
+          bikeId: bike.id,
+          branchId: bike.branchId,
+          customerName: dto.customerName,
+          customerPhone: dto.customerPhone,
+          customerCNIC: dto.customerCNIC,
+          customerAddress: dto.customerAddress,
+          negotiatedAmount: dto.salePrice,
+          paymentMethod: dto.paymentMethod,
+          status: OrderStatus.CONFIRMED,
+          processedById: user.id,
+        },
+      });
+
+      // 4. Update Bike
+      await tx.bikeUnit.update({
+        where: { id: bike.id },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
+
+      // 5. Create PaymentTransaction
+      await tx.paymentTransaction.create({
+        data: {
+          orderId: order.id,
+          amount: dto.salePrice,
+          method: dto.paymentMethod,
+          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.CREATE,
+          entityType: "ORDER",
+          entityId: order.id,
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return order;
+    });
   }
 }

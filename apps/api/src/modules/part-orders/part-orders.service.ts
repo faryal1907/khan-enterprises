@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
-import { OrderStatus, PaymentStatus, BikeStatus } from "@khan/prisma";
+import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
+import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class PartOrdersService {
@@ -152,6 +153,38 @@ export class PartOrdersService {
   }
 
   /**
+   * Get part order by ID
+   */
+  async getPartOrderById(id: string) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id },
+      include: {
+        part: true,
+        partInventory: {
+          include: {
+            branch: true,
+          },
+        },
+        branch: true,
+        transactions: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Part order with ID ${id} not found`);
+    }
+
+    return order;
+  }
+
+  /**
    * Paginated, filtered by status/branchId/date range. Include part, inventory, branch, processedBy
    * For CUSTOMER role: filters by customer phone/CNIC from user profile
    */
@@ -164,6 +197,10 @@ export class PartOrdersService {
 
     if (query.branchId) {
       where.branchId = query.branchId;
+    }
+
+    if (query.partId) {
+      where.partId = query.partId;
     }
 
     if (query.dateFrom || query.dateTo) {
@@ -254,7 +291,7 @@ export class PartOrdersService {
   /**
    * Update part order status
    */
-  async updatePartOrderStatus(id: string, status: OrderStatus, adminId: string) {
+  async updatePartOrderStatus(id: string, status: OrderStatus, user: any) {
     const order = await this.prisma.client.partOrder.findUnique({
       where: { id },
     });
@@ -279,28 +316,44 @@ export class PartOrdersService {
       );
     }
 
-    return this.prisma.client.partOrder.update({
-      where: { id },
-      data: {
-        status,
-        processedById: adminId,
-      },
-      include: {
-        part: true,
-        partInventory: {
-          include: {
-            branch: true,
-          },
+    return this.prisma.client.$transaction(async (tx) => {
+      const updatedOrder = await tx.partOrder.update({
+        where: { id },
+        data: {
+          status,
+          processedById: user.id,
         },
-        branch: true,
-      },
+        include: {
+          part: true,
+          partInventory: {
+            include: {
+              branch: true,
+            },
+          },
+          branch: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_ORDER",
+          entityId: id,
+          oldValue: JSON.stringify({ status: currentStatus }),
+          newValue: JSON.stringify({ status }),
+        },
+      });
+
+      return updatedOrder;
     });
   }
 
   /**
    * Cancel part order and restore stock
    */
-  async cancelPartOrder(id: string, adminId: string) {
+  async cancelPartOrder(id: string, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
       const order = await tx.partOrder.findUnique({
         where: { id },
@@ -326,7 +379,7 @@ export class PartOrdersService {
         where: { id },
         data: {
           status: OrderStatus.CANCELLED,
-          processedById: adminId,
+          processedById: user.id,
         },
       });
 
@@ -351,11 +404,97 @@ export class PartOrdersService {
           },
         });
       }
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_ORDER",
+          entityId: order.id,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.CANCELLED }),
+        },
+      });
 
       return {
         order: updatedOrder,
         message: "Part order cancelled successfully",
       };
+    });
+  }
+
+  /**
+   * Manual part sale registration (admin bypasses offer workflow)
+   */
+  async createManualPartOrder(dto: CreateManualPartOrderDto, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch branch inventory
+      const inventory = await tx.partInventory.findFirst({
+        where: { partId: dto.partId }, // In a real app we'd scope this to the admin's branch
+        include: { branch: true },
+      });
+
+      if (!inventory) {
+        throw new NotFoundException(`Part inventory not found`);
+      }
+
+      // 2. Ensure stock
+      if (inventory.quantity < dto.quantity) {
+        throw new BadRequestException(`Insufficient stock. Available: ${inventory.quantity}`);
+      }
+
+      // 3. Deduct stock immediately
+      await tx.partInventory.update({
+        where: { id: inventory.id },
+        data: {
+          quantity: { decrement: dto.quantity },
+        },
+      });
+
+      // 4. Generate order number
+      const orderNumber = this.generateOrderNumber();
+
+      // 5. Create PartOrder
+      const partOrder = await tx.partOrder.create({
+        data: {
+          orderNumber,
+          partId: dto.partId,
+          partInventoryId: inventory.id,
+          branchId: inventory.branchId,
+          customerName: dto.customerName,
+          customerPhone: dto.customerPhone,
+          customerAddress: dto.customerAddress,
+          quantity: dto.quantity,
+          amount: dto.amount,
+          paymentMethod: dto.paymentMethod,
+          status: OrderStatus.DELIVERED, // Manual sale assumes immediate delivery
+          processedById: user.id,
+        },
+      });
+
+      // 6. Record StockMovement
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: inventory.id,
+          movementType: "STOCK_OUT",
+          quantity: dto.quantity,
+          reason: `Manual sale: ${orderNumber}`,
+          performedById: user.id,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.CREATE,
+          entityType: "PART_ORDER",
+          entityId: partOrder.id,
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return partOrder;
     });
   }
 

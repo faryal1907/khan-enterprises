@@ -9,6 +9,7 @@ import { getDeliveries, getDeliveryStats } from "@/lib/api/deliveries";
 export default function DeliveryQueuePage() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
+  const isStaff = user?.role === UserRole.SALES_STAFF;
 
   const [filters, setFilters] = useState({
     status: "",
@@ -18,6 +19,15 @@ export default function DeliveryQueuePage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [branches, setBranches] = useState<any[]>([]);
+
+  // Fetch branches (only after user is available to ensure token is in cookie)
+  useEffect(() => {
+    if (!user) return;
+    import("@/lib/api/inventory").then(({ getBranches }) => {
+      getBranches().then((data: any) => setBranches(data.branches || [])).catch(console.warn);
+    }).catch(console.warn);
+  }, [user?.id]);
 
   // Set branch filter to user's branch if not admin
   useEffect(() => {
@@ -27,9 +37,13 @@ export default function DeliveryQueuePage() {
   }, [isAdmin, user?.branchId]);
 
   useEffect(() => {
+    if (!user) return;
     fetchDeliveries();
-    fetchStats();
-  }, [filters]);
+    // SALES_STAFF do not have access to the /deliveries/stats endpoint
+    if (!isStaff) {
+      fetchStats();
+    }
+  }, [filters, user?.id]);
 
   const fetchDeliveries = async () => {
     try {
@@ -41,8 +55,8 @@ export default function DeliveryQueuePage() {
       const data = await getDeliveries(params);
       setDeliveries(data.deliveries || []);
     } catch (err: any) {
-      console.error("Failed to fetch deliveries:", err);
-      setError(err.response?.data?.message || "Failed to load deliveries");
+      console.warn("Failed to fetch deliveries:", err?.message || err);
+      setError(err.message || "Failed to load deliveries");
     } finally {
       setLoading(false);
     }
@@ -54,7 +68,7 @@ export default function DeliveryQueuePage() {
       const data = await getDeliveryStats(branchId);
       setStats(data);
     } catch (err: any) {
-      console.error("Failed to fetch delivery stats:", err);
+      console.warn("Failed to fetch delivery stats:", err?.message || err);
     }
   };
 
@@ -173,8 +187,9 @@ export default function DeliveryQueuePage() {
                 }}
               >
                 <option value="">All Branches</option>
-                <option value="1">Islamabad HQ</option>
-                <option value="2">Tordher Branch</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
               </select>
               {!isAdmin && (
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>

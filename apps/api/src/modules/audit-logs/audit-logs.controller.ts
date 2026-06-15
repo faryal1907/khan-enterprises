@@ -1,6 +1,8 @@
 import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { AuditLogsService } from "./audit-logs.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { Query } from "@nestjs/common";
+import { QueryAuditLogsDto } from "./dto/query-audit-logs.dto";
 
 @Controller("audit-logs")
 @UseGuards(JwtAuthGuard)
@@ -12,8 +14,8 @@ export class AuditLogsController {
    * Returns all audit logs
    */
   @Get()
-  async getAllAuditLogs() {
-    const auditLogs = await this.auditLogsService.getAllAuditLogs();
+  async getAllAuditLogs(@Query() query: QueryAuditLogsDto) {
+    const auditLogs = await this.auditLogsService.getAllAuditLogs(query);
     return { count: auditLogs.length, auditLogs };
   }
 

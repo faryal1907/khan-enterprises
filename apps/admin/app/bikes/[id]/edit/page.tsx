@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { toast } from "sonner";
 import {
   getBranches,
   getVendors,
   getBikeModels,
   getBikeById,
   updateBike,
+  deleteBike,
   attachDocument,
   uploadFile,
 } from "@/lib/api/inventory";
@@ -172,6 +174,8 @@ export default function EditBikePage() {
   // Upload states
   const [uploading, setUploading] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Fetch reference data and bike on mount
   useEffect(() => {
@@ -239,7 +243,7 @@ export default function EditBikePage() {
       });
     } catch (error) {
       console.error("File upload failed:", error);
-      alert("Failed to upload file");
+      toast.error("Failed to upload file");
     } finally {
       setUploading(null);
     }
@@ -261,7 +265,7 @@ export default function EditBikePage() {
       console.error("Media upload failed:", error);
       const errorMessage = error.response?.data?.message || error.message || "Failed to upload media files";
       const formattedMessage = Array.isArray(errorMessage) ? errorMessage.join(", ") : errorMessage;
-      alert(`Upload failed: ${formattedMessage}`);
+      toast.error(`Upload failed: ${formattedMessage}`);
     } finally {
       setUploadingMedia(false);
     }
@@ -273,7 +277,7 @@ export default function EditBikePage() {
 
     // Validate required fields
     if (!chassisNumber || !engineNumber || !branchId || !modelId || !vendorId) {
-      alert("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -301,6 +305,7 @@ export default function EditBikePage() {
         }
       }
 
+      toast.success("Bike updated successfully");
       // Redirect to bikes page
       router.push("/bikes");
     } catch (error: any) {
@@ -310,15 +315,30 @@ export default function EditBikePage() {
       const errorMessage = 
         error.response?.data?.message || 
         error.message || 
-        "Failed to create bike";
+        "Failed to update bike";
         
       const formattedMessage = Array.isArray(errorMessage) 
         ? errorMessage.join(", ") 
         : errorMessage;
         
-      alert(`Validation Error: ${formattedMessage}`);
+      toast.error(`Validation Error: ${formattedMessage}`);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await deleteBike(id);
+      toast.success("Bike deleted successfully");
+      router.push("/bikes");
+    } catch (error: any) {
+      console.error("Failed to delete bike:", error);
+      toast.error(error.response?.data?.message || "Failed to delete bike");
+      setShowDeleteModal(false);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -650,33 +670,95 @@ export default function EditBikePage() {
               </div>
             </div>
 
-            <div className="flex justify-end space-x-4 pt-6">
+            <div className="flex justify-between space-x-4 pt-6">
               <button
                 type="button"
-                onClick={() => router.push("/bikes")}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                onClick={() => setShowDeleteModal(true)}
+                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
                 style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
+                  backgroundColor: "red",
+                  color: "white",
                 }}
               >
-                Cancel
+                Delete Bike
               </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                }}
-              >
-                {submitting ? "Saving..." : "Save Changes"}
-              </button>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => router.push("/bikes")}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  {submitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
             </div>
           </form>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div
+            className="fixed inset-0 flex items-center justify-center z-50"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+          >
+            <div
+              className="rounded-lg p-6 max-w-md w-full mx-4"
+              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+            >
+              <h3
+                className="text-lg font-semibold mb-4"
+                style={{ color: theme.text.primary }}
+              >
+                Delete Bike Unit
+              </h3>
+              <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+                Are you sure you want to delete this bike unit (Chassis: <strong>{chassisNumber}</strong>)? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: "red",
+                    color: "white",
+                  }}
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

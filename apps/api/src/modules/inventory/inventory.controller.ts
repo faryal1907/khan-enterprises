@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Put, Query, Param, Body, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Put, Delete, Query, Param, Body, UseGuards } from "@nestjs/common";
 import { InventoryService } from "./inventory.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -11,6 +11,7 @@ import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
 import { UpdateBikeUnitDto } from "./dto/update-bike-unit.dto";
 import { UpdateBikeStatusDto } from "./dto/update-bike-status.dto";
 import { TransferBikeDto } from "./dto/transfer-bike.dto";
+import { TransferPartDto } from "./dto/transfer-part.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { QueryBikesDto } from "./dto/query-bikes.dto";
 
@@ -26,8 +27,8 @@ export class InventoryController {
    */
   @Post("bikes")
   @Roles("ADMIN")
-  async createBike(@Body() dto: CreateBikeUnitDto) {
-    return this.inventoryService.createBike(dto);
+  async createBike(@Body() dto: CreateBikeUnitDto, @CurrentUser() user: any) {
+    return this.inventoryService.createBike(dto, user);
   }
 
   /**
@@ -60,8 +61,18 @@ export class InventoryController {
    */
   @Put("bikes/:id")
   @Roles("ADMIN", "MANAGER")
-  async updateBike(@Param("id") id: string, @Body() dto: UpdateBikeUnitDto) {
-    return this.inventoryService.updateBike(id, dto);
+  async updateBike(@Param("id") id: string, @Body() dto: UpdateBikeUnitDto, @CurrentUser() user: any) {
+    return this.inventoryService.updateBike(id, dto, user);
+  }
+
+  /**
+   * DELETE /api/inventory/bikes/:id
+   * Deletes a bike unit.
+   */
+  @Delete("bikes/:id")
+  @Roles("ADMIN")
+  async deleteBike(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.inventoryService.deleteBike(id, user);
   }
 
   /**
@@ -70,8 +81,8 @@ export class InventoryController {
    */
   @Patch("bikes/:id/status")
   @Roles("ADMIN", "MANAGER")
-  async updateBikeStatus(@Param("id") id: string, @Body() dto: UpdateBikeStatusDto) {
-    return this.inventoryService.updateBikeStatus(id, dto);
+  async updateBikeStatus(@Param("id") id: string, @Body() dto: UpdateBikeStatusDto, @CurrentUser() user: any) {
+    return this.inventoryService.updateBikeStatus(id, dto, user);
   }
 
   /**
@@ -80,8 +91,8 @@ export class InventoryController {
    */
   @Patch("bikes/:id/branch")
   @Roles("ADMIN")
-  async transferBike(@Param("id") id: string, @Body() dto: TransferBikeDto) {
-    return this.inventoryService.transferBike(id, dto);
+  async transferBike(@Param("id") id: string, @Body() dto: TransferBikeDto, @CurrentUser() user: any) {
+    return this.inventoryService.transferBike(id, dto, user);
   }
 
   /**
@@ -104,8 +115,12 @@ export class InventoryController {
    * Returns all parts inventory records, optionally filtered by branch.
    */
   @Get("parts")
-  async getParts(@Query("branchId") branchId?: string) {
-    const parts = await this.inventoryService.getAllParts(branchId);
+  async getParts(
+    @Query("branchId") branchId?: string,
+    @Query("search") search?: string,
+    @Query("category") category?: string,
+  ) {
+    const parts = await this.inventoryService.getAllParts(branchId, search, category);
     return { count: parts.length, parts };
   }
 
@@ -115,8 +130,8 @@ export class InventoryController {
    */
   @Post("parts")
   @Roles("ADMIN", "MANAGER")
-  async createPart(@Body() dto: CreatePartDto) {
-    return this.inventoryService.createPart(dto);
+  async createPart(@Body() dto: CreatePartDto, @CurrentUser() user: any) {
+    return this.inventoryService.createPart(dto, user);
   }
 
   /**
@@ -150,8 +165,18 @@ export class InventoryController {
    */
   @Put("parts/:id")
   @Roles("ADMIN", "MANAGER")
-  async updatePart(@Param("id") id: string, @Body() dto: UpdatePartDto) {
-    return this.inventoryService.updatePart(id, dto);
+  async updatePart(@Param("id") id: string, @Body() dto: UpdatePartDto, @CurrentUser() user: any) {
+    return this.inventoryService.updatePart(id, dto, user);
+  }
+
+  /**
+   * DELETE /api/inventory/parts/:id
+   * Deletes a Part if it has no associated orders.
+   */
+  @Delete("parts/:id")
+  @Roles("ADMIN", "MANAGER")
+  async deletePart(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.inventoryService.deletePart(id, user);
   }
 
   /**
@@ -175,6 +200,19 @@ export class InventoryController {
     @CurrentUser() user: any,
   ) {
     return this.inventoryService.adjustStock(inventoryId, dto, user.id);
+  }
+
+  /**
+   * POST /api/inventory/parts/transfer
+   * Atomically transfers part stock between branches.
+   */
+  @Post("parts/transfer")
+  @Roles("ADMIN", "MANAGER")
+  async transferPart(
+    @Body() dto: TransferPartDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.inventoryService.transferPart(dto, user);
   }
 
   /**

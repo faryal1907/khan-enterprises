@@ -9,6 +9,7 @@ import {
   rejectOffer,
   counterOffer,
 } from "@/lib/api/offers";
+import { numberToWords } from "@repo/utils";
 
 interface Offer {
   id: string;
@@ -28,10 +29,12 @@ interface Offer {
     id: string;
     chassisNumber: string;
     engineNumber: string;
+    price?: number;
     model: {
       brand: string;
       modelName: string;
       year: number;
+      basePrice?: number;
     };
     branch: {
       name: string;
@@ -110,15 +113,15 @@ export default function OfferDetailPage() {
   };
 
   const handleCounter = async () => {
-    if (!counterAmount.trim() || !adminResponse.trim()) {
-      toast.error("Please provide both counter amount and response message");
+    if (!counterAmount.trim()) {
+      toast.error("Please provide a counter amount");
       return;
     }
 
     try {
       setActionLoading(true);
       await counterOffer(offerId, {
-        counterAmount: parseFloat(counterAmount),
+        counterAmount: parseFloat(counterAmount.replace(/,/g, "")),
         adminResponse,
       });
       setShowCounterModal(false);
@@ -384,7 +387,21 @@ export default function OfferDetailPage() {
           >
             Offer Details
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div>
+              <label
+                className="block text-xs font-medium uppercase tracking-wider mb-1"
+                style={{ color: theme.text.muted }}
+              >
+                Listed Price
+              </label>
+              <p
+                className="text-2xl font-bold"
+                style={{ color: theme.text.primary }}
+              >
+                Rs. {Number(offer.bike.price || offer.bike.model.basePrice || 0).toLocaleString()}
+              </p>
+            </div>
             <div>
               <label
                 className="block text-xs font-medium uppercase tracking-wider mb-1"
@@ -621,9 +638,16 @@ export default function OfferDetailPage() {
                     Counter Amount (Rs.)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     value={counterAmount}
-                    onChange={(e) => setCounterAmount(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      if (val) {
+                        setCounterAmount(Number(val).toLocaleString());
+                      } else {
+                        setCounterAmount("");
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded text-sm"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -632,6 +656,11 @@ export default function OfferDetailPage() {
                     }}
                     placeholder="Enter counter amount"
                   />
+                  {counterAmount && (
+                    <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
+                      {numberToWords(parseFloat(counterAmount.replace(/,/g, "")))}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label

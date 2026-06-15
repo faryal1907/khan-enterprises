@@ -18,13 +18,29 @@ export default function CreateBranchPage() {
     phoneNumber: "",
     managerId: "",
   });
+  const [managers, setManagers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Role check: Admin only
+  // Role check and fetch managers
   useEffect(() => {
     if (user && user.role !== UserRole.ADMIN) {
       router.push("/branches");
+      return;
+    }
+
+    const fetchManagers = async () => {
+      try {
+        const res = await api.get("/auth/users");
+        const managerUsers = res.data.users.filter((u: any) => u.role === "MANAGER");
+        setManagers(managerUsers);
+      } catch (err) {
+        console.error("Failed to fetch managers", err);
+      }
+    };
+
+    if (user && user.role === UserRole.ADMIN) {
+      fetchManagers();
     }
   }, [user, router]);
 
@@ -176,8 +192,11 @@ export default function CreateBranchPage() {
                   }}
                 >
                   <option value="">No Manager (Assign Later)</option>
-                  <option value="2">Kamran Shah (Islamabad HQ)</option>
-                  <option value="3">Bilal Khan (Tordher Branch)</option>
+                  {managers.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.fullName} ({m.email})
+                    </option>
+                  ))}
                 </select>
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
                   Leave empty to assign a manager later

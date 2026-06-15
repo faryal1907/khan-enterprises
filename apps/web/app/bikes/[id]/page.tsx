@@ -6,6 +6,7 @@ import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { createOffer } from "@/lib/api/offers";
+import { numberToWords } from "@repo/utils";
 
 export default function BikeDetailPage() {
   const { id } = useParams();
@@ -40,6 +41,15 @@ export default function BikeDetailPage() {
     fetchBike();
   }, [id]);
 
+  // Pre-fill customer details if logged in
+  useEffect(() => {
+    if (user) {
+      if (!customerName) setCustomerName(user.fullName || "");
+      if (!customerPhone) setCustomerPhone(user.phoneNumber || "");
+      if (!customerEmail) setCustomerEmail(user.email || "");
+    }
+  }, [user]);
+
   const handleMakeOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -64,7 +74,7 @@ export default function BikeDetailPage() {
         customerEmail: customerEmail || undefined,
         customerCNIC: customerCNIC || undefined,
         customerAddress: customerAddress || undefined,
-        offerAmount: parseFloat(offerAmount),
+        offerAmount: parseFloat(offerAmount.replace(/,/g, "")),
         message: message || undefined,
         paymentMethod: paymentMethod as any,
       }, user?.id);
@@ -73,7 +83,12 @@ export default function BikeDetailPage() {
       window.location.href = `/offers/${result.id}`;
     } catch (error: any) {
       console.error("Failed to submit offer:", error);
-      setErrorMessage(error.response?.data?.message || "Failed to submit offer. Please try again.");
+      const data = error.response?.data;
+      if (data?.message && Array.isArray(data.message)) {
+        setErrorMessage(data.message.join(", "));
+      } else {
+        setErrorMessage(data?.message || "Failed to submit offer. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -266,6 +281,9 @@ export default function BikeDetailPage() {
                       window.location.href = "/login";
                       return;
                     }
+                    setCustomerName(user.fullName || "");
+                    setCustomerPhone(user.phoneNumber || "");
+                    setCustomerEmail(user.email || "");
                     setShowOfferForm(true);
                   }}
                   className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
@@ -284,9 +302,16 @@ export default function BikeDetailPage() {
                         Your Offer (PKR) *
                       </label>
                       <input
-                        type="number"
+                        type="text"
                         value={offerAmount}
-                        onChange={(e) => setOfferAmount(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          if (val) {
+                            setOfferAmount(Number(val).toLocaleString());
+                          } else {
+                            setOfferAmount("");
+                          }
+                        }}
                         placeholder="Enter your offer amount"
                         className="w-full px-4 py-3 rounded-lg focus:outline-none"
                         style={{
@@ -295,6 +320,11 @@ export default function BikeDetailPage() {
                           color: theme.text.primary,
                         }}
                       />
+                      {offerAmount && (
+                        <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
+                          {numberToWords(parseFloat(offerAmount.replace(/,/g, "")))}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>

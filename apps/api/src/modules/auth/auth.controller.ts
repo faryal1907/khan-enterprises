@@ -121,8 +121,8 @@ export class AuthController {
   @Post("users")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async createUser(@Body() dto: any) {
-    return this.authService.createUser(dto);
+  async createUser(@Body() dto: any, @CurrentUser() admin: any) {
+    return this.authService.createUser(dto, admin.sub);
   }
 
   /**
@@ -143,8 +143,8 @@ export class AuthController {
   @Put("users/:id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async updateUser(@Param("id") id: string, @Body() dto: any) {
-    return this.authService.updateUser(id, dto);
+  async updateUser(@Param("id") id: string, @Body() dto: any, @CurrentUser() admin: any) {
+    return this.authService.updateUser(id, dto, admin.sub);
   }
 
   /**
@@ -154,8 +154,19 @@ export class AuthController {
   @Delete("users/:id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async deactivateUser(@Param("id") id: string) {
-    return this.authService.deactivateUser(id);
+  async deactivateUser(@Param("id") id: string, @CurrentUser() admin: any) {
+    return this.authService.deactivateUser(id, admin.sub);
+  }
+
+  /**
+   * POST /api/auth/users/:id/activate
+   * Activate a user. ADMIN only.
+   */
+  @Post("users/:id/activate")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async activateUser(@Param("id") id: string, @CurrentUser() admin: any) {
+    return this.authService.activateUser(id, admin.sub);
   }
 
   // ─── OAuth Endpoints (Supabase) ─────────────────────────────────────────
