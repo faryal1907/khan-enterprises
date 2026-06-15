@@ -259,7 +259,7 @@ export default function DeliveryDetailPage() {
                 Address
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order?.customerAddress || delivery.partOrder?.customerAddress || "N/A"}
+                {delivery.deliveryAddress || "N/A"}
               </p>
             </div>
           </div>
