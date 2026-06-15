@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { AuditAction } from "@khan/prisma";
 import { CreateBikeModelDto } from "./dto/create-bike-model.dto";
@@ -43,9 +43,18 @@ export class BikeModelsService {
   }
 
   async createBikeModel(data: CreateBikeModelDto, user: any) {
+    const normalizedData = {
+      ...data,
+      brand: data.brand.trim(),
+      modelName: data.modelName.trim(),
+      engineCapacity: data.engineCapacity?.trim() || undefined,
+      color: data.color?.trim() || undefined,
+      description: data.description?.trim() || undefined,
+    };
+    await this.assertUniqueModel(normalizedData.brand, normalizedData.modelName, normalizedData.year);
     return this.prisma.client.$transaction(async (tx) => {
       const bikeModel = await tx.bikeModel.create({
-        data,
+        data: normalizedData,
       });
 
       await tx.auditLog.create({
@@ -55,7 +64,7 @@ export class BikeModelsService {
           action: AuditAction.CREATE,
           entityType: "BIKE_MODEL",
           entityId: bikeModel.id,
-          newValue: JSON.stringify(data),
+          newValue: JSON.stringify(normalizedData),
         },
       });
 
@@ -64,18 +73,26 @@ export class BikeModelsService {
   }
 
   async updateBikeModel(id: string, data: UpdateBikeModelDto, user: any) {
+    const oldModel = await this.getBikeModelById(id);
+    const normalizedData = {
+      ...data,
+      ...(data.brand !== undefined && { brand: data.brand.trim() }),
+      ...(data.modelName !== undefined && { modelName: data.modelName.trim() }),
+      ...(data.engineCapacity !== undefined && { engineCapacity: data.engineCapacity.trim() || undefined }),
+      ...(data.color !== undefined && { color: data.color.trim() || undefined }),
+      ...(data.description !== undefined && { description: data.description.trim() || undefined }),
+    };
+    await this.assertUniqueModel(
+      normalizedData.brand ?? oldModel.brand,
+      normalizedData.modelName ?? oldModel.modelName,
+      normalizedData.year ?? oldModel.year,
+      id,
+    );
+
     return this.prisma.client.$transaction(async (tx) => {
-      const oldModel = await tx.bikeModel.findUnique({
-        where: { id },
-      });
-
-      if (!oldModel) {
-        throw new NotFoundException(`Bike model with ID ${id} not found`);
-      }
-
       const bikeModel = await tx.bikeModel.update({
         where: { id },
-        data,
+        data: normalizedData,
       });
 
       await tx.auditLog.create({
@@ -86,7 +103,7 @@ export class BikeModelsService {
           entityType: "BIKE_MODEL",
           entityId: bikeModel.id,
           oldValue: JSON.stringify(oldModel),
-          newValue: JSON.stringify(data),
+          newValue: JSON.stringify(normalizedData),
         },
       });
 
@@ -132,5 +149,20 @@ export class BikeModelsService {
 
       return deletedModel;
     });
+  }
+
+  private async assertUniqueModel(brand: string, modelName: string, year: number, excludeId?: string) {
+    const existing = await this.prisma.client.bikeModel.findFirst({
+      where: {
+        brand: { equals: brand.trim(), mode: "insensitive" },
+        modelName: { equals: modelName.trim(), mode: "insensitive" },
+        year,
+        ...(excludeId && { id: { not: excludeId } }),
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(`${brand} ${modelName} (${year}) already exists.`);
+    }
   }
 }

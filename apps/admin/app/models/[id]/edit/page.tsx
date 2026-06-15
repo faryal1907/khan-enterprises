@@ -6,9 +6,13 @@ import { theme } from "@/lib/colors";
 import { getBikeModelById, updateBikeModel } from "@/lib/api/inventory";
 import Link from "next/link";
 import { numberToWords } from "@repo/utils";
+import { AsyncButton } from "@/components/async-button";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
 
 export default function EditBikeModelPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const params = useParams();
   const id = params.id as string;
   
@@ -24,6 +28,10 @@ export default function EditBikeModelPage() {
     description: "",
     basePrice: "",
   });
+
+  useEffect(() => {
+    if (user && user.role !== UserRole.ADMIN) router.replace("/models");
+  }, [router, user]);
 
   useEffect(() => {
     const fetchModel = async () => {
@@ -74,9 +82,9 @@ export default function EditBikeModelPage() {
 
       toast.success("Bike model updated successfully");
       router.push("/models");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to update model:", error);
-      toast.error(error.response?.data?.message || "Failed to update bike model");
+      toast.error(error instanceof Error ? error.message : "Failed to update bike model");
     } finally {
       setSaving(false);
     }
@@ -175,6 +183,8 @@ export default function EditBikeModelPage() {
                   type="number"
                   name="year"
                   required
+                  min={1900}
+                  max={2100}
                   value={formData.year}
                   onChange={handleChange}
                   className="w-full px-4 py-2 rounded focus:outline-none focus:ring-2"
@@ -244,6 +254,7 @@ export default function EditBikeModelPage() {
                   type="text"
                   name="basePrice"
                   required
+                  inputMode="numeric"
                   value={formData.basePrice}
                   onChange={(e) => {
                     const val = e.target.value.replace(/\D/g, "");
@@ -292,17 +303,14 @@ export default function EditBikeModelPage() {
             </div>
 
             <div className="flex justify-end pt-4">
-              <button
+              <AsyncButton
                 type="submit"
-                disabled={saving}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                }}
+                loading={saving}
+                loadingLabel="Saving..."
+                className="px-6"
               >
-                {saving ? "Saving..." : "Update Model"}
-              </button>
+                Update Model
+              </AsyncButton>
             </div>
           </form>
         </div>

@@ -14,6 +14,22 @@ export interface User {
   status: string;
 }
 
+export interface DashboardStats {
+  scope: {
+    type: "GLOBAL" | "BRANCH";
+    branch: Pick<Branch, "id" | "name" | "city"> | null;
+  };
+  pendingOffers: number;
+  availableBikes: number;
+  availableParts: number;
+  lowStockAlerts: number;
+  pendingDeliveries: number;
+  ordersWaitingPayment: number;
+  cancelledOrders: number;
+  totalRevenue?: number;
+  bikesSold?: number;
+}
+
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -25,17 +41,47 @@ export interface LoginPayload {
   password: string;
 }
 
+export enum BikeStatus {
+  AVAILABLE = "AVAILABLE",
+  RESERVED = "RESERVED",
+  SOLD = "SOLD",
+  IN_DELIVERY = "IN_DELIVERY",
+}
+
 export interface BikeUnit {
   id: string;
   chassisNumber: string;
   engineNumber: string;
   serialNumber: string;
-  status: string;
+  status: BikeStatus;
+  price?: number | null;
+  negotiatedPrice?: number | null;
+  reservedUntil?: string | null;
+  soldAt?: string | null;
   model: BikeModel;
   vendor: Vendor;
   branch: Branch;
   documents: Document[];
   createdAt: string;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface BikeInventoryResponse {
+  bikes: BikeUnit[];
+  pagination: Pagination;
+  summary: {
+    total: number;
+    available: number;
+    reserved: number;
+    sold: number;
+    inDelivery: number;
+  };
 }
 
 export interface BikeModel {

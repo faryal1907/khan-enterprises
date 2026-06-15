@@ -13,56 +13,110 @@ export class TransactionsService {
 
   /** Return all payment transactions with order and branch details. */
   async getAllTransactions(query: QueryTransactionsDto) {
-    const where: any = {};
+    const whereBike: any = {};
+    const wherePart: any = {};
 
     if (query.status) {
-      where.status = query.status;
+      whereBike.status = query.status;
+      wherePart.status = query.status;
     }
     if (query.method) {
-      where.method = query.method;
+      whereBike.method = query.method;
+      wherePart.method = query.method;
     }
     if (query.dateFrom || query.dateTo) {
-      where.createdAt = {};
+      whereBike.createdAt = {};
+      wherePart.createdAt = {};
       if (query.dateFrom) {
-        where.createdAt.gte = new Date(query.dateFrom);
+        whereBike.createdAt.gte = new Date(query.dateFrom);
+        wherePart.createdAt.gte = new Date(query.dateFrom);
       }
       if (query.dateTo) {
-        where.createdAt.lte = new Date(query.dateTo);
+        whereBike.createdAt.lte = new Date(query.dateTo);
+        wherePart.createdAt.lte = new Date(query.dateTo);
       }
     }
     if (query.branchId) {
-      where.order = {
-        branchId: query.branchId,
-      };
+      whereBike.order = { branchId: query.branchId };
+      wherePart.partOrder = { branchId: query.branchId };
     }
 
-    return this.prisma.client.paymentTransaction.findMany({
-      where,
-      select: {
-        id: true,
-        amount: true,
-        method: true,
-        status: true,
-        gatewayReference: true,
-        failureReason: true,
-        createdAt: true,
-        updatedAt: true,
-        order: {
-          select: {
-            id: true,
-            orderNumber: true,
-            customerName: true,
-            customerPhone: true,
-            negotiatedAmount: true,
-            status: true,
-            branch: {
-              select: { id: true, name: true, city: true },
+    const [bikeTransactions, partTransactions] = await Promise.all([
+      this.prisma.client.paymentTransaction.findMany({
+        where: whereBike,
+        select: {
+          id: true,
+          amount: true,
+          method: true,
+          status: true,
+          gatewayReference: true,
+          failureReason: true,
+          createdAt: true,
+          updatedAt: true,
+          order: {
+            select: {
+              id: true,
+              orderNumber: true,
+              customerName: true,
+              customerPhone: true,
+              negotiatedAmount: true,
+              status: true,
+              branch: { select: { id: true, name: true, city: true } },
             },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+      }),
+      this.prisma.client.partPaymentTransaction.findMany({
+        where: wherePart,
+        select: {
+          id: true,
+          amount: true,
+          method: true,
+          status: true,
+          gatewayReference: true,
+          failureReason: true,
+          createdAt: true,
+          updatedAt: true,
+          partOrder: {
+            select: {
+              id: true,
+              orderNumber: true,
+              customerName: true,
+              customerPhone: true,
+              amount: true,
+              status: true,
+              branch: { select: { id: true, name: true, city: true } },
+            },
+          },
+        },
+      })
+    ]);
+
+    const normalizedBike = bikeTransactions.map(t => ({ ...t, type: 'BIKE' }));
+    const normalizedPart = partTransactions.map(t => ({
+      id: t.id,
+      amount: t.amount,
+      method: t.method,
+      status: t.status,
+      gatewayReference: t.gatewayReference,
+      failureReason: t.failureReason,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+      type: 'PART',
+      order: t.partOrder ? {
+        id: t.partOrder.id,
+        orderNumber: t.partOrder.orderNumber,
+        customerName: t.partOrder.customerName,
+        customerPhone: t.partOrder.customerPhone,
+        negotiatedAmount: t.partOrder.amount,
+        status: t.partOrder.status,
+        branch: t.partOrder.branch,
+      } : null,
+    }));
+
+    const all = [...normalizedBike, ...normalizedPart];
+    all.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return all;
   }
 
   /** Return a single transaction by ID with full details. */
@@ -140,9 +194,19 @@ export class TransactionsService {
   /** Refund a transaction and log the action */
   async refundTransaction(id: string, adminId: string) {
     return this.prisma.client.$transaction(async (tx) => {
-      const transaction = await tx.paymentTransaction.findUnique({
+      let isPart = false;
+      let transaction: any = await tx.paymentTransaction.findUnique({
         where: { id },
+        include: { order: true },
       });
+
+      if (!transaction) {
+        transaction = await tx.partPaymentTransaction.findUnique({
+          where: { id },
+          include: { partOrder: true },
+        });
+        isPart = true;
+      }
 
       if (!transaction) {
         throw new NotFoundException("Transaction not found");
@@ -152,22 +216,62 @@ export class TransactionsService {
         throw new BadRequestException("Only SUCCESS transactions can be refunded");
       }
 
-      const updatedTransaction = await tx.paymentTransaction.update({
-        where: { id },
-        data: {
-          status: PaymentStatus.REFUNDED,
-        },
-      });
+      let updatedTransaction;
+      if (isPart) {
+        updatedTransaction = await tx.partPaymentTransaction.update({
+          where: { id },
+          data: { status: PaymentStatus.REFUNDED },
+        });
+
+        const order = transaction.partOrder;
+        if (order && order.status !== "CANCELLED") {
+          await tx.partOrder.update({
+            where: { id: order.id },
+            data: { status: "CANCELLED", processedById: adminId },
+          });
+
+          // Stock logic: restore reserved
+          await tx.partInventory.update({
+            where: { id: order.partInventoryId },
+            data: { reservedQuantity: { decrement: order.quantity } },
+          });
+
+          if (["CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"].includes(order.status)) {
+            await tx.partInventory.update({
+              where: { id: order.partInventoryId },
+              data: { quantity: { increment: order.quantity } },
+            });
+          }
+        }
+      } else {
+        updatedTransaction = await tx.paymentTransaction.update({
+          where: { id },
+          data: { status: PaymentStatus.REFUNDED },
+        });
+
+        const order = transaction.order;
+        if (order && order.status !== "CANCELLED") {
+          await tx.order.update({
+            where: { id: order.id },
+            data: { status: "CANCELLED", processedById: adminId },
+          });
+
+          await tx.bikeUnit.update({
+            where: { id: order.bikeId },
+            data: { status: "AVAILABLE", reservedUntil: null, soldAt: null },
+          });
+        }
+      }
 
       await tx.auditLog.create({
         data: {
           userId: adminId,
           userRole: "ADMIN",
           action: AuditAction.REFUND,
-          entityType: "PaymentTransaction",
+          entityType: isPart ? "PART_PAYMENT_TRANSACTION" : "PaymentTransaction",
           entityId: id,
-          oldValue: { status: PaymentStatus.SUCCESS },
-          newValue: { status: PaymentStatus.REFUNDED },
+          oldValue: JSON.stringify({ status: PaymentStatus.SUCCESS }),
+          newValue: JSON.stringify({ status: PaymentStatus.REFUNDED }),
         },
       });
 
@@ -182,21 +286,33 @@ export class TransactionsService {
       include: {
         order: {
           include: {
-            bike: {
-              include: {
-                model: true,
-              },
-            },
+            bike: { include: { model: true } },
             branch: true,
           },
         },
       },
     });
 
-    if (!transaction || !transaction.order) {
-      throw new NotFoundException("Transaction or associated order not found");
+    if (transaction && transaction.order) {
+      return this.pdfService.generateInvoice(transaction.order);
     }
 
-    return this.pdfService.generateInvoice(transaction.order);
+    const partTransaction = await this.prisma.client.partPaymentTransaction.findUnique({
+      where: { id },
+      include: {
+        partOrder: {
+          include: {
+            part: true,
+            branch: true,
+          },
+        },
+      },
+    });
+
+    if (partTransaction && partTransaction.partOrder) {
+      return this.pdfService.generateInvoice(partTransaction.partOrder);
+    }
+
+    throw new NotFoundException("Transaction or associated order not found");
   }
 }

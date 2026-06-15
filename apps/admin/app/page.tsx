@@ -1,33 +1,51 @@
 "use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { DashboardCard } from "@/components/dashboard-card";
+import { getDashboardStats } from "@/lib/api/dashboard";
 import { useAuthStore } from "@/lib/auth-store";
-import { UserRole } from "@/lib/types";
 import { theme } from "@/lib/colors";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api-client";
-import Link from "next/link";
+import type { DashboardStats } from "@/lib/types";
+import { UserRole } from "@/lib/types";
 
 export default function Dashboard() {
   const { user } = useAuthStore();
-  const [stats, setStats] = useState<any>(null);
+  const userId = user?.id;
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchStats = useCallback(async () => {
+    if (!userId) return;
+
+    setLoading(true);
+    setError("");
+    try {
+      setStats(await getDashboardStats());
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Failed to load dashboard statistics.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
 
   useEffect(() => {
-    async function fetchStats() {
-      if (!user) return;
-      try {
-        const response = await api.get("/dashboard/stats");
-        setStats(response.data);
-      } catch (error) {
-        console.warn("Error fetching stats:", error);
-      }
-    }
+    // The dashboard request intentionally starts when the authenticated user changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStats();
-  }, [user]);
+  }, [fetchStats]);
 
   if (!user) return null;
 
-  const isAdmin = user.role === UserRole.ADMIN;
-  const isManager = user.role === UserRole.MANAGER;
-  const isStaff = user.role === UserRole.SALES_STAFF;
+  const scopeLabel = loading
+    ? "Loading..."
+    : stats?.scope.branch
+      ? `${stats.scope.branch.name}, ${stats.scope.branch.city}`
+      : "All branches (Global)";
 
   return (
     <div className="p-8">
@@ -36,13 +54,19 @@ export default function Dashboard() {
           className="text-3xl font-bold mb-6"
           style={{ color: theme.text.primary }}
         >
-          {isStaff ? "My Dashboard" : isManager ? "Branch Dashboard" : "Dashboard"}
+          {user.role === UserRole.ADMIN
+            ? "Dashboard"
+            : stats?.scope.type === "GLOBAL"
+              ? "Global Dashboard"
+              : "Branch Dashboard"}
         </h1>
 
-        {/* User Info Card */}
         <div
           className="rounded-lg p-6 mb-8"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          style={{
+            backgroundColor: theme.backgrounds.primary,
+            border: `1px solid ${theme.borders.light}`,
+          }}
         >
           <h2
             className="text-xl font-semibold mb-4"
@@ -51,278 +75,168 @@ export default function Dashboard() {
             Welcome, {user.email}
           </h2>
           <div className="space-y-2 text-sm">
-            <p style={{ color: theme.text.secondary }}>
-              <span className="font-medium">Role:</span> {user.role}
-            </p>
-            <p style={{ color: theme.text.secondary }}>
-              <span className="font-medium">Branch:</span> {user.branchId ?? "All branches (Admin)"}
-            </p>
-            <p style={{ color: theme.text.secondary }}>
-              <span className="font-medium">Status:</span> {user.status}
-            </p>
+            <Info label="Role" value={user.role.replace(/_/g, " ")} />
+            <Info label="Scope" value={scopeLabel} />
+            <Info label="Status" value={user.status} />
           </div>
         </div>
 
-        {/* Sales Staff Dashboard */}
-        {isStaff && <SalesStaffDashboard stats={stats} />}
+        {error && (
+          <div
+            className="rounded-lg p-4 mb-6 flex items-center justify-between gap-4"
+            style={{
+              backgroundColor: theme.backgrounds.secondary,
+              border: `1px solid ${theme.accents.secondary}`,
+              color: theme.text.primary,
+            }}
+          >
+            <p>{error}</p>
+            <button
+              type="button"
+              onClick={fetchStats}
+              className="px-4 py-2 rounded font-medium"
+              style={{
+                backgroundColor: theme.accents.primary,
+                color: theme.text.inverse,
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
-        {/* Branch Manager Dashboard */}
-        {isManager && <BranchManagerDashboard stats={stats} />}
-
-        {/* Admin Dashboard */}
-        {isAdmin && <AdminDashboard stats={stats} />}
+        <DashboardCards role={user.role} stats={loading ? null : stats} />
       </div>
     </div>
   );
 }
 
-function SalesStaffDashboard({ stats }: { stats: any }) {
+function DashboardCards({
+  role,
+  stats,
+}: {
+  role: UserRole;
+  stats: DashboardStats | null;
+}) {
+  const operationalCards: MetricCard[] = [
+    {
+      label: "Pending Offers",
+      field: "pendingOffers",
+      href: "/offers?status=PENDING",
+      emphasis: "primary",
+    },
+    {
+      label: "Orders Waiting Payment",
+      field: "ordersWaitingPayment",
+      href: "/orders?status=PENDING_PAYMENT",
+      emphasis: "secondary",
+    },
+    {
+      label: "Pending Deliveries",
+      field: "pendingDeliveries",
+      href: "/deliveries",
+    },
+    {
+      label: "Available Bikes",
+      field: "availableBikes",
+      href: "/bikes?status=AVAILABLE",
+      emphasis: "tertiary",
+    },
+    {
+      label: "Available Parts",
+      field: "availableParts",
+      href: "/parts",
+      emphasis: "tertiary",
+    },
+    {
+      label: "Low Stock Alerts",
+      field: "lowStockAlerts",
+      href: "/parts?lowStock=true",
+      emphasis: "secondary",
+    },
+  ];
+
+  if (role === UserRole.SALES_STAFF) {
+    return <MetricGrid cards={operationalCards} stats={stats} columns={3} />;
+  }
+
+  const summaryCards: MetricCard[] = [
+    {
+      label: role === UserRole.ADMIN ? "Total Revenue" : "Scope Revenue",
+      field: "totalRevenue",
+      format: "currency",
+      emphasis: "primary",
+    },
+    {
+      label: "Bikes Sold",
+      field: "bikesSold",
+      href: "/bikes?status=SOLD",
+      emphasis: "tertiary",
+    },
+    {
+      label: "Cancelled Orders",
+      field: "cancelledOrders",
+      href: "/orders?status=CANCELLED",
+      emphasis: "secondary",
+    },
+    operationalCards[0],
+  ];
+
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Link
-          href="/deliveries"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Deliveries
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
-            {stats?.pendingDeliveries ?? "—"}
-          </p>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Link
-          href="/bikes"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Available Bikes
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            {stats?.availableBikes ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/parts"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Available Parts
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            {stats?.availableParts ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/offers"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Sales
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            {stats?.pendingSales ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/offers"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Offers
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats?.pendingSales ?? "—"}
-          </p>
-        </Link>
-      </div>
+      <MetricGrid cards={summaryCards} stats={stats} columns={4} />
+      <MetricGrid cards={operationalCards.slice(1, 5)} stats={stats} columns={4} />
+      <MetricGrid cards={operationalCards.slice(5)} stats={stats} columns={2} />
     </>
   );
 }
 
-function BranchManagerDashboard({ stats }: { stats: any }) {
+type MetricCard = {
+  label: string;
+  field: keyof DashboardStats;
+  href?: string;
+  format?: "number" | "currency";
+  emphasis?: "default" | "primary" | "secondary" | "tertiary";
+};
+
+function MetricGrid({
+  cards,
+  stats,
+  columns,
+}: {
+  cards: MetricCard[];
+  stats: DashboardStats | null;
+  columns: 2 | 3 | 4;
+}) {
+  const columnClass = {
+    2: "md:grid-cols-2",
+    3: "md:grid-cols-3",
+    4: "md:grid-cols-4",
+  }[columns];
+
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Branch Revenue
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            {stats ? `Rs ${stats.branchRevenue.toLocaleString()}` : "—"}
-          </p>
-        </div>
-        <Link
-          href="/sales"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Bikes Sold
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            {stats?.bikesSold ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/bikes"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Available Bikes
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            {stats?.availableBikes ?? "—"}
-            </p>
-        </Link>
-        <Link
-          href="/parts"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Available Parts
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            {stats?.availableParts ?? "—"}
-            </p>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-
-        <Link
-          href="/orders"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Orders Waiting Payment
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats?.ordersWaitingPayment ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/deliveries"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Deliveries
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats?.pendingDeliveries ?? "—"}
-            </p>
-        </Link>
-        <Link
-          href="/orders?status=CANCELLED"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Cancelled Orders
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats?.issues ?? "—"}
-          </p>
-        </Link>
-      </div>
-    </>
+    <div className={`grid grid-cols-1 ${columnClass} gap-4 mb-6`}>
+      {cards.map((card) => {
+        const value = stats?.[card.field];
+        return (
+          <DashboardCard
+            key={card.field}
+            label={card.label}
+            value={typeof value === "number" ? value : undefined}
+            href={card.href}
+            format={card.format}
+            emphasis={card.emphasis}
+          />
+        );
+      })}
+    </div>
   );
 }
 
-function AdminDashboard({ stats }: { stats: any }) {
+function Info({ label, value }: { label: string; value: string }) {
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Link
-          href="/offers"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Orders
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.primary }}>
-            {stats?.pendingOrders ?? "—"}
-          </p>
-        </Link>
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Total Sales
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats ? `Rs ${stats.totalSales.toLocaleString()}` : "—"}
-          </p>
-        </div>
-        <Link
-          href="/parts"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Available Parts
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.tertiary }}>
-            {stats?.availableParts ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/bikes"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Available Bikes
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
-            {stats?.availableBikes ?? "—"}
-          </p>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Link
-          href="/parts"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Low Stock Alerts
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.accents.secondary }}>
-            {stats?.lowStockAlerts ?? "—"}
-          </p>
-        </Link>
-        <Link
-          href="/deliveries"
-          className="rounded-lg p-4 block cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Pending Deliveries
-          </p>
-          <p className="text-2xl font-bold mt-2" style={{ color: theme.text.primary }}>
-            {stats?.pendingDeliveries ?? "—"}
-          </p>
-        </Link>
-      </div>
-    </>
+    <p style={{ color: theme.text.secondary }}>
+      <span className="font-medium">{label}:</span> {value}
+    </p>
   );
 }

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { useAuthStore } from "@/lib/auth-store";
 import { toast } from "sonner";
 import {
   getBranches,
@@ -11,7 +12,7 @@ import {
   attachDocument,
   uploadFile,
 } from "@/lib/api/inventory";
-import type { Branch, Vendor, BikeModel } from "@/lib/types";
+import { UserRole, type Branch, type Vendor, type BikeModel } from "@/lib/types";
 
 interface UploadedFile {
   fileName: string;
@@ -141,6 +142,7 @@ function FileUploadZone({
 
 export default function AddBikePage() {
   const router = useRouter();
+  const { user } = useAuthStore();
 
   // Form fields
   const [chassisNumber, setChassisNumber] = useState("");
@@ -149,7 +151,6 @@ export default function AddBikePage() {
   const [branchId, setBranchId] = useState("");
   const [modelId, setModelId] = useState("");
   const [vendorId, setVendorId] = useState("");
-  const [status, setStatus] = useState("AVAILABLE");
 
   // Reference data
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -170,6 +171,10 @@ export default function AddBikePage() {
   // Upload states
   const [uploading, setUploading] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role !== UserRole.ADMIN) router.replace("/bikes");
+  }, [router, user]);
 
   // Fetch reference data on mount
   useEffect(() => {
@@ -294,6 +299,8 @@ export default function AddBikePage() {
 
   const selectedModel = bikeModels.find(m => m.id === modelId);
   const availableColors = selectedModel?.color ? selectedModel.color.split('/').map(c => c.trim()) : [];
+
+  if (user && user.role !== UserRole.ADMIN) return null;
 
   return (
     <div className="p-8">
@@ -501,20 +508,20 @@ export default function AddBikePage() {
                 Status
               </label>
               <select
-                className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
                 }}
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                value="AVAILABLE"
+                disabled
+                className="w-full px-3 py-2 rounded text-sm opacity-60 cursor-not-allowed"
               >
                 <option value="AVAILABLE">Available</option>
-                <option value="SOLD">Sold</option>
-                <option value="RESERVED">Reserved</option>
-                <option value="IN_DELIVERY">In Delivery</option>
               </select>
+              <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                New bikes always enter inventory as available.
+              </p>
             </div>
 
             <div className="border-t pt-6" style={{ borderColor: theme.borders.light }}>

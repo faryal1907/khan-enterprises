@@ -1,394 +1,273 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { theme } from "@/lib/colors";
-import { useAuthStore } from "@/lib/auth-store";
-import { UserRole } from "@/lib/types";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { BikeStatusBadge } from "@/components/bike-status-badge";
+import { SummaryCard } from "@/components/summary-card";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
+  getBikeModels,
   getBikes,
   getBranches,
   getVendors,
-  getBikeModels,
   transferBike,
   updateBikeStatus,
 } from "@/lib/api/inventory";
-import type { Branch, Vendor, BikeModel, BikeUnit } from "@/lib/types";
+import { useAuthStore } from "@/lib/auth-store";
+import { theme } from "@/lib/colors";
+import {
+  BikeStatus,
+  UserRole,
+  type BikeInventoryResponse,
+  type BikeModel,
+  type BikeUnit,
+  type Branch,
+  type Vendor,
+} from "@/lib/types";
+
+const PAGE_SIZE = 20;
+
+type BikeFilters = {
+  branch: string;
+  status: string;
+  model: string;
+  vendor: string;
+};
+
+const EMPTY_RESULT: BikeInventoryResponse = {
+  bikes: [],
+  pagination: { page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 },
+  summary: { total: 0, available: 0, reserved: 0, sold: 0, inDelivery: 0 },
+};
+
+function buildBikeParams(filters: BikeFilters, search: string, page: number) {
+  return {
+    ...(filters.branch && { branchId: filters.branch }),
+    ...(filters.status && { status: filters.status }),
+    ...(filters.model && { modelId: filters.model }),
+    ...(filters.vendor && { vendorId: filters.vendor }),
+    ...(search && { search }),
+    page,
+    limit: PAGE_SIZE,
+  };
+}
 
 export default function BikesListPage() {
+  const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
-  const isManager = user?.role === UserRole.MANAGER;
-  const isStaff = user?.role === "SALES_STAFF";
+  const isGlobal = isAdmin || !user?.branchId;
 
-  const searchParams = useSearchParams();
-
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<BikeFilters>({
     branch: "",
-    status: "",
+    status: searchParams.get("status") || "",
     model: searchParams.get("model") || "",
     vendor: "",
-    search: "",
   });
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search.trim());
+  const [page, setPage] = useState(1);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Data state
-  const [bikes, setBikes] = useState<BikeUnit[]>([]);
+  const [result, setResult] = useState<BikeInventoryResponse>(EMPTY_RESULT);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [bikeModels, setBikeModels] = useState<BikeModel[]>([]);
-
-  // Loading state
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Modal state
   const [selectedBike, setSelectedBike] = useState<BikeUnit | null>(null);
   const [transferBranchId, setTransferBranchId] = useState("");
-  const [statusValue, setStatusValue] = useState("");
-
-  // Lock branch filter for non-admins and vendor filter for SALES_STAFF
-  const [prevUserBranchId, setPrevUserBranchId] = useState(user?.branchId);
-  if (user?.branchId !== prevUserBranchId) {
-    setPrevUserBranchId(user?.branchId);
-    if (!isAdmin && user?.branchId) {
-      setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
-    }
-  }
-  const [prevVendorId, setPrevVendorId] = useState(user?.vendorId);
-  if (user?.vendorId !== prevVendorId) {
-    setPrevVendorId(user?.vendorId ?? null);
-    if (isStaff && user?.vendorId) {
-      setFilters((prev) => ({ ...prev, vendor: user.vendorId || "" }));
-    }
-  }
+  const [modal, setModal] = useState<"transfer" | "release" | null>(null);
+  const [isTransferring, setIsTransferring] = useState(false);
+  const [isReleasing, setIsReleasing] = useState(false);
+  const requestId = useRef(0);
 
   useEffect(() => {
-    const fetchReferenceData = async () => {
-      try {
-        const [branchesRes, vendorsRes, modelsRes] = await Promise.all([
-          getBranches(),
-          getVendors(),
-          getBikeModels(),
-        ]);
-        setBranches(branchesRes.branches);
-        setVendors(vendorsRes.vendors);
-        setBikeModels(modelsRes.bikeModels);
-      } catch (error) {
-        console.error("Failed to fetch reference data:", error);
-      }
+    let active = true;
+    Promise.all([getBranches(), getVendors(), getBikeModels()])
+      .then(([branchResponse, vendorResponse, modelResponse]) => {
+        if (!active) return;
+        setBranches(branchResponse.branches);
+        setVendors(vendorResponse.vendors);
+        setBikeModels(modelResponse.bikeModels);
+      })
+      .catch((referenceError: Error) => {
+        if (active) toast.error(referenceError.message || "Failed to load filter options");
+      });
+    return () => {
+      active = false;
     };
-    fetchReferenceData();
   }, []);
 
-  // Fetch bikes on mount and filter change
-  useEffect(() => {
-    const fetchBikes = async () => {
-      setLoading(true);
-      try {
-        const params: Record<string, string> = {};
-        if (filters.branch) params.branchId = filters.branch;
-        if (filters.status) params.status = filters.status;
-        if (filters.model) params.modelId = filters.model;
-        if (filters.vendor) params.vendorId = filters.vendor;
-        if (filters.search) params.search = filters.search;
+  const effectiveFilters = useMemo(
+    () => ({
+      ...filters,
+      branch: !isGlobal && user?.branchId ? user.branchId : filters.branch,
+    }),
+    [filters, isGlobal, user?.branchId],
+  );
+  const requestParams = useMemo(
+    () => buildBikeParams(effectiveFilters, debouncedSearch, page),
+    [debouncedSearch, effectiveFilters, page],
+  );
 
-        const response = await getBikes(params);
-        setBikes(response.bikes);
-      } catch (error) {
-        console.error("Failed to fetch bikes:", error);
-      } finally {
-        setLoading(false);
+  const loadBikes = useCallback(async () => {
+    const currentRequest = ++requestId.current;
+    setLoading(true);
+    setError("");
+    try {
+      const response = await getBikes(requestParams);
+      if (currentRequest === requestId.current) setResult(response);
+    } catch (fetchError) {
+      if (currentRequest === requestId.current) {
+        setError(fetchError instanceof Error ? fetchError.message : "Failed to load bikes");
       }
-    };
-    fetchBikes();
-  }, [filters]);
+    } finally {
+      if (currentRequest === requestId.current) setLoading(false);
+    }
+  }, [requestParams]);
 
-  const handleFilterChange = (key: string, value: string) => {
-    // Prevent non-admins from changing branch filter
-    if (key === "branch" && !isAdmin) {
-      return;
-    }
-    // Prevent SALES_STAFF from changing vendor filter
-    if (key === "vendor" && isStaff) {
-      return;
-    }
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  useEffect(() => {
+    const timeout = window.setTimeout(() => void loadBikes(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [loadBikes, refreshKey]);
+
+  const updateFilter = (key: keyof BikeFilters, value: string) => {
+    if (key === "branch" && !isGlobal) return;
+    setPage(1);
+    setFilters((current) => ({ ...current, [key]: value }));
   };
 
-  // Handle transfer
-  const handleTransfer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedBike || !transferBranchId) return;
+  const closeModal = useCallback(() => {
+    if (isTransferring || isReleasing) return;
+    setModal(null);
+    setSelectedBike(null);
+    setTransferBranchId("");
+  }, [isReleasing, isTransferring]);
 
+  const refetch = () => setRefreshKey((key) => key + 1);
+
+  const submitTransfer = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedBike || !transferBranchId) return;
+    setIsTransferring(true);
     try {
       await transferBike(selectedBike.id, transferBranchId);
       toast.success("Bike transferred successfully");
-      setShowTransferModal(false);
+      setModal(null);
+      setSelectedBike(null);
       setTransferBranchId("");
-      setSelectedBike(null);
-      // Refetch bikes
-      const params: Record<string, string> = {};
-      if (filters.branch) params.branchId = filters.branch;
-      if (filters.status) params.status = filters.status;
-      if (filters.model) params.modelId = filters.model;
-      if (filters.vendor) params.vendorId = filters.vendor;
-      if (filters.search) params.search = filters.search;
-      const response = await getBikes(params);
-      setBikes(response.bikes);
-    } catch (error) {
-      console.error("Failed to transfer bike:", error);
-      toast.error("Failed to transfer bike");
+      refetch();
+    } catch (transferError) {
+      toast.error(transferError instanceof Error ? transferError.message : "Failed to transfer bike");
+    } finally {
+      setIsTransferring(false);
     }
   };
 
-  // Handle status change
-  const handleStatusChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedBike || !statusValue) return;
-
+  const submitRelease = async () => {
+    if (!selectedBike) return;
+    setIsReleasing(true);
     try {
-      await updateBikeStatus(selectedBike.id, statusValue);
-      toast.success("Status updated successfully");
-      setShowStatusModal(false);
-      setStatusValue("");
+      await updateBikeStatus(selectedBike.id, BikeStatus.AVAILABLE);
+      toast.success("Bike released to available inventory");
+      setModal(null);
       setSelectedBike(null);
-      // Refetch bikes
-      const params: Record<string, string> = {};
-      if (filters.branch) params.branchId = filters.branch;
-      if (filters.status) params.status = filters.status;
-      if (filters.model) params.modelId = filters.model;
-      if (filters.vendor) params.vendorId = filters.vendor;
-      if (filters.search) params.search = filters.search;
-      const response = await getBikes(params);
-      setBikes(response.bikes);
-    } catch (error) {
-      console.error("Failed to update status:", error);
-      toast.error("Failed to update status");
+      refetch();
+    } catch (releaseError) {
+      toast.error(releaseError instanceof Error ? releaseError.message : "Failed to release bike");
+    } finally {
+      setIsReleasing(false);
     }
   };
-
-  // Open transfer modal
-  const openTransferModal = (bike: BikeUnit) => {
-    setSelectedBike(bike);
-    setTransferBranchId("");
-    setShowTransferModal(true);
-  };
-
-  // Open status modal
-  const openStatusModal = (bike: BikeUnit) => {
-    setSelectedBike(bike);
-    setStatusValue(bike.status);
-    setShowStatusModal(true);
-  };
-
-  // Compute summary stats
-  const totalBikes = bikes.length;
-  const availableBikes = bikes.filter((b) => b.status === "AVAILABLE").length;
-  const reservedBikes = bikes.filter((b) => b.status === "RESERVED").length;
-  const soldBikes = bikes.filter((b) => b.status === "SOLD").length;
 
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: theme.text.primary }}
-          >
-            Bikes Inventory
-          </h1>
-          <Link
-            href="/bikes/new"
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
-          >
-            Add New Bike
-          </Link>
+          <div>
+            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+              Bikes Inventory
+            </h1>
+            <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
+              {isGlobal ? "Global inventory access" : "Inventory for your assigned branch"}
+            </p>
+          </div>
+          {isAdmin && (
+            <Link
+              href="/bikes/new"
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+            >
+              Add New Bike
+            </Link>
+          )}
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Total Bikes
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              {totalBikes}
-            </p>
-          </div>
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Available
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.accents.tertiary }}>
-              {availableBikes}
-            </p>
-          </div>
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Reserved
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
-              {reservedBikes}
-            </p>
-          </div>
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Sold
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              {soldBikes}
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <SummaryCard label="Total Bikes" value={result.summary.total} />
+          <SummaryCard label="Available" value={result.summary.available} color={theme.accents.tertiary} />
+          <SummaryCard label="Reserved" value={result.summary.reserved} color={theme.accents.secondary} />
+          <SummaryCard label="Sold" value={result.summary.sold} />
+          <SummaryCard label="In Delivery" value={result.summary.inDelivery} color={theme.accents.primary} />
         </div>
 
-        {/* Filters */}
         <div
           className="rounded-lg p-4 mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <FilterSelect
+              label="Branch"
+              value={effectiveFilters.branch}
+              disabled={!isGlobal}
+              onChange={(value) => updateFilter("branch", value)}
+              options={branches.map((branch) => ({ value: branch.id, label: branch.name }))}
+              emptyLabel="All Branches"
+              helper={!isGlobal ? "Filtered to your assigned branch" : undefined}
+            />
+            <FilterSelect
+              label="Status"
+              value={filters.status}
+              onChange={(value) => updateFilter("status", value)}
+              options={Object.values(BikeStatus).map((status) => ({
+                value: status,
+                label: status.replaceAll("_", " "),
+              }))}
+              emptyLabel="All Statuses"
+            />
+            <FilterSelect
+              label="Model"
+              value={filters.model}
+              onChange={(value) => updateFilter("model", value)}
+              options={bikeModels.map((model) => ({
+                value: model.id,
+                label: `${model.brand} ${model.modelName}`,
+              }))}
+              emptyLabel="All Models"
+            />
+            <FilterSelect
+              label="Vendor"
+              value={filters.vendor}
+              onChange={(value) => updateFilter("vendor", value)}
+              options={vendors.map((vendor) => ({ value: vendor.id, label: vendor.name }))}
+              emptyLabel="All Vendors"
+            />
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Branch
-              </label>
-              <select
-                value={filters.branch}
-                onChange={(e) => handleFilterChange("branch", e.target.value)}
-                disabled={!isAdmin}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                  opacity: !isAdmin ? 0.6 : 1,
-                }}
-              >
-                <option value="">All Branches</option>
-                {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </option>
-                ))}
-              </select>
-              {!isAdmin && (
-                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
-                  Filtered to your branch
-                </p>
-              )}
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Status
-              </label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange("status", e.target.value)}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-              >
-                <option value="">All Status</option>
-                <option value="AVAILABLE">Available</option>
-                <option value="SOLD">Sold</option>
-                <option value="RESERVED">Reserved</option>
-                <option value="IN_DELIVERY">In Delivery</option>
-              </select>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Model
-              </label>
-              <select
-                value={filters.model}
-                onChange={(e) => handleFilterChange("model", e.target.value)}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-              >
-                <option value="">All Models</option>
-                {bikeModels.map((model) => (
-                  <option key={model.id} value={model.id}>
-                    {model.brand} {model.modelName}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Vendor
-              </label>
-              <select
-                value={filters.vendor}
-                onChange={(e) => handleFilterChange("vendor", e.target.value)}
-                disabled={isStaff}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                  opacity: isStaff ? 0.6 : 1,
-                }}
-              >
-                <option value="">All Vendors</option>
-                {vendors.map((vendor) => (
-                  <option key={vendor.id} value={vendor.id}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
-              {isStaff && (
-                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
-                  Filtered to your vendor
-                </p>
-              )}
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Search
               </label>
               <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange("search", e.target.value)}
+                value={search}
+                onChange={(event) => {
+                  setPage(1);
+                  setSearch(event.target.value);
+                }}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -401,279 +280,272 @@ export default function BikesListPage() {
           </div>
         </div>
 
-        {/* Table */}
-        <div
-          className="rounded-lg overflow-hidden"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <table className="w-full">
-            <thead>
-              <tr
-                style={{ backgroundColor: theme.backgrounds.secondary }}
-              >
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Chassis No.
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Engine No.
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Model
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Branch
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Vendor
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }}></div>
-                    </div>
-                  </td>
-                </tr>
-              ) : bikes.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <p className="text-sm" style={{ color: theme.text.secondary }}>
-                      No bikes found
-                    </p>
-                  </td>
-                </tr>
-              ) : (
-                bikes.map((bike) => (
-                  <tr key={bike.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {bike.chassisNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {bike.engineNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {bike.model.brand} {bike.model.modelName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {bike.branch.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {bike.vendor.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className="px-2 py-1 rounded text-xs font-medium"
-                        style={{
-                          backgroundColor:
-                            bike.status === "AVAILABLE"
-                              ? theme.accents.tertiary
-                              : bike.status === "SOLD"
-                              ? theme.accents.primary
-                              : bike.status === "RESERVED"
-                              ? theme.accents.secondary
-                              : theme.backgrounds.secondary,
-                          color: bike.status === "AVAILABLE" || bike.status === "SOLD" ? theme.text.inverse : theme.text.primary,
-                        }}
-                      >
-                        {bike.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex space-x-2">
-                        <Link
-                          href={`/bikes/${bike.id}/edit`}
-                          className="text-sm font-medium transition-colors hover:opacity-70"
-                          style={{ color: theme.accents.primary }}
-                        >
-                          Edit
-                        </Link>
-                        {(isAdmin || isManager) && (
-                          <>
-                            <button
-                              onClick={() => openTransferModal(bike)}
-                              className="text-sm font-medium transition-colors hover:opacity-70"
-                              style={{ color: theme.text.secondary }}
-                            >
-                              Transfer
-                            </button>
-                            <button
-                              onClick={() => openStatusModal(bike)}
-                              className="text-sm font-medium transition-colors hover:opacity-70"
-                              style={{ color: theme.accents.secondary }}
-                            >
-                              Status
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Transfer Branch Modal */}
-        {showTransferModal && (
+        {error ? (
           <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+            className="rounded-lg p-8 text-center"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
-                Transfer Branch
-              </h3>
-              <form onSubmit={handleTransfer} className="space-y-4">
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    To Branch
-                  </label>
-                  <select
-                    value={transferBranchId}
-                    onChange={(e) => setTransferBranchId(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  >
-                    <option value="">Select branch</option>
-                    {branches
-                      .filter((b) => b.id !== selectedBike?.branch.id)
-                      .map((branch) => (
-                        <option key={branch.id} value={branch.id}>
-                          {branch.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowTransferModal(false);
-                      setTransferBranchId("");
-                      setSelectedBike(null);
-                    }}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    Transfer
-                  </button>
-                </div>
-              </form>
-            </div>
+            <p className="mb-4 text-sm" style={{ color: theme.accents.primary }}>
+              {error}
+            </p>
+            <AsyncButton onClick={refetch}>Retry</AsyncButton>
           </div>
+        ) : (
+          <BikeTable
+            bikes={result.bikes}
+            loading={loading}
+            isAdmin={isAdmin}
+            onTransfer={(bike) => {
+              setSelectedBike(bike);
+              setTransferBranchId("");
+              setModal("transfer");
+            }}
+            onRelease={(bike) => {
+              setSelectedBike(bike);
+              setModal("release");
+            }}
+          />
         )}
 
-        {/* Change Status Modal */}
-        {showStatusModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
+        {!error && result.pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Showing {(result.pagination.page - 1) * result.pagination.limit + 1}-
+              {Math.min(result.pagination.page * result.pagination.limit, result.pagination.total)} of{" "}
+              {result.pagination.total}
+            </p>
+            <div className="flex gap-2">
+              <AsyncButton
+                disabled={loading || page <= 1}
+                onClick={() => setPage((current) => current - 1)}
+                style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary }}
               >
-                Change Status
-              </h3>
-              <form onSubmit={handleStatusChange} className="space-y-4">
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    New Status
-                  </label>
-                  <select
-                    value={statusValue}
-                    onChange={(e) => setStatusValue(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  >
-                    <option value="">Select status</option>
-                    <option value="AVAILABLE">Available</option>
-                    <option value="SOLD">Sold</option>
-                    <option value="RESERVED">Reserved</option>
-                    <option value="IN_DELIVERY">In Delivery</option>
-                  </select>
-                </div>
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowStatusModal(false);
-                      setStatusValue("");
-                      setSelectedBike(null);
-                    }}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    Change Status
-                  </button>
-                </div>
-              </form>
+                Previous
+              </AsyncButton>
+              <AsyncButton
+                disabled={loading || page >= result.pagination.totalPages}
+                onClick={() => setPage((current) => current + 1)}
+              >
+                Next
+              </AsyncButton>
             </div>
           </div>
         )}
       </div>
+
+      {modal === "transfer" && selectedBike && (
+        <ActionModal title="Transfer Bike" onClose={closeModal}>
+          <form onSubmit={submitTransfer} className="space-y-4">
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Transfer {selectedBike.chassisNumber} from {selectedBike.branch.name}.
+            </p>
+            <FilterSelect
+              label="Destination Branch"
+              value={transferBranchId}
+              onChange={setTransferBranchId}
+              options={branches
+                .filter((branch) => branch.id !== selectedBike.branch.id)
+                .map((branch) => ({ value: branch.id, label: branch.name }))}
+              emptyLabel="Select branch"
+            />
+            <ModalActions onCancel={closeModal}>
+              <AsyncButton
+                type="submit"
+                loading={isTransferring}
+                loadingLabel="Transferring..."
+                disabled={!transferBranchId}
+              >
+                Transfer
+              </AsyncButton>
+            </ModalActions>
+          </form>
+        </ActionModal>
+      )}
+
+      {modal === "release" && selectedBike && (
+        <ActionModal title="Release Bike Reservation" onClose={closeModal}>
+          <p className="text-sm mb-5" style={{ color: theme.text.secondary }}>
+            Release {selectedBike.chassisNumber} back to available inventory? This will fail if an active offer or
+            order still owns the reservation.
+          </p>
+          <ModalActions onCancel={closeModal}>
+            <AsyncButton loading={isReleasing} loadingLabel="Releasing..." onClick={submitRelease}>
+              Release Bike
+            </AsyncButton>
+          </ModalActions>
+        </ActionModal>
+      )}
+    </div>
+  );
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+  emptyLabel,
+  disabled = false,
+  helper,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{ value: string; label: string }>;
+  emptyLabel: string;
+  disabled?: boolean;
+  helper?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        disabled={disabled}
+        className="w-full px-3 py-2 rounded text-sm disabled:opacity-60"
+        style={{
+          backgroundColor: theme.backgrounds.tertiary,
+          border: `1px solid ${theme.borders.medium}`,
+          color: theme.text.primary,
+        }}
+      >
+        <option value="">{emptyLabel}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {helper && (
+        <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+          {helper}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function BikeTable({
+  bikes,
+  loading,
+  isAdmin,
+  onTransfer,
+  onRelease,
+}: {
+  bikes: BikeUnit[];
+  loading: boolean;
+  isAdmin: boolean;
+  onTransfer: (bike: BikeUnit) => void;
+  onRelease: (bike: BikeUnit) => void;
+}) {
+  return (
+    <div
+      className="rounded-lg overflow-hidden overflow-x-auto"
+      style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+    >
+      <table className="w-full">
+        <thead>
+          <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+            {["Chassis No.", "Engine No.", "Model", "Branch", "Vendor", "Status", "Actions"].map((heading) => (
+              <th
+                key={heading}
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                style={{ color: theme.text.secondary }}
+              >
+                {heading}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={7} className="px-6 py-8 text-center">
+                <div className="flex justify-center">
+                  <div
+                    className="animate-spin rounded-full h-8 w-8 border-b-2"
+                    style={{ borderColor: theme.accents.primary }}
+                  />
+                </div>
+              </td>
+            </tr>
+          ) : bikes.length === 0 ? (
+            <tr>
+              <td colSpan={7} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                No bikes found
+              </td>
+            </tr>
+          ) : (
+            bikes.map((bike) => (
+              <tr key={bike.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  {bike.chassisNumber}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  {bike.engineNumber}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  {bike.model.brand} {bike.model.modelName}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  {bike.branch.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  {bike.vendor.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <BikeStatusBadge status={bike.status} />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <div className="flex gap-3">
+                    <Link href={`/bikes/${bike.id}`} style={{ color: theme.text.secondary }}>
+                      View
+                    </Link>
+                    {isAdmin && (
+                      <Link href={`/bikes/${bike.id}/edit`} style={{ color: theme.accents.primary }}>
+                        Edit
+                      </Link>
+                    )}
+                    {isAdmin && bike.status === BikeStatus.AVAILABLE && (
+                      <button onClick={() => onTransfer(bike)} style={{ color: theme.text.secondary }}>
+                        Transfer
+                      </button>
+                    )}
+                    {isAdmin && bike.status === BikeStatus.RESERVED && (
+                      <button onClick={() => onRelease(bike)} style={{ color: theme.accents.secondary }}>
+                        Release
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ModalActions({ onCancel, children }: { onCancel: () => void; children: React.ReactNode }) {
+  return (
+    <div className="flex justify-end gap-3 pt-4">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+        style={{
+          backgroundColor: theme.backgrounds.tertiary,
+          color: theme.text.secondary,
+          border: `1px solid ${theme.borders.medium}`,
+        }}
+      >
+        Cancel
+      </button>
+      {children}
     </div>
   );
 }

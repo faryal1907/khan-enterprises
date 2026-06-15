@@ -1,18 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { getDeliveries, getDeliveryStats } from "@/lib/api/deliveries";
 
 export default function DeliveryQueuePage() {
+  const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
   const isStaff = user?.role === UserRole.SALES_STAFF;
 
   const [filters, setFilters] = useState({
-    status: "",
+    status: searchParams.get("status") || "",
     branch: "",
   });
   const [deliveries, setDeliveries] = useState<any[]>([]);

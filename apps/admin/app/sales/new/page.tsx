@@ -158,7 +158,7 @@ export default function ManualOrderPage() {
 
         const res = await createManualPartOrder(payload);
         toast.success("Part sale registered successfully!");
-        router.push(`/orders`); // Part orders don't have dedicated details page yet, go to list
+        router.push(`/part-orders/${res.id}`);
       }
     } catch (error: any) {
       console.error("Sale registration failed:", error);

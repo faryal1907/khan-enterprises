@@ -4,19 +4,27 @@ import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
 import { getPartById, updatePart, deletePart } from "@/lib/api/inventory";
-import { getBranches, getVendors } from "@/lib/api/inventory";
-import type { Branch, Vendor } from "@/lib/types";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
+import { AsyncButton } from "@/components/async-button";
 
 export default function EditPartPage() {
   const params = useParams();
   const router = useRouter();
   const partId = params.id as string;
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === UserRole.ADMIN;
+  const canManage = isAdmin || user?.role === UserRole.MANAGER;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  useEffect(() => {
+    if (user && !canManage) router.replace("/parts");
+  }, [canManage, router, user]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -79,8 +87,8 @@ export default function EditPartPage() {
       await deletePart(partId);
       toast.success("Part deleted successfully");
       router.push("/parts");
-    } catch (error: any) {
-      setDeleteError(error.response?.data?.message || "Failed to delete part. It may have associated orders.");
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : "Failed to delete part. It may have associated orders.");
     } finally {
       setDeleting(false);
     }
@@ -221,7 +229,7 @@ export default function EditPartPage() {
             </div>
 
             <div className="flex justify-between items-center pt-6">
-              <button
+              {isAdmin && <button
                 type="button"
                 onClick={handleDelete}
                 className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
@@ -231,7 +239,7 @@ export default function EditPartPage() {
                 }}
               >
                 Delete Part
-              </button>
+              </button>}
               <div className="flex space-x-4">
                 <a
                   href={`/parts/${partId}`}
@@ -244,18 +252,14 @@ export default function EditPartPage() {
                 >
                   Cancel
                 </a>
-                <button
+                <AsyncButton
                   type="submit"
-                  disabled={submitting}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                    opacity: submitting ? 0.7 : 1,
-                  }}
+                  loading={submitting}
+                  loadingLabel="Saving..."
+                  className="px-6"
                 >
-                  {submitting ? "Saving..." : "Save Changes"}
-                </button>
+                  Save Changes
+                </AsyncButton>
               </div>
             </div>
           </form>

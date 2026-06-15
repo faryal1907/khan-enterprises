@@ -67,6 +67,7 @@ export class OrdersService {
               email: true,
             },
           },
+          transactions: true,
         },
         orderBy: { createdAt: "desc" },
       }),

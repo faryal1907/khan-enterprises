@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, Max } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreateBikeModelDto {
@@ -13,6 +13,8 @@ export class CreateBikeModelDto {
   @IsNumber()
   @IsNotEmpty()
   @Type(() => Number)
+  @Min(1900)
+  @Max(2100)
   year: number;
 
   @IsString()
@@ -30,5 +32,6 @@ export class CreateBikeModelDto {
   @IsNumber()
   @IsNotEmpty()
   @Type(() => Number)
+  @Min(0.01)
   basePrice: number;
 }

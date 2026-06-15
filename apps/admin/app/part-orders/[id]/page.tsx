@@ -30,6 +30,7 @@ export default function PartOrderDetailPage() {
     fetchOrder();
   }, [orderId]);
 
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case OrderStatus.PENDING_PAYMENT:
@@ -445,7 +446,7 @@ export default function PartOrderDetailPage() {
 
         <div className="flex justify-end space-x-4 mt-6">
           <button
-            onClick={() => router.push("/orders")}
+            onClick={() => router.back()}
             className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
             style={{
               backgroundColor: theme.backgrounds.primary,
@@ -453,7 +454,7 @@ export default function PartOrderDetailPage() {
               border: `1px solid ${theme.borders.medium}`,
             }}
           >
-            Back to Orders
+            Go Back
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
@@ -13,10 +14,16 @@ import {
   transferPart,
 } from "@/lib/api/inventory";
 import type { Branch, PartInventory } from "@/lib/types";
+import { SummaryCard } from "@/components/summary-card";
 
 export default function PartsListPage() {
+  const searchParams = useSearchParams();
+  const lowStockOnly = searchParams.get("lowStock") === "true";
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
+  const isManager = user?.role === UserRole.MANAGER;
+  const canManage = isAdmin || isManager;
+  const isGlobal = isAdmin || !user?.branchId;
 
   const [filters, setFilters] = useState({
     branch: "",
@@ -46,14 +53,7 @@ export default function PartsListPage() {
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [isTransferring, setIsTransferring] = useState(false);
 
-  // Adjust state during render when user.branchId changes to avoid synchronous setState in useEffect
-  const [prevUserBranchId, setPrevUserBranchId] = useState(user?.branchId);
-  if (user?.branchId !== prevUserBranchId) {
-    setPrevUserBranchId(user?.branchId);
-    if (!isAdmin && user?.branchId) {
-      setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
-    }
-  }
+  const effectiveBranch = !isGlobal && user?.branchId ? user.branchId : filters.branch;
 
   // Fetch branches on mount
   useEffect(() => {
@@ -74,16 +74,16 @@ export default function PartsListPage() {
       setLoading(true);
       try {
         const params: Record<string, string> = {};
-        if (filters.branch) params.branchId = filters.branch;
+        if (effectiveBranch) params.branchId = effectiveBranch;
         if (filters.category) params.category = filters.category;
         if (filters.search) params.search = filters.search;
 
         const [partsResponse, lowStockResponse] = await Promise.all([
           getParts(params),
-          getLowStockItems(filters.branch),
+          getLowStockItems(effectiveBranch),
         ]);
 
-        setParts(partsResponse.parts);
+        setParts(lowStockOnly ? lowStockResponse.items : partsResponse.parts);
         setLowStockCount(lowStockResponse.count);
       } catch (error) {
         console.error("Failed to fetch parts:", error);
@@ -92,11 +92,11 @@ export default function PartsListPage() {
       }
     };
     fetchData();
-  }, [filters]);
+  }, [effectiveBranch, filters.category, filters.search, lowStockOnly]);
 
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter
-    if (key === "branch" && !isAdmin) {
+    if (key === "branch" && !isGlobal) {
       return;
     }
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -132,7 +132,7 @@ export default function PartsListPage() {
       setSelectedPart(null);
       // Refetch parts
       const params: Record<string, string> = {};
-      if (filters.branch) params.branchId = filters.branch;
+      if (effectiveBranch) params.branchId = effectiveBranch;
       if (filters.category) params.category = filters.category;
       if (filters.search) params.search = filters.search;
       const response = await getParts(params);
@@ -173,14 +173,16 @@ export default function PartsListPage() {
       setSelectedPart(null);
       // Refetch parts
       const params: Record<string, string> = {};
-      if (filters.branch) params.branchId = filters.branch;
+      if (effectiveBranch) params.branchId = effectiveBranch;
       if (filters.category) params.category = filters.category;
       if (filters.search) params.search = filters.search;
       const response = await getParts(params);
       setParts(response.parts);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to transfer stock:", error);
-      toast.error(error.response?.data?.message || "Failed to transfer stock");
+      toast.error(error instanceof Error ? error.message : "Failed to transfer stock");
+    } finally {
+      setIsTransferring(false);
     }
   };
 
@@ -206,8 +208,6 @@ export default function PartsListPage() {
   const totalParts = parts.length;
   const lowStockItems = lowStockCount;
   const outOfStockItems = parts.filter((p) => p.quantity === 0).length;
-  const totalValue = parts.reduce((sum, p) => sum + (p.part.sellingPrice * p.quantity), 0);
-
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -246,7 +246,7 @@ export default function PartsListPage() {
           >
             Parts Inventory
           </h1>
-          <Link
+          {canManage && <Link
             href="/parts/new"
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
             style={{
@@ -255,44 +255,14 @@ export default function PartsListPage() {
             }}
           >
             Add New Part
-          </Link>
+          </Link>}
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Total Parts
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              {totalParts}
-            </p>
-          </div>
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Low Stock Items
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.accents.secondary }}>
-              {lowStockItems}
-            </p>
-          </div>
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Out of Stock Items
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
-              {outOfStockItems}
-            </p>
-          </div>
+          <SummaryCard label="Total Parts" value={totalParts} />
+          <SummaryCard label="Low Stock Items" value={lowStockItems} color={theme.accents.secondary} />
+          <SummaryCard label="Out of Stock Items" value={outOfStockItems} color={theme.accents.primary} />
           <div
             className="rounded-lg p-4"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -320,15 +290,15 @@ export default function PartsListPage() {
                 Branch
               </label>
               <select
-                value={filters.branch}
+                value={effectiveBranch}
                 onChange={(e) => handleFilterChange("branch", e.target.value)}
-                disabled={!isAdmin}
+                disabled={!isGlobal}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
-                  opacity: !isAdmin ? 0.6 : 1,
+                  opacity: !isGlobal ? 0.6 : 1,
                 }}
               >
                 <option value="">All Branches</option>
@@ -338,7 +308,7 @@ export default function PartsListPage() {
                   </option>
                 ))}
               </select>
-              {!isAdmin && (
+              {!isGlobal && (
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
                   Filtered to your branch
                 </p>
@@ -491,20 +461,20 @@ export default function PartsListPage() {
                         >
                           History
                         </a> */}
-                        <button
+                        {canManage && <button
                           onClick={() => openAdjustModal(part)}
                           className="text-sm font-medium transition-colors hover:opacity-70"
                           style={{ color: theme.accents.primary }}
                         >
                           Adjust
-                        </button>
-                        <button
+                        </button>}
+                        {canManage && <button
                           onClick={() => openTransferModal(part)}
                           className="text-sm font-medium transition-colors hover:opacity-70"
                           style={{ color: theme.accents.secondary }}
                         >
                           Transfer
-                        </button>
+                        </button>}
                         <a
                           href={`/parts/${part.part.id}/edit`}
                           className="text-sm font-medium transition-colors hover:opacity-70"

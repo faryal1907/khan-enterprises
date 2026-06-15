@@ -1,14 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { createBikeModel } from "@/lib/api/inventory";
 import Link from "next/link";
 import { numberToWords } from "@repo/utils";
+import { AsyncButton } from "@/components/async-button";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
 
 export default function NewBikeModelPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -20,6 +24,10 @@ export default function NewBikeModelPage() {
     description: "",
     basePrice: "",
   });
+
+  useEffect(() => {
+    if (user && user.role !== UserRole.ADMIN) router.replace("/models");
+  }, [router, user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -44,9 +52,9 @@ export default function NewBikeModelPage() {
 
       toast.success("Bike model created successfully");
       router.push("/models");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to create model:", error);
-      toast.error(error.response?.data?.message || "Failed to create bike model");
+      toast.error(error instanceof Error ? error.message : "Failed to create bike model");
     } finally {
       setLoading(false);
     }
@@ -137,6 +145,8 @@ export default function NewBikeModelPage() {
                   type="number"
                   name="year"
                   required
+                  min={1900}
+                  max={2100}
                   value={formData.year}
                   onChange={handleChange}
                   className="w-full px-4 py-2 rounded focus:outline-none focus:ring-2"
@@ -206,6 +216,7 @@ export default function NewBikeModelPage() {
                   type="text"
                   name="basePrice"
                   required
+                  inputMode="numeric"
                   value={formData.basePrice}
                   onChange={(e) => {
                     const val = e.target.value.replace(/\D/g, "");
@@ -254,17 +265,14 @@ export default function NewBikeModelPage() {
             </div>
 
             <div className="flex justify-end pt-4">
-              <button
+              <AsyncButton
                 type="submit"
-                disabled={loading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                }}
+                loading={loading}
+                loadingLabel="Saving..."
+                className="px-6"
               >
-                {loading ? "Saving..." : "Save Model"}
-              </button>
+                Save Model
+              </AsyncButton>
             </div>
           </form>
         </div>

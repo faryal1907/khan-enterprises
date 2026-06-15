@@ -7,9 +7,15 @@ import { toast } from "sonner";
 import { createPart, getBranches } from "@/lib/api/inventory";
 import type { Branch } from "@/lib/types";
 import { numberToWords } from "@repo/utils";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
+import { AsyncButton } from "@/components/async-button";
 
 export default function AddPartPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const canManage = user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
+  const isGlobal = user?.role === UserRole.ADMIN || !user?.branchId;
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +35,9 @@ export default function AddPartPage() {
       try {
         const data = await getBranches();
         setBranches(data.branches || []);
-        if (data.branches && data.branches.length > 0) {
+        if (user?.branchId) {
+          setFormData((prev) => ({ ...prev, branchId: user.branchId || "" }));
+        } else if (data.branches && data.branches.length > 0) {
           setFormData((prev) => ({ ...prev, branchId: data.branches[0].id }));
         }
       } catch (error) {
@@ -38,7 +46,11 @@ export default function AddPartPage() {
       }
     };
     fetchBranches();
-  }, []);
+  }, [user?.branchId]);
+
+  useEffect(() => {
+    if (user && !canManage) router.replace("/parts");
+  }, [canManage, router, user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -69,9 +81,9 @@ export default function AddPartPage() {
 
       toast.success("Part added successfully");
       router.push("/parts");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to add part:", error);
-      toast.error(error.response?.data?.message || "Failed to add part");
+      toast.error(error instanceof Error ? error.message : "Failed to add part");
     } finally {
       setLoading(false);
     }
@@ -268,6 +280,7 @@ export default function AddPartPage() {
                     required
                     value={formData.branchId}
                     onChange={handleChange}
+                    disabled={!isGlobal}
                     className="w-full px-3 py-2 rounded text-sm"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -344,17 +357,14 @@ export default function AddPartPage() {
               >
                 Cancel
               </Link>
-              <button
+              <AsyncButton
                 type="submit"
-                disabled={loading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                }}
+                loading={loading}
+                loadingLabel="Adding..."
+                className="px-6"
               >
-                {loading ? "Adding..." : "Add Part"}
-              </button>
+                Add Part
+              </AsyncButton>
             </div>
           </form>
         </div>

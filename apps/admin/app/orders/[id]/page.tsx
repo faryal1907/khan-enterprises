@@ -29,14 +29,16 @@ export default function OrderDetailPage() {
         const data = await getOrderById(orderId);
         setOrder(data);
         setPaymentData((prev) => ({ ...prev, amount: data.negotiatedAmount }));
-      } catch (error) {
-        console.error("Failed to fetch order:", error);
+      } catch (error: any) {
+        console.warn("Failed to fetch order:", error?.message || error);
+        toast.error("Failed to fetch order");
       } finally {
         setLoading(false);
       }
     };
     fetchOrder();
   }, [orderId]);
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -63,8 +65,9 @@ export default function OrderDetailPage() {
       await updateOrderStatus(orderId, newStatus);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
-    } catch (error) {
-      console.error("Failed to update status:", error);
+    } catch (error: any) {
+      console.warn("Failed to update status:", error?.message || error);
+      toast.error(error?.message || "Failed to update status");
     } finally {
       setActionLoading(false);
     }
@@ -78,8 +81,9 @@ export default function OrderDetailPage() {
       setOrder(updatedOrder);
       setShowCancelModal(false);
       setCancelReason("");
-    } catch (error) {
-      console.error("Failed to cancel order:", error);
+    } catch (error: any) {
+      console.warn("Failed to cancel order:", error?.message || error);
+      toast.error(error?.message || "Failed to cancel order");
     } finally {
       setActionLoading(false);
     }
@@ -99,9 +103,8 @@ export default function OrderDetailPage() {
       setOrder(updatedOrder);
       setShowPaymentModal(false);
     } catch (error: any) {
-      console.error("Failed to record payment:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
+      console.warn("Failed to record payment:", error?.message || error);
+      toast.error(error?.message || "Failed to record payment");
     } finally {
       setActionLoading(false);
     }
@@ -180,9 +183,9 @@ export default function OrderDetailPage() {
       setActionLoading(true);
       await downloadInvoice(orderId, false);
       toast.success("Invoice downloaded successfully");
-    } catch (error) {
-      console.error("Failed to download invoice:", error);
-      toast.error("Failed to download invoice");
+    } catch (error: any) {
+      console.warn("Failed to download invoice:", error?.message || error);
+      toast.error(error?.message || "Failed to download invoice");
     } finally {
       setActionLoading(false);
     }
@@ -521,7 +524,7 @@ export default function OrderDetailPage() {
 
         <div className="flex justify-end space-x-4 mt-6">
           <button
-            onClick={() => router.push("/orders")}
+            onClick={() => router.back()}
             className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
             style={{
               backgroundColor: theme.backgrounds.primary,
@@ -529,7 +532,7 @@ export default function OrderDetailPage() {
               border: `1px solid ${theme.borders.medium}`,
             }}
           >
-            Back to Orders
+            Go Back
           </button>
         </div>
       </div>
