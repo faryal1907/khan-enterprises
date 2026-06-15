@@ -100,8 +100,6 @@ export class OrdersService {
         offer: true,
         branch: true,
         transactions: true,
-        delivery: true,
-        documents: true,
         processedBy: {
           select: {
             id: true,

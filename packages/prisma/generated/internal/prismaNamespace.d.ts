@@ -1675,6 +1675,7 @@ export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransacti
 export declare const DeliveryRequestScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
+    readonly partOrderId: "partOrderId";
     readonly deliveryAddress: "deliveryAddress";
     readonly preferredTimeWindow: "preferredTimeWindow";
     readonly contactNumber: "contactNumber";

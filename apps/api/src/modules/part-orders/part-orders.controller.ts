@@ -27,15 +27,6 @@ export class PartOrdersController {
   }
 
   /**
-   * GET /api/part-orders/:orderNumber
-   * Get part order by order number (public endpoint)
-   */
-  @Get(":orderNumber")
-  async getPartOrderByNumber(@Param("orderNumber") orderNumber: string) {
-    return this.partOrdersService.getPartOrderByNumber(orderNumber);
-  }
-
-  /**
    * GET /api/part-orders/id/:id
    * Get part order by ID
    */
@@ -43,6 +34,15 @@ export class PartOrdersController {
   @UseGuards(JwtAuthGuard)
   async getPartOrderById(@Param("id") id: string) {
     return this.partOrdersService.getPartOrderById(id);
+  }
+
+  /**
+   * GET /api/part-orders/:orderNumber
+   * Get part order by order number (public endpoint)
+   */
+  @Get(":orderNumber")
+  async getPartOrderByNumber(@Param("orderNumber") orderNumber: string) {
+    return this.partOrdersService.getPartOrderByNumber(orderNumber);
   }
 
   /**

@@ -453,6 +453,8 @@ model PartOrder {
 
   transactions PartPaymentTransaction[]
 
+  delivery DeliveryRequest?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -528,8 +530,11 @@ model PartPaymentTransaction {
 model DeliveryRequest {
   id String @id @default(uuid())
 
-  orderId String @unique
-  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  partOrderId String?
+  partOrder   PartOrder?  @relation(fields: [partOrderId], references: [id])
 
   deliveryAddress     String
   preferredTimeWindow String?
@@ -546,6 +551,8 @@ model DeliveryRequest {
   updatedAt DateTime @updatedAt
 
   @@index([status])
+  @@unique([orderId])
+  @@unique([partOrderId])
 }
 
 // ============================================================================

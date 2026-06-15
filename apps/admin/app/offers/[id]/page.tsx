@@ -122,7 +122,7 @@ export default function OfferDetailPage() {
       setActionLoading(true);
       await counterOffer(offerId, {
         counterAmount: parseFloat(counterAmount.replace(/,/g, "")),
-        adminResponse,
+        ...(adminResponse.trim() && { adminResponse }),
       });
       setShowCounterModal(false);
       setCounterAmount("");

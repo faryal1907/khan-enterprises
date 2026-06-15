@@ -233,6 +233,7 @@ exports.PartPaymentTransactionScalarFieldEnum = {
 exports.DeliveryRequestScalarFieldEnum = {
     id: 'id',
     orderId: 'orderId',
+    partOrderId: 'partOrderId',
     deliveryAddress: 'deliveryAddress',
     preferredTimeWindow: 'preferredTimeWindow',
     contactNumber: 'contactNumber',

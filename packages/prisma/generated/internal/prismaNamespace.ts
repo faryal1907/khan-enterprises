@@ -1955,6 +1955,7 @@ export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransacti
 export const DeliveryRequestScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
+  partOrderId: 'partOrderId',
   deliveryAddress: 'deliveryAddress',
   preferredTimeWindow: 'preferredTimeWindow',
   contactNumber: 'contactNumber',

@@ -23,9 +23,10 @@ export class DeliveriesController {
   async createDeliveryRequest(
     @Param("orderId") orderId: string,
     @Body() dto: CreateDeliveryDto,
+    @Query("orderType") orderType: "BIKE" | "PART" = "BIKE",
     @CurrentUser() user: any
   ) {
-    return this.deliveriesService.createDeliveryRequest(orderId, dto);
+    return this.deliveriesService.createDeliveryRequest(orderId, dto, orderType);
   }
 
   /**
@@ -72,8 +73,11 @@ export class DeliveriesController {
   @Get("order/:orderId")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
-  async getDeliveryByOrderId(@Param("orderId") orderId: string) {
-    return this.deliveriesService.getDeliveryByOrderId(orderId);
+  async getDeliveryByOrderId(
+    @Param("orderId") orderId: string,
+    @Query("orderType") orderType: "BIKE" | "PART" = "BIKE"
+  ) {
+    return this.deliveriesService.getDeliveryByOrderId(orderId, orderType);
   }
 
   /**

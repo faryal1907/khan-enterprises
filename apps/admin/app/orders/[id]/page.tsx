@@ -140,19 +140,22 @@ export default function OrderDetailPage() {
           </button>
         );
       case OrderStatus.CONFIRMED:
-        return (
-          <button
-            onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
-          >
-            Mark Ready for Delivery
-          </button>
-        );
+        if (order.delivery) {
+          return (
+            <button
+              onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
+              disabled={actionLoading}
+              className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+              style={{
+                backgroundColor: theme.accents.primary,
+                color: theme.text.inverse,
+              }}
+            >
+              Mark Ready for Delivery
+            </button>
+          );
+        }
+        return null;
       case OrderStatus.READY_FOR_DELIVERY:
         return (
           <button

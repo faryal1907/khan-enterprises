@@ -305,6 +305,7 @@ export type PartOrderWhereInput = {
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.PartPaymentTransactionListRelationFilter
+  delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null
 }
 
 export type PartOrderOrderByWithRelationInput = {
@@ -328,6 +329,7 @@ export type PartOrderOrderByWithRelationInput = {
   branch?: Prisma.BranchOrderByWithRelationInput
   processedBy?: Prisma.UserOrderByWithRelationInput
   transactions?: Prisma.PartPaymentTransactionOrderByRelationAggregateInput
+  delivery?: Prisma.DeliveryRequestOrderByWithRelationInput
 }
 
 export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
@@ -354,6 +356,7 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.PartPaymentTransactionListRelationFilter
+  delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null
 }, "id" | "orderNumber">
 
 export type PartOrderOrderByWithAggregationInput = {
@@ -417,6 +420,7 @@ export type PartOrderCreateInput = {
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateInput = {
@@ -436,6 +440,7 @@ export type PartOrderUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUpdateInput = {
@@ -455,6 +460,7 @@ export type PartOrderUpdateInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateInput = {
@@ -474,6 +480,7 @@ export type PartOrderUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderCreateManyInput = {
@@ -603,6 +610,11 @@ export type PartOrderSumOrderByAggregateInput = {
 export type PartOrderScalarRelationFilter = {
   is?: Prisma.PartOrderWhereInput
   isNot?: Prisma.PartOrderWhereInput
+}
+
+export type PartOrderNullableScalarRelationFilter = {
+  is?: Prisma.PartOrderWhereInput | null
+  isNot?: Prisma.PartOrderWhereInput | null
 }
 
 export type PartOrderCreateNestedManyWithoutProcessedByInput = {
@@ -787,6 +799,22 @@ export type PartOrderUpdateOneRequiredWithoutTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartOrderUpdateToOneWithWhereWithoutTransactionsInput, Prisma.PartOrderUpdateWithoutTransactionsInput>, Prisma.PartOrderUncheckedUpdateWithoutTransactionsInput>
 }
 
+export type PartOrderCreateNestedOneWithoutDeliveryInput = {
+  create?: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+  connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutDeliveryInput
+  connect?: Prisma.PartOrderWhereUniqueInput
+}
+
+export type PartOrderUpdateOneWithoutDeliveryNestedInput = {
+  create?: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+  connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutDeliveryInput
+  upsert?: Prisma.PartOrderUpsertWithoutDeliveryInput
+  disconnect?: Prisma.PartOrderWhereInput | boolean
+  delete?: Prisma.PartOrderWhereInput | boolean
+  connect?: Prisma.PartOrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartOrderUpdateToOneWithWhereWithoutDeliveryInput, Prisma.PartOrderUpdateWithoutDeliveryInput>, Prisma.PartOrderUncheckedUpdateWithoutDeliveryInput>
+}
+
 export type PartOrderCreateWithoutProcessedByInput = {
   id?: string
   orderNumber: string
@@ -803,6 +831,7 @@ export type PartOrderCreateWithoutProcessedByInput = {
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutProcessedByInput = {
@@ -821,6 +850,7 @@ export type PartOrderUncheckedCreateWithoutProcessedByInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutProcessedByInput = {
@@ -886,6 +916,7 @@ export type PartOrderCreateWithoutBranchInput = {
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutBranchInput = {
@@ -904,6 +935,7 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutBranchInput = {
@@ -948,6 +980,7 @@ export type PartOrderCreateWithoutPartInput = {
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutPartInput = {
@@ -966,6 +999,7 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutPartInput = {
@@ -1010,6 +1044,7 @@ export type PartOrderCreateWithoutPartInventoryInput = {
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
@@ -1028,6 +1063,7 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutPartInventoryInput = {
@@ -1072,6 +1108,7 @@ export type PartOrderCreateWithoutTransactionsInput = {
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutTransactionsInput = {
@@ -1090,6 +1127,7 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutTransactionsInput = {
@@ -1124,6 +1162,7 @@ export type PartOrderUpdateWithoutTransactionsInput = {
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
@@ -1142,6 +1181,99 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
+}
+
+export type PartOrderCreateWithoutDeliveryInput = {
+  id?: string
+  orderNumber: string
+  customerName: string
+  customerPhone: string
+  customerAddress: string
+  quantity: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod: $Enums.PaymentMethod
+  status?: $Enums.OrderStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
+  partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
+  branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
+  processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
+  transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+}
+
+export type PartOrderUncheckedCreateWithoutDeliveryInput = {
+  id?: string
+  orderNumber: string
+  partId: string
+  partInventoryId: string
+  branchId: string
+  customerName: string
+  customerPhone: string
+  customerAddress: string
+  quantity: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod: $Enums.PaymentMethod
+  status?: $Enums.OrderStatus
+  processedById?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+}
+
+export type PartOrderCreateOrConnectWithoutDeliveryInput = {
+  where: Prisma.PartOrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+}
+
+export type PartOrderUpsertWithoutDeliveryInput = {
+  update: Prisma.XOR<Prisma.PartOrderUpdateWithoutDeliveryInput, Prisma.PartOrderUncheckedUpdateWithoutDeliveryInput>
+  create: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+  where?: Prisma.PartOrderWhereInput
+}
+
+export type PartOrderUpdateToOneWithWhereWithoutDeliveryInput = {
+  where?: Prisma.PartOrderWhereInput
+  data: Prisma.XOR<Prisma.PartOrderUpdateWithoutDeliveryInput, Prisma.PartOrderUncheckedUpdateWithoutDeliveryInput>
+}
+
+export type PartOrderUpdateWithoutDeliveryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
+  partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
+  branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
+  processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
+  transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+}
+
+export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  partId?: Prisma.StringFieldUpdateOperationsInput | string
+  partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
 }
 
 export type PartOrderCreateManyProcessedByInput = {
@@ -1177,6 +1309,7 @@ export type PartOrderUpdateWithoutProcessedByInput = {
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
@@ -1195,6 +1328,7 @@ export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
@@ -1247,6 +1381,7 @@ export type PartOrderUpdateWithoutBranchInput = {
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutBranchInput = {
@@ -1265,6 +1400,7 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
@@ -1317,6 +1453,7 @@ export type PartOrderUpdateWithoutPartInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutPartInput = {
@@ -1335,6 +1472,7 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutPartInput = {
@@ -1387,6 +1525,7 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
@@ -1405,6 +1544,7 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
@@ -1476,6 +1616,7 @@ export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>
   transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>
+  delivery?: boolean | Prisma.PartOrder$deliveryArgs<ExtArgs>
   _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partOrder"]>
 
@@ -1548,6 +1689,7 @@ export type PartOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>
   transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>
+  delivery?: boolean | Prisma.PartOrder$deliveryArgs<ExtArgs>
   _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1571,6 +1713,7 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     branch: Prisma.$BranchPayload<ExtArgs>
     processedBy: Prisma.$UserPayload<ExtArgs> | null
     transactions: Prisma.$PartPaymentTransactionPayload<ExtArgs>[]
+    delivery: Prisma.$DeliveryRequestPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1987,6 +2130,7 @@ export interface Prisma__PartOrderClient<T, Null = never, ExtArgs extends runtim
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   processedBy<T extends Prisma.PartOrder$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transactions<T extends Prisma.PartOrder$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  delivery<T extends Prisma.PartOrder$deliveryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$deliveryArgs<ExtArgs>>): Prisma.Prisma__DeliveryRequestClient<runtime.Types.Result.GetResult<Prisma.$DeliveryRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2472,6 +2616,25 @@ export type PartOrder$transactionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PartPaymentTransactionScalarFieldEnum | Prisma.PartPaymentTransactionScalarFieldEnum[]
+}
+
+/**
+ * PartOrder.delivery
+ */
+export type PartOrder$deliveryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryRequest
+   */
+  select?: Prisma.DeliveryRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryRequest
+   */
+  omit?: Prisma.DeliveryRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryRequestInclude<ExtArgs> | null
+  where?: Prisma.DeliveryRequestWhereInput
 }
 
 /**

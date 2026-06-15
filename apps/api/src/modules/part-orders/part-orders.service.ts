@@ -91,28 +91,6 @@ export class PartOrdersService {
         },
       });
 
-      // 8. If CASH payment, immediately confirm order and reduce stock
-      if (dto.paymentMethod === "CASH") {
-        await tx.partOrder.update({
-          where: { id: partOrder.id },
-          data: {
-            status: OrderStatus.CONFIRMED,
-          },
-        });
-
-        await tx.partInventory.update({
-          where: { id: dto.partInventoryId },
-          data: {
-            quantity: {
-              decrement: dto.quantity,
-            },
-            reservedQuantity: {
-              decrement: dto.quantity,
-            },
-          },
-        });
-      }
-
       return {
         order: partOrder,
         transaction,
@@ -135,6 +113,7 @@ export class PartOrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
         processedBy: {
           select: {
             id: true,
@@ -167,6 +146,7 @@ export class PartOrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
         processedBy: {
           select: {
             id: true,
@@ -281,6 +261,7 @@ export class PartOrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
       },
       orderBy: { createdAt: "desc" },
     });

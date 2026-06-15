@@ -257,7 +257,7 @@ export default function CustomerOrdersPage() {
                       </>
                     ) : null}
                   </div>
-                  {order.type === "BIKE" ? (
+                  {(order.type === "BIKE" || order.type === "PART") ? (
                     <Link
                       href={`/orders/${order.orderNumber}`}
                       className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity text-center"

@@ -663,10 +663,12 @@ export type OrderCreateNestedOneWithoutDeliveryInput = {
     connectOrCreate?: Prisma.OrderCreateOrConnectWithoutDeliveryInput;
     connect?: Prisma.OrderWhereUniqueInput;
 };
-export type OrderUpdateOneRequiredWithoutDeliveryNestedInput = {
+export type OrderUpdateOneWithoutDeliveryNestedInput = {
     create?: Prisma.XOR<Prisma.OrderCreateWithoutDeliveryInput, Prisma.OrderUncheckedCreateWithoutDeliveryInput>;
     connectOrCreate?: Prisma.OrderCreateOrConnectWithoutDeliveryInput;
     upsert?: Prisma.OrderUpsertWithoutDeliveryInput;
+    disconnect?: Prisma.OrderWhereInput | boolean;
+    delete?: Prisma.OrderWhereInput | boolean;
     connect?: Prisma.OrderWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutDeliveryInput, Prisma.OrderUpdateWithoutDeliveryInput>, Prisma.OrderUncheckedUpdateWithoutDeliveryInput>;
 };
