@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
+import { useAuthStore } from "@/lib/auth-store";
 import { toast } from "sonner";
 import {
   getBranches,
@@ -13,7 +14,7 @@ import {
   attachDocument,
   uploadFile,
 } from "@/lib/api/inventory";
-import type { Branch, Vendor, BikeModel } from "@/lib/types";
+import { UserRole, type Branch, type Vendor, type BikeModel } from "@/lib/types";
 
 interface UploadedFile {
   fileName: string;
@@ -144,6 +145,7 @@ function FileUploadZone({
 export default function EditBikePage() {
   const router = useRouter();
   const params = useParams();
+  const { user } = useAuthStore();
   const id = params.id as string;
 
   // Form fields
@@ -175,6 +177,11 @@ export default function EditBikePage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role !== UserRole.ADMIN) router.replace("/bikes");
+  }, [router, user]);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Fetch reference data and bike on mount
@@ -285,12 +292,10 @@ export default function EditBikePage() {
     try {
       // Update bike
       await updateBike(id, {
-        branchId,
         vendorId,
         price: price ? parseFloat(price) : undefined,
         color: color || undefined,
         media,
-        status,
       });
 
       // Attach documents
@@ -344,6 +349,8 @@ export default function EditBikePage() {
 
   const selectedModel = bikeModels.find(m => m.id === modelId);
   const availableColors = selectedModel?.color ? selectedModel.color.split('/').map(c => c.trim()) : [];
+
+  if (user && user.role !== UserRole.ADMIN) return null;
 
   return (
     <div className="p-8">
@@ -421,14 +428,14 @@ export default function EditBikePage() {
                   Branch *
                 </label>
                 <select
-                  className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
                   value={branchId}
-                  onChange={(e) => setBranchId(e.target.value)}
+                  disabled
+                  className="w-full px-3 py-2 rounded text-sm opacity-60 cursor-not-allowed"
                 >
                   <option value="">Select branch</option>
                   {branches.map((branch) => (
@@ -437,6 +444,9 @@ export default function EditBikePage() {
                     </option>
                   ))}
                 </select>
+                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                  Use the transfer action on the Bikes Inventory page to change branch.
+                </p>
               </div>
               <div>
                 <label
@@ -554,20 +564,23 @@ export default function EditBikePage() {
                 Status
               </label>
               <select
-                className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
                 }}
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                disabled
+                className="w-full px-3 py-2 rounded text-sm opacity-60 cursor-not-allowed"
               >
                 <option value="AVAILABLE">Available</option>
                 <option value="SOLD">Sold</option>
                 <option value="RESERVED">Reserved</option>
                 <option value="IN_DELIVERY">In Delivery</option>
               </select>
+              <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                Status is managed by offer, order, and delivery workflows.
+              </p>
             </div>
 
             <div className="border-t pt-6" style={{ borderColor: theme.borders.light }}>

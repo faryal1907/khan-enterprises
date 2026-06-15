@@ -1,18 +1,9 @@
-import { IsString, IsOptional, IsNumber, IsArray, IsEnum, IsUUID } from "class-validator";
-import { BikeStatus } from "@khan/prisma";
+import { IsString, IsOptional, IsNumber, IsArray } from "class-validator";
 
 export class UpdateBikeUnitDto {
   @IsString()
   @IsOptional()
-  branchId?: string;
-
-  @IsString()
-  @IsOptional()
   vendorId?: string;
-
-  @IsEnum(BikeStatus)
-  @IsOptional()
-  status?: BikeStatus;
 
   @IsNumber()
   @IsOptional()

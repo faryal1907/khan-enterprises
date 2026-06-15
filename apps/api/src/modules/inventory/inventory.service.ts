@@ -10,15 +10,21 @@ import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
-import { AuditAction } from "@khan/prisma";
+import { AuditAction, BikeStatus, OfferStatus, OrderStatus } from "@khan/prisma";
+
+type InventoryUser = {
+  id: string;
+  role: string;
+  branchId: string | null;
+};
 
 @Injectable()
 export class InventoryService {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Return all serialized bike units with their model, vendor, and branch details. */
-  async getAllBikes(query?: string | QueryBikesDto) {
-    let branchId: string | undefined;
+  async getAllBikes(query: QueryBikesDto, user: InventoryUser) {
+    let branchId = query.branchId;
     let status: any;
     let modelId: string | undefined;
     let vendorId: string | undefined;
@@ -26,19 +32,17 @@ export class InventoryService {
     let page: number | undefined;
     let limit: number | undefined;
 
-    if (typeof query === "string") {
-      branchId = query;
-    } else if (query) {
-      branchId = query.branchId;
-      status = query.status;
-      modelId = query.modelId;
-      vendorId = query.vendorId;
-      search = query.search;
-      page = query.page;
-      limit = query.limit;
-    }
+    status = query.status;
+    modelId = query.modelId;
+    vendorId = query.vendorId;
+    search = query.search;
+    page = query.page;
+    limit = query.limit;
 
     const where: any = {};
+    if (user.role !== "ADMIN" && user.branchId) {
+      branchId = user.branchId;
+    }
     if (branchId) {
       where.branchId = branchId;
     }
@@ -66,47 +70,74 @@ export class InventoryService {
       ];
     }
 
-    const skip = page && limit ? (page - 1) * limit : undefined;
-    const take = limit ? limit : undefined;
+    const currentPage = page || 1;
+    const pageSize = limit || 20;
+    const skip = (currentPage - 1) * pageSize;
+    const summaryWhere = { ...where };
+    delete summaryWhere.status;
 
-    return this.prisma.client.bikeUnit.findMany({
-      where,
-      skip,
-      take,
-      select: {
-        id: true,
-        chassisNumber: true,
-        engineNumber: true,
-        serialNumber: true,
-        status: true,
-        negotiatedPrice: true,
-        reservedUntil: true,
-        soldAt: true,
-        createdAt: true,
-        model: {
-          select: {
-            id: true,
-            brand: true,
-            modelName: true,
-            year: true,
-            engineCapacity: true,
-            color: true,
-            basePrice: true,
+    const [bikes, total, available, reserved, sold, inDelivery] = await Promise.all([
+      this.prisma.client.bikeUnit.findMany({
+        where,
+        skip,
+        take: pageSize,
+        select: {
+          id: true,
+          chassisNumber: true,
+          engineNumber: true,
+          serialNumber: true,
+          status: true,
+          negotiatedPrice: true,
+          reservedUntil: true,
+          soldAt: true,
+          createdAt: true,
+          model: {
+            select: {
+              id: true,
+              brand: true,
+              modelName: true,
+              year: true,
+              engineCapacity: true,
+              color: true,
+              basePrice: true,
+            },
+          },
+          vendor: {
+            select: { id: true, name: true },
+          },
+          branch: {
+            select: { id: true, name: true, city: true },
           },
         },
-        vendor: {
-          select: { id: true, name: true },
-        },
-        branch: {
-          select: { id: true, name: true, city: true },
-        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.bikeUnit.count({ where }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.AVAILABLE } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.RESERVED } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.SOLD } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.IN_DELIVERY } }),
+    ]);
+
+    return {
+      bikes,
+      pagination: {
+        page: currentPage,
+        limit: pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
       },
-      orderBy: { createdAt: "desc" },
-    });
+      summary: {
+        total: available + reserved + sold + inDelivery,
+        available,
+        reserved,
+        sold,
+        inDelivery,
+      },
+    };
   }
 
   /** Fetch a single bike unit with documents and all associated relations. */
-  async getBikeById(id: string) {
+  async getBikeById(id: string, user?: InventoryUser) {
     const bike = await this.prisma.client.bikeUnit.findUnique({
       where: { id },
       include: {
@@ -120,6 +151,7 @@ export class InventoryService {
     if (!bike) {
       throw new NotFoundException(`Bike with ID ${id} not found`);
     }
+    this.assertBikeAccess(bike.branchId, user);
 
     return bike;
   }
@@ -189,15 +221,13 @@ export class InventoryService {
 
   /** Update an existing bike unit's properties. */
   async updateBike(id: string, dto: UpdateBikeUnitDto, user: any) {
-    const oldBike = await this.getBikeById(id);
+    const oldBike = await this.getBikeById(id, user);
 
     return this.prisma.client.$transaction(async (tx) => {
       const bike = await tx.bikeUnit.update({
         where: { id },
         data: {
-          branchId: dto.branchId,
           vendorId: dto.vendorId,
-          status: dto.status,
           price: dto.price,
           color: dto.color,
           media: dto.media,
@@ -227,7 +257,7 @@ export class InventoryService {
 
   /** Delete a bike unit. */
   async deleteBike(id: string, user: any) {
-    const oldBike = await this.getBikeById(id);
+    const oldBike = await this.getBikeById(id, user);
 
     return this.prisma.client.$transaction(async (tx) => {
       const deletedBike = await tx.bikeUnit.delete({
@@ -251,12 +281,39 @@ export class InventoryService {
 
   /** Update status of a bike unit. */
   async updateBikeStatus(id: string, dto: UpdateBikeStatusDto, user: any) {
-    const oldBike = await this.getBikeById(id);
+    const oldBike = await this.getBikeById(id, user);
+
+    if (dto.status !== BikeStatus.AVAILABLE) {
+      throw new BadRequestException(
+        "SOLD, RESERVED, and IN_DELIVERY statuses are managed by offer, order, and delivery workflows.",
+      );
+    }
+    if (oldBike.status === BikeStatus.SOLD || oldBike.status === BikeStatus.IN_DELIVERY) {
+      throw new BadRequestException(`Cannot manually release a bike in ${oldBike.status} status.`);
+    }
+
+    const [activeOrders, activeOffers] = await Promise.all([
+      this.prisma.client.order.count({
+        where: { bikeId: id, status: { not: OrderStatus.CANCELLED } },
+      }),
+      this.prisma.client.offer.count({
+        where: { bikeId: id, status: { in: [OfferStatus.ACCEPTED, OfferStatus.PAID] } },
+      }),
+    ]);
+    if (activeOrders > 0 || activeOffers > 0) {
+      throw new BadRequestException(
+        "This bike has an active offer or order. Resolve that workflow instead of changing inventory status.",
+      );
+    }
 
     return this.prisma.client.$transaction(async (tx) => {
       const bike = await tx.bikeUnit.update({
         where: { id },
-        data: { status: dto.status },
+        data: {
+          status: BikeStatus.AVAILABLE,
+          reservedUntil: null,
+          negotiatedPrice: null,
+        },
         include: {
           model: true,
           vendor: true,
@@ -282,7 +339,14 @@ export class InventoryService {
 
   /** Transfer a bike unit to a different branch. */
   async transferBike(id: string, dto: TransferBikeDto, user: any) {
-    const oldBike = await this.getBikeById(id);
+    const oldBike = await this.getBikeById(id, user);
+
+    if (oldBike.branchId === dto.branchId) {
+      throw new BadRequestException("Destination branch must be different from the current branch.");
+    }
+    if (oldBike.status !== BikeStatus.AVAILABLE) {
+      throw new BadRequestException("Only AVAILABLE bikes can be transferred between branches.");
+    }
 
     const targetBranch = await this.prisma.client.branch.findUnique({
       where: { id: dto.branchId },
@@ -333,6 +397,12 @@ export class InventoryService {
         uploadedById: userId || null,
       },
     });
+  }
+
+  private assertBikeAccess(branchId: string, user?: InventoryUser) {
+    if (user?.role !== "ADMIN" && user?.branchId && user.branchId !== branchId) {
+      throw new NotFoundException("Bike not found");
+    }
   }
 
   /** Return all part inventory records with part details and branch info. */

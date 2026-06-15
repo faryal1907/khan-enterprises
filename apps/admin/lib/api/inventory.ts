@@ -1,4 +1,5 @@
 import { api } from "../api-client";
+import type { BikeInventoryResponse } from "../types";
 
 // ============================================================================
 // BIKES
@@ -12,7 +13,7 @@ export async function getBikes(params?: {
   vendorId?: string;
   page?: number;
   limit?: number;
-}) {
+}): Promise<BikeInventoryResponse> {
   const response = await api.get("/inventory/bikes", { params });
   return response.data;
 }
