@@ -181,6 +181,7 @@ exports.OrderScalarFieldEnum = {
     negotiatedAmount: 'negotiatedAmount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    expiresAt: 'expiresAt',
     processedById: 'processedById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -198,6 +199,7 @@ exports.PartOrderScalarFieldEnum = {
     amount: 'amount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    expiresAt: 'expiresAt',
     processedById: 'processedById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'

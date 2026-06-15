@@ -506,7 +506,11 @@ export class OrdersService {
       // 2. Generate order number
       const orderNumber = `ORD-MAN-${Date.now()}`;
 
-      // 3. Create Order
+      // 3. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      // 4. Create Order
       const order = await tx.order.create({
         data: {
           orderNumber,
@@ -519,6 +523,7 @@ export class OrdersService {
           negotiatedAmount: dto.salePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.CONFIRMED,
+          expiresAt,
           processedById: user.id,
         },
       });

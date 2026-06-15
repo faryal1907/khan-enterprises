@@ -45,7 +45,11 @@ export class PartOrdersService {
       // 4. Calculate total amount
       const amount = part.sellingPrice.mul(dto.quantity);
 
-      // 5. Create part order
+      // 5. Set expiresAt to 1 week from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      // 6. Create part order
       const partOrder = await tx.partOrder.create({
         data: {
           orderNumber,
@@ -59,6 +63,7 @@ export class PartOrdersService {
           amount,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.PENDING_PAYMENT,
+          expiresAt,
         },
         include: {
           part: true,

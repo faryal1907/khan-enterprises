@@ -198,6 +198,10 @@ export class OffersService {
       // 5. Create Order
       const orderNumber = generateOrderNumber();
       const negotiatedAmount = offer.counterAmount || offer.offerAmount;
+      
+      // Set expiresAt to 1 week from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
       const order = await tx.order.create({
         data: {
@@ -212,6 +216,7 @@ export class OffersService {
           negotiatedAmount,
           paymentMethod: offer.paymentMethod || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
+          expiresAt,
           processedById: user.id,
         },
       });
@@ -386,6 +391,10 @@ export class OffersService {
       // 5. Create Order (without processedById since customer is accepting)
       const orderNumber = generateOrderNumber();
       const negotiatedAmount = offer.counterAmount || offer.offerAmount;
+      
+      // Set expiresAt to 1 week from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
       const order = await tx.order.create({
         data: {
@@ -400,6 +409,7 @@ export class OffersService {
           negotiatedAmount,
           paymentMethod: (paymentMethod as PaymentMethod) || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
+          expiresAt,
           processedById: null,
         },
       });

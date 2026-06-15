@@ -1619,6 +1619,7 @@ export declare const OrderScalarFieldEnum: {
     readonly negotiatedAmount: "negotiatedAmount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
+    readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -1637,6 +1638,7 @@ export declare const PartOrderScalarFieldEnum: {
     readonly amount: "amount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
+    readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";

@@ -406,6 +406,8 @@ model Order {
 
   status OrderStatus @default(PENDING_PAYMENT)
 
+  expiresAt DateTime?
+
   processedById String?
   processedBy   User?   @relation("OrderProcessedBy", fields: [processedById], references: [id])
 
@@ -447,6 +449,8 @@ model PartOrder {
   paymentMethod PaymentMethod
 
   status OrderStatus @default(PENDING_PAYMENT)
+
+  expiresAt DateTime?
 
   processedById String?
   processedBy   User?   @relation("PartOrderProcessedBy", fields: [processedById], references: [id])

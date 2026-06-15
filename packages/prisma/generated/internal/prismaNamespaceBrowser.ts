@@ -256,6 +256,7 @@ export const OrderScalarFieldEnum = {
   negotiatedAmount: 'negotiatedAmount',
   paymentMethod: 'paymentMethod',
   status: 'status',
+  expiresAt: 'expiresAt',
   processedById: 'processedById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -277,6 +278,7 @@ export const PartOrderScalarFieldEnum = {
   amount: 'amount',
   paymentMethod: 'paymentMethod',
   status: 'status',
+  expiresAt: 'expiresAt',
   processedById: 'processedById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

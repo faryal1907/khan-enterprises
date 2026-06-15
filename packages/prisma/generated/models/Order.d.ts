@@ -28,6 +28,7 @@ export type OrderMinAggregateOutputType = {
     negotiatedAmount: runtime.Decimal | null;
     paymentMethod: $Enums.PaymentMethod | null;
     status: $Enums.OrderStatus | null;
+    expiresAt: Date | null;
     processedById: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -45,6 +46,7 @@ export type OrderMaxAggregateOutputType = {
     negotiatedAmount: runtime.Decimal | null;
     paymentMethod: $Enums.PaymentMethod | null;
     status: $Enums.OrderStatus | null;
+    expiresAt: Date | null;
     processedById: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -62,6 +64,7 @@ export type OrderCountAggregateOutputType = {
     negotiatedAmount: number;
     paymentMethod: number;
     status: number;
+    expiresAt: number;
     processedById: number;
     createdAt: number;
     updatedAt: number;
@@ -86,6 +89,7 @@ export type OrderMinAggregateInputType = {
     negotiatedAmount?: true;
     paymentMethod?: true;
     status?: true;
+    expiresAt?: true;
     processedById?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -103,6 +107,7 @@ export type OrderMaxAggregateInputType = {
     negotiatedAmount?: true;
     paymentMethod?: true;
     status?: true;
+    expiresAt?: true;
     processedById?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -120,6 +125,7 @@ export type OrderCountAggregateInputType = {
     negotiatedAmount?: true;
     paymentMethod?: true;
     status?: true;
+    expiresAt?: true;
     processedById?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -166,6 +172,7 @@ export type OrderGroupByOutputType = {
     negotiatedAmount: runtime.Decimal;
     paymentMethod: $Enums.PaymentMethod;
     status: $Enums.OrderStatus;
+    expiresAt: Date | null;
     processedById: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -194,6 +201,7 @@ export type OrderWhereInput = {
     negotiatedAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFilter<"Order"> | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus;
+    expiresAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"Order"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
@@ -218,6 +226,7 @@ export type OrderOrderByWithRelationInput = {
     negotiatedAmount?: Prisma.SortOrder;
     paymentMethod?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -245,6 +254,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
     negotiatedAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFilter<"Order"> | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus;
+    expiresAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"Order"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
@@ -269,6 +279,7 @@ export type OrderOrderByWithAggregationInput = {
     negotiatedAmount?: Prisma.SortOrder;
     paymentMethod?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -294,6 +305,7 @@ export type OrderScalarWhereWithAggregatesInput = {
     negotiatedAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodWithAggregatesFilter<"Order"> | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus;
+    expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string;
@@ -308,6 +320,7 @@ export type OrderCreateInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -331,6 +344,7 @@ export type OrderUncheckedCreateInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -348,6 +362,7 @@ export type OrderUpdateInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -371,6 +386,7 @@ export type OrderUncheckedUpdateInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -391,6 +407,7 @@ export type OrderCreateManyInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -405,6 +422,7 @@ export type OrderUpdateManyMutationInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -421,6 +439,7 @@ export type OrderUncheckedUpdateManyInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -450,6 +469,7 @@ export type OrderCountOrderByAggregateInput = {
     negotiatedAmount?: Prisma.SortOrder;
     paymentMethod?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -470,6 +490,7 @@ export type OrderMaxOrderByAggregateInput = {
     negotiatedAmount?: Prisma.SortOrder;
     paymentMethod?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -487,6 +508,7 @@ export type OrderMinOrderByAggregateInput = {
     negotiatedAmount?: Prisma.SortOrder;
     paymentMethod?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -696,6 +718,7 @@ export type OrderCreateWithoutProcessedByInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -718,6 +741,7 @@ export type OrderUncheckedCreateWithoutProcessedByInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
@@ -761,6 +785,7 @@ export type OrderScalarWhereInput = {
     negotiatedAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFilter<"Order"> | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus;
+    expiresAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"Order"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
@@ -775,6 +800,7 @@ export type OrderCreateWithoutBranchInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -796,6 +822,7 @@ export type OrderUncheckedCreateWithoutBranchInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -834,6 +861,7 @@ export type OrderCreateWithoutBikeInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     offer?: Prisma.OfferCreateNestedOneWithoutOrderInput;
@@ -855,6 +883,7 @@ export type OrderUncheckedCreateWithoutBikeInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -893,6 +922,7 @@ export type OrderCreateWithoutOfferInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -914,6 +944,7 @@ export type OrderUncheckedCreateWithoutOfferInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -944,6 +975,7 @@ export type OrderUpdateWithoutOfferInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -965,6 +997,7 @@ export type OrderUncheckedUpdateWithoutOfferInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -982,6 +1015,7 @@ export type OrderCreateWithoutTransactionsInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -1004,6 +1038,7 @@ export type OrderUncheckedCreateWithoutTransactionsInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1033,6 +1068,7 @@ export type OrderUpdateWithoutTransactionsInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -1055,6 +1091,7 @@ export type OrderUncheckedUpdateWithoutTransactionsInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1071,6 +1108,7 @@ export type OrderCreateWithoutDeliveryInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -1093,6 +1131,7 @@ export type OrderUncheckedCreateWithoutDeliveryInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1122,6 +1161,7 @@ export type OrderUpdateWithoutDeliveryInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -1144,6 +1184,7 @@ export type OrderUncheckedUpdateWithoutDeliveryInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1160,6 +1201,7 @@ export type OrderCreateWithoutDocumentsInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
@@ -1182,6 +1224,7 @@ export type OrderUncheckedCreateWithoutDocumentsInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1211,6 +1254,7 @@ export type OrderUpdateWithoutDocumentsInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -1233,6 +1277,7 @@ export type OrderUncheckedUpdateWithoutDocumentsInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1252,6 +1297,7 @@ export type OrderCreateManyProcessedByInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -1265,6 +1311,7 @@ export type OrderUpdateWithoutProcessedByInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -1287,6 +1334,7 @@ export type OrderUncheckedUpdateWithoutProcessedByInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
@@ -1306,6 +1354,7 @@ export type OrderUncheckedUpdateManyWithoutProcessedByInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -1321,6 +1370,7 @@ export type OrderCreateManyBranchInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1335,6 +1385,7 @@ export type OrderUpdateWithoutBranchInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
@@ -1356,6 +1407,7 @@ export type OrderUncheckedUpdateWithoutBranchInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1375,6 +1427,7 @@ export type OrderUncheckedUpdateManyWithoutBranchInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1391,6 +1444,7 @@ export type OrderCreateManyBikeInput = {
     negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod: $Enums.PaymentMethod;
     status?: $Enums.OrderStatus;
+    expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1405,6 +1459,7 @@ export type OrderUpdateWithoutBikeInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput;
@@ -1426,6 +1481,7 @@ export type OrderUncheckedUpdateWithoutBikeInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1445,6 +1501,7 @@ export type OrderUncheckedUpdateManyWithoutBikeInput = {
     negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
     status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1479,6 +1536,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     negotiatedAmount?: boolean;
     paymentMethod?: boolean;
     status?: boolean;
+    expiresAt?: boolean;
     processedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -1504,6 +1562,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     negotiatedAmount?: boolean;
     paymentMethod?: boolean;
     status?: boolean;
+    expiresAt?: boolean;
     processedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -1525,6 +1584,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     negotiatedAmount?: boolean;
     paymentMethod?: boolean;
     status?: boolean;
+    expiresAt?: boolean;
     processedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -1546,11 +1606,12 @@ export type OrderSelectScalar = {
     negotiatedAmount?: boolean;
     paymentMethod?: boolean;
     status?: boolean;
+    expiresAt?: boolean;
     processedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "bikeId" | "offerId" | "branchId" | "customerName" | "customerPhone" | "customerCNIC" | "customerAddress" | "negotiatedAmount" | "paymentMethod" | "status" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>;
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "bikeId" | "offerId" | "branchId" | "customerName" | "customerPhone" | "customerCNIC" | "customerAddress" | "negotiatedAmount" | "paymentMethod" | "status" | "expiresAt" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>;
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
     offer?: boolean | Prisma.Order$offerArgs<ExtArgs>;
@@ -1597,6 +1658,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
         negotiatedAmount: runtime.Decimal;
         paymentMethod: $Enums.PaymentMethod;
         status: $Enums.OrderStatus;
+        expiresAt: Date | null;
         processedById: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -1676,6 +1738,7 @@ export interface OrderFieldRefs {
     readonly negotiatedAmount: Prisma.FieldRef<"Order", 'Decimal'>;
     readonly paymentMethod: Prisma.FieldRef<"Order", 'PaymentMethod'>;
     readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>;
+    readonly expiresAt: Prisma.FieldRef<"Order", 'DateTime'>;
     readonly processedById: Prisma.FieldRef<"Order", 'String'>;
     readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"Order", 'DateTime'>;

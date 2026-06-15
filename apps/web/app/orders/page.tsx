@@ -7,11 +7,62 @@ import { useAuthStore } from "@/lib/auth-store";
 import { getOrders } from "@/lib/api/orders";
 import { getPartOrders } from "@/lib/api/part-orders";
 
+function CountdownTimer({ expiresAt }: { expiresAt: string }) {
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(expiresAt).getTime();
+      const difference = expiry - now;
+
+      if (difference <= 0) {
+        return "Expired";
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
+      } else if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
+      }
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [expiresAt]);
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-full"
+      style={{
+        backgroundColor: timeLeft === "Expired" ? "#FEE2E2" : "#FEF3C7",
+        color: timeLeft === "Expired" ? "#991B1B" : "#92400E",
+        border: timeLeft === "Expired" ? "1px solid #EF4444" : "1px solid #F59E0B",
+      }}
+    >
+      <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: timeLeft === "Expired" ? "#EF4444" : "#F59E0B" }} />
+      {timeLeft === "Expired" ? "Order Expired" : `Pay in: ${timeLeft}`}
+    </div>
+  );
+}
+
 interface UnifiedOrder {
   id: string;
   orderNumber: string;
   status: string;
   createdAt: string;
+  expiresAt?: string;
   type: "BIKE" | "PART";
   
   // Bike order fields
@@ -197,7 +248,7 @@ export default function CustomerOrdersPage() {
               >
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-3 mb-3 flex-wrap">
                       <span
                         className="inline-block px-3 py-1 text-xs font-medium rounded-full uppercase"
                         style={{
@@ -213,6 +264,9 @@ export default function CustomerOrdersPage() {
                       >
                         {getStatusLabel(order.status)}
                       </span>
+                      {order.status === "PENDING_PAYMENT" && order.expiresAt && (
+                        <CountdownTimer expiresAt={order.expiresAt} />
+                      )}
                       <span className="text-xs" style={{ color: theme.text.muted }}>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </span>

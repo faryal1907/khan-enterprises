@@ -7,6 +7,56 @@ import { getOrderByNumber } from "@/lib/api/orders";
 import { getPartOrderByNumber } from "@/lib/api/part-orders";
 import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
 
+function CountdownTimer({ expiresAt }: { expiresAt: string }) {
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(expiresAt).getTime();
+      const difference = expiry - now;
+
+      if (difference <= 0) {
+        return "Expired";
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
+      } else if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
+      }
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [expiresAt]);
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-full"
+      style={{
+        backgroundColor: timeLeft === "Expired" ? "#FEE2E2" : "#FEF3C7",
+        color: timeLeft === "Expired" ? "#991B1B" : "#92400E",
+        border: timeLeft === "Expired" ? "1px solid #EF4444" : "1px solid #F59E0B",
+      }}
+    >
+      <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: timeLeft === "Expired" ? "#EF4444" : "#F59E0B" }} />
+      {timeLeft === "Expired" ? "Order Expired" : `Pay in: ${timeLeft}`}
+    </div>
+  );
+}
+
 interface Order {
   id: string;
   orderNumber: string;
@@ -20,6 +70,7 @@ interface Order {
   paymentMethod: string;
   createdAt: string;
   updatedAt: string;
+  expiresAt?: string;
   type: "BIKE" | "PART";
   
   // Bike order fields
@@ -248,10 +299,13 @@ export default function OrderStatusPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <div>
-                <h2 className="text-lg font-semibold mb-2" style={{ color: "#92400E" }}>
-                  Payment Pending
-                </h2>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-lg font-semibold" style={{ color: "#92400E" }}>
+                    Payment Pending
+                  </h2>
+                  {order.expiresAt && <CountdownTimer expiresAt={order.expiresAt} />}
+                </div>
                 <p className="text-sm" style={{ color: "#92400E" }}>
                   Please visit your nearest branch to complete payment and confirm your order.
                 </p>
