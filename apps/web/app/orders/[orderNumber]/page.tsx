@@ -304,7 +304,7 @@ export default function OrderStatusPage() {
                   <h2 className="text-lg font-semibold" style={{ color: "#92400E" }}>
                     Payment Pending
                   </h2>
-                  {order.expiresAt && <CountdownTimer expiresAt={order.expiresAt} />}
+                  <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />
                 </div>
                 <p className="text-sm" style={{ color: "#92400E" }}>
                   Please visit your nearest branch to complete payment and confirm your order.

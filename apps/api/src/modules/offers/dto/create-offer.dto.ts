@@ -23,8 +23,8 @@ export class CreateOfferDto {
   customerCNIC?: string;
 
   @IsString()
-  @IsOptional()
-  customerAddress?: string;
+  @IsNotEmpty()
+  customerAddress: string;
 
   @IsNumber()
   @Min(1)
