@@ -26,7 +26,7 @@ export default function BikesListPage() {
 
   const [filters, setFilters] = useState({
     branch: "",
-    status: "",
+    status: searchParams.get("status") || "",
     model: searchParams.get("model") || "",
     vendor: "",
     search: "",

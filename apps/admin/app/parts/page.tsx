@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
@@ -15,6 +16,8 @@ import {
 import type { Branch, PartInventory } from "@/lib/types";
 
 export default function PartsListPage() {
+  const searchParams = useSearchParams();
+  const lowStockOnly = searchParams.get("lowStock") === "true";
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
 
@@ -83,7 +86,7 @@ export default function PartsListPage() {
           getLowStockItems(filters.branch),
         ]);
 
-        setParts(partsResponse.parts);
+        setParts(lowStockOnly ? lowStockResponse.items : partsResponse.parts);
         setLowStockCount(lowStockResponse.count);
       } catch (error) {
         console.error("Failed to fetch parts:", error);
@@ -92,7 +95,7 @@ export default function PartsListPage() {
       }
     };
     fetchData();
-  }, [filters]);
+  }, [filters, lowStockOnly]);
 
   const handleFilterChange = (key: string, value: string) => {
     // Prevent non-admins from changing branch filter

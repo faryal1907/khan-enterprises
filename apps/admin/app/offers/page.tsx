@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { getOffers } from "@/lib/api/offers";
 
@@ -26,9 +26,10 @@ interface Offer {
 
 export default function OffersListPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("PENDING");
+  const [activeTab, setActiveTab] = useState(searchParams.get("status") || "PENDING");
   const [page, setPage] = useState(1);
 
   const statusTabs = [

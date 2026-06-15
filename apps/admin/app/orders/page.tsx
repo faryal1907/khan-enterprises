@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole, OrderStatus, Order } from "@/lib/types";
@@ -10,11 +10,12 @@ import { toast } from "sonner";
 
 export default function OrdersListPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
 
   const [filters, setFilters] = useState({
-    status: "",
+    status: searchParams.get("status") || "",
     branchId: "",
     dateFrom: "",
     dateTo: "",

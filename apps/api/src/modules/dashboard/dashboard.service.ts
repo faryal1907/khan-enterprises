@@ -2,123 +2,124 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserRole, OrderStatus, BikeStatus, DeliveryStatus, OfferStatus, PaymentStatus } from '@khan/prisma';
 
+type DashboardUser = {
+  role: UserRole;
+  branchId: string | null;
+};
+
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getStats(user: any) {
-    const branchId = user.role !== UserRole.ADMIN ? user.branchId : undefined;
-    
-    // Base where clauses
+  async getStats(user: DashboardUser) {
+    // Assigned operational users are branch-scoped; unassigned users intentionally
+    // operate globally. Admins are always global.
+    const branchId = user.role === UserRole.ADMIN ? undefined : user.branchId ?? undefined;
     const branchFilter = branchId ? { branchId } : {};
-    
-    // 1. Pending Orders (Offers needing action)
-    const pendingOrders = await this.prisma.client.offer.count({
-      where: {
-        bike: branchFilter,
-        status: { in: [OfferStatus.PENDING, OfferStatus.COUNTERED] }
-      }
-    });
+    const relatedBranchFilter = branchId ? { branchId } : {};
 
-    // 2. Total Sales / Branch Revenue
-    // Sum only successful payment transactions to properly handle refunded amounts
-    const successfulPayments = await this.prisma.client.paymentTransaction.findMany({
-      where: {
-        status: PaymentStatus.SUCCESS,
-        order: branchId ? { branchId } : undefined,
-      },
-      select: { amount: true }
-    });
-    
-    const totalSalesAmount = successfulPayments.reduce((sum, payment) => {
-      return sum + Number(payment.amount || 0);
-    }, 0);
-
-    const bikesSold = await this.prisma.client.order.count({
-      where: {
-        ...branchFilter,
-        status: { in: [OrderStatus.DELIVERED, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] }
-      }
-    });
-
-    // 3. Available Bikes
-    const availableBikes = await this.prisma.client.bikeUnit.count({
-      where: {
-        ...branchFilter,
-        status: BikeStatus.AVAILABLE
-      }
-    });
-
-    // 4. Available Parts
-    const availablePartsAgg = await this.prisma.client.partInventory.aggregate({
-      where: { ...branchFilter },
-      _sum: { quantity: true, reservedQuantity: true }
-    });
-    
-    const availableParts = (availablePartsAgg._sum.quantity || 0) - (availablePartsAgg._sum.reservedQuantity || 0);
-
-    // 5. Low Stock Alerts
-    const lowStockInventories = await this.prisma.client.partInventory.count({
-      where: {
-        ...branchFilter,
-        quantity: { lte: this.prisma.client.partInventory.fields.reorderLevel }
-      }
-    });
-    
-    // Fallback if the above doesn't work in Prisma (comparing two fields is tricky in some Prisma versions)
-    // Actually, comparing two fields directly in `where` is not supported in Prisma unless using raw or `where: { quantity: { lte: Prisma.sql... } }`. 
-    // I will fetch all and filter in memory if needed, but since we might have many, let's use queryRaw or just fetch them.
-    const allInventories = await this.prisma.client.partInventory.findMany({
-      where: { ...branchFilter },
-      select: { quantity: true, reorderLevel: true }
-    });
-    const lowStockAlerts = allInventories.filter(inv => inv.quantity <= inv.reorderLevel).length;
-
-    // 6. Pending Deliveries
-    const pendingDeliveries = await this.prisma.client.deliveryRequest.count({
-      where: {
-        order: branchFilter,
-        status: { in: [DeliveryStatus.REQUESTED, DeliveryStatus.APPROVED, DeliveryStatus.IN_TRANSIT] }
-      }
-    });
-
-    // 7. Orders Waiting Payment
-    const ordersWaitingPayment = await this.prisma.client.order.count({
-      where: {
-        ...branchFilter,
-        status: OrderStatus.PENDING_PAYMENT
-      }
-    });
-
-    // 8. Pending Sales (Offers)
-    const pendingSales = await this.prisma.client.offer.count({
-      where: {
-        bike: branchFilter,
-        status: OfferStatus.PENDING
-      }
-    });
-
-    // 9. Issues: Cancelled orders in the branch that need review
-    const issues = await this.prisma.client.order.count({
-      where: {
-        ...branchFilter,
-        status: OrderStatus.CANCELLED,
-      }
-    });
-
-    return {
-      pendingOrders,
-      totalSales: totalSalesAmount,
-      branchRevenue: totalSalesAmount,
+    const [
+      branch,
+      pendingOffers,
+      bikePayments,
+      partPayments,
       bikesSold,
+      availableBikes,
+      availablePartsAgg,
+      lowStockAlerts,
+      pendingDeliveries,
+      ordersWaitingPayment,
+      cancelledOrders,
+    ] = await Promise.all([
+      branchId
+        ? this.prisma.client.branch.findUnique({
+            where: { id: branchId },
+            select: { id: true, name: true, city: true },
+          })
+        : Promise.resolve(null),
+      this.prisma.client.offer.count({
+        where: {
+          bike: relatedBranchFilter,
+          status: OfferStatus.PENDING,
+        },
+      }),
+      this.prisma.client.paymentTransaction.aggregate({
+        where: {
+          status: PaymentStatus.SUCCESS,
+          order: branchId ? { branchId } : undefined,
+        },
+        _sum: { amount: true },
+      }),
+      this.prisma.client.partPaymentTransaction.aggregate({
+        where: {
+          status: PaymentStatus.SUCCESS,
+          partOrder: branchId ? { branchId } : undefined,
+        },
+        _sum: { amount: true },
+      }),
+      this.prisma.client.bikeUnit.count({
+        where: { ...branchFilter, status: BikeStatus.SOLD },
+      }),
+      this.prisma.client.bikeUnit.count({
+        where: { ...branchFilter, status: BikeStatus.AVAILABLE },
+      }),
+      this.prisma.client.partInventory.aggregate({
+        where: branchFilter,
+        _sum: { quantity: true, reservedQuantity: true },
+      }),
+      this.prisma.client.partInventory.count({
+        where: {
+          ...branchFilter,
+          quantity: { lt: this.prisma.client.partInventory.fields.reorderLevel },
+        },
+      }),
+      this.prisma.client.deliveryRequest.count({
+        where: {
+          order: relatedBranchFilter,
+          status: {
+            in: [
+              DeliveryStatus.REQUESTED,
+              DeliveryStatus.UNDER_REVIEW,
+              DeliveryStatus.APPROVED,
+              DeliveryStatus.IN_TRANSIT,
+            ],
+          },
+        },
+      }),
+      this.prisma.client.order.count({
+        where: { ...branchFilter, status: OrderStatus.PENDING_PAYMENT },
+      }),
+      this.prisma.client.order.count({
+        where: { ...branchFilter, status: OrderStatus.CANCELLED },
+      }),
+    ]);
+
+    const totalRevenue =
+      Number(bikePayments._sum.amount ?? 0) + Number(partPayments._sum.amount ?? 0);
+    const availableParts =
+      (availablePartsAgg._sum.quantity ?? 0) -
+      (availablePartsAgg._sum.reservedQuantity ?? 0);
+    const commonStats = {
+      scope: branch
+        ? { type: 'BRANCH' as const, branch }
+        : { type: 'GLOBAL' as const, branch: null },
+      pendingOffers,
       availableBikes,
       availableParts,
       lowStockAlerts,
       pendingDeliveries,
       ordersWaitingPayment,
-      pendingSales,
-      alerts: lowStockAlerts + pendingOrders, // example combination
-      issues,
+      cancelledOrders,
+    };
+
+    if (user.role === UserRole.SALES_STAFF) {
+      return commonStats;
+    }
+
+    return {
+      ...commonStats,
+      totalRevenue,
+      bikesSold,
     };
   }
 }

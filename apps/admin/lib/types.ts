@@ -14,6 +14,22 @@ export interface User {
   status: string;
 }
 
+export interface DashboardStats {
+  scope: {
+    type: "GLOBAL" | "BRANCH";
+    branch: Pick<Branch, "id" | "name" | "city"> | null;
+  };
+  pendingOffers: number;
+  availableBikes: number;
+  availableParts: number;
+  lowStockAlerts: number;
+  pendingDeliveries: number;
+  ordersWaitingPayment: number;
+  cancelledOrders: number;
+  totalRevenue?: number;
+  bikesSold?: number;
+}
+
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
