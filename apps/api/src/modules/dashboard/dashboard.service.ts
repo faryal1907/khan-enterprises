@@ -68,12 +68,16 @@ export class DashboardService {
         where: branchFilter,
         _sum: { quantity: true, reservedQuantity: true },
       }),
-      this.prisma.client.partInventory.count({
-        where: {
-          ...branchFilter,
-          quantity: { lt: this.prisma.client.partInventory.fields.reorderLevel },
+      this.prisma.client.partInventory.findMany({
+        where: branchFilter,
+        select: {
+          quantity: true,
+          reservedQuantity: true,
+          reorderLevel: true,
         },
-      }),
+      }).then(inventories => 
+        inventories.filter(inv => inv.quantity - inv.reservedQuantity < inv.reorderLevel).length
+      ),
       this.prisma.client.deliveryRequest.count({
         where: {
           order: relatedBranchFilter,

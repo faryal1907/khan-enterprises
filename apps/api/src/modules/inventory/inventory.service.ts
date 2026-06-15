@@ -865,8 +865,8 @@ export class InventoryService {
       },
     });
 
-    // Filter in memory where quantity < reorderLevel
-    return inventories.filter((inv) => inv.quantity < inv.reorderLevel);
+    // Filter in memory where available quantity (quantity - reservedQuantity) < reorderLevel
+    return inventories.filter((inv) => inv.quantity - inv.reservedQuantity < inv.reorderLevel);
   }
 
   /** Return all PartInventory rows for a given Part. */
