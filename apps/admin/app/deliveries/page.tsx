@@ -291,16 +291,16 @@ export default function DeliveryQueuePage() {
                 {deliveries.map((delivery) => (
                   <tr key={delivery.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                      {delivery.order.orderNumber}
+                      {delivery.order?.orderNumber || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {delivery.order.customerName}
+                      {delivery.order?.customerName || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-sm max-w-xs truncate" style={{ color: theme.text.primary }}>
                       {delivery.deliveryAddress}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {delivery.order.branch.name}, {delivery.order.branch.city}
+                      {delivery.order?.branch ? `${delivery.order.branch.name}, ${delivery.order.branch.city}` : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {new Date(delivery.createdAt).toLocaleDateString()}

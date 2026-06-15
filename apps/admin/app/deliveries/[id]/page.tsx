@@ -181,7 +181,7 @@ export default function DeliveryDetailPage() {
                 Order Number
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order.orderNumber}
+                {delivery.order?.orderNumber || "N/A"}
               </p>
             </div>
             <div>
@@ -192,7 +192,7 @@ export default function DeliveryDetailPage() {
                 Order Date
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {new Date(delivery.order.createdAt).toLocaleDateString()}
+                {delivery.order?.createdAt ? new Date(delivery.order.createdAt).toLocaleDateString() : "N/A"}
               </p>
             </div>
             <div>
@@ -210,7 +210,7 @@ export default function DeliveryDetailPage() {
                   border: "1px solid #6366F1",
                 }}
               >
-                {delivery.order.status.replace(/_/g, " ")}
+                {delivery.order?.status?.replace(/_/g, " ") || "N/A"}
               </span>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function DeliveryDetailPage() {
                 Name
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order.customerName}
+                {delivery.order?.customerName || "N/A"}
               </p>
             </div>
             <div>
@@ -247,7 +247,7 @@ export default function DeliveryDetailPage() {
                 Phone
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order.customerPhone}
+                {delivery.order?.customerPhone || "N/A"}
               </p>
             </div>
             <div>
@@ -258,7 +258,7 @@ export default function DeliveryDetailPage() {
                 Address
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order.customerAddress}
+                {delivery.order?.customerAddress || "N/A"}
               </p>
             </div>
           </div>
@@ -342,7 +342,7 @@ export default function DeliveryDetailPage() {
                 Branch
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {delivery.order.branch.name}, {delivery.order.branch.city}
+                {delivery.order?.branch ? `${delivery.order.branch.name}, ${delivery.order.branch.city}` : "N/A"}
               </p>
             </div>
           </div>
@@ -510,8 +510,9 @@ export default function DeliveryDetailPage() {
             Back to Delivery Queue
           </button>
           <button
-            onClick={() => router.push(`/orders/${delivery.order.id}`)}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            onClick={() => delivery.order?.id && router.push(`/orders/${delivery.order.id}`)}
+            disabled={!delivery.order?.id}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
