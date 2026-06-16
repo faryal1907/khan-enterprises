@@ -1,4 +1,4 @@
-import { IsEnum, IsUUID, IsOptional, IsDateString } from "class-validator";
+import { IsEnum, IsOptional, IsDateString, IsString } from "class-validator";
 import { PaymentStatus, PaymentMethod } from "@khan/prisma";
 
 export class QueryTransactionsDto {
@@ -10,7 +10,7 @@ export class QueryTransactionsDto {
   @IsOptional()
   method?: PaymentMethod;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   branchId?: string;
 

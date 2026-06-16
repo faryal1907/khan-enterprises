@@ -40,9 +40,10 @@ export class PartOrdersController {
    * Get part order by ID
    */
   @Get("id/:id")
-  @UseGuards(JwtAuthGuard)
-  async getPartOrderById(@Param("id") id: string) {
-    return this.partOrdersService.getPartOrderById(id);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async getPartOrderById(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.partOrdersService.getPartOrderById(id, user);
   }
 
   /**
@@ -50,7 +51,8 @@ export class PartOrdersController {
    * Get part orders (paginated, filtered)
    */
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
   async getPartOrders(@Query() query: any, @CurrentUser() user: any) {
     return this.partOrdersService.getPartOrders(query, user);
   }
@@ -60,7 +62,8 @@ export class PartOrdersController {
    * Update part order status (admin only)
    */
   @Patch(":id/status")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
   async updatePartOrderStatus(
     @Param("id") id: string,
     @Body("status") status: OrderStatus,
@@ -74,7 +77,8 @@ export class PartOrdersController {
    * Cancel part order (admin only)
    */
   @Patch(":id/cancel")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
   async cancelPartOrder(@Param("id") id: string, @CurrentUser() user: any) {
     return this.partOrdersService.cancelPartOrder(id, user);
   }
@@ -98,9 +102,10 @@ export class PartOrdersController {
    * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
    */
   @Get(":id/invoice")
-  @UseGuards(JwtAuthGuard)
-  async downloadInvoice(@Param("id") id: string, @Res() res: Response) {
-    const order = await this.partOrdersService.getPartOrderById(id);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async downloadInvoice(@Param("id") id: string, @CurrentUser() user: any, @Res() res: Response) {
+    const order = await this.partOrdersService.getPartOrderById(id, user);
     if (!order) {
       throw new NotFoundException("Part order not found");
     }

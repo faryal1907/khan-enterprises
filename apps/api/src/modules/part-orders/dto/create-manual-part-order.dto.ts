@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, Min, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, Min, IsEnum, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PaymentMethod } from '@khan/prisma';
 
@@ -6,6 +6,10 @@ export class CreateManualPartOrderDto {
   @IsString()
   @IsNotEmpty()
   partId: string;
+
+  @IsString()
+  @IsOptional()
+  partInventoryId?: string;
 
   @Type(() => Number)
   @IsNumber()

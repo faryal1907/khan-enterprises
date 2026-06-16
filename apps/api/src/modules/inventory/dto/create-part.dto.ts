@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsUUID, IsInt, Min } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsInt, Min } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreatePartDto {
@@ -23,7 +23,7 @@ export class CreatePartDto {
   @Type(() => Number)
   sellingPrice: number;
 
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   branchId: string;
 

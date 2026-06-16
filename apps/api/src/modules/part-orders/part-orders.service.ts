@@ -8,6 +8,26 @@ import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prism
 export class PartOrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private isAssignedBranchUser(user?: any) {
+    return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
+  }
+
+  private applyBranchScope(where: any, user?: any) {
+    if (this.isAssignedBranchUser(user)) {
+      where.branchId = user.branchId;
+    }
+  }
+
+  private assertPartOrderAccess(order: { branchId: string; customerPhone?: string }, user?: any) {
+    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
+      throw new NotFoundException("Part order not found");
+    }
+
+    if (this.isAssignedBranchUser(user) && order.branchId !== user.branchId) {
+      throw new NotFoundException("Part order not found");
+    }
+  }
+
   /**
    * Create a new part order
    */
@@ -123,7 +143,7 @@ export class PartOrdersService {
   /**
    * Get part order by order number
    */
-  async getPartOrderByNumber(orderNumber: string) {
+  async getPartOrderByNumber(orderNumber: string, user?: any) {
     const order = await this.prisma.client.partOrder.findUnique({
       where: { orderNumber },
       include: {
@@ -149,13 +169,15 @@ export class PartOrdersService {
       throw new NotFoundException(`Part order with number ${orderNumber} not found`);
     }
 
+    this.assertPartOrderAccess(order, user);
+
     return order;
   }
 
   /**
    * Get part order by ID
    */
-  async getPartOrderById(id: string) {
+  async getPartOrderById(id: string, user?: any) {
     const order = await this.prisma.client.partOrder.findUnique({
       where: { id },
       include: {
@@ -181,6 +203,8 @@ export class PartOrdersService {
       throw new NotFoundException(`Part order with ID ${id} not found`);
     }
 
+    this.assertPartOrderAccess(order, user);
+
     return order;
   }
 
@@ -199,8 +223,14 @@ export class PartOrdersService {
       where.branchId = query.branchId;
     }
 
+    this.applyBranchScope(where, user);
+
     if (query.partId) {
       where.partId = query.partId;
+    }
+
+    if (query.processedById) {
+      where.processedById = query.processedById;
     }
 
     if (query.dateFrom || query.dateTo) {
@@ -301,6 +331,8 @@ export class PartOrdersService {
       throw new NotFoundException(`Part order with ID ${id} not found`);
     }
 
+    this.assertPartOrderAccess(order, user);
+
     const validTransitions: Record<OrderStatus, OrderStatus[]> = {
       [OrderStatus.PENDING_PAYMENT]: [OrderStatus.PAID, OrderStatus.CANCELLED],
       [OrderStatus.PAID]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
@@ -367,6 +399,8 @@ export class PartOrdersService {
         throw new NotFoundException(`Part order with ID ${id} not found`);
       }
 
+      this.assertPartOrderAccess(order, user);
+
       if (order.status === OrderStatus.DELIVERED) {
         throw new BadRequestException(`Cannot cancel a delivered order`);
       }
@@ -429,9 +463,17 @@ export class PartOrdersService {
    */
   async createManualPartOrder(dto: CreateManualPartOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
-      // 1. Fetch branch inventory
+      const inventoryWhere: any = dto.partInventoryId
+        ? { id: dto.partInventoryId, partId: dto.partId }
+        : { partId: dto.partId };
+
+      if (this.isAssignedBranchUser(user)) {
+        inventoryWhere.branchId = user.branchId;
+      }
+
+      // 1. Fetch the exact branch inventory row selected by the sale form.
       const inventory = await tx.partInventory.findFirst({
-        where: { partId: dto.partId }, // In a real app we'd scope this to the admin's branch
+        where: inventoryWhere,
         include: { branch: true },
       });
 
@@ -440,8 +482,9 @@ export class PartOrdersService {
       }
 
       // 2. Ensure stock
-      if (inventory.quantity < dto.quantity) {
-        throw new BadRequestException(`Insufficient stock. Available: ${inventory.quantity}`);
+      const availableQuantity = inventory.quantity - inventory.reservedQuantity;
+      if (availableQuantity < dto.quantity) {
+        throw new BadRequestException(`Insufficient stock. Available: ${availableQuantity}`);
       }
 
       // 3. Deduct stock immediately

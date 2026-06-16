@@ -6,6 +6,7 @@ export interface OrderFilters {
   dateFrom?: string;
   dateTo?: string;
   search?: string;
+  processedById?: string;
   page?: number;
   limit?: number;
   partId?: string;
@@ -18,6 +19,7 @@ export async function getOrders(filters: OrderFilters = {}) {
   if (filters.dateFrom) params.dateFrom = filters.dateFrom;
   if (filters.dateTo) params.dateTo = filters.dateTo;
   if (filters.search) params.search = filters.search;
+  if (filters.processedById) params.processedById = filters.processedById;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
 
@@ -32,6 +34,7 @@ export async function getPartOrders(filters: OrderFilters = {}) {
   if (filters.dateFrom) params.dateFrom = filters.dateFrom;
   if (filters.dateTo) params.dateTo = filters.dateTo;
   if (filters.search) params.search = filters.search;
+  if (filters.processedById) params.processedById = filters.processedById;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
   if (filters.partId) params.partId = filters.partId;
