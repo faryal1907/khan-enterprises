@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common";
 import { BranchService } from "./branch.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -15,8 +15,8 @@ export class BranchController {
    * Returns all branches with manager info and inventory/staff counts.
    */
   @Get()
-  async getBranches() {
-    const branches = await this.branchService.getAllBranches();
+  async getBranches(@CurrentUser() user: any) {
+    const branches = await this.branchService.getAllBranches(user);
     return { count: branches.length, branches };
   }
 
@@ -25,8 +25,8 @@ export class BranchController {
    * Returns a single branch with full detail including staff list.
    */
   @Get(":id")
-  async getBranch(@Param("id") id: string) {
-    const branch = await this.branchService.getBranchById(id);
+  async getBranch(@Param("id") id: string, @CurrentUser() user: any) {
+    const branch = await this.branchService.getBranchById(id, user);
     return { branch };
   }
 
@@ -38,7 +38,7 @@ export class BranchController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async createBranch(@Body() dto: any, @CurrentUser() admin: any) {
-    return this.branchService.createBranch(dto, admin.sub);
+    return this.branchService.createBranch(dto, admin.id);
   }
 
   /**
@@ -46,10 +46,11 @@ export class BranchController {
    * Update a branch. ADMIN only.
    */
   @Put(":id")
+  @Patch(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async updateBranch(@Param("id") id: string, @Body() dto: any, @CurrentUser() admin: any) {
-    return this.branchService.updateBranch(id, dto, admin.sub);
+    return this.branchService.updateBranch(id, dto, admin.id);
   }
 
   /**
@@ -60,7 +61,7 @@ export class BranchController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async deleteBranch(@Param("id") id: string, @CurrentUser() admin: any) {
-    return this.branchService.deleteBranch(id, admin.sub);
+    return this.branchService.deleteBranch(id, admin.id);
   }
 
   /**
@@ -82,6 +83,6 @@ export class BranchController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async transferStock(@Body() dto: any, @CurrentUser() admin: any) {
-    return this.branchService.transferStock(dto, admin.sub);
+    return this.branchService.transferStock(dto, admin.id);
   }
 }

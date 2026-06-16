@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { api } from "@/lib/api-client";
+import { AsyncButton } from "@/components/async-button";
+import { SummaryCard } from "@/components/summary-card";
+import { getBranchById, getBranchMetrics, updateBranch } from "@/lib/api/branches";
+import { getUsers } from "@/lib/api/users";
 import { useAuthStore } from "@/lib/auth-store";
+import { theme } from "@/lib/colors";
 import { UserRole } from "@/lib/types";
 
 type Branch = {
@@ -14,14 +18,14 @@ type Branch = {
   name: string;
   city: string;
   address: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   createdAt: string;
   updatedAt: string;
   manager: {
     id: string;
     fullName: string;
     email: string;
-    phoneNumber: string;
+    phoneNumber: string | null;
   } | null;
   users: Array<{
     id: string;
@@ -38,10 +42,6 @@ type Branch = {
 };
 
 type Metrics = {
-  branch: {
-    id: string;
-    name: string;
-  };
   metrics: {
     inventory: {
       bikes: number;
@@ -61,18 +61,31 @@ type Metrics = {
   };
 };
 
+type Manager = {
+  id: string;
+  fullName: string;
+  email: string;
+  branchId: string | null;
+};
+
+const inputStyle = {
+  backgroundColor: theme.backgrounds.tertiary,
+  border: `1px solid ${theme.borders.medium}`,
+  color: theme.text.primary,
+};
+
 export default function BranchDetailPage() {
   const router = useRouter();
   const { user } = useAuthStore();
   const params = useParams<{ id: string }>();
-  const branchId = typeof params?.id === "string" ? params.id : "UNKNOWN";
+  const branchId = params.id;
   const [branch, setBranch] = useState<Branch | null>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [managers, setManagers] = useState<any[]>([]);
+  const [managers, setManagers] = useState<Manager[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     city: "",
@@ -84,94 +97,95 @@ export default function BranchDetailPage() {
   const isAdmin = user?.role === UserRole.ADMIN;
   const isManager = user?.role === UserRole.MANAGER;
 
-  // Role check: Sales Staff cannot access branch management
   useEffect(() => {
     if (user && user.role === UserRole.SALES_STAFF) {
-      router.push("/");
+      router.replace("/");
     }
-  }, [user, router]);
+  }, [router, user]);
 
-  // Role check: Manager scoped to a branch can only view their own branch.
-  // Global managers (no branchId) can view any branch.
   useEffect(() => {
     if (isManager && user?.branchId && branchId !== user.branchId) {
-      router.push("/branches");
+      router.replace("/branches");
     }
-  }, [isManager, user?.branchId, branchId, router]);
+  }, [branchId, isManager, router, user?.branchId]);
 
-  useEffect(() => {
-    // Don't fetch until user is loaded, and don't attempt if manager is on wrong branch
+  const fillForm = (branchData: Branch) => {
+    setFormData({
+      name: branchData.name || "",
+      city: branchData.city || "",
+      address: branchData.address || "",
+      phoneNumber: branchData.phoneNumber || "",
+      managerId: branchData.manager?.id || "",
+    });
+  };
+
+  const fetchData = useCallback(async () => {
     if (!user) return;
     if (isManager && user.branchId && branchId !== user.branchId) return;
 
-    const fetchData = async () => {
-      try {
-        const [branchRes, metricsRes] = await Promise.all([
-          api.get(`/branches/${branchId}`),
-          api.get(`/branches/${branchId}/metrics`),
-        ]);
-        setBranch(branchRes.data.branch);
-        setMetrics(metricsRes.data);
-        setFormData({
-          name: branchRes.data.branch.name,
-          city: branchRes.data.branch.city,
-          address: branchRes.data.branch.address,
-          phoneNumber: branchRes.data.branch.phoneNumber,
-          managerId: branchRes.data.branch.manager?.id || "",
-        });
+    setLoading(true);
+    setError("");
 
-        if (isAdmin) {
-          const usersRes = await api.get("/auth/users");
-          const managerUsers = usersRes.data.users.filter((u: any) => u.role === "MANAGER");
-          setManagers(managerUsers);
-        }
-      } catch (err) {
-        setError("Failed to load branch details");
-        console.warn(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [branchId, user?.id]);
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setUpdating(true);
     try {
-      const updateData: any = {
-        name: formData.name,
-        city: formData.city,
-        address: formData.address,
-        phoneNumber: formData.phoneNumber,
-      };
-      if (formData.managerId) {
-        updateData.managerId = formData.managerId;
-      } else {
-        updateData.managerId = null;
-      }
+      const [branchResponse, metricsResponse] = await Promise.all([
+        getBranchById(branchId),
+        getBranchMetrics(branchId),
+      ]);
+      setBranch(branchResponse.branch);
+      setMetrics(metricsResponse);
+      fillForm(branchResponse.branch);
 
-      await api.patch(`/branches/${branchId}`, updateData);
-      
-      const res = await api.get(`/branches/${branchId}`);
-      setBranch(res.data.branch);
+      if (isAdmin) {
+        const usersResponse = await getUsers({ role: UserRole.MANAGER, status: "ACTIVE" });
+        setManagers(usersResponse.users || []);
+      }
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to load branch details");
+      setBranch(null);
+      setMetrics(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [branchId, isAdmin, isManager, user]);
+
+  useEffect(() => {
+    if (!user || user.role === UserRole.SALES_STAFF) return;
+    fetchData();
+  }, [fetchData, user]);
+
+  const resetForm = () => {
+    if (branch) fillForm(branch);
+  };
+
+  const handleUpdate = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setUpdating(true);
+
+    try {
+      await updateBranch(branchId, {
+        name: formData.name.trim(),
+        city: formData.city.trim(),
+        address: formData.address.trim(),
+        phoneNumber: formData.phoneNumber.trim() || undefined,
+        managerId: formData.managerId || null,
+      });
+      await fetchData();
       setIsEditing(false);
-      toast.success("Branch updated successfully");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to update branch details");
-      toast.error("Failed to update branch");
+      toast.success("Branch updated");
+    } catch (updateError: any) {
+      toast.error(updateError.response?.data?.message || "Failed to update branch");
     } finally {
       setUpdating(false);
     }
   };
 
+  if (user && user.role === UserRole.SALES_STAFF) return null;
+
   if (loading) {
     return (
       <div className="p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading...</p>
+          <p style={{ color: theme.text.secondary }}>Loading branch details...</p>
         </div>
       </div>
     );
@@ -181,18 +195,19 @@ export default function BranchDetailPage() {
     return (
       <div className="p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>{error || "Branch not found"}</p>
-          <Link
-            href="/branches"
-            className="mt-4 inline-block px-4 py-2 text-sm font-medium rounded"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Back to Branches
-          </Link>
+          <p className="mb-4" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
+            {error || "Branch not found"}
+          </p>
+          <div className="flex gap-3">
+            <AsyncButton onClick={fetchData}>Retry</AsyncButton>
+            <Link
+              href="/branches"
+              className="px-4 py-2 text-sm font-medium rounded"
+              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+            >
+              Back to Branches
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -201,39 +216,28 @@ export default function BranchDetailPage() {
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
               Branch Details
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-              Branch ID: {branchId}
+              View branch staff, inventory, and performance.
             </p>
           </div>
 
-          <div className="flex gap-3">
-            <Link
-              href="/branches"
-              className="px-4 py-2 text-sm font-medium rounded"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.secondary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
-            >
-              Back
-            </Link>
-          </div>
+          <Link
+            href="/branches"
+            className="px-4 py-2 text-sm font-medium rounded"
+            style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+          >
+            Back
+          </Link>
         </div>
 
-        {/* Info */}
         <div
           className="rounded-lg p-6 mb-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold" style={{ color: theme.text.primary }}>
@@ -241,8 +245,12 @@ export default function BranchDetailPage() {
             </h2>
             {isAdmin && (
               <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="text-sm font-medium"
+                onClick={() => {
+                  if (isEditing) resetForm();
+                  setIsEditing(!isEditing);
+                }}
+                disabled={updating}
+                className="text-sm font-medium disabled:opacity-50"
                 style={{ color: theme.accents.primary }}
               >
                 {isEditing ? "Cancel" : "Edit"}
@@ -252,197 +260,104 @@ export default function BranchDetailPage() {
 
           {isEditing ? (
             <form onSubmit={handleUpdate}>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Name
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Name *">
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, name: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    City
-                  </label>
+                </FormField>
+                <FormField label="City *">
                   <input
                     type="text"
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, city: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Address
-                  </label>
+                </FormField>
+                <FormField label="Address *">
                   <input
                     type="text"
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, address: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Phone Number
-                  </label>
+                </FormField>
+                <FormField label="Phone Number">
                   <input
                     type="text"
                     value={formData.phoneNumber}
-                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, phoneNumber: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    required
+                    style={inputStyle}
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Manager
-                  </label>
+                </FormField>
+                <FormField label="Manager">
                   <select
                     value={formData.managerId}
-                    onChange={(e) => setFormData({ ...formData, managerId: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, managerId: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                   >
                     <option value="">No Manager</option>
-                    {managers.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.fullName} ({m.email})
+                    {managers.map((manager) => (
+                      <option key={manager.id} value={manager.id}>
+                        {manager.fullName} ({manager.email}){manager.branchId ? " - branch scoped" : " - global"}
                       </option>
                     ))}
                   </select>
-                </div>
+                </FormField>
               </div>
               <div className="mt-4 flex gap-2">
-                <button
-                  type="submit"
-                  disabled={updating}
-                  className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                  }}
-                >
-                  {updating ? "Saving..." : "Save Changes"}
-                </button>
+                <AsyncButton type="submit" loading={updating} loadingLabel="Saving...">
+                  Save Changes
+                </AsyncButton>
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => {
+                    resetForm();
+                    setIsEditing(false);
+                  }}
                   disabled={updating}
                   className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    color: theme.text.secondary,
-                    border: `1px solid ${theme.borders.medium}`,
-                  }}
+                  style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
                 >
                   Cancel
                 </button>
               </div>
             </form>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Info label="Branch ID" value={branch.id} />
               <Info label="Name" value={branch.name} />
               <Info label="City" value={branch.city} />
               <Info label="Address" value={branch.address} />
-              <Info label="Phone Number" value={branch.phoneNumber} />
-              <Info label="Manager" value={branch.manager ? branch.manager.fullName : "—"} />
+              <Info label="Phone Number" value={branch.phoneNumber || "-"} />
+              <Info label="Manager" value={branch.manager?.fullName || "-"} />
               <Info label="Staff Count" value={branch.users.length.toString()} />
               <Info label="Created At" value={new Date(branch.createdAt).toLocaleString()} />
             </div>
           )}
         </div>
 
-        {/* Metrics */}
         {metrics && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.light}`,
-            }}
-          >
-            <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-              Performance Metrics
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Inventory
-                </p>
-                <p className="font-medium" style={{ color: theme.text.primary }}>
-                  {metrics.metrics.inventory.bikes} bikes, {metrics.metrics.inventory.parts} parts
-                </p>
-              </div>
-              <div>
-                <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Staff
-                </p>
-                <p className="font-medium" style={{ color: theme.text.primary }}>
-                  {metrics.metrics.staff} members
-                </p>
-              </div>
-              <div>
-                <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Total Orders
-                </p>
-                <p className="font-medium" style={{ color: theme.text.primary }}>
-                  {metrics.metrics.orders.total}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Total Revenue
-                </p>
-                <p className="font-medium" style={{ color: theme.text.primary }}>
-                  PKR {metrics.metrics.revenue.total.toLocaleString()}
-                </p>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <SummaryCard label="Inventory" value={`${metrics.metrics.inventory.bikes} bikes / ${metrics.metrics.inventory.parts} parts`} />
+            <SummaryCard label="Staff" value={metrics.metrics.staff} />
+            <SummaryCard label="Orders" value={metrics.metrics.orders.total} />
+            <SummaryCard label="Revenue" value={`PKR ${metrics.metrics.revenue.total.toLocaleString()}`} />
           </div>
         )}
 
-        {/* Staff */}
-        <div
-          className="rounded-lg p-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
-        >
+        <div className="rounded-lg p-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
           <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
             Staff Members
           </h2>
@@ -453,15 +368,11 @@ export default function BranchDetailPage() {
             </p>
           ) : (
             <div className="space-y-2">
-              {branch.users.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex justify-between border-b pb-2"
-                  style={{ borderColor: theme.borders.light }}
-                >
-                  <span style={{ color: theme.text.primary }}>{user.fullName}</span>
+              {branch.users.map((staff) => (
+                <div key={staff.id} className="flex justify-between border-b pb-2" style={{ borderColor: theme.borders.light }}>
+                  <span style={{ color: theme.text.primary }}>{staff.fullName}</span>
                   <span style={{ color: theme.text.secondary }}>
-                    {user.role} - {user.status}
+                    {staff.role} - {staff.status}
                   </span>
                 </div>
               ))}
@@ -473,13 +384,24 @@ export default function BranchDetailPage() {
   );
 }
 
+function FormField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>
         {label}
       </p>
-      <p className="font-medium" style={{ color: theme.text.primary }}>
+      <p className="font-medium break-all" style={{ color: theme.text.primary }}>
         {value}
       </p>
     </div>

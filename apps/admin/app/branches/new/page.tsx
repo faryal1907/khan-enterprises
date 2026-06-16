@@ -1,12 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { theme } from "@/lib/colors";
-import { api } from "@/lib/api-client";
+import { toast } from "sonner";
+import { AsyncButton } from "@/components/async-button";
+import { createBranch } from "@/lib/api/branches";
+import { getUsers } from "@/lib/api/users";
 import { useAuthStore } from "@/lib/auth-store";
+import { theme } from "@/lib/colors";
 import { UserRole } from "@/lib/types";
+
+type Manager = {
+  id: string;
+  fullName: string;
+  email: string;
+  branchId: string | null;
+};
+
+const inputStyle = {
+  backgroundColor: theme.backgrounds.tertiary,
+  border: `1px solid ${theme.borders.medium}`,
+  color: theme.text.primary,
+};
 
 export default function CreateBranchPage() {
   const router = useRouter();
@@ -18,213 +35,144 @@ export default function CreateBranchPage() {
     phoneNumber: "",
     managerId: "",
   });
-  const [managers, setManagers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [managers, setManagers] = useState<Manager[]>([]);
+  const [loadingManagers, setLoadingManagers] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  // Role check and fetch managers
   useEffect(() => {
     if (user && user.role !== UserRole.ADMIN) {
-      router.push("/branches");
-      return;
+      router.replace("/branches");
     }
+  }, [router, user]);
 
-    const fetchManagers = async () => {
-      try {
-        const res = await api.get("/auth/users");
-        const managerUsers = res.data.users.filter((u: any) => u.role === "MANAGER");
-        setManagers(managerUsers);
-      } catch (err) {
-        console.error("Failed to fetch managers", err);
-      }
-    };
+  useEffect(() => {
+    if (!user || user.role !== UserRole.ADMIN) return;
 
-    if (user && user.role === UserRole.ADMIN) {
-      fetchManagers();
-    }
-  }, [user, router]);
+    setLoadingManagers(true);
+    getUsers({ role: UserRole.MANAGER, status: "ACTIVE" })
+      .then((data) => setManagers(data.users || []))
+      .catch(() => setManagers([]))
+      .finally(() => setLoadingManagers(false));
+  }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError("");
 
     try {
-      const createData: any = {
-        name: formData.name,
-        city: formData.city,
-        address: formData.address,
-        phoneNumber: formData.phoneNumber,
-      };
-      if (formData.managerId) {
-        createData.managerId = formData.managerId;
-      }
-
-      await api.post("/branches", createData);
+      await createBranch({
+        name: formData.name.trim(),
+        city: formData.city.trim(),
+        address: formData.address.trim(),
+        phoneNumber: formData.phoneNumber.trim() || undefined,
+        managerId: formData.managerId || undefined,
+      });
+      toast.success("Branch created");
       router.push("/branches");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create branch");
-      console.error(err);
+    } catch (createError: any) {
+      setError(createError.response?.data?.message || "Failed to create branch");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  if (user && user.role !== UserRole.ADMIN) return null;
 
   return (
     <div className="p-8">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
             Add New Branch
           </h1>
           <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-            Create a new branch location
+            Create a branch location and optionally assign an active manager.
           </p>
         </div>
 
-        {/* Form */}
-        <div
-          className="rounded-lg p-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
-        >
+        <div className="rounded-lg p-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
           {error && (
-            <div
-              className="mb-4 p-3 rounded text-sm"
-              style={{
-                backgroundColor: theme.accents.secondary + "20",
-                color: theme.accents.secondary,
-              }}
-            >
+            <div className="mb-4 p-3 rounded text-sm" style={{ backgroundColor: theme.accents.secondary + "20", color: theme.accents.secondary }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Branch Name *
-                </label>
+              <FormField label="Branch Name *">
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(event) => setFormData({ ...formData, name: event.target.value })}
                   className="w-full px-3 py-2 text-sm rounded"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
+                  style={inputStyle}
                   required
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  City *
-                </label>
+              <FormField label="City *">
                 <input
                   type="text"
                   value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  onChange={(event) => setFormData({ ...formData, city: event.target.value })}
                   className="w-full px-3 py-2 text-sm rounded"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
+                  style={inputStyle}
                   required
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Address *
-                </label>
+              <FormField label="Address *">
                 <input
                   type="text"
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  onChange={(event) => setFormData({ ...formData, address: event.target.value })}
                   className="w-full px-3 py-2 text-sm rounded"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
+                  style={inputStyle}
                   required
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Phone Number *
-                </label>
+              <FormField label="Phone Number">
                 <input
                   type="text"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={(event) => setFormData({ ...formData, phoneNumber: event.target.value })}
                   className="w-full px-3 py-2 text-sm rounded"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                  required
+                  style={inputStyle}
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                  Manager
-                </label>
+              <FormField label="Manager">
                 <select
                   value={formData.managerId}
-                  onChange={(e) => setFormData({ ...formData, managerId: e.target.value })}
+                  onChange={(event) => setFormData({ ...formData, managerId: event.target.value })}
                   className="w-full px-3 py-2 text-sm rounded"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
+                  style={inputStyle}
+                  disabled={loadingManagers}
                 >
                   <option value="">No Manager (Assign Later)</option>
-                  {managers.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.fullName} ({m.email})
+                  {managers.map((manager) => (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.fullName} ({manager.email}){manager.branchId ? " - branch scoped" : " - global"}
                     </option>
                   ))}
                 </select>
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
-                  Leave empty to assign a manager later
+                  Only active manager accounts are shown.
                 </p>
-              </div>
+              </FormField>
             </div>
 
             <div className="mt-6 flex gap-3">
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                  opacity: loading ? 0.5 : 1,
-                }}
-              >
-                {loading ? "Creating..." : "Create Branch"}
-              </button>
+              <AsyncButton type="submit" loading={submitting} loadingLabel="Creating...">
+                Create Branch
+              </AsyncButton>
               <Link
                 href="/branches"
                 className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
+                style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
               >
                 Cancel
               </Link>
@@ -232,6 +180,17 @@ export default function CreateBranchPage() {
           </form>
         </div>
       </div>
+    </div>
+  );
+}
+
+function FormField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+        {label}
+      </label>
+      {children}
     </div>
   );
 }

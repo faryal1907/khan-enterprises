@@ -1,26 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { theme } from "@/lib/colors";
-import { api } from "@/lib/api-client";
-import { useAuthStore } from "@/lib/auth-store";
-import { UserRole } from "@/lib/types";
 import { toast } from "sonner";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { deleteBranch, getBranches } from "@/lib/api/branches";
+import { useAuthStore } from "@/lib/auth-store";
+import { theme } from "@/lib/colors";
+import { UserRole } from "@/lib/types";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 type Branch = {
   id: string;
   name: string;
   city: string;
   address: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   createdAt: string;
   manager: {
     id: string;
     fullName: string;
     email: string;
-    phoneNumber: string;
+    phoneNumber: string | null;
   } | null;
   _count: {
     users: number;
@@ -34,284 +37,220 @@ export default function BranchesPage() {
   const { user } = useAuthStore();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [branchToDelete, setBranchToDelete] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 250);
+  const [branchToDelete, setBranchToDelete] = useState<Branch | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const isAdmin = user?.role === UserRole.ADMIN;
   const isManager = user?.role === UserRole.MANAGER;
 
-  // Role check: Sales Staff cannot access branch management
   useEffect(() => {
     if (user && user.role === UserRole.SALES_STAFF) {
-      router.push("/");
+      router.replace("/");
     }
-  }, [user, router]);
+  }, [router, user]);
+
+  const fetchBranches = useCallback(async () => {
+    if (!user) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await getBranches();
+      setBranches(response.branches || []);
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to load branches");
+      setBranches([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        const res = await api.get("/branches");
-        let allBranches = res.data.branches;
-
-        // If manager, filter to show only their branch
-        if (isManager && user?.branchId) {
-          allBranches = allBranches.filter((b: Branch) => b.id === user.branchId);
-        }
-
-        setBranches(allBranches);
-      } catch (err: any) {
-        setError("Failed to load branches");
-        // Use console.warn instead of console.error to prevent Next.js dev overlay from popping up
-        console.warn("Branch fetch error:", err?.message || err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (!user || user.role === UserRole.SALES_STAFF) return;
     fetchBranches();
-  }, [isManager, user?.branchId]);
+  }, [fetchBranches, user]);
+
+  const visibleBranches = useMemo(() => {
+    const query = debouncedSearch.trim().toLowerCase();
+    if (!query) return branches;
+
+    return branches.filter((branch) => (
+      branch.name.toLowerCase().includes(query) ||
+      branch.city.toLowerCase().includes(query) ||
+      branch.address.toLowerCase().includes(query) ||
+      branch.manager?.fullName.toLowerCase().includes(query)
+    ));
+  }, [branches, debouncedSearch]);
 
   const confirmDelete = async () => {
     if (!branchToDelete) return;
-    setIsDeleting(true);
 
+    setIsDeleting(true);
     try {
-      await api.delete(`/branches/${branchToDelete}`);
-      setBranches(branches.filter((b) => b.id !== branchToDelete));
-      toast.success("Branch deleted successfully");
-    } catch (err) {
-      console.error("Failed to delete branch:", err);
-      toast.error("Failed to delete branch");
+      await deleteBranch(branchToDelete.id);
+      toast.success("Branch deleted");
+      setBranchToDelete(null);
+      await fetchBranches();
+    } catch (deleteError: any) {
+      toast.error(deleteError.response?.data?.message || "Failed to delete branch");
     } finally {
       setIsDeleting(false);
-      setBranchToDelete(null);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
-                {isAdmin ? "Branch Management" : "My Branch"}
-              </h1>
-              <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-                {isAdmin ? "Manage branch locations and performance" : "View your branch details"}
-              </p>
-            </div>
-          </div>
-
-          <div
-            className="flex flex-col items-center justify-center rounded-lg p-12 text-center"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.light}`,
-            }}
-          >
-            <div className="text-red-500 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text.primary }}>
-              Oops! Something went wrong
-            </h3>
-            <p className="mb-6 max-w-md" style={{ color: theme.text.secondary }}>
-              {error}. Our servers might be experiencing issues. Please try again.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 rounded font-medium transition-opacity hover:opacity-80"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (user && user.role === UserRole.SALES_STAFF) return null;
 
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
               {isAdmin ? "Branch Management" : "My Branch"}
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-              {isAdmin ? "Manage branch locations and performance" : "View your branch details"}
+              {isAdmin ? "Manage branch locations and performance." : "View branch details and performance."}
             </p>
           </div>
 
           {isAdmin && (
             <Link
               href="/branches/new"
-              className="px-4 py-2 text-sm font-medium rounded"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
+              className="px-4 py-2 text-sm font-medium rounded text-center"
+              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
             >
               Add Branch
             </Link>
           )}
         </div>
 
-        {/* Table */}
+        <div
+          className="rounded-lg p-4 mb-6"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+            Search Branches
+          </label>
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="w-full px-3 py-2 rounded text-sm"
+            style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+            placeholder="Name, city, address, manager"
+          />
+        </div>
+
         <div
           className="rounded-lg overflow-hidden"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="min-w-full">
-            <thead>
-              <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Location
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Manager
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Staff
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Inventory
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {branches.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                    No branches found
-                  </td>
+          {loading ? (
+            <div className="p-8 text-center" style={{ color: theme.text.secondary }}>
+              Loading branches...
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="mb-4" style={{ color: theme.accents.secondary }}>{error}</p>
+              <AsyncButton onClick={fetchBranches}>Retry</AsyncButton>
+            </div>
+          ) : (
+            <table className="min-w-full">
+              <thead>
+                <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                  {["Name", "Location", "Manager", "Staff", "Inventory", "Actions"].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                      style={{ color: theme.text.secondary }}
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
-              ) : (
-                branches.map((branch) => (
-                  <tr
-                    key={branch.id}
-                    className="border-b"
-                    style={{ borderColor: theme.borders.light }}
-                  >
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {branch.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {branch.city}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {branch.manager ? branch.manager.fullName : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {branch._count.users}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {branch._count.bikeInventory} bikes, {branch._count.partInventory} parts
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex gap-2">
-                        <Link href={`/branches/${branch.id}`}>
-                          <button
-                            className="font-medium hover:opacity-70"
-                            style={{ color: theme.accents.primary }}
-                          >
-                            View
-                          </button>
-                        </Link>
-                        {isAdmin && (
-                          <button
-                            onClick={() => setBranchToDelete(branch.id)}
-                            className="font-medium hover:opacity-70 ml-4"
-                            style={{ color: theme.accents.secondary }}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
+              </thead>
+              <tbody>
+                {visibleBranches.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                      No branches found
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  visibleBranches.map((branch) => (
+                    <tr key={branch.id} className="border-b" style={{ borderColor: theme.borders.light }}>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                        <div className="font-medium">{branch.name}</div>
+                        <div className="text-xs" style={{ color: theme.text.secondary }}>{branch.phoneNumber || "-"}</div>
+                      </td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                        <div>{branch.city}</div>
+                        <div className="text-xs" style={{ color: theme.text.secondary }}>{branch.address}</div>
+                      </td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                        {branch.manager ? branch.manager.fullName : "-"}
+                      </td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{branch._count.users}</td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                        {branch._count.bikeInventory} bikes, {branch._count.partInventory} parts
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="flex gap-3">
+                          <Link href={`/branches/${branch.id}`} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
+                            View
+                          </Link>
+                          {isAdmin && (
+                            <button
+                              onClick={() => setBranchToDelete(branch)}
+                              className="font-medium hover:opacity-70"
+                              style={{ color: theme.accents.secondary }}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {branchToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setBranchToDelete(null)}
-          ></div>
-          <div
-            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
-              Confirm Deletion
-            </h3>
-            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
-              Are you sure you want to delete this branch? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setBranchToDelete(null)}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={isDeleting}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: "#fff",
-                  opacity: isDeleting ? 0.7 : 1,
-                }}
-              >
-                {isDeleting ? "Deleting..." : "Delete Branch"}
-              </button>
-            </div>
+        <ActionModal
+          title="Confirm Deletion"
+          onClose={() => {
+            if (!isDeleting) setBranchToDelete(null);
+          }}
+        >
+          <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+            Delete {branchToDelete.name}? Branches with staff, inventory, or orders cannot be deleted.
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setBranchToDelete(null)}
+              disabled={isDeleting}
+              className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
+              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={confirmDelete}
+              loading={isDeleting}
+              loadingLabel="Deleting..."
+              style={{ backgroundColor: theme.accents.secondary }}
+            >
+              Delete Branch
+            </AsyncButton>
           </div>
-        </div>
+        </ActionModal>
       )}
     </div>
   );
