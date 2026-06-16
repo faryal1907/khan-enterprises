@@ -55,7 +55,7 @@ export default function Home() {
           {/* Hero Bikes Image */}
           <div className="mt-8 flex justify-center">
             <img
-              src="https://evee.pk/wp-content/uploads/2025/01/Footer.png"
+              src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1781621453/three-bikes_uydimg.png"
               alt="Featured Motorcycles"
               className="
                 w-full
