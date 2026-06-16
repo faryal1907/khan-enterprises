@@ -60,7 +60,7 @@ export class OffersService {
 
   /**
    * Paginated list with filters on status, bikeId. Include bike + model info
-   * By default excludes ACCEPTED offers (converted to orders) unless includeConverted=true
+   * By default excludes ACCEPTED and PAID offers (converted to orders) unless includeConverted=true
    */
   async getOffers(query: QueryOffersDto) {
     const where: any = {};
@@ -68,8 +68,8 @@ export class OffersService {
     if (query.status) {
       where.status = query.status;
     } else if (!query.includeConverted) {
-      // By default, exclude ACCEPTED offers (they've been converted to orders)
-      where.status = { not: OfferStatus.ACCEPTED };
+      // By default, exclude ACCEPTED and PAID offers (they've been converted to orders)
+      where.status = { notIn: [OfferStatus.ACCEPTED, OfferStatus.PAID] };
     }
 
     if (query.bikeId) {
@@ -487,6 +487,9 @@ export class OffersService {
 
     if (query.status) {
       where.status = query.status;
+    } else if (!query.includeConverted) {
+      // By default, exclude ACCEPTED and PAID offers (they've been converted to orders)
+      where.status = { notIn: [OfferStatus.ACCEPTED, OfferStatus.PAID] };
     }
 
     const page = query.page || 1;
