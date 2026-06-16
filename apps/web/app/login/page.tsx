@@ -80,7 +80,7 @@ export default function LoginPage() {
             </span>
           </div>
           <h1 className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-            Khan Enterprises
+            Ali & Khan's
           </h1>
           <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
             Sign in to your account
@@ -216,7 +216,7 @@ export default function LoginPage() {
               />
             </svg>
             Sign in with Google
-          </button>
+i do not want it to be necessary to send message          </button>
         </form>
 
         {/* Link to sign-up */}

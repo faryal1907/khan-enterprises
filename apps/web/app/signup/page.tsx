@@ -80,7 +80,7 @@ export default function SignupPage() {
             </span>
           </div>
           <h1 className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-            Khan Enterprises
+            Ali & Khan's
           </h1>
           <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
             Create your account

@@ -43,10 +43,10 @@ async function main() {
 
   const branchHQ = await prisma.branch.create({
     data: {
-      name: "Islamabad Headquarters",
+      name: "Islamabad Branch",
       city: "Islamabad",
-      address: "Plot 12, Street 4, F-10 Markaz, Islamabad",
-      phoneNumber: "+925188001001",
+      address: "Noghazi Shop, Fateh Jang Road, Near Faisal Town, Islamabad",
+      phoneNumber: "+923119143977",
     },
   });
 
@@ -54,8 +54,8 @@ async function main() {
     data: {
       name: "Tordher Branch",
       city: "Tordher",
-      address: "Main GT Road, Near Tordher Chowk, Tordher, KPK",
-      phoneNumber: "+929876543210",
+      address: "Near Byco Petrol Pump, Swabi, Jhangira Road, Tordher, District Swabi",
+      phoneNumber: "+923119143977",
     },
   });
 
@@ -602,7 +602,7 @@ async function main() {
 
   console.log("✅ Seeded sample audit log.");
 
-  console.log("🚀 Seeding complete! Khan Enterprises database is fully stocked.");
+  console.log("🚀 Seeding complete! Ali & Khan's database is fully stocked.");
 }
 
 main()
