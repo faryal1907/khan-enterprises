@@ -11,8 +11,25 @@ import { generateOrderNumber } from "../../common/utils";
 export class OffersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private isAssignedBranchUser(user?: any) {
+    return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
+  }
+
+  private assertOfferAccess(offer: { bike?: { branchId: string } | null }, user?: any) {
+    if (this.isAssignedBranchUser(user) && offer.bike?.branchId !== user.branchId) {
+      throw new NotFoundException("Offer not found");
+    }
+  }
+
+  private getReservationExpiry() {
+    const reservedUntil = new Date();
+    reservedUntil.setHours(reservedUntil.getHours() + 48);
+    return reservedUntil;
+  }
+
   /**
-   * Create offer, verify bike is AVAILABLE, set expiresAt = now + 48h, status PENDING
+   * Create offer, verify bike is AVAILABLE, status PENDING.
+   * expiresAt is only used for accepted offers while payment is pending.
    */
   async createOffer(dto: CreateOfferDto, userId?: string) {
     // Verify bike exists and is AVAILABLE
@@ -28,10 +45,6 @@ export class OffersService {
       throw new BadRequestException(`Bike is not available for offer. Current status: ${bike.status}`);
     }
 
-    // Set expiresAt to 48 hours from now
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 48);
-
     return this.prisma.client.offer.create({
       data: {
         bikeId: dto.bikeId,
@@ -43,7 +56,7 @@ export class OffersService {
         offerAmount: dto.offerAmount,
         message: dto.message,
         status: OfferStatus.PENDING,
-        expiresAt,
+        expiresAt: null,
         paymentMethod: dto.paymentMethod,
         createdById: userId,
       },
@@ -61,7 +74,7 @@ export class OffersService {
   /**
    * Paginated list with filters on status, bikeId. Include bike + model info
    */
-  async getOffers(query: QueryOffersDto) {
+  async getOffers(query: QueryOffersDto, user?: any) {
     const where: any = {};
 
     if (query.status) {
@@ -70,6 +83,22 @@ export class OffersService {
 
     if (query.bikeId) {
       where.bikeId = query.bikeId;
+    }
+
+    const branchId = this.isAssignedBranchUser(user) ? user.branchId : query.branchId;
+    if (branchId) {
+      where.bike = { is: { branchId } };
+    }
+
+    if (query.search) {
+      where.OR = [
+        { customerName: { contains: query.search, mode: "insensitive" } },
+        { customerPhone: { contains: query.search, mode: "insensitive" } },
+        { customerEmail: { contains: query.search, mode: "insensitive" } },
+        { bike: { is: { chassisNumber: { contains: query.search, mode: "insensitive" } } } },
+        { bike: { is: { model: { is: { brand: { contains: query.search, mode: "insensitive" } } } } } },
+        { bike: { is: { model: { is: { modelName: { contains: query.search, mode: "insensitive" } } } } } },
+      ];
     }
 
     const page = query.page || 1;
@@ -115,7 +144,7 @@ export class OffersService {
   /**
    * Single offer with bike, createdBy, linked order
    */
-  async getOfferById(id: string) {
+  async getOfferById(id: string, user?: any) {
     const offer = await this.prisma.client.offer.findUnique({
       where: { id },
       include: {
@@ -140,32 +169,35 @@ export class OffersService {
       throw new NotFoundException(`Offer with ID ${id} not found`);
     }
 
+    this.assertOfferAccess(offer, user);
+
     return offer;
   }
 
   /**
    * Critical path — atomic transaction: set offer → ACCEPTED, bike → RESERVED,
-   * reservedUntil = now + 24h, create Order record
+   * reservedUntil = now + 48h, create Order record
    */
   async acceptOffer(id: string, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
       // 1. Fetch offer, verify status === PENDING or COUNTERED
       const offer = await tx.offer.findUnique({
         where: { id },
+        include: { bike: true },
       });
 
       if (!offer) {
         throw new NotFoundException(`Offer with ID ${id} not found`);
       }
 
+      this.assertOfferAccess(offer, user);
+
       if (offer.status !== OfferStatus.PENDING && offer.status !== OfferStatus.COUNTERED) {
         throw new BadRequestException(`Offer cannot be accepted. Current status: ${offer.status}`);
       }
 
       // 2. Fetch bike, verify status === AVAILABLE (re-check inside tx, prevents race condition)
-      const bike = await tx.bikeUnit.findUnique({
-        where: { id: offer.bikeId },
-      });
+      const bike = offer.bike;
 
       if (!bike) {
         throw new NotFoundException(`Bike with ID ${offer.bikeId} not found`);
@@ -176,23 +208,31 @@ export class OffersService {
       }
 
       // 3. Update offer: status → ACCEPTED
+      const reservedUntil = this.getReservationExpiry();
+
       const updatedOffer = await tx.offer.update({
         where: { id },
         data: {
           status: OfferStatus.ACCEPTED,
+          expiresAt: reservedUntil,
         },
       });
 
-      // 4. Update bike: status → RESERVED, reservedUntil = now + 24h
-      const reservedUntil = new Date();
-      reservedUntil.setHours(reservedUntil.getHours() + 24);
-
-      const updatedBike = await tx.bikeUnit.update({
-        where: { id: offer.bikeId },
+      // 4. Update bike: status -> RESERVED, reservedUntil = now + 48h
+      const reservedBike = await tx.bikeUnit.updateMany({
+        where: { id: offer.bikeId, status: BikeStatus.AVAILABLE },
         data: {
           status: BikeStatus.RESERVED,
           reservedUntil,
         },
+      });
+
+      if (reservedBike.count === 0) {
+        throw new BadRequestException("Bike is no longer available for reservation");
+      }
+
+      const updatedBike = await tx.bikeUnit.findUniqueOrThrow({
+        where: { id: offer.bikeId },
       });
 
       // 5. Create Order
@@ -242,7 +282,7 @@ export class OffersService {
    * Set offer → REJECTED, store adminResponse
    */
   async rejectOffer(id: string, dto: RejectOfferDto, user: any) {
-    const offer = await this.getOfferById(id);
+    const offer = await this.getOfferById(id, user);
 
     if (offer.status !== OfferStatus.PENDING && offer.status !== OfferStatus.COUNTERED) {
       throw new BadRequestException(`Offer cannot be rejected. Current status: ${offer.status}`);
@@ -254,6 +294,7 @@ export class OffersService {
         data: {
           status: OfferStatus.REJECTED,
           adminResponse: dto.adminResponse,
+          expiresAt: null,
         },
         include: {
           bike: {
@@ -282,18 +323,15 @@ export class OffersService {
   }
 
   /**
-   * Set offer → COUNTERED, store counterAmount + adminResponse, reset expiresAt = now + 48h
+   * Set offer -> COUNTERED, store counterAmount + adminResponse.
+   * Expiry is only set once an offer is accepted and awaiting payment.
    */
   async counterOffer(id: string, dto: CounterOfferDto, user: any) {
-    const offer = await this.getOfferById(id);
+    const offer = await this.getOfferById(id, user);
 
     if (offer.status !== OfferStatus.PENDING) {
       throw new BadRequestException(`Offer cannot be countered. Current status: ${offer.status}`);
     }
-
-    // Reset expiresAt to 48 hours from now
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 48);
 
     return this.prisma.client.$transaction(async (tx) => {
       const counteredOffer = await tx.offer.update({
@@ -302,7 +340,7 @@ export class OffersService {
           status: OfferStatus.COUNTERED,
           counterAmount: dto.counterAmount,
           adminResponse: dto.adminResponse,
-          expiresAt,
+          expiresAt: null,
         },
         include: {
           bike: {
@@ -364,23 +402,31 @@ export class OffersService {
       }
 
       // 3. Update offer: status → ACCEPTED
+      const reservedUntil = this.getReservationExpiry();
+
       const updatedOffer = await tx.offer.update({
         where: { id },
         data: {
           status: OfferStatus.ACCEPTED,
+          expiresAt: reservedUntil,
         },
       });
 
-      // 4. Update bike: status → RESERVED, reservedUntil = now + 24h
-      const reservedUntil = new Date();
-      reservedUntil.setHours(reservedUntil.getHours() + 24);
-
-      const updatedBike = await tx.bikeUnit.update({
-        where: { id: offer.bikeId },
+      // 4. Update bike: status -> RESERVED, reservedUntil = now + 48h
+      const reservedBike = await tx.bikeUnit.updateMany({
+        where: { id: offer.bikeId, status: BikeStatus.AVAILABLE },
         data: {
           status: BikeStatus.RESERVED,
           reservedUntil,
         },
+      });
+
+      if (reservedBike.count === 0) {
+        throw new BadRequestException("Bike is no longer available for reservation");
+      }
+
+      const updatedBike = await tx.bikeUnit.findUniqueOrThrow({
+        where: { id: offer.bikeId },
       });
 
       // 5. Create Order (without processedById since customer is accepting)
@@ -524,6 +570,7 @@ export class OffersService {
       data: {
         status: OfferStatus.REJECTED,
         message: message || offer.message,
+        expiresAt: null,
       },
       include: {
         bike: {
@@ -550,6 +597,7 @@ export class OffersService {
       where: { id },
       data: {
         status: OfferStatus.REJECTED,
+        expiresAt: null,
       },
       include: {
         bike: {

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from "@nestjs/comm
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
-import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prisma";
+import { OrderStatus, PaymentStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class PartOrdersService {
@@ -325,6 +325,9 @@ export class PartOrdersService {
   async updatePartOrderStatus(id: string, status: OrderStatus, user: any) {
     const order = await this.prisma.client.partOrder.findUnique({
       where: { id },
+      include: {
+        partInventory: true,
+      },
     });
 
     if (!order) {
@@ -350,6 +353,25 @@ export class PartOrdersService {
     }
 
     return this.prisma.client.$transaction(async (tx) => {
+      if (status === OrderStatus.CONFIRMED && currentStatus === OrderStatus.PAID) {
+        const reservedQuantity = order.partInventory.reservedQuantity;
+        if (order.partInventory.quantity < order.quantity || reservedQuantity < order.quantity) {
+          throw new BadRequestException("Insufficient reserved stock to confirm this order");
+        }
+
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            quantity: { decrement: order.quantity },
+            reservedQuantity: { decrement: order.quantity },
+          },
+        });
+      }
+
+      if (status === OrderStatus.CANCELLED) {
+        await this.restorePartOrderStock(tx, order);
+      }
+
       const updatedOrder = await tx.partOrder.update({
         where: { id },
         data: {
@@ -418,27 +440,8 @@ export class PartOrdersService {
         },
       });
 
-      // Restore reserved stock
-      await tx.partInventory.update({
-        where: { id: order.partInventoryId },
-        data: {
-          reservedQuantity: {
-            decrement: order.quantity,
-          },
-        },
-      });
+      await this.restorePartOrderStock(tx, order);
 
-      // If order was confirmed or ready for delivery (stock was already deducted), restore it
-      if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
-        await tx.partInventory.update({
-          where: { id: order.partInventoryId },
-          data: {
-            quantity: {
-              increment: order.quantity,
-            },
-          },
-        });
-      }
       await tx.auditLog.create({
         data: {
           userId: user.id,
@@ -562,5 +565,38 @@ export class PartOrdersService {
     const day = String(date.getDate()).padStart(2, '0');
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     return `PART-${year}${month}${day}-${random}`;
+  }
+
+  private async restorePartOrderStock(tx: any, order: { status: OrderStatus; partInventoryId: string; quantity: number }) {
+    if (order.status === OrderStatus.PENDING_PAYMENT || order.status === OrderStatus.PAID) {
+      const inventory = await tx.partInventory.findUnique({
+        where: { id: order.partInventoryId },
+        select: { reservedQuantity: true },
+      });
+      const reservedToRelease = Math.min(inventory?.reservedQuantity || 0, order.quantity);
+
+      if (reservedToRelease > 0) {
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            reservedQuantity: {
+              decrement: reservedToRelease,
+            },
+          },
+        });
+      }
+      return;
+    }
+
+    if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
+      await tx.partInventory.update({
+        where: { id: order.partInventoryId },
+        data: {
+          quantity: {
+            increment: order.quantity,
+          },
+        },
+      });
+    }
   }
 }

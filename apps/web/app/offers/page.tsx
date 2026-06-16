@@ -121,8 +121,8 @@ export default function CustomerOffersPage() {
     }
   };
 
-  const getTimeUntilExpiry = (expiresAt: string | null) => {
-    if (!expiresAt) return "—";
+  const getReservationExpiryLabel = (status: string, expiresAt: string | null) => {
+    if (status !== "ACCEPTED" || !expiresAt) return "—";
     const now = new Date();
     const expiry = new Date(expiresAt);
     const diff = expiry.getTime() - now.getTime();
@@ -140,8 +140,8 @@ export default function CustomerOffersPage() {
     return `${hours}h ${minutes}m`;
   };
 
-  const isExpiringSoon = (expiresAt: string | null) => {
-    if (!expiresAt) return false;
+  const isExpiringSoon = (status: string, expiresAt: string | null) => {
+    if (status !== "ACCEPTED" || !expiresAt) return false;
     const now = new Date();
     const expiry = new Date(expiresAt);
     const diff = expiry.getTime() - now.getTime();
@@ -277,7 +277,7 @@ export default function CustomerOffersPage() {
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
                     style={{ color: theme.text.secondary }}
                   >
-                    Expires In
+                    Reservation Expires
                   </th>
                 </tr>
               </thead>
@@ -323,14 +323,14 @@ export default function CustomerOffersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
-                        className={isExpiringSoon(offer.expiresAt) ? "font-medium" : ""}
+                        className={isExpiringSoon(offer.status, offer.expiresAt) ? "font-medium" : ""}
                         style={{
-                          color: isExpiringSoon(offer.expiresAt)
+                          color: isExpiringSoon(offer.status, offer.expiresAt)
                             ? "#F59E0B"
                             : theme.text.primary,
                         }}
                       >
-                        {getTimeUntilExpiry(offer.expiresAt)}
+                        {getReservationExpiryLabel(offer.status, offer.expiresAt)}
                       </span>
                     </td>
                   </tr>

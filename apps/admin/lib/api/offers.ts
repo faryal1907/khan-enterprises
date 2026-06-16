@@ -7,6 +7,8 @@ import { api } from "../api-client";
 export async function getOffers(filters?: {
   status?: string;
   bikeId?: string;
+  branchId?: string;
+  search?: string;
   page?: number;
   limit?: number;
 }) {
@@ -15,7 +17,7 @@ export async function getOffers(filters?: {
 }
 
 export async function getOfferById(id: string) {
-  const response = await api.get(`/offers/${id}`);
+  const response = await api.get(`/offers/admin/${id}`);
   return response.data;
 }
 

@@ -1,65 +1,55 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
-import { OrderStatus, PaymentMethod } from "@/lib/types";
+import { OrderStatus, UserRole } from "@/lib/types";
 import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice } from "@/lib/api/orders";
 import { toast } from "sonner";
+import { useAuthStore } from "@/lib/auth-store";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { OrderStatusBadge } from "@/components/order-status-badge";
 
 export default function PartOrderDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuthStore();
   const orderId = params.id as string;
+  const canManageLifecycle = user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
 
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const data = await getPartOrderById(orderId);
-        setOrder(data);
-      } catch (error) {
-        console.error("Failed to fetch order:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrder();
+  const fetchOrder = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await getPartOrderById(orderId);
+      setOrder(data);
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to fetch part order");
+      setOrder(null);
+    } finally {
+      setLoading(false);
+    }
   }, [orderId]);
 
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case OrderStatus.PENDING_PAYMENT:
-        return "#f59e0b"; // amber
-      case OrderStatus.PAID:
-        return "#3b82f6"; // blue
-      case OrderStatus.CONFIRMED:
-        return "#6366f1"; // indigo
-      case OrderStatus.READY_FOR_DELIVERY:
-        return "#a855f7"; // purple
-      case OrderStatus.DELIVERED:
-        return "#22c55e"; // green
-      case OrderStatus.CANCELLED:
-        return "#ef4444"; // red
-      default:
-        return "#6b7280"; // gray
-    }
-  };
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
       setActionLoading(true);
       await updatePartOrderStatus(orderId, newStatus);
-      const updatedOrder = await getPartOrderById(orderId);
-      setOrder(updatedOrder);
+      await fetchOrder();
       toast.success("Order status updated");
-    } catch (error) {
-      console.error("Failed to update status:", error);
-      toast.error("Failed to update order status");
+    } catch (updateError: any) {
+      toast.error(updateError.response?.data?.message || "Failed to update order status");
     } finally {
       setActionLoading(false);
     }
@@ -69,13 +59,11 @@ export default function PartOrderDetailPage() {
     try {
       setActionLoading(true);
       await cancelPartOrder(orderId);
-      const updatedOrder = await getPartOrderById(orderId);
-      setOrder(updatedOrder);
+      await fetchOrder();
       setShowCancelModal(false);
       toast.success("Order cancelled");
-    } catch (error) {
-      console.error("Failed to cancel order:", error);
-      toast.error("Failed to cancel order");
+    } catch (cancelError: any) {
+      toast.error(cancelError.response?.data?.message || "Failed to cancel order");
     } finally {
       setActionLoading(false);
     }
@@ -87,59 +75,43 @@ export default function PartOrderDetailPage() {
     switch (order.status) {
       case OrderStatus.PENDING_PAYMENT:
         return (
-          <button
+          <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.PAID)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={actionLoading}
+            className="px-6"
           >
             Mark as Paid
-          </button>
+          </AsyncButton>
         );
       case OrderStatus.PAID:
         return (
-          <button
+          <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.CONFIRMED)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={actionLoading}
+            className="px-6"
           >
             Confirm Order
-          </button>
+          </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
         return (
-          <button
+          <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={actionLoading}
+            className="px-6"
           >
             Mark Ready for Delivery
-          </button>
+          </AsyncButton>
         );
       case OrderStatus.READY_FOR_DELIVERY:
         return (
-          <button
+          <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.DELIVERED)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={actionLoading}
+            className="px-6"
           >
             Mark Delivered
-          </button>
+          </AsyncButton>
         );
       default:
         return null;
@@ -148,14 +120,13 @@ export default function PartOrderDetailPage() {
 
   const handleDownloadInvoice = async () => {
     try {
-      setActionLoading(true);
-      await downloadInvoice(orderId, true); // true for isPart
+      setInvoiceLoading(true);
+      await downloadInvoice(orderId, true);
       toast.success("Invoice downloaded successfully");
-    } catch (error) {
-      console.error("Failed to download invoice:", error);
-      toast.error("Failed to download invoice");
+    } catch (invoiceError: any) {
+      toast.error(invoiceError.response?.data?.message || "Failed to download invoice");
     } finally {
-      setActionLoading(false);
+      setInvoiceLoading(false);
     }
   };
 
@@ -173,7 +144,10 @@ export default function PartOrderDetailPage() {
     return (
       <div className="p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Order not found</p>
+          <div className="flex flex-col items-start gap-3">
+            <p style={{ color: theme.text.secondary }}>{error || "Part order not found"}</p>
+            <AsyncButton onClick={fetchOrder}>Retry</AsyncButton>
+          </div>
         </div>
       </div>
     );
@@ -196,14 +170,14 @@ export default function PartOrderDetailPage() {
           </div>
           <button
             onClick={handleDownloadInvoice}
-            disabled={actionLoading}
+            disabled={invoiceLoading}
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.secondary,
               color: theme.text.inverse,
             }}
           >
-            Download Invoice
+            {invoiceLoading ? "Downloading..." : "Download Invoice"}
           </button>
         </div>
 
@@ -311,16 +285,7 @@ export default function PartOrderDetailPage() {
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Order Status
                 </label>
-                <span
-                  className="inline-block px-2 py-1 text-xs font-medium rounded"
-                  style={{
-                    backgroundColor: `${getStatusColor(order.status)}20`,
-                    color: getStatusColor(order.status),
-                    border: `1px solid ${getStatusColor(order.status)}`,
-                  }}
-                >
-                  {order.status.replace(/_/g, " ")}
-                </span>
+                <OrderStatusBadge status={order.status} />
               </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
@@ -428,7 +393,7 @@ export default function PartOrderDetailPage() {
         )}
 
         {/* Status Action Bar */}
-        {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
+        {canManageLifecycle && order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
           <div
             className="rounded-lg p-6 mb-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -473,20 +438,20 @@ export default function PartOrderDetailPage() {
 
       {/* Cancel Modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-          <div
-            className="rounded-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-              Cancel Part Order
-            </h3>
+        <ActionModal
+          title="Cancel Part Order"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowCancelModal(false);
+          }}
+        >
             <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-              Are you sure you want to cancel this part order? The reserved stock will be restored.
+              Are you sure you want to cancel this part order? Reserved or deducted stock will be restored according to the current order status.
             </p>
             <div className="flex justify-end space-x-4 mt-6">
               <button
                 onClick={() => setShowCancelModal(false)}
+                disabled={actionLoading}
                 className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -496,20 +461,18 @@ export default function PartOrderDetailPage() {
               >
                 Go Back
               </button>
-              <button
+              <AsyncButton
                 onClick={handleCancelOrder}
-                disabled={actionLoading}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                loading={actionLoading}
+                loadingLabel="Cancelling..."
                 style={{
                   backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
                 }}
               >
-                {actionLoading ? "Cancelling..." : "Confirm Cancellation"}
-              </button>
+                Confirm Cancellation
+              </AsyncButton>
             </div>
-          </div>
-        </div>
+        </ActionModal>
       )}
     </div>
   );

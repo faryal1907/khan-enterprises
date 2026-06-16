@@ -10,57 +10,19 @@ export class SchedulerService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Task 1 — Expire stale offers (every hour)
-   * Find all offers where status IN [PENDING, COUNTERED] AND expiresAt < now
-   * → Set those offers: status → EXPIRED
+   * Offer expiry is handled by reservation cleanup.
+   * Pending and countered offers do not have a countdown.
    */
   @Cron(CronExpression.EVERY_HOUR)
   async expireOffers() {
     this.logger.log("Running expireOffers cron job...");
 
-    try {
-      const now = new Date();
-
-      const expiredOffers = await this.prisma.client.offer.findMany({
-        where: {
-          status: {
-            in: [OfferStatus.PENDING, OfferStatus.COUNTERED],
-          },
-          expiresAt: {
-            lt: now,
-          },
-        },
-      });
-
-      if (expiredOffers.length === 0) {
-        this.logger.log("No expired offers found.");
-        return;
-      }
-
-      const updatedOffers = await this.prisma.client.offer.updateMany({
-        where: {
-          id: {
-            in: expiredOffers.map((offer) => offer.id),
-          },
-        },
-        data: {
-          status: OfferStatus.EXPIRED,
-        },
-      });
-
-      this.logger.log(`Expired ${updatedOffers.count} offers.`);
-    } catch (error) {
-      this.logger.error("Error in expireOffers cron job:", error);
-    }
+    this.logger.log("Offer expiry is handled by releaseExpiredReservations for accepted unpaid offers.");
   }
 
   /**
-   * Task 2 — Release expired reservations (every 15 minutes)
-   * Find all bikes where status = RESERVED AND reservedUntil < now
-   * → For each bike:
-   *     Check if it has an Order with status = PENDING_PAYMENT and offerId linked
-   *     If yes → update Order status → CANCELLED
-   *     Update bike: status → AVAILABLE, reservedUntil → null
+   * Release expired accepted-unpaid reservations.
+   * The pending order is cancelled, the accepted offer expires, and the bike is released.
    */
   @Cron(CronExpression.EVERY_10_MINUTES)
   async releaseExpiredReservations() {
@@ -104,6 +66,23 @@ export class SchedulerService {
                 status: OrderStatus.CANCELLED,
               },
             });
+
+            const offerIds = bike.orders
+              .map((order) => order.offerId)
+              .filter((offerId): offerId is string => Boolean(offerId));
+
+            if (offerIds.length > 0) {
+              await tx.offer.updateMany({
+                where: {
+                  id: { in: offerIds },
+                  status: OfferStatus.ACCEPTED,
+                },
+                data: {
+                  status: OfferStatus.EXPIRED,
+                  expiresAt: null,
+                },
+              });
+            }
             this.logger.log(
               `Cancelled ${bike.orders.length} order(s) for bike ${bike.id}`,
             );

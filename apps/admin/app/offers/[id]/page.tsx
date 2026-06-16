@@ -1,14 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { theme } from "@/lib/colors";
+
+import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  getOfferById,
-  acceptOffer,
-  rejectOffer,
-  counterOffer,
-} from "@/lib/api/offers";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { OfferStatusBadge } from "@/components/offer-status-badge";
+import { acceptOffer, counterOffer, getOfferById, rejectOffer } from "@/lib/api/offers";
+import { theme } from "@/lib/colors";
 import { numberToWords } from "@repo/utils";
 
 interface Offer {
@@ -47,6 +47,42 @@ interface Offer {
   } | null;
 }
 
+type ActionState = "accept" | "reject" | "counter" | null;
+
+function formatCurrency(value: number | string | null | undefined) {
+  return `Rs. ${Number(value || 0).toLocaleString()}`;
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+        {label}
+      </label>
+      <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+        {children || "-"}
+      </p>
+    </div>
+  );
+}
+
+function Section({ title, children, tone }: { title: string; children: ReactNode; tone?: "success" | "info" }) {
+  const style = tone === "success"
+    ? { backgroundColor: "#D1FAE5", border: "1px solid #10B981" }
+    : tone === "info"
+      ? { backgroundColor: "#DBEAFE", border: "1px solid #3B82F6" }
+      : { backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` };
+
+  return (
+    <div className="rounded-lg p-6 mb-6" style={style}>
+      <h3 className="text-lg font-semibold mb-4" style={{ color: tone === "success" ? "#065F46" : tone === "info" ? "#1E40AF" : theme.text.primary }}>
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
 export default function OfferDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -54,40 +90,48 @@ export default function OfferDetailPage() {
 
   const [offer, setOffer] = useState<Offer | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showCounterModal, setShowCounterModal] = useState(false);
-  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [error, setError] = useState("");
+  const [modal, setModal] = useState<"reject" | "counter" | null>(null);
   const [counterAmount, setCounterAmount] = useState("");
   const [adminResponse, setAdminResponse] = useState("");
-  const [actionLoading, setActionLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<ActionState>(null);
 
-  useEffect(() => {
-    fetchOffer();
-  }, [offerId]);
+  const fetchOffer = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-  const fetchOffer = async () => {
     try {
-      setLoading(true);
       const data = await getOfferById(offerId);
       setOffer(data);
-    } catch (error) {
-      console.error("Failed to fetch offer:", error);
-      router.push("/offers");
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to load offer");
+      setOffer(null);
     } finally {
       setLoading(false);
     }
+  }, [offerId]);
+
+  useEffect(() => {
+    fetchOffer();
+  }, [fetchOffer]);
+
+  const closeModal = () => {
+    if (actionLoading) return;
+    setModal(null);
+    setCounterAmount("");
+    setAdminResponse("");
   };
 
   const handleAccept = async () => {
     try {
-      setActionLoading(true);
+      setActionLoading("accept");
       await acceptOffer(offerId);
       await fetchOffer();
-      toast.success("Offer accepted successfully");
-    } catch (error) {
-      console.error("Failed to accept offer:", error);
-      toast.error("Failed to accept offer. Please try again.");
+      toast.success("Offer accepted and bike reserved for 48 hours");
+    } catch (acceptError: any) {
+      toast.error(acceptError.response?.data?.message || "Failed to accept offer");
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -98,83 +142,41 @@ export default function OfferDetailPage() {
     }
 
     try {
-      setActionLoading(true);
-      await rejectOffer(offerId, { adminResponse });
-      setShowRejectModal(false);
+      setActionLoading("reject");
+      await rejectOffer(offerId, { adminResponse: adminResponse.trim() });
+      setModal(null);
       setAdminResponse("");
       await fetchOffer();
-      toast.success("Offer rejected successfully");
-    } catch (error) {
-      console.error("Failed to reject offer:", error);
-      toast.error("Failed to reject offer. Please try again.");
+      toast.success("Offer rejected");
+    } catch (rejectError: any) {
+      toast.error(rejectError.response?.data?.message || "Failed to reject offer");
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
   const handleCounter = async () => {
-    if (!counterAmount.trim()) {
-      toast.error("Please provide a counter amount");
+    const amount = Number(counterAmount.replace(/,/g, ""));
+    if (!amount || amount <= 0) {
+      toast.error("Please provide a valid counter amount");
       return;
     }
 
     try {
-      setActionLoading(true);
+      setActionLoading("counter");
       await counterOffer(offerId, {
-        counterAmount: parseFloat(counterAmount.replace(/,/g, "")),
-        adminResponse,
+        counterAmount: amount,
+        adminResponse: adminResponse.trim() || undefined,
       });
-      setShowCounterModal(false);
+      setModal(null);
       setCounterAmount("");
       setAdminResponse("");
       await fetchOffer();
-      toast.success("Counter offer sent successfully");
-    } catch (error) {
-      console.error("Failed to counter offer:", error);
-      toast.error("Failed to counter offer. Please try again.");
+      toast.success("Counter offer sent");
+    } catch (counterError: any) {
+      toast.error(counterError.response?.data?.message || "Failed to send counter offer");
     } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const getStatusBadgeStyle = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return {
-          backgroundColor: "#FEF3C7",
-          color: "#92400E",
-          border: "1px solid #F59E0B",
-        };
-      case "ACCEPTED":
-        return {
-          backgroundColor: "#D1FAE5",
-          color: "#065F46",
-          border: "1px solid #10B981",
-        };
-      case "REJECTED":
-        return {
-          backgroundColor: "#FEE2E2",
-          color: "#991B1B",
-          border: "1px solid #EF4444",
-        };
-      case "COUNTERED":
-        return {
-          backgroundColor: "#DBEAFE",
-          color: "#1E40AF",
-          border: "1px solid #3B82F6",
-        };
-      case "EXPIRED":
-        return {
-          backgroundColor: "#F3F4F6",
-          color: "#374151",
-          border: "1px solid #6B7280",
-        };
-      default:
-        return {
-          backgroundColor: theme.backgrounds.tertiary,
-          color: theme.text.secondary,
-          border: `1px solid ${theme.borders.medium}`,
-        };
+      setActionLoading(null);
     }
   };
 
@@ -188,11 +190,23 @@ export default function OfferDetailPage() {
     );
   }
 
-  if (!offer) {
+  if (error || !offer) {
     return (
       <div className="p-8">
-        <div className="max-w-5xl mx-auto text-center" style={{ color: theme.text.secondary }}>
-          Offer not found
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="mb-4" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
+            {error || "Offer not found"}
+          </p>
+          <div className="flex justify-center gap-3">
+            <AsyncButton onClick={fetchOffer}>Retry</AsyncButton>
+            <button
+              onClick={() => router.push("/offers")}
+              className="px-4 py-2 text-sm font-medium rounded"
+              style={{ backgroundColor: theme.backgrounds.primary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+            >
+              Back to Offers
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -201,606 +215,240 @@ export default function OfferDetailPage() {
   const canAct = offer.status === "PENDING";
   const isCountered = offer.status === "COUNTERED";
   const isAccepted = offer.status === "ACCEPTED";
+  const isPaid = offer.status === "PAID";
+  const listedPrice = offer.bike.price || offer.bike.model.basePrice || 0;
 
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: theme.text.primary }}
-          >
-            Offer Details
-          </h1>
-          <p style={{ color: theme.text.secondary }}>
-            View and manage offer negotiation
-          </p>
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: theme.text.primary }}>
+              Offer Details
+            </h1>
+            <p style={{ color: theme.text.secondary }}>
+              View and manage the customer negotiation.
+            </p>
+          </div>
+          <OfferStatusBadge status={offer.status} />
         </div>
 
-        {/* Status Badge */}
-        <div className="mb-6">
-          <span
-            className="inline-block px-3 py-1 text-sm font-medium rounded"
-            style={getStatusBadgeStyle(offer.status)}
-          >
-            {offer.status}
-          </span>
-        </div>
-
-        {/* Customer Information */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Customer Information
-          </h3>
+        <Section title="Customer Information">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Name
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.customerName}
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Phone
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.customerPhone}
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Email
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.customerEmail || "—"}
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                CNIC
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.customerCNIC || "—"}
-              </p>
-            </div>
+            <Field label="Name">{offer.customerName}</Field>
+            <Field label="Phone">{offer.customerPhone}</Field>
+            <Field label="Email">{offer.customerEmail}</Field>
+            <Field label="CNIC">{offer.customerCNIC}</Field>
             <div className="md:col-span-2">
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Address
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.customerAddress || "—"}
-              </p>
+              <Field label="Address">{offer.customerAddress}</Field>
             </div>
           </div>
-        </div>
+        </Section>
 
-        {/* Bike Information */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Bike Information
-          </h3>
+        <Section title="Bike Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Brand
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.bike.model.brand}
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Model
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.bike.model.modelName} ({offer.bike.model.year})
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Branch
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.bike.branch.name}, {offer.bike.branch.city}
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Chassis Number
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.bike.chassisNumber}
-              </p>
-            </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Engine Number
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {offer.bike.engineNumber}
-              </p>
-            </div>
+            <Field label="Brand">{offer.bike.model.brand}</Field>
+            <Field label="Model">{offer.bike.model.modelName} ({offer.bike.model.year})</Field>
+            <Field label="Branch">{offer.bike.branch.name}, {offer.bike.branch.city}</Field>
+            <Field label="Chassis Number">{offer.bike.chassisNumber}</Field>
+            <Field label="Engine Number">{offer.bike.engineNumber}</Field>
           </div>
-        </div>
+        </Section>
 
-        {/* Offer Details */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Offer Details
-          </h3>
+        <Section title="Offer Details">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
+              <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                 Listed Price
               </label>
-              <p
-                className="text-2xl font-bold"
-                style={{ color: theme.text.primary }}
-              >
-                Rs. {Number(offer.bike.price || offer.bike.model.basePrice || 0).toLocaleString()}
-              </p>
+              <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>{formatCurrency(listedPrice)}</p>
             </div>
             <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
+              <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                 Original Offer
               </label>
-              <p
-                className="text-2xl font-bold"
-                style={{ color: theme.accents.primary }}
-              >
-                Rs. {Number(offer.offerAmount).toLocaleString()}
-              </p>
+              <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>{formatCurrency(offer.offerAmount)}</p>
             </div>
             <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
+              <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                 Counter Offer
               </label>
               <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-                {offer.counterAmount
-                  ? `Rs. ${Number(offer.counterAmount).toLocaleString()}`
-                  : "—"}
+                {offer.counterAmount ? formatCurrency(offer.counterAmount) : "-"}
               </p>
             </div>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Submitted
-              </label>
-              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                {new Date(offer.createdAt).toLocaleString()}
-              </p>
-            </div>
+            <Field label="Submitted">{new Date(offer.createdAt).toLocaleString()}</Field>
           </div>
 
           {offer.message && (
             <div className="mt-4">
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Customer Message
-              </label>
-              <p
-                className="text-sm p-3 rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.primary,
-                }}
-              >
-                {offer.message}
-              </p>
+              <Field label="Customer Message">{offer.message}</Field>
             </div>
           )}
 
           {offer.adminResponse && (
             <div className="mt-4">
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: theme.text.muted }}
-              >
-                Admin Response
-              </label>
-              <p
-                className="text-sm p-3 rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.primary,
-                }}
-              >
-                {offer.adminResponse}
-              </p>
+              <Field label="Staff Response">{offer.adminResponse}</Field>
             </div>
           )}
-        </div>
+        </Section>
 
-        {/* Order Information (if accepted) */}
         {offer.order && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{
-              backgroundColor: "#D1FAE5",
-              border: "1px solid #10B981",
-            }}
-          >
-            <h3
-              className="text-lg font-semibold mb-4"
-              style={{ color: "#065F46" }}
-            >
-              Order Created
-            </h3>
-            <div>
-              <label
-                className="block text-xs font-medium uppercase tracking-wider mb-1"
-                style={{ color: "#065F46" }}
-              >
-                Order Number
-              </label>
-              <p className="text-sm font-medium" style={{ color: "#065F46" }}>
-                {offer.order.orderNumber}
-              </p>
-            </div>
-          </div>
+          <Section title="Order Created" tone="success">
+            <Field label="Order Number">{offer.order.orderNumber}</Field>
+          </Section>
         )}
 
-        {/* Actions */}
         {canAct && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.light}`,
-            }}
-          >
-            <h3
-              className="text-lg font-semibold mb-4"
-              style={{ color: theme.text.primary }}
-            >
-              Actions
-            </h3>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleAccept}
-                disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                }}
-              >
-                {actionLoading ? "Processing..." : "Accept Offer"}
-              </button>
-              <button
-                onClick={() => setShowRejectModal(true)}
-                disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
+          <Section title="Actions">
+            <div className="flex flex-wrap gap-3">
+              <AsyncButton onClick={handleAccept} loading={actionLoading === "accept"} loadingLabel="Accepting...">
+                Accept Offer
+              </AsyncButton>
+              <AsyncButton
+                onClick={() => setModal("reject")}
+                disabled={Boolean(actionLoading)}
+                style={{ backgroundColor: theme.accents.secondary }}
               >
                 Reject Offer
-              </button>
-              <button
-                onClick={() => setShowCounterModal(true)}
-                disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
+              </AsyncButton>
+              <AsyncButton
+                onClick={() => setModal("counter")}
+                disabled={Boolean(actionLoading)}
+                style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
               >
                 Counter Offer
-              </button>
+              </AsyncButton>
             </div>
-          </div>
+          </Section>
         )}
 
-        {/* Waiting for customer (countered) */}
         {isCountered && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{
-              backgroundColor: "#DBEAFE",
-              border: "1px solid #3B82F6",
-            }}
-          >
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ color: "#1E40AF" }}
-            >
-              Waiting for Customer Response
-            </h3>
+          <Section title="Waiting for Customer Response" tone="info">
             <p className="text-sm" style={{ color: "#1E40AF" }}>
-              Customer has been sent a counter offer of Rs.{" "}
-              {Number(offer.counterAmount).toLocaleString()}. They can accept
-              or reject this offer.
+              Customer has been sent a counter offer of {formatCurrency(offer.counterAmount)}.
             </p>
-          </div>
+          </Section>
         )}
 
-        {/* Read-only (accepted) */}
         {isAccepted && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{
-              backgroundColor: "#D1FAE5",
-              border: "1px solid #10B981",
-            }}
-          >
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ color: "#065F46" }}
-            >
-              Offer Accepted
-            </h3>
+          <Section title="Offer Accepted" tone="success">
             <p className="text-sm" style={{ color: "#065F46" }}>
-              This offer has been accepted and an order has been created.
+              This offer has been accepted and the bike has been reserved for payment.
             </p>
-          </div>
+          </Section>
         )}
 
-        {/* Counter Modal */}
-        {showCounterModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{
-                backgroundColor: theme.backgrounds.primary,
-                border: `1px solid ${theme.borders.light}`,
-              }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
-                Counter Offer
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Counter Amount (Rs.)
-                  </label>
-                  <input
-                    type="text"
-                    value={counterAmount}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, "");
-                      if (val) {
-                        setCounterAmount(Number(val).toLocaleString());
-                      } else {
-                        setCounterAmount("");
-                      }
-                    }}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter counter amount"
-                  />
-                  {counterAmount && (
-                    <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
-                      {numberToWords(parseFloat(counterAmount.replace(/,/g, "")))}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Response Message
-                  </label>
-                  <textarea
-                    value={adminResponse}
-                    onChange={(e) => setAdminResponse(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter your response to the customer"
-                  />
-                </div>
-                <div className="flex space-x-3 justify-end">
-                  <button
-                    onClick={() => {
-                      setShowCounterModal(false);
-                      setCounterAmount("");
-                      setAdminResponse("");
-                    }}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleCounter}
-                    disabled={actionLoading}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors disabled:opacity-50"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    {actionLoading ? "Sending..." : "Send Counter"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        {isPaid && (
+          <Section title="Offer Paid" tone="success">
+            <p className="text-sm" style={{ color: "#065F46" }}>
+              Payment has been received for this offer.
+            </p>
+          </Section>
         )}
 
-        {/* Reject Modal */}
-        {showRejectModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{
-                backgroundColor: theme.backgrounds.primary,
-                border: `1px solid ${theme.borders.light}`,
-              }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
-                Reject Offer
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Rejection Reason
-                  </label>
-                  <textarea
-                    value={adminResponse}
-                    onChange={(e) => setAdminResponse(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter reason for rejection"
-                  />
-                </div>
-                <div className="flex space-x-3 justify-end">
-                  <button
-                    onClick={() => {
-                      setShowRejectModal(false);
-                      setAdminResponse("");
-                    }}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleReject}
-                    disabled={actionLoading}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors disabled:opacity-50"
-                    style={{
-                      backgroundColor: theme.accents.secondary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    {actionLoading ? "Rejecting..." : "Reject Offer"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-end space-x-4 mt-6">
+        <div className="flex justify-end mt-6">
           <button
             onClick={() => router.push("/offers")}
             className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
+            style={{ backgroundColor: theme.backgrounds.primary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
           >
             Back to Offers
           </button>
         </div>
       </div>
+
+      {modal === "counter" && (
+        <ActionModal title="Counter Offer" onClose={closeModal}>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Counter Amount (Rs.)
+              </label>
+              <input
+                type="text"
+                value={counterAmount}
+                onChange={(event) => {
+                  const value = event.target.value.replace(/\D/g, "");
+                  setCounterAmount(value ? Number(value).toLocaleString() : "");
+                }}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                placeholder="Enter counter amount"
+              />
+              {counterAmount && (
+                <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
+                  {numberToWords(Number(counterAmount.replace(/,/g, "")))}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Response Message
+              </label>
+              <textarea
+                value={adminResponse}
+                onChange={(event) => setAdminResponse(event.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                placeholder="Enter your response to the customer"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={closeModal}
+                disabled={Boolean(actionLoading)}
+                className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
+                style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+              >
+                Cancel
+              </button>
+              <AsyncButton onClick={handleCounter} loading={actionLoading === "counter"} loadingLabel="Sending...">
+                Send Counter
+              </AsyncButton>
+            </div>
+          </div>
+        </ActionModal>
+      )}
+
+      {modal === "reject" && (
+        <ActionModal title="Reject Offer" onClose={closeModal}>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Rejection Reason
+              </label>
+              <textarea
+                value={adminResponse}
+                onChange={(event) => setAdminResponse(event.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                placeholder="Enter reason for rejection"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={closeModal}
+                disabled={Boolean(actionLoading)}
+                className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
+                style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+              >
+                Cancel
+              </button>
+              <AsyncButton
+                onClick={handleReject}
+                loading={actionLoading === "reject"}
+                loadingLabel="Rejecting..."
+                style={{ backgroundColor: theme.accents.secondary }}
+              >
+                Reject Offer
+              </AsyncButton>
+            </div>
+          </div>
+        </ActionModal>
+      )}
     </div>
   );
 }

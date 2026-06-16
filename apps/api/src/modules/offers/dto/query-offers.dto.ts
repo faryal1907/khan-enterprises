@@ -11,6 +11,14 @@ export class QueryOffersDto {
   @IsOptional()
   bikeId?: string;
 
+  @IsString()
+  @IsOptional()
+  branchId?: string;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
+
   @IsInt()
   @Min(1)
   @IsOptional()

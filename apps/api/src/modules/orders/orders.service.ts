@@ -6,7 +6,7 @@ import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
-import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
+import { OrderStatus, BikeStatus, PaymentStatus, AuditAction, OfferStatus } from "@khan/prisma";
 
 @Injectable()
 export class OrdersService {
@@ -348,6 +348,16 @@ export class OrdersService {
         },
       });
 
+      if (order.offerId) {
+        await tx.offer.update({
+          where: { id: order.offerId },
+          data: {
+            status: OfferStatus.REJECTED,
+            expiresAt: null,
+          },
+        });
+      }
+
       // 4. Check for any SUCCESS transactions → if found, create AuditLog entry flagging refund needed
       const successTransactions = order.transactions.filter(
         (t) => t.status === PaymentStatus.SUCCESS
@@ -448,6 +458,7 @@ export class OrdersService {
             where: { id: order.offerId },
             data: {
               status: "PAID",
+              expiresAt: null,
             },
           });
         }

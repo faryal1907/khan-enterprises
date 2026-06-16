@@ -177,12 +177,14 @@ export default function OfferStatusPage() {
 
   const isCountered = offer.status === "COUNTERED";
   const isAccepted = offer.status === "ACCEPTED";
+  const isPaid = offer.status === "PAID";
   const isPending = offer.status === "PENDING";
   const isRejected = offer.status === "REJECTED";
   const isExpired = offer.status === "EXPIRED";
 
   // Calculate time remaining until expiry
   const getTimeRemaining = () => {
+    if (!isAccepted) return null;
     if (!offer.expiresAt) return null;
     const now = new Date();
     const expiry = new Date(offer.expiresAt);
@@ -308,7 +310,7 @@ export default function OfferStatusPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold mb-1" style={{ color: theme.text.primary }}>Offer Accepted</h3>
                   <p className="text-sm" style={{ color: theme.text.secondary }}>
-                    Your offer was accepted and an order has been created.
+              Your offer was accepted and an order has been created. Complete payment before the reservation expires.
                   </p>
                 </div>
               </div>
@@ -416,7 +418,7 @@ export default function OfferStatusPage() {
         )}
 
         {/* Order Information */}
-        {isAccepted && offer.order && (
+        {(isAccepted || isPaid) && offer.order && (
           <div
             className="rounded-xl p-6 mb-6"
             style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}
@@ -425,7 +427,9 @@ export default function OfferStatusPage() {
               Order Created
             </h2>
             <p className="text-sm mb-4" style={{ color: "#065F46" }}>
-              Your offer was accepted! Complete payment to confirm your order.
+              {isPaid
+                ? "Payment has been received for this offer."
+                : "Your offer was accepted! Complete payment to confirm your order."}
             </p>
             <div className="flex items-center justify-between">
               <div>

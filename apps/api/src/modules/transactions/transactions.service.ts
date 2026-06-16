@@ -304,6 +304,13 @@ export class TransactionsService {
             data: { status: "CANCELLED", processedById: user.id },
           });
 
+          if (order.offerId) {
+            await tx.offer.update({
+              where: { id: order.offerId },
+              data: { status: "REJECTED", expiresAt: null },
+            });
+          }
+
           await tx.bikeUnit.update({
             where: { id: order.bikeId },
             data: { status: "AVAILABLE", reservedUntil: null, soldAt: null },
