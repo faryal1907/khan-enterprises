@@ -5,9 +5,10 @@ type ActionModalProps = {
   title: string;
   children: ReactNode;
   onClose: () => void;
+  className?: string;
 };
 
-export function ActionModal({ title, children, onClose }: ActionModalProps) {
+export function ActionModal({ title, children, onClose, className = "" }: ActionModalProps) {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
@@ -17,7 +18,7 @@ export function ActionModal({ title, children, onClose }: ActionModalProps) {
       }}
     >
       <div
-        className="rounded-lg p-6 max-w-md w-full mx-4"
+        className={`rounded-lg p-6 max-w-md w-full mx-4 ${className}`}
         style={{
           backgroundColor: theme.backgrounds.primary,
           border: `1px solid ${theme.borders.light}`,

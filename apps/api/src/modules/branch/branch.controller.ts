@@ -20,10 +20,7 @@ export class BranchController {
     return { count: branches.length, branches };
   }
 
-  /**
-   * GET /api/branches/:id
-   * Returns a single branch with full detail including staff list.
-   */
+
   @Get(":id")
   async getBranch(@Param("id") id: string, @CurrentUser() user: any) {
     const branch = await this.branchService.getBranchById(id, user);
@@ -42,10 +39,9 @@ export class BranchController {
   }
 
   /**
-   * PUT /api/branches/:id
+   * PATCH /api/branches/:id
    * Update a branch. ADMIN only.
    */
-  @Put(":id")
   @Patch(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
