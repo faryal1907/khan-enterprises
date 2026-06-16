@@ -12,6 +12,26 @@ import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prism
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private isAssignedBranchUser(user?: any) {
+    return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
+  }
+
+  private applyBranchScope(where: any, user?: any) {
+    if (this.isAssignedBranchUser(user)) {
+      where.branchId = user.branchId;
+    }
+  }
+
+  private assertOrderAccess(order: { branchId: string; customerPhone?: string }, user?: any) {
+    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
+      throw new NotFoundException("Order not found");
+    }
+
+    if (this.isAssignedBranchUser(user) && order.branchId !== user.branchId) {
+      throw new NotFoundException("Order not found");
+    }
+  }
+
   /**
    * Paginated, filtered by status/branchId/date range. Include bike, offer, branch, processedBy
    * For CUSTOMER role: filters by customer phone/CNIC from user profile
@@ -40,6 +60,12 @@ export class OrdersService {
       where.branchId = query.branchId;
     }
 
+    this.applyBranchScope(where, user);
+
+    if (query.processedById) {
+      where.processedById = query.processedById;
+    }
+
     if (query.dateFrom || query.dateTo) {
       where.createdAt = {};
       if (query.dateFrom) {
@@ -48,6 +74,15 @@ export class OrdersService {
       if (query.dateTo) {
         where.createdAt.lte = new Date(query.dateTo);
       }
+    }
+
+    if (query.search) {
+      where.OR = [
+        { orderNumber: { contains: query.search, mode: "insensitive" } },
+        { customerName: { contains: query.search, mode: "insensitive" } },
+        { customerPhone: { contains: query.search, mode: "insensitive" } },
+        { bike: { is: { chassisNumber: { contains: query.search, mode: "insensitive" } } } },
+      ];
     }
 
     // Filter by customer for CUSTOMER role
@@ -101,7 +136,7 @@ export class OrdersService {
   /**
    * Full detail: bike + model, offer, branch, transactions, delivery, documents
    */
-  async getOrderById(id: string) {
+  async getOrderById(id: string, user?: any) {
     const order = await this.prisma.client.order.findUnique({
       where: { id },
       include: {
@@ -127,6 +162,8 @@ export class OrdersService {
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
+
+    this.assertOrderAccess(order, user);
 
     return order;
   }
@@ -169,6 +206,8 @@ export class OrdersService {
       throw new NotFoundException(`Order with number ${orderNumber} not found`);
     }
 
+    this.assertOrderAccess(order, user);
+
     return order;
   }
 
@@ -176,7 +215,7 @@ export class OrdersService {
    * Complete missing details of an order before payment
    */
   async completeOrderDetails(id: string, dto: CompleteOrderDetailsDto, user: any) {
-    const order = await this.getOrderById(id);
+    const order = await this.getOrderById(id, user);
 
     if (order.status !== OrderStatus.PENDING_PAYMENT) {
       throw new BadRequestException(
@@ -222,7 +261,7 @@ export class OrdersService {
    * Advance order through valid state transitions only
    */
   async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, user: any) {
-    const order = await this.getOrderById(id);
+    const order = await this.getOrderById(id, user);
 
     const validTransitions: Record<OrderStatus, OrderStatus[]> = {
       [OrderStatus.PENDING_PAYMENT]: [OrderStatus.PAID, OrderStatus.CANCELLED],
@@ -290,6 +329,8 @@ export class OrdersService {
       if (!order) {
         throw new NotFoundException(`Order with ID ${id} not found`);
       }
+
+      this.assertOrderAccess(order, user);
 
       if (order.status === OrderStatus.DELIVERED) {
         throw new BadRequestException(`Cannot cancel a delivered order`);
@@ -376,6 +417,8 @@ export class OrdersService {
         throw new NotFoundException(`Order with ID ${orderId} not found`);
       }
 
+      this.assertOrderAccess(order, user);
+
       if (order.status !== OrderStatus.PENDING_PAYMENT) {
         throw new BadRequestException(
           `Order is not in PENDING_PAYMENT status. Current status: ${order.status}`
@@ -449,7 +492,11 @@ export class OrdersService {
   /**
    * Branch-scoped order list (used by MANAGER)
    */
-  async getOrdersByBranch(branchId: string) {
+  async getOrdersByBranch(branchId: string, user?: any) {
+    if (this.isAssignedBranchUser(user) && user.branchId !== branchId) {
+      throw new NotFoundException("Orders not found");
+    }
+
     const orders = await this.prisma.client.order.findMany({
       where: { branchId },
       include: {
@@ -507,6 +554,10 @@ export class OrdersService {
       });
 
       if (!bike) {
+        throw new NotFoundException(`Bike with chassis ${dto.chassisNumber} not found`);
+      }
+
+      if (this.isAssignedBranchUser(user) && bike.branchId !== user.branchId) {
         throw new NotFoundException(`Bike with chassis ${dto.chassisNumber} not found`);
       }
 

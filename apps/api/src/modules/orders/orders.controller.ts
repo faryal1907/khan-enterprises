@@ -81,8 +81,8 @@ export class OrdersController {
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MANAGER", "SALES_STAFF")
-  async getOrderById(@Param("id") id: string) {
-    return this.ordersService.getOrderById(id);
+  async getOrderById(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.ordersService.getOrderById(id, user);
   }
 
   /**
@@ -195,8 +195,8 @@ export class OrdersController {
    */
   @Get(":id/invoice")
   @UseGuards(JwtAuthGuard)
-  async downloadInvoice(@Param("id") id: string, @Res() res: Response) {
-    const order = await this.ordersService.getOrderById(id);
+  async downloadInvoice(@Param("id") id: string, @CurrentUser() user: any, @Res() res: Response) {
+    const order = await this.ordersService.getOrderById(id, user);
     if (!order) {
       throw new NotFoundException("Order not found");
     }

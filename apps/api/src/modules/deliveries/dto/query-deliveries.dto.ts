@@ -1,4 +1,4 @@
-import { IsEnum, IsUUID, IsOptional, IsInt, Min, IsDateString } from "class-validator";
+import { IsEnum, IsOptional, IsInt, Min, IsDateString, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { DeliveryStatus } from "@khan/prisma";
 
@@ -7,11 +7,11 @@ export class QueryDeliveriesDto {
   @IsOptional()
   status?: DeliveryStatus;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   branchId?: string;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   orderId?: string;
 

@@ -32,6 +32,10 @@ export class QueryPartOrdersDto {
   @IsOptional()
   search?: string;
 
+  @IsString()
+  @IsOptional()
+  processedById?: string;
+
   @IsInt()
   @Min(1)
   @IsOptional()

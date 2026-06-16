@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEmail, IsNumber, Min, IsEnum } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsEmail, IsNumber, Min, IsEnum } from "class-validator";
 import { PaymentMethod } from "@khan/prisma";
 
 export class CreateOfferDto {

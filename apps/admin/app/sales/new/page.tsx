@@ -6,14 +6,20 @@ import { toast } from "sonner";
 import { getBikes, getParts } from "@/lib/api/inventory";
 import { createManualOrder, createManualPartOrder } from "@/lib/api/orders";
 import { numberToWords } from "@repo/utils";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
+import { AsyncButton } from "@/components/async-button";
 
 export default function ManualOrderPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const isBranchScoped = user?.role !== UserRole.ADMIN && Boolean(user?.branchId);
   const [saleType, setSaleType] = useState<"BIKE" | "PART">("BIKE");
   const [formData, setFormData] = useState({
     chassisNumber: "",
     bikeModel: "",
     bikePrice: "",
+    partInventoryId: "",
     partId: "",
     partName: "",
     partQuantity: "",
@@ -40,7 +46,7 @@ export default function ManualOrderPage() {
     const fetchAllParts = async () => {
       setIsFetchingParts(true);
       try {
-        const res = await getParts();
+        const res = await getParts(isBranchScoped ? { branchId: user?.branchId || undefined } : undefined);
         setAllParts(res.parts || []);
       } catch (error) {
         console.error("Failed to fetch parts:", error);
@@ -52,7 +58,7 @@ export default function ManualOrderPage() {
     if (allParts.length === 0) {
       fetchAllParts();
     }
-  }, [saleType]);
+  }, [allParts.length, isBranchScoped, saleType, user?.branchId]);
 
   const partSearchResults = partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
     ? allParts.filter((p: any) => 
@@ -121,7 +127,7 @@ export default function ManualOrderPage() {
         toast.success("Bike sale registered successfully!");
         router.push(`/orders/${res.id}`);
       } else {
-        if (!formData.partId || !formData.partQuantity || !formData.partPrice) {
+        if (!formData.partInventoryId || !formData.partId || !formData.partQuantity || !formData.partPrice) {
           toast.error("Please fill in all part details");
           return;
         }
@@ -148,6 +154,7 @@ export default function ManualOrderPage() {
 
         const payload = {
           partId: formData.partId,
+          partInventoryId: formData.partInventoryId,
           quantity: quantityClean,
           amount: salePriceClean,
           customerName: formData.customerName,
@@ -176,7 +183,11 @@ export default function ManualOrderPage() {
 
     try {
       setLookupLoading(true);
-      const res = await getBikes({ search: formData.chassisNumber.trim() });
+      const res = await getBikes({
+        search: formData.chassisNumber.trim(),
+        status: "AVAILABLE",
+        limit: 50,
+      });
       const bikes = res.bikes || [];
       const exactBike = bikes.find(
         (b: any) => b.chassisNumber.toUpperCase() === formData.chassisNumber.trim().toUpperCase()
@@ -246,6 +257,7 @@ export default function ManualOrderPage() {
           <div className="flex gap-4">
             <button
               onClick={() => setSaleType("BIKE")}
+              disabled={isSubmitting}
               className={`px-6 py-3 text-sm font-medium rounded transition-colors ${
                 saleType === "BIKE" ? "opacity-100" : "opacity-60 hover:opacity-80"
               }`}
@@ -259,6 +271,7 @@ export default function ManualOrderPage() {
             </button>
             <button
               onClick={() => setSaleType("PART")}
+              disabled={isSubmitting}
               className={`px-6 py-3 text-sm font-medium rounded transition-colors ${
                 saleType === "PART" ? "opacity-100" : "opacity-60 hover:opacity-80"
               }`}
@@ -298,6 +311,7 @@ export default function ManualOrderPage() {
                     type="text"
                     value={formData.chassisNumber}
                     onChange={(e) => handleInputChange("chassisNumber", e.target.value)}
+                    disabled={lookupLoading || isSubmitting}
                     className="flex-1 px-3 py-2 rounded text-sm"
                     style={{
                       backgroundColor: theme.backgrounds.tertiary,
@@ -306,17 +320,14 @@ export default function ManualOrderPage() {
                     }}
                     placeholder="Enter chassis number"
                   />
-                  <button
+                  <AsyncButton
                     onClick={handleChassisLookup}
-                    disabled={lookupLoading}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
+                    loading={lookupLoading}
+                    loadingLabel="Looking up..."
+                    disabled={isSubmitting}
                   >
-                    {lookupLoading ? "Looking up..." : "Lookup"}
-                  </button>
+                    Lookup
+                  </AsyncButton>
                 </div>
               </div>
               <div>
@@ -391,14 +402,17 @@ export default function ManualOrderPage() {
                   onChange={(e) => {
                     setPartSearchTerm(e.target.value);
                     if (formData.partId) {
+                      handleInputChange("partInventoryId", "");
                       handleInputChange("partId", "");
                       handleInputChange("partName", "");
                       handleInputChange("partPrice", "");
+                      handleInputChange("partMaxQuantity", "");
                     }
                     setShowPartDropdown(true);
                   }}
                   onFocus={() => setShowPartDropdown(true)}
                   onBlur={() => setTimeout(() => setShowPartDropdown(false), 200)}
+                  disabled={isSubmitting}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
@@ -430,17 +444,19 @@ export default function ManualOrderPage() {
                             borderBottom: `1px solid ${theme.borders.light}`,
                           }}
                           onClick={() => {
+                            const availableQuantity = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0));
                             setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`);
+                            handleInputChange("partInventoryId", p.id);
                             handleInputChange("partId", p.part?.id);
                             handleInputChange("partName", p.part?.name);
                             handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0");
-                            handleInputChange("partMaxQuantity", p.quantity?.toString() || "0");
+                            handleInputChange("partMaxQuantity", availableQuantity.toString());
                             setShowPartDropdown(false);
                           }}
                         >
                           <div className="font-medium">{p.part?.name}</div>
                           <div className="text-xs" style={{ color: theme.text.secondary }}>
-                            SKU: {p.part?.sku} | Rs. {Number(p.part?.sellingPrice || 0).toLocaleString()} | Stock: {p.quantity}
+                            SKU: {p.part?.sku} | Rs. {Number(p.part?.sellingPrice || 0).toLocaleString()} | Available: {Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0))}
                           </div>
                         </div>
                       ))
@@ -476,6 +492,7 @@ export default function ManualOrderPage() {
                     }
                     handleInputChange("partQuantity", val);
                   }}
+                  disabled={!formData.partInventoryId || isSubmitting}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
@@ -498,6 +515,7 @@ export default function ManualOrderPage() {
                   step="0.01"
                   value={formData.partPrice}
                   onChange={(e) => handleInputChange("partPrice", e.target.value)}
+                  disabled={!formData.partInventoryId || isSubmitting}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
@@ -534,6 +552,7 @@ export default function ManualOrderPage() {
                 type="text"
                 value={formData.customerName}
                 onChange={(e) => handleInputChange("customerName", e.target.value)}
+                disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -548,12 +567,13 @@ export default function ManualOrderPage() {
                 className="block text-sm font-medium mb-1"
                 style={{ color: theme.text.secondary }}
               >
-                CNIC *
+                CNIC {saleType === "BIKE" ? "*" : ""}
               </label>
               <input
                 type="text"
                 value={formData.customerCNIC}
                 onChange={(e) => handleInputChange("customerCNIC", e.target.value)}
+                disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -574,6 +594,7 @@ export default function ManualOrderPage() {
                 type="text"
                 value={formData.customerPhone}
                 onChange={(e) => handleInputChange("customerPhone", e.target.value)}
+                disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -588,12 +609,13 @@ export default function ManualOrderPage() {
                 className="block text-sm font-medium mb-1"
                 style={{ color: theme.text.secondary }}
               >
-                Address
+                Address *
               </label>
               <input
                 type="text"
                 value={formData.customerAddress}
                 onChange={(e) => handleInputChange("customerAddress", e.target.value)}
+                disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -636,6 +658,7 @@ export default function ManualOrderPage() {
                     handleInputChange("salePrice", "");
                   }
                 }}
+                disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -660,6 +683,7 @@ export default function ManualOrderPage() {
               <select
                 value={formData.paymentMethod}
                 onChange={(e) => handleInputChange("paymentMethod", e.target.value)}
+                disabled={isSubmitting}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -705,17 +729,14 @@ export default function ManualOrderPage() {
           >
             Cancel
           </a>
-          <button
+          <AsyncButton
             onClick={handleRegisterSale}
-            disabled={isSubmitting}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={isSubmitting}
+            loadingLabel="Registering..."
+            className="px-6"
           >
-            {isSubmitting ? "Registering..." : "Register Sale"}
-          </button>
+            Register Sale
+          </AsyncButton>
         </div>
       </div>
     </div>

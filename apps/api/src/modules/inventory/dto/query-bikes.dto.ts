@@ -1,10 +1,10 @@
-import { IsOptional, IsString, IsUUID, IsEnum, IsInt, Min } from "class-validator";
+import { IsOptional, IsString, IsEnum, IsInt, Min } from "class-validator";
 import { Type } from "class-transformer";
 import { BikeStatus } from "@khan/prisma";
 
 export class QueryBikesDto {
   @IsOptional()
-  @IsUUID()
+  @IsString()
   branchId?: string;
 
   @IsOptional()

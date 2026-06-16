@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsUUID } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray } from "class-validator";
 
 export class CreateBikeUnitDto {
   @IsString()
@@ -9,7 +9,7 @@ export class CreateBikeUnitDto {
   @IsNotEmpty()
   engineNumber: string;
 
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   branchId: string;
 

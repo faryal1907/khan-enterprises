@@ -1,4 +1,4 @@
-import { IsEnum, IsUUID, IsOptional, IsInt, Min, IsDateString, IsBoolean } from "class-validator";
+import { IsEnum, IsUUID, IsOptional, IsInt, Min, IsDateString, IsBoolean, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { OrderStatus } from "@khan/prisma";
 
@@ -7,9 +7,17 @@ export class QueryOrdersDto {
   @IsOptional()
   status?: OrderStatus;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   branchId?: string;
+
+  @IsString()
+  @IsOptional()
+  processedById?: string;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
 
   @IsDateString()
   @IsOptional()
