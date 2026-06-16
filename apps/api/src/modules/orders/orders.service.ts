@@ -19,6 +19,7 @@ export class OrdersService {
    */
   async getOrders(query: QueryOrdersDto, user?: any) {
     console.log('getOrders called with query:', query);
+    console.log('isCompleted value:', query.isCompleted, 'type:', typeof query.isCompleted, 'is undefined:', query.isCompleted === undefined);
     const where: any = {};
 
     if (query.status) {

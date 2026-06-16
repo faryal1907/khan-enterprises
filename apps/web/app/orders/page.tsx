@@ -101,6 +101,7 @@ export default function CustomerOrdersPage() {
   const [activeTab, setActiveTab] = useState<"current" | "history">("current");
 
   useEffect(() => {
+    console.log('activeTab changed to:', activeTab);
     if (!user) {
       router.push("/login");
       return;
@@ -108,14 +109,16 @@ export default function CustomerOrdersPage() {
     fetchOrders();
   }, [user, router, activeTab]);
 
+  // Log initial state
+  console.log('Initial activeTab:', activeTab);
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const isCompleted = activeTab === "history";
-      console.log('fetchOrders called with isCompleted:', isCompleted, 'activeTab:', activeTab);
+      console.log('fetchOrders called with activeTab:', activeTab, 'fetching all orders (no isCompleted filter)');
       const [bikesRes, partsRes] = await Promise.all([
-        getOrders({ isCompleted }).catch(err => ({ orders: [] })),
-        getPartOrders({ isCompleted }).catch(err => [])
+        getOrders({}).catch(err => ({ orders: [] })),
+        getPartOrders({}).catch(err => ({ orders: [] }))
       ]);
 
       const bikes: UnifiedOrder[] = (bikesRes.orders || []).map((o: any) => ({
@@ -123,7 +126,7 @@ export default function CustomerOrdersPage() {
         type: "BIKE"
       }));
 
-      const parts: UnifiedOrder[] = (partsRes.orders || partsRes || []).map((o: any) => ({
+      const parts: UnifiedOrder[] = (partsRes.orders || []).map((o: any) => ({
         ...o,
         type: "PART"
       }));
@@ -131,6 +134,9 @@ export default function CustomerOrdersPage() {
       const merged = [...bikes, ...parts].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+
+      console.log('API response - bikes:', bikes.length, 'parts:', parts.length, 'merged:', merged.length);
+      console.log('All orders with statuses:', merged.map(o => ({ orderNumber: o.orderNumber, status: o.status, type: o.type })));
 
       setOrders(merged);
     } catch (err: any) {
@@ -192,6 +198,15 @@ export default function CustomerOrdersPage() {
     return status.replace(/_/g, " ");
   };
 
+  // Filter orders based on activeTab
+  const filteredOrders = orders.filter((order) => {
+    const isOrderCompleted =
+      order.status === "DELIVERED" || order.status === "CANCELLED";
+    return activeTab === "history" ? isOrderCompleted : !isOrderCompleted;
+  });
+
+  console.log('Filtered orders for display:', filteredOrders.map(o => ({ orderNumber: o.orderNumber, status: o.status, type: o.type })));
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -217,7 +232,10 @@ export default function CustomerOrdersPage() {
         <div className="mb-6">
           <div className="flex gap-2">
             <button
-              onClick={() => setActiveTab("current")}
+              onClick={() => {
+                console.log('Switching to current tab');
+                setActiveTab("current");
+              }}
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
               style={{
                 backgroundColor: activeTab === "current" ? theme.accents.primary : theme.backgrounds.tertiary,
@@ -227,7 +245,10 @@ export default function CustomerOrdersPage() {
               Current Orders
             </button>
             <button
-              onClick={() => setActiveTab("history")}
+              onClick={() => {
+                console.log('Switching to history tab');
+                setActiveTab("history");
+              }}
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
               style={{
                 backgroundColor: activeTab === "history" ? theme.accents.primary : theme.backgrounds.tertiary,
@@ -248,28 +269,30 @@ export default function CustomerOrdersPage() {
           </div>
         )}
 
-        {orders.length === 0 && !error ? (
+        {filteredOrders.length === 0 && !error ? (
           <div
             className="rounded-xl p-12 text-center"
             style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
           >
             <p className="text-lg mb-4" style={{ color: theme.text.secondary }}>
-              You don't have any orders yet
+              {activeTab === "current" ? "You don't have any current orders" : "You don't have any order history"}
             </p>
-            <Link
-              href="/bikes"
-              className="inline-block px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
-            >
-              Browse Shop
-            </Link>
+            {activeTab === "current" && (
+              <Link
+                href="/bikes"
+                className="inline-block px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                style={{
+                  backgroundColor: theme.accents.primary,
+                  color: theme.text.inverse,
+                }}
+              >
+                Browse Shop
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.id}
                 className="rounded-xl p-6"

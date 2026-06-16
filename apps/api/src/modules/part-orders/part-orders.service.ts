@@ -177,6 +177,7 @@ export class PartOrdersService {
    */
   async getPartOrders(query: QueryPartOrdersDto, user?: any) {
     console.log('getPartOrders called with query:', query);
+    console.log('isCompleted value:', query.isCompleted, 'type:', typeof query.isCompleted, 'is undefined:', query.isCompleted === undefined);
     const where: any = {};
 
     if (query.status) {
