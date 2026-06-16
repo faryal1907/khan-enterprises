@@ -19,8 +19,8 @@ export class CreateOfferDto {
   customerEmail?: string;
 
   @IsString()
-  @IsOptional()
-  customerCNIC?: string;
+  @IsNotEmpty()
+  customerCNIC: string;
 
   @IsString()
   @IsNotEmpty()

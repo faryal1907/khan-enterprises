@@ -348,7 +348,7 @@ model Offer {
   customerName    String
   customerPhone   String
   customerEmail   String?
-  customerCNIC    String?
+  customerCNIC    String
   customerAddress String?
 
   offerAmount Decimal @db.Decimal(12, 2)

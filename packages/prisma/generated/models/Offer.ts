@@ -261,7 +261,7 @@ export type OfferGroupByOutputType = {
   customerName: string
   customerPhone: string
   customerEmail: string | null
-  customerCNIC: string | null
+  customerCNIC: string
   customerAddress: string | null
   offerAmount: runtime.Decimal
   counterAmount: runtime.Decimal | null
@@ -304,7 +304,7 @@ export type OfferWhereInput = {
   customerName?: Prisma.StringFilter<"Offer"> | string
   customerPhone?: Prisma.StringFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringNullableFilter<"Offer"> | string | null
+  customerCNIC?: Prisma.StringFilter<"Offer"> | string
   customerAddress?: Prisma.StringNullableFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -327,7 +327,7 @@ export type OfferOrderByWithRelationInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerEmail?: Prisma.SortOrderInput | Prisma.SortOrder
-  customerCNIC?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerCNIC?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   offerAmount?: Prisma.SortOrder
   counterAmount?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,7 +353,7 @@ export type OfferWhereUniqueInput = Prisma.AtLeast<{
   customerName?: Prisma.StringFilter<"Offer"> | string
   customerPhone?: Prisma.StringFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringNullableFilter<"Offer"> | string | null
+  customerCNIC?: Prisma.StringFilter<"Offer"> | string
   customerAddress?: Prisma.StringNullableFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -376,7 +376,7 @@ export type OfferOrderByWithAggregationInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerEmail?: Prisma.SortOrderInput | Prisma.SortOrder
-  customerCNIC?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerCNIC?: Prisma.SortOrder
   customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   offerAmount?: Prisma.SortOrder
   counterAmount?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -404,7 +404,7 @@ export type OfferScalarWhereWithAggregatesInput = {
   customerName?: Prisma.StringWithAggregatesFilter<"Offer"> | string
   customerPhone?: Prisma.StringWithAggregatesFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
+  customerCNIC?: Prisma.StringWithAggregatesFilter<"Offer"> | string
   customerAddress?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalWithAggregatesFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -423,7 +423,7 @@ export type OfferCreateInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -445,7 +445,7 @@ export type OfferUncheckedCreateInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -465,7 +465,7 @@ export type OfferUpdateInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -487,7 +487,7 @@ export type OfferUncheckedUpdateInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -508,7 +508,7 @@ export type OfferCreateManyInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -527,7 +527,7 @@ export type OfferUpdateManyMutationInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -546,7 +546,7 @@ export type OfferUncheckedUpdateManyInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -758,7 +758,7 @@ export type OfferCreateWithoutCreatedByInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -779,7 +779,7 @@ export type OfferUncheckedCreateWithoutCreatedByInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -828,7 +828,7 @@ export type OfferScalarWhereInput = {
   customerName?: Prisma.StringFilter<"Offer"> | string
   customerPhone?: Prisma.StringFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringNullableFilter<"Offer"> | string | null
+  customerCNIC?: Prisma.StringFilter<"Offer"> | string
   customerAddress?: Prisma.StringNullableFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -847,7 +847,7 @@ export type OfferCreateWithoutBikeInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -867,7 +867,7 @@ export type OfferUncheckedCreateWithoutBikeInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -913,7 +913,7 @@ export type OfferCreateWithoutOrderInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -934,7 +934,7 @@ export type OfferUncheckedCreateWithoutOrderInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -969,7 +969,7 @@ export type OfferUpdateWithoutOrderInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -990,7 +990,7 @@ export type OfferUncheckedUpdateWithoutOrderInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1010,7 +1010,7 @@ export type OfferCreateManyCreatedByInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1028,7 +1028,7 @@ export type OfferUpdateWithoutCreatedByInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1049,7 +1049,7 @@ export type OfferUncheckedUpdateWithoutCreatedByInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1069,7 +1069,7 @@ export type OfferUncheckedUpdateManyWithoutCreatedByInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1087,7 +1087,7 @@ export type OfferCreateManyBikeInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC?: string | null
+  customerCNIC: string
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1106,7 +1106,7 @@ export type OfferUpdateWithoutBikeInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1126,7 +1126,7 @@ export type OfferUncheckedUpdateWithoutBikeInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1146,7 +1146,7 @@ export type OfferUncheckedUpdateManyWithoutBikeInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1277,7 +1277,7 @@ export type $OfferPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     customerName: string
     customerPhone: string
     customerEmail: string | null
-    customerCNIC: string | null
+    customerCNIC: string
     customerAddress: string | null
     offerAmount: runtime.Decimal
     counterAmount: runtime.Decimal | null
