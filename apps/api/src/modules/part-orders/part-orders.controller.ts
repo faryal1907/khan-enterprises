@@ -113,6 +113,21 @@ export class PartOrdersController {
   }
 
   /**
+   * PATCH /api/part-orders/:id/picked-up
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * Mark part order as picked up by customer (no delivery)
+   */
+  @Patch(":id/picked-up")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async markAsPickedByCustomer(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.markAsPickedByCustomer(id, user);
+  }
+
+  /**
    * GET /api/part-orders/:id/invoice
    * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
    */

@@ -691,4 +691,87 @@ export class PartOrdersService {
       return updatedOrder;
     });
   }
+
+  /**
+   * Mark part order as picked up by customer (no delivery)
+   * Used when customer picks up the parts at the branch themselves
+   */
+  async markAsPickedByCustomer(orderId: string, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch part order
+      const order = await tx.partOrder.findUnique({
+        where: { id: orderId },
+        include: {
+          partInventory: true,
+          delivery: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Part order with ID ${orderId} not found`);
+      }
+
+      // 2. Verify part order is in CONFIRMED status
+      if (order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(
+          `Part order must be in CONFIRMED status to be marked as picked by customer. Current status: ${order.status}`
+        );
+      }
+
+      // 3. Verify no delivery request exists (customer is picking up themselves)
+      if (order.delivery) {
+        throw new BadRequestException(
+          `Cannot mark part order as picked by customer when a delivery request exists`
+        );
+      }
+
+      // 4. Update part order status to DELIVERED
+      const updatedOrder = await tx.partOrder.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.DELIVERED,
+          processedById: user.id,
+        },
+      });
+
+      // 5. Update part inventory (clear reserved quantity and deduct stock)
+      await tx.partInventory.update({
+        where: { id: order.partInventoryId },
+        data: {
+          quantity: {
+            decrement: order.quantity,
+          },
+          reservedQuantity: {
+            decrement: order.quantity,
+          },
+        },
+      });
+
+      // Create stock movement record
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: order.partInventoryId,
+          movementType: "STOCK_OUT",
+          quantity: -order.quantity,
+          reason: `Part order picked by customer: ${updatedOrder.orderNumber}`,
+          performedById: user.id,
+        },
+      });
+
+      // 6. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_ORDER",
+          entityId: orderId,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, pickedByCustomer: true }),
+        },
+      });
+
+      return updatedOrder;
+    });
+  }
 }

@@ -108,3 +108,8 @@ export async function markAsPickedByCustomer(id: string) {
   const response = await api.patch(`/orders/${id}/picked-up`);
   return response.data;
 }
+
+export async function markPartOrderAsPickedByCustomer(id: string) {
+  const response = await api.patch(`/part-orders/${id}/picked-up`);
+  return response.data;
+}
