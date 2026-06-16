@@ -11,10 +11,29 @@ export class TransactionsService {
     private readonly pdfService: PdfService
   ) {}
 
+  private isAssignedBranchUser(user?: any) {
+    return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
+  }
+
+  private getBranchScope(user?: any, requestedBranchId?: string) {
+    if (this.isAssignedBranchUser(user)) {
+      return user.branchId;
+    }
+
+    return requestedBranchId || undefined;
+  }
+
+  private assertTransactionAccess(branchId?: string, user?: any) {
+    if (this.isAssignedBranchUser(user) && branchId !== user.branchId) {
+      throw new NotFoundException("Transaction not found");
+    }
+  }
+
   /** Return all payment transactions with order and branch details. */
-  async getAllTransactions(query: QueryTransactionsDto) {
+  async getAllTransactions(query: QueryTransactionsDto, user?: any) {
     const whereBike: any = {};
     const wherePart: any = {};
+    const branchId = this.getBranchScope(user, query.branchId);
 
     if (query.status) {
       whereBike.status = query.status;
@@ -36,9 +55,9 @@ export class TransactionsService {
         wherePart.createdAt.lte = new Date(query.dateTo);
       }
     }
-    if (query.branchId) {
-      whereBike.order = { branchId: query.branchId };
-      wherePart.partOrder = { branchId: query.branchId };
+    if (branchId) {
+      whereBike.order = { is: { branchId } };
+      wherePart.partOrder = { is: { branchId } };
     }
 
     const [bikeTransactions, partTransactions] = await Promise.all([
@@ -120,7 +139,7 @@ export class TransactionsService {
   }
 
   /** Return a single transaction by ID with full details. */
-  async getTransactionById(id: string) {
+  async getTransactionById(id: string, user?: any) {
     const transaction = await this.prisma.client.paymentTransaction.findUnique({
       where: { id },
       select: {
@@ -152,47 +171,82 @@ export class TransactionsService {
       },
     });
 
-    if (!transaction) {
+    if (transaction) {
+      this.assertTransactionAccess(transaction.order.branch.id, user);
+
+      return {
+        ...transaction,
+        type: "BIKE",
+        timeline: this.buildTimeline(transaction),
+      };
+    }
+
+    const partTransaction = await this.prisma.client.partPaymentTransaction.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        amount: true,
+        method: true,
+        status: true,
+        gatewayReference: true,
+        failureReason: true,
+        gatewayResponse: true,
+        webhookReceivedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        partOrder: {
+          select: {
+            id: true,
+            orderNumber: true,
+            customerName: true,
+            customerPhone: true,
+            customerAddress: true,
+            amount: true,
+            paymentMethod: true,
+            status: true,
+            branch: {
+              select: { id: true, name: true, city: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!partTransaction) {
       throw new NotFoundException("Transaction not found");
     }
 
-    // Build timeline from available data
-    const timeline = [
-      { event: "Payment Initiated", timestamp: transaction.createdAt },
-    ];
-
-    if (transaction.webhookReceivedAt) {
-      timeline.push({
-        event: "Webhook Received",
-        timestamp: transaction.webhookReceivedAt,
-      });
-    }
-
-    if (transaction.status === "SUCCESS") {
-      timeline.push({
-        event: "Payment Verified",
-        timestamp: transaction.updatedAt,
-      });
-    } else if (transaction.status === "FAILED") {
-      timeline.push({
-        event: "Payment Failed",
-        timestamp: transaction.updatedAt,
-      });
-    } else if (transaction.status === "REFUNDED") {
-      timeline.push({
-        event: "Refund Processed",
-        timestamp: transaction.updatedAt,
-      });
-    }
+    this.assertTransactionAccess(partTransaction.partOrder.branch.id, user);
 
     return {
-      ...transaction,
-      timeline,
+      id: partTransaction.id,
+      amount: partTransaction.amount,
+      method: partTransaction.method,
+      status: partTransaction.status,
+      gatewayReference: partTransaction.gatewayReference,
+      failureReason: partTransaction.failureReason,
+      gatewayResponse: partTransaction.gatewayResponse,
+      webhookReceivedAt: partTransaction.webhookReceivedAt,
+      createdAt: partTransaction.createdAt,
+      updatedAt: partTransaction.updatedAt,
+      type: "PART",
+      order: {
+        id: partTransaction.partOrder.id,
+        orderNumber: partTransaction.partOrder.orderNumber,
+        customerName: partTransaction.partOrder.customerName,
+        customerPhone: partTransaction.partOrder.customerPhone,
+        customerAddress: partTransaction.partOrder.customerAddress,
+        negotiatedAmount: partTransaction.partOrder.amount,
+        paymentMethod: partTransaction.partOrder.paymentMethod,
+        status: partTransaction.partOrder.status,
+        branch: partTransaction.partOrder.branch,
+      },
+      timeline: this.buildTimeline(partTransaction),
     };
   }
 
   /** Refund a transaction and log the action */
-  async refundTransaction(id: string, adminId: string) {
+  async refundTransaction(id: string, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
       let isPart = false;
       let transaction: any = await tx.paymentTransaction.findUnique({
@@ -227,13 +281,7 @@ export class TransactionsService {
         if (order && order.status !== "CANCELLED") {
           await tx.partOrder.update({
             where: { id: order.id },
-            data: { status: "CANCELLED", processedById: adminId },
-          });
-
-          // Stock logic: restore reserved
-          await tx.partInventory.update({
-            where: { id: order.partInventoryId },
-            data: { reservedQuantity: { decrement: order.quantity } },
+            data: { status: "CANCELLED", processedById: user.id },
           });
 
           if (["CONFIRMED", "READY_FOR_DELIVERY", "DELIVERED"].includes(order.status)) {
@@ -253,7 +301,7 @@ export class TransactionsService {
         if (order && order.status !== "CANCELLED") {
           await tx.order.update({
             where: { id: order.id },
-            data: { status: "CANCELLED", processedById: adminId },
+            data: { status: "CANCELLED", processedById: user.id },
           });
 
           await tx.bikeUnit.update({
@@ -265,8 +313,8 @@ export class TransactionsService {
 
       await tx.auditLog.create({
         data: {
-          userId: adminId,
-          userRole: "ADMIN",
+          userId: user.id,
+          userRole: user.role,
           action: AuditAction.REFUND,
           entityType: isPart ? "PART_PAYMENT_TRANSACTION" : "PaymentTransaction",
           entityId: id,
@@ -280,7 +328,7 @@ export class TransactionsService {
   }
 
   /** Get a receipt (invoice) stream for a transaction */
-  async getReceiptStream(id: string) {
+  async getReceiptStream(id: string, user?: any) {
     const transaction = await this.prisma.client.paymentTransaction.findUnique({
       where: { id },
       include: {
@@ -294,6 +342,7 @@ export class TransactionsService {
     });
 
     if (transaction && transaction.order) {
+      this.assertTransactionAccess(transaction.order.branchId, user);
       return this.pdfService.generateInvoice(transaction.order);
     }
 
@@ -310,9 +359,47 @@ export class TransactionsService {
     });
 
     if (partTransaction && partTransaction.partOrder) {
+      this.assertTransactionAccess(partTransaction.partOrder.branchId, user);
       return this.pdfService.generateInvoice(partTransaction.partOrder);
     }
 
     throw new NotFoundException("Transaction or associated order not found");
+  }
+
+  private buildTimeline(transaction: {
+    createdAt: Date;
+    updatedAt: Date;
+    webhookReceivedAt?: Date | null;
+    status: string;
+  }) {
+    const timeline = [
+      { event: "Payment Initiated", timestamp: transaction.createdAt },
+    ];
+
+    if (transaction.webhookReceivedAt) {
+      timeline.push({
+        event: "Webhook Received",
+        timestamp: transaction.webhookReceivedAt,
+      });
+    }
+
+    if (transaction.status === "SUCCESS") {
+      timeline.push({
+        event: "Payment Verified",
+        timestamp: transaction.updatedAt,
+      });
+    } else if (transaction.status === "FAILED") {
+      timeline.push({
+        event: "Payment Failed",
+        timestamp: transaction.updatedAt,
+      });
+    } else if (transaction.status === "REFUNDED") {
+      timeline.push({
+        event: "Refund Processed",
+        timestamp: transaction.updatedAt,
+      });
+    }
+
+    return timeline;
   }
 }
