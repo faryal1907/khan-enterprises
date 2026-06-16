@@ -515,9 +515,12 @@ export class OrdersService {
   /**
    * Customer-scoped order list by phone number (public endpoint)
    */
-  async getOrdersByCustomerPhone(phone: string) {
+  async getOrdersByCustomerPhone(phone: string, user?: any) {
+    const where: any = { customerPhone: phone };
+    this.applyBranchScope(where, user);
+
     const orders = await this.prisma.client.order.findMany({
-      where: { customerPhone: phone },
+      where,
       include: {
         bike: {
           include: {
