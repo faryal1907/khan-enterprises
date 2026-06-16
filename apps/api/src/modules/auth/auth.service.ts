@@ -180,8 +180,36 @@ export class AuthService {
     return user;
   }
 
-  async getAllUsers() {
+  async getAllUsers(filters: {
+    role?: "ADMIN" | "MANAGER" | "SALES_STAFF";
+    status?: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+    branchId?: string;
+    search?: string;
+  } = {}) {
+    const where: any = {};
+
+    if (filters.role) {
+      where.role = filters.role;
+    }
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    if (filters.branchId) {
+      where.branchId = filters.branchId;
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { email: { contains: filters.search, mode: "insensitive" } },
+        { fullName: { contains: filters.search, mode: "insensitive" } },
+        { phoneNumber: { contains: filters.search, mode: "insensitive" } },
+      ];
+    }
+
     return this.prisma.client.user.findMany({
+      where,
       select: {
         id: true,
         email: true,
@@ -189,6 +217,7 @@ export class AuthService {
         phoneNumber: true,
         role: true,
         status: true,
+        branchId: true,
         vendorId: true,
         branch: { select: { id: true, name: true, city: true } },
         vendor: { select: { id: true, name: true } },
@@ -244,6 +273,32 @@ export class AuthService {
       throw new ForbiddenException("User with this email already exists.");
     }
 
+    if (!dto.password || dto.password.length < 6) {
+      throw new ForbiddenException("Password must be at least 6 characters.");
+    }
+
+    if (dto.branchId) {
+      const branch = await this.prisma.client.branch.findUnique({
+        where: { id: dto.branchId },
+        select: { id: true },
+      });
+
+      if (!branch) {
+        throw new ForbiddenException("Selected branch does not exist.");
+      }
+    }
+
+    if (dto.vendorId) {
+      const vendor = await this.prisma.client.vendor.findUnique({
+        where: { id: dto.vendorId },
+        select: { id: true },
+      });
+
+      if (!vendor) {
+        throw new ForbiddenException("Selected vendor does not exist.");
+      }
+    }
+
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const resolvedVendorId = dto.role === "SALES_STAFF" ? (dto.vendorId || null) : null;
 
@@ -266,6 +321,7 @@ export class AuthService {
           phoneNumber: true,
           role: true,
           status: true,
+          branchId: true,
           vendorId: true,
           branch: { select: { id: true, name: true, city: true } },
           vendor: { select: { id: true, name: true } },
@@ -310,6 +366,28 @@ export class AuthService {
         throw new UnauthorizedException("User not found.");
       }
 
+      if (dto.branchId) {
+        const branch = await tx.branch.findUnique({
+          where: { id: dto.branchId },
+          select: { id: true },
+        });
+
+        if (!branch) {
+          throw new ForbiddenException("Selected branch does not exist.");
+        }
+      }
+
+      if (dto.vendorId) {
+        const vendor = await tx.vendor.findUnique({
+          where: { id: dto.vendorId },
+          select: { id: true },
+        });
+
+        if (!vendor) {
+          throw new ForbiddenException("Selected vendor does not exist.");
+        }
+      }
+
       const updateData: any = { ...dto };
       
       // If role is changing, or if role is already non-SALES_STAFF and not changing
@@ -328,6 +406,7 @@ export class AuthService {
           phoneNumber: true,
           role: true,
           status: true,
+          branchId: true,
           vendorId: true,
           branch: { select: { id: true, name: true, city: true } },
           vendor: { select: { id: true, name: true } },
@@ -360,6 +439,10 @@ export class AuthService {
   }
 
   async deactivateUser(id: string, adminId: string) {
+    if (id === adminId) {
+      throw new ForbiddenException("You cannot deactivate your own account.");
+    }
+
     return this.prisma.client.$transaction(async (tx) => {
       const user = await tx.user.update({
         where: { id },

@@ -1,18 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { api } from "@/lib/api-client";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { UserStatusBadge } from "@/components/user-status-badge";
+import { getBranches, getVendors } from "@/lib/api/inventory";
+import { activateUser, deactivateUser, getUserById, updateUser } from "@/lib/api/users";
 import { useAuthStore } from "@/lib/auth-store";
+import { theme } from "@/lib/colors";
+import { Branch, UserRole, Vendor } from "@/lib/types";
 
-type User = {
+type StaffUser = {
   id: string;
   email: string;
   fullName: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   role: string;
   status: string;
   branchId: string | null;
@@ -30,24 +36,29 @@ type User = {
   updatedAt: string;
 };
 
-type Vendor = { id: string; name: string };
-type Branch = { id: string; name: string; city: string };
+type PendingAction = "activate" | "deactivate" | null;
+
+const inputStyle = {
+  backgroundColor: theme.backgrounds.tertiary,
+  border: `1px solid ${theme.borders.medium}`,
+  color: theme.text.primary,
+};
 
 export default function UserDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { user: currentUser } = useAuthStore();
-  const userId = typeof params?.id === "string" ? params.id : "UNKNOWN";
-  const [user, setUser] = useState<User | null>(null);
+  const userId = params.id;
+  const [staffUser, setStaffUser] = useState<StaffUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [actionLoading, setActionLoading] = useState<PendingAction | "save">(null);
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
-    role: "",
+    role: UserRole.MANAGER,
     branchId: "",
     vendorId: "",
   });
@@ -55,123 +66,159 @@ export default function UserDetailPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
 
   useEffect(() => {
-    const fetchRefData = async () => {
-      try {
-        const [vendorRes, branchRes] = await Promise.all([
-          api.get("/vendors"),
-          api.get("/branches"),
-        ]);
-        setVendors(vendorRes.data.vendors);
-        setBranches(branchRes.data.branches);
-      } catch (err) {
-        console.error("Failed to fetch reference data:", err);
-      }
-    };
-    fetchRefData();
-  }, []);
+    if (currentUser && currentUser.role !== UserRole.ADMIN) {
+      router.replace("/");
+    }
+  }, [currentUser, router]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get(`/auth/users/${userId}`);
-        setUser(res.data);
-        setFormData({
-          fullName: res.data.fullName,
-          phoneNumber: res.data.phoneNumber,
-          role: res.data.role,
-          branchId: res.data.branchId || "",
-          vendorId: res.data.vendorId || "",
-        });
-      } catch (err) {
-        setError("Failed to load user details");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    Promise.all([getVendors(), getBranches()])
+      .then(([vendorData, branchData]) => {
+        setVendors(vendorData.vendors || []);
+        setBranches(branchData.branches || []);
+      })
+      .catch(() => {
+        setVendors([]);
+        setBranches([]);
+      });
+  }, []);
 
-    fetchUser();
+  const fetchUser = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await getUserById(userId);
+      setStaffUser(data);
+      setFormData({
+        fullName: data.fullName || "",
+        phoneNumber: data.phoneNumber || "",
+        role: data.role,
+        branchId: data.branchId || "",
+        vendorId: data.vendorId || "",
+      });
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to load user details");
+      setStaffUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, [userId]);
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== UserRole.ADMIN) return;
+    fetchUser();
+  }, [currentUser, fetchUser]);
+
+  const resetForm = () => {
+    if (!staffUser) return;
+    setFormData({
+      fullName: staffUser.fullName || "",
+      phoneNumber: staffUser.phoneNumber || "",
+      role: staffUser.role as UserRole,
+      branchId: staffUser.branchId || "",
+      vendorId: staffUser.vendorId || "",
+    });
+  };
+
+  const handleRoleChange = (role: UserRole) => {
+    setFormData((prev) => ({
+      ...prev,
+      role,
+      vendorId: role === UserRole.SALES_STAFF ? prev.vendorId : "",
+    }));
+  };
+
+  const handleUpdate = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setActionLoading("save");
+
     try {
-      const updateData: any = {
-        fullName: formData.fullName,
-        phoneNumber: formData.phoneNumber,
+      const updated = await updateUser(userId, {
+        fullName: formData.fullName.trim(),
+        phoneNumber: formData.phoneNumber.trim(),
         role: formData.role,
         branchId: formData.branchId || null,
-        vendorId: formData.role === "SALES_STAFF" ? (formData.vendorId || null) : null,
-      };
-
-      const res = await api.put(`/auth/users/${userId}`, updateData);
-      setUser(res.data);
+        vendorId: formData.role === UserRole.SALES_STAFF ? formData.vendorId || null : null,
+      });
+      setStaffUser(updated);
       setIsEditing(false);
-      toast.success("User updated successfully");
-    } catch (err) {
-      console.error("Failed to update user:", err);
-      toast.error("Failed to update user");
-    }
-  };
-
-  const confirmDeactivate = async () => {
-    setIsProcessing(true);
-
-    try {
-      await api.delete(`/auth/users/${userId}`);
-      setUser((prev) => (prev ? { ...prev, status: "INACTIVE" } : null));
-      toast.success("User deactivated successfully");
-    } catch (err) {
-      console.error("Failed to deactivate user:", err);
-      toast.error("Failed to deactivate user");
+      toast.success("User updated");
+    } catch (updateError: any) {
+      toast.error(updateError.response?.data?.message || "Failed to update user");
     } finally {
-      setIsProcessing(false);
-      setShowDeactivateModal(false);
+      setActionLoading(null);
     }
   };
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+
+    setActionLoading(pendingAction);
+    try {
+      if (pendingAction === "activate") {
+        await activateUser(userId);
+        toast.success("User activated");
+      } else {
+        await deactivateUser(userId);
+        toast.success("User deactivated");
+      }
+      setPendingAction(null);
+      await fetchUser();
+    } catch (actionError: any) {
+      toast.error(actionError.response?.data?.message || `Failed to ${pendingAction} user`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (currentUser && currentUser.role !== UserRole.ADMIN) return null;
 
   if (loading) {
     return (
       <div className="p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading...</p>
+          <p style={{ color: theme.text.secondary }}>Loading user details...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !user) {
+  if (error || !staffUser) {
     return (
       <div className="p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>{error || "User not found"}</p>
-          <Link
-            href="/users"
-            className="mt-4 inline-block px-4 py-2 text-sm font-medium rounded"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Back to Users
-          </Link>
+          <p className="mb-4" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
+            {error || "User not found"}
+          </p>
+          <div className="flex gap-3">
+            <AsyncButton onClick={fetchUser}>Retry</AsyncButton>
+            <Link
+              href="/users"
+              className="px-4 py-2 text-sm font-medium rounded"
+              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+            >
+              Back to Users
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
+
+  const isCurrentUser = staffUser.id === currentUser?.id;
+  const canToggleStatus = !isCurrentUser;
 
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
               User Details
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-              User ID: {userId}
+              Review account access, branch scope, and staff status.
             </p>
           </div>
 
@@ -179,45 +226,39 @@ export default function UserDetailPage() {
             <Link
               href="/users"
               className="px-4 py-2 text-sm font-medium rounded"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.secondary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
+              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
             >
               Back
             </Link>
 
-            {user.status === "ACTIVE" && user.id !== currentUser?.id && (
-              <button
-                onClick={() => setShowDeactivateModal(true)}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
-              >
+            {canToggleStatus && staffUser.status === "ACTIVE" && (
+              <AsyncButton onClick={() => setPendingAction("deactivate")} style={{ backgroundColor: theme.accents.secondary }}>
                 Deactivate User
-              </button>
+              </AsyncButton>
+            )}
+            {canToggleStatus && staffUser.status !== "ACTIVE" && (
+              <AsyncButton onClick={() => setPendingAction("activate")}>
+                Activate User
+              </AsyncButton>
             )}
           </div>
         </div>
 
-        {/* Info */}
         <div
           className="rounded-lg p-6 mb-6"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold" style={{ color: theme.text.primary }}>
               User Information
             </h2>
             <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="text-sm font-medium"
+              onClick={() => {
+                if (isEditing) resetForm();
+                setIsEditing(!isEditing);
+              }}
+              disabled={actionLoading === "save"}
+              className="text-sm font-medium disabled:opacity-50"
               style={{ color: theme.accents.primary }}
             >
               {isEditing ? "Cancel" : "Edit"}
@@ -226,206 +267,157 @@ export default function UserDetailPage() {
 
           {isEditing ? (
             <form onSubmit={handleUpdate}>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Full Name
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Full Name *">
                   <input
                     type="text"
                     value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, fullName: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Phone Number
-                  </label>
+                </FormField>
+                <FormField label="Phone Number">
                   <input
                     type="text"
                     value={formData.phoneNumber}
-                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, phoneNumber: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    required
+                    style={inputStyle}
                   />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Role
-                  </label>
+                </FormField>
+                <FormField label="Role *">
                   <select
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value, vendorId: "" })}
+                    onChange={(event) => handleRoleChange(event.target.value as UserRole)}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                     required
                   >
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="MANAGER">MANAGER</option>
-                    <option value="SALES_STAFF">SALES_STAFF</option>
+                    <option value={UserRole.ADMIN}>Admin</option>
+                    <option value={UserRole.MANAGER}>Manager</option>
+                    <option value={UserRole.SALES_STAFF}>Sales Staff</option>
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                    Branch
-                  </label>
+                </FormField>
+                <FormField label="Branch Scope">
                   <select
                     value={formData.branchId}
-                    onChange={(e) => setFormData({ ...formData, branchId: e.target.value })}
+                    onChange={(event) => setFormData({ ...formData, branchId: event.target.value })}
                     className="w-full px-3 py-2 text-sm rounded"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
+                    style={inputStyle}
                   >
-                    <option value="">No Branch (Global)</option>
+                    <option value="">Global / Unassigned</option>
                     {branches.map((branch) => (
                       <option key={branch.id} value={branch.id}>
                         {branch.name} ({branch.city})
                       </option>
                     ))}
                   </select>
-                </div>
+                </FormField>
 
-                {/* Vendor assignment — only shown for SALES_STAFF */}
-                {formData.role === "SALES_STAFF" && (
-                  <div className="col-span-2">
-                    <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
-                      Assigned Vendor *
-                    </label>
-                    <select
-                      value={formData.vendorId}
-                      onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
-                      className="w-full px-3 py-2 text-sm rounded"
-                      style={{
-                        backgroundColor: theme.backgrounds.tertiary,
-                        border: `1px solid ${theme.borders.medium}`,
-                        color: theme.text.primary,
-                      }}
-                      required
-                    >
-                      <option value="">Select vendor</option>
-                      {vendors.map((vendor) => (
-                        <option key={vendor.id} value={vendor.id}>
-                          {vendor.name}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
-                      Sales staff can only access bikes and sales from their assigned vendor.
-                    </p>
+                {formData.role === UserRole.SALES_STAFF && (
+                  <div className="md:col-span-2">
+                    <FormField label="Vendor Assignment">
+                      <select
+                        value={formData.vendorId}
+                        onChange={(event) => setFormData({ ...formData, vendorId: event.target.value })}
+                        className="w-full px-3 py-2 text-sm rounded"
+                        style={inputStyle}
+                      >
+                        <option value="">No vendor assigned</option>
+                        {vendors.map((vendor) => (
+                          <option key={vendor.id} value={vendor.id}>
+                            {vendor.name}
+                          </option>
+                        ))}
+                      </select>
+                    </FormField>
                   </div>
                 )}
               </div>
               <div className="mt-4 flex gap-2">
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium rounded"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                  }}
-                >
+                <AsyncButton type="submit" loading={actionLoading === "save"} loadingLabel="Saving...">
                   Save Changes
-                </button>
+                </AsyncButton>
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 text-sm font-medium rounded"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    color: theme.text.secondary,
-                    border: `1px solid ${theme.borders.medium}`,
+                  onClick={() => {
+                    resetForm();
+                    setIsEditing(false);
                   }}
+                  disabled={actionLoading === "save"}
+                  className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
+                  style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
                 >
                   Cancel
                 </button>
               </div>
             </form>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <Info label="User ID" value={user.id} />
-              <Info label="Email" value={user.email} />
-              <Info label="Full Name" value={user.fullName} />
-              <Info label="Phone Number" value={user.phoneNumber} />
-              <Info label="Role" value={user.role} />
-              <Info label="Branch" value={user.branch ? `${user.branch.name} (${user.branch.city})` : "No Branch (Global)"} />
-              {user.role === "SALES_STAFF" && (
-                <Info label="Assigned Vendor" value={user.vendor ? user.vendor.name : "Not assigned"} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Info label="User ID" value={staffUser.id} />
+              <Info label="Email" value={staffUser.email} />
+              <Info label="Full Name" value={staffUser.fullName} />
+              <Info label="Phone Number" value={staffUser.phoneNumber || "-"} />
+              <Info label="Role" value={staffUser.role} />
+              <Info label="Branch Scope" value={staffUser.branch ? `${staffUser.branch.name} (${staffUser.branch.city})` : "Global / Unassigned"} />
+              {staffUser.role === UserRole.SALES_STAFF && (
+                <Info label="Assigned Vendor" value={staffUser.vendor?.name || "Not assigned"} />
               )}
-              <Info label="Status" value={user.status} />
-              <Info label="Created At" value={new Date(user.createdAt).toLocaleString()} />
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>Status</p>
+                <UserStatusBadge status={staffUser.status} />
+              </div>
+              <Info label="Created At" value={new Date(staffUser.createdAt).toLocaleString()} />
             </div>
           )}
         </div>
       </div>
 
-      {/* Deactivate Confirmation Modal */}
-      {showDeactivateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => !isProcessing && setShowDeactivateModal(false)}
-          ></div>
-          <div
-            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
-              Confirm Deactivation
-            </h3>
-            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
-              Are you sure you want to deactivate this user? They will immediately lose access to the system.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeactivateModal(false)}
-                disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeactivate}
-                disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: "#fff",
-                  opacity: isProcessing ? 0.7 : 1,
-                }}
-              >
-                {isProcessing ? "Processing..." : "Deactivate User"}
-              </button>
-            </div>
+      {pendingAction && (
+        <ActionModal
+          title={pendingAction === "activate" ? "Confirm Activation" : "Confirm Deactivation"}
+          onClose={() => {
+            if (!actionLoading) setPendingAction(null);
+          }}
+        >
+          <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+            {pendingAction === "activate"
+              ? `Activate ${staffUser.fullName}? They will regain access based on their role.`
+              : `Deactivate ${staffUser.fullName}? They will immediately lose access to the system.`}
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setPendingAction(null)}
+              disabled={Boolean(actionLoading)}
+              className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
+              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleConfirmAction}
+              loading={actionLoading === pendingAction}
+              loadingLabel={pendingAction === "activate" ? "Activating..." : "Deactivating..."}
+              style={{ backgroundColor: pendingAction === "activate" ? theme.accents.primary : theme.accents.secondary }}
+            >
+              {pendingAction === "activate" ? "Activate User" : "Deactivate User"}
+            </AsyncButton>
           </div>
-        </div>
+        </ActionModal>
       )}
+    </div>
+  );
+}
+
+function FormField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm mb-1" style={{ color: theme.text.secondary }}>
+        {label}
+      </label>
+      {children}
     </div>
   );
 }
@@ -436,7 +428,7 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="text-sm mb-1" style={{ color: theme.text.secondary }}>
         {label}
       </p>
-      <p className="font-medium" style={{ color: theme.text.primary }}>
+      <p className="font-medium break-all" style={{ color: theme.text.primary }}>
         {value}
       </p>
     </div>

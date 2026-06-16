@@ -1,21 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { api } from "@/lib/api-client";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { UserStatusBadge } from "@/components/user-status-badge";
+import { getBranches } from "@/lib/api/inventory";
+import { activateUser, deactivateUser, getUsers, type UserFilters } from "@/lib/api/users";
 import { useAuthStore } from "@/lib/auth-store";
-import { UserRole } from "@/lib/types";
+import { theme } from "@/lib/colors";
+import { Branch, UserRole } from "@/lib/types";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
-type User = {
+type StaffUser = {
   id: string;
   email: string;
   fullName: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   role: string;
   status: string;
+  branchId: string | null;
   branch: {
     id: string;
     name: string;
@@ -28,343 +34,313 @@ type User = {
   createdAt: string;
 };
 
+type PendingAction = {
+  type: "activate" | "deactivate";
+  user: StaffUser;
+} | null;
+
+function getBranchLabel(user: StaffUser) {
+  return user.branch ? `${user.branch.name} (${user.branch.city})` : "Global";
+}
+
 export default function UsersPage() {
   const router = useRouter();
   const { user: currentUser } = useAuthStore();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<StaffUser[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [filters, setFilters] = useState({
+    role: "",
+    status: "",
+    branchId: "",
+    search: "",
+  });
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [userToDeactivate, setUserToDeactivate] = useState<string | null>(null);
-  const [userToActivate, setUserToActivate] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState("");
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [processingAction, setProcessingAction] = useState<"activate" | "deactivate" | null>(null);
 
-  // Role check: Admin only
   useEffect(() => {
     if (currentUser && currentUser.role !== UserRole.ADMIN) {
-      router.push("/");
+      router.replace("/");
     }
   }, [currentUser, router]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get("/auth/users");
-        setUsers(res.data.users);
-      } catch (err) {
-        setError("Failed to load users");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
+    getBranches()
+      .then((data) => setBranches(data.branches || []))
+      .catch(() => setBranches([]));
   }, []);
 
-  const confirmDeactivate = async () => {
-    if (!userToDeactivate) return;
-    setIsProcessing(true);
+  const requestFilters = useMemo<UserFilters>(() => ({
+    role: filters.role || undefined,
+    status: filters.status || undefined,
+    branchId: filters.branchId || undefined,
+    search: debouncedSearch || undefined,
+  }), [debouncedSearch, filters.branchId, filters.role, filters.status]);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
     try {
-      await api.delete(`/auth/users/${userToDeactivate}`);
-      setUsers(users.map((u) => u.id === userToDeactivate ? { ...u, status: "INACTIVE" } : u));
-      toast.success("User deactivated successfully");
-    } catch (err) {
-      console.error("Failed to deactivate user:", err);
-      toast.error("Failed to deactivate user");
+      const response = await getUsers(requestFilters);
+      setUsers(response.users || []);
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to load users");
+      setUsers([]);
     } finally {
-      setIsProcessing(false);
-      setUserToDeactivate(null);
+      setLoading(false);
+    }
+  }, [requestFilters]);
+
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== UserRole.ADMIN) return;
+    fetchUsers();
+  }, [currentUser, fetchUsers]);
+
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+
+    setProcessingAction(pendingAction.type);
+    try {
+      if (pendingAction.type === "activate") {
+        await activateUser(pendingAction.user.id);
+        toast.success("User activated");
+      } else {
+        await deactivateUser(pendingAction.user.id);
+        toast.success("User deactivated");
+      }
+
+      setPendingAction(null);
+      await fetchUsers();
+    } catch (actionError: any) {
+      toast.error(actionError.response?.data?.message || `Failed to ${pendingAction.type} user`);
+    } finally {
+      setProcessingAction(null);
     }
   };
 
-  const confirmActivate = async () => {
-    if (!userToActivate) return;
-    setIsProcessing(true);
-
-    try {
-      await api.post(`/auth/users/${userToActivate}/activate`);
-      setUsers(users.map((u) => u.id === userToActivate ? { ...u, status: "ACTIVE" } : u));
-      toast.success("User activated successfully");
-    } catch (err) {
-      console.error("Failed to activate user:", err);
-      toast.error("Failed to activate user");
-    } finally {
-      setIsProcessing(false);
-      setUserToActivate(null);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>{error}</p>
-        </div>
-      </div>
-    );
-  }
+  if (currentUser && currentUser.role !== UserRole.ADMIN) return null;
 
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
               User Management
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-              Manage staff accounts and permissions
+              Manage staff accounts, roles, branch scope, and access status.
             </p>
           </div>
 
           <Link
             href="/users/new"
-            className="px-4 py-2 text-sm font-medium rounded"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            className="px-4 py-2 text-sm font-medium rounded text-center"
+            style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
           >
             Create Staff Account
           </Link>
         </div>
 
-        {/* Table */}
+        <div
+          className="rounded-lg p-4 mb-6"
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Role
+              </label>
+              <select
+                value={filters.role}
+                onChange={(event) => handleFilterChange("role", event.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+              >
+                <option value="">All Roles</option>
+                <option value="ADMIN">Admin</option>
+                <option value="MANAGER">Manager</option>
+                <option value="SALES_STAFF">Sales Staff</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Status
+              </label>
+              <select
+                value={filters.status}
+                onChange={(event) => handleFilterChange("status", event.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+              >
+                <option value="">All Statuses</option>
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Branch
+              </label>
+              <select
+                value={filters.branchId}
+                onChange={(event) => handleFilterChange("branchId", event.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+              >
+                <option value="">All Branches</option>
+                {branches.map((branch) => (
+                  <option key={branch.id} value={branch.id}>
+                    {branch.name} - {branch.city}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Search
+              </label>
+              <input
+                value={filters.search}
+                onChange={(event) => handleFilterChange("search", event.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                placeholder="Name, email, phone"
+              />
+            </div>
+          </div>
+        </div>
+
         <div
           className="rounded-lg overflow-hidden"
-          style={{
-            backgroundColor: theme.backgrounds.primary,
-            border: `1px solid ${theme.borders.light}`,
-          }}
+          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="min-w-full">
-            <thead>
-              <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Branch
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Vendor
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                    No users found
-                  </td>
+          {loading ? (
+            <div className="p-8 text-center" style={{ color: theme.text.secondary }}>
+              Loading users...
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="mb-4" style={{ color: theme.accents.secondary }}>{error}</p>
+              <AsyncButton onClick={fetchUsers}>Retry</AsyncButton>
+            </div>
+          ) : (
+            <table className="min-w-full">
+              <thead>
+                <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                  {["Name", "Email", "Role", "Scope", "Vendor", "Status", "Created", "Actions"].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                      style={{ color: theme.text.secondary }}
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
-              ) : (
-                users.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b"
-                    style={{ borderColor: theme.borders.light }}
-                  >
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {user.fullName}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {user.email}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {user.role}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {user.branch ? `${user.branch.name} (${user.branch.city})` : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {user.role === "SALES_STAFF"
-                        ? (user.vendor ? user.vendor.name : <span style={{ color: theme.accents.secondary }}>Not assigned</span>)
-                        : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <span
-                        className="px-2 py-1 text-xs font-medium rounded"
-                        style={{
-                          backgroundColor:
-                            user.status === "ACTIVE"
-                              ? theme.accents.tertiary + "20"
-                              : theme.accents.secondary + "20",
-                          color:
-                            user.status === "ACTIVE"
-                              ? theme.accents.tertiary
-                              : theme.accents.secondary,
-                        }}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex gap-2">
-                        <Link href={`/users/${user.id}`}>
-                          <button
-                            className="font-medium hover:opacity-70"
-                            style={{ color: theme.accents.primary }}
-                          >
-                            View
-                          </button>
-                        </Link>
-                        {user.id === currentUser?.id ? (
-                          <span 
-                            className="text-xs italic ml-4"
-                            style={{ color: theme.text.muted }}
-                          >
-                            Current User
-                          </span>
-                        ) : user.status === "ACTIVE" ? (
-                          <button
-                            onClick={() => setUserToDeactivate(user.id)}
-                            className="font-medium hover:opacity-70 ml-4"
-                            style={{ color: theme.accents.secondary }}
-                          >
-                            Deactivate
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => setUserToActivate(user.id)}
-                            className="font-medium hover:opacity-70 ml-4"
-                            style={{ color: theme.accents.tertiary }}
-                          >
-                            Activate
-                          </button>
-                        )}
-                      </div>
+              </thead>
+              <tbody>
+                {users.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                      No users found
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.id} className="border-b" style={{ borderColor: theme.borders.light }}>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                        <div className="font-medium">{user.fullName}</div>
+                        <div className="text-xs" style={{ color: theme.text.secondary }}>{user.phoneNumber || "-"}</div>
+                      </td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{user.email}</td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{user.role}</td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{getBranchLabel(user)}</td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                        {user.role === "SALES_STAFF" ? user.vendor?.name || "-" : "-"}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <UserStatusBadge status={user.status} />
+                      </td>
+                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.secondary }}>
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="flex gap-3">
+                          <Link href={`/users/${user.id}`} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
+                            View
+                          </Link>
+                          {user.id === currentUser?.id ? (
+                            <span className="text-xs italic" style={{ color: theme.text.muted }}>
+                              Current User
+                            </span>
+                          ) : user.status === "ACTIVE" ? (
+                            <button
+                              onClick={() => setPendingAction({ type: "deactivate", user })}
+                              className="font-medium hover:opacity-70"
+                              style={{ color: theme.accents.secondary }}
+                            >
+                              Deactivate
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setPendingAction({ type: "activate", user })}
+                              className="font-medium hover:opacity-70"
+                              style={{ color: theme.accents.tertiary }}
+                            >
+                              Activate
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
-      {/* Deactivate Confirmation Modal */}
-      {userToDeactivate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => !isProcessing && setUserToDeactivate(null)}
-          ></div>
-          <div
-            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
-              Confirm Deactivation
-            </h3>
-            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
-              Are you sure you want to deactivate this user? They will immediately lose access to the system.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setUserToDeactivate(null)}
-                disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeactivate}
-                disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: "#fff",
-                  opacity: isProcessing ? 0.7 : 1,
-                }}
-              >
-                {isProcessing ? "Processing..." : "Deactivate User"}
-              </button>
-            </div>
+      {pendingAction && (
+        <ActionModal
+          title={pendingAction.type === "activate" ? "Confirm Activation" : "Confirm Deactivation"}
+          onClose={() => {
+            if (!processingAction) setPendingAction(null);
+          }}
+        >
+          <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+            {pendingAction.type === "activate"
+              ? `Activate ${pendingAction.user.fullName}? They will regain access based on their role.`
+              : `Deactivate ${pendingAction.user.fullName}? They will immediately lose access to the system.`}
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setPendingAction(null)}
+              disabled={Boolean(processingAction)}
+              className="px-4 py-2 text-sm font-medium rounded disabled:opacity-50"
+              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleConfirmAction}
+              loading={processingAction === pendingAction.type}
+              loadingLabel={pendingAction.type === "activate" ? "Activating..." : "Deactivating..."}
+              style={{ backgroundColor: pendingAction.type === "activate" ? theme.accents.primary : theme.accents.secondary }}
+            >
+              {pendingAction.type === "activate" ? "Activate User" : "Deactivate User"}
+            </AsyncButton>
           </div>
-        </div>
-      )}
-
-      {/* Activate Confirmation Modal */}
-      {userToActivate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => !isProcessing && setUserToActivate(null)}
-          ></div>
-          <div
-            className="relative w-full max-w-md p-6 rounded-lg shadow-xl"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
-              Confirm Activation
-            </h3>
-            <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
-              Are you sure you want to activate this user? They will be granted access to the system based on their role.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setUserToActivate(null)}
-                disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmActivate}
-                disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium rounded"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: "#fff",
-                  opacity: isProcessing ? 0.7 : 1,
-                }}
-              >
-                {isProcessing ? "Processing..." : "Activate User"}
-              </button>
-            </div>
-          </div>
-        </div>
+        </ActionModal>
       )}
     </div>
   );
