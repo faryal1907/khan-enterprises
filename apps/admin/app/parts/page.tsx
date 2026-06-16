@@ -263,17 +263,7 @@ export default function PartsListPage() {
           <SummaryCard label="Total Parts" value={totalParts} />
           <SummaryCard label="Low Stock Items" value={lowStockItems} color={theme.accents.secondary} />
           <SummaryCard label="Out of Stock Items" value={outOfStockItems} color={theme.accents.primary} />
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            {/* <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Total Inventory Value
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              ${totalValue.toLocaleString()}
-            </p> */}
-          </div>
+          
         </div>
 
         {/* Filters */}

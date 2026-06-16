@@ -149,7 +149,7 @@ export default function Home() {
             className="text-lg text-center mb-12 max-w-2xl mx-auto"
             style={{ color: theme.text.secondary }}
           >
-            Multiple secure payment methods available
+            Integration into website coming soon!
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[

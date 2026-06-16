@@ -42,7 +42,7 @@ export function Navigation() {
         <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
           
           <span className="font-bold text-xl hidden sm:block" style={{ color: theme.text.primary }}>
-            Ali & Khan's
+            ALI & KHAN'S
           </span>
         </Link>
 

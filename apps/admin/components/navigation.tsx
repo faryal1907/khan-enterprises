@@ -53,7 +53,7 @@ export function Navigation() {
             className="font-bold text-xl"
             style={{ color: theme.text.primary }}
           >
-            Ali & Khan's
+            ALI & KHAN'S
           </span>
           <div className="flex space-x-6">
             <div className="flex space-x-6 items-center">
