@@ -5,6 +5,7 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
+import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { OrderStatus } from "@khan/prisma";
 import { PdfService } from "../pdf/pdf.service";
@@ -51,7 +52,7 @@ export class PartOrdersController {
    */
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getPartOrders(@Query() query: any, @CurrentUser() user: any) {
+  async getPartOrders(@Query() query: QueryPartOrdersDto, @CurrentUser() user: any) {
     return this.partOrdersService.getPartOrders(query, user);
   }
 

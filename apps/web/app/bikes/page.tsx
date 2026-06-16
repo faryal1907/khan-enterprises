@@ -76,7 +76,7 @@ export default function BikesPage() {
             Motorcycle Inventory
           </h1>
           <p style={{ color: theme.text.secondary }}>
-            Browse our exclusive collection of premium motorcycles
+            Browse bikes, their specs and start negotitation process!
           </p>
         </div>
 

@@ -18,16 +18,20 @@ export class OrdersService {
    * Supports isCompleted filter: true=DELIVERED/CANCELLED, false=active orders
    */
   async getOrders(query: QueryOrdersDto, user?: any) {
+    console.log('getOrders called with query:', query);
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
     } else if (query.isCompleted !== undefined) {
+      console.log('Filtering by isCompleted:', query.isCompleted);
       // Filter by completion status
       if (query.isCompleted) {
         where.status = { in: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] };
+        console.log('Setting where.status for completed orders:', where.status);
       } else {
-        where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] };
+        where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.READY_FOR_DELIVERY] };
+        console.log('Setting where.status for current orders:', where.status);
       }
     }
 

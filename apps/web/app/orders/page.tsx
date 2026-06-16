@@ -98,6 +98,7 @@ export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<UnifiedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<"current" | "history">("current");
 
   useEffect(() => {
     if (!user) {
@@ -105,21 +106,23 @@ export default function CustomerOrdersPage() {
       return;
     }
     fetchOrders();
-  }, [user, router]);
+  }, [user, router, activeTab]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
+      const isCompleted = activeTab === "history";
+      console.log('fetchOrders called with isCompleted:', isCompleted, 'activeTab:', activeTab);
       const [bikesRes, partsRes] = await Promise.all([
-        getOrders().catch(err => ({ orders: [] })),
-        getPartOrders().catch(err => [])
+        getOrders({ isCompleted }).catch(err => ({ orders: [] })),
+        getPartOrders({ isCompleted }).catch(err => [])
       ]);
-      
+
       const bikes: UnifiedOrder[] = (bikesRes.orders || []).map((o: any) => ({
         ...o,
         type: "BIKE"
       }));
-      
+
       const parts: UnifiedOrder[] = (partsRes.orders || partsRes || []).map((o: any) => ({
         ...o,
         type: "PART"
@@ -128,7 +131,7 @@ export default function CustomerOrdersPage() {
       const merged = [...bikes, ...parts].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      
+
       setOrders(merged);
     } catch (err: any) {
       console.error("Failed to fetch orders:", err);
@@ -210,6 +213,32 @@ export default function CustomerOrdersPage() {
           </p>
         </div>
 
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab("current")}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: activeTab === "current" ? theme.accents.primary : theme.backgrounds.tertiary,
+                color: activeTab === "current" ? theme.text.inverse : theme.text.primary,
+              }}
+            >
+              Current Orders
+            </button>
+            <button
+              onClick={() => setActiveTab("history")}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: activeTab === "history" ? theme.accents.primary : theme.backgrounds.tertiary,
+                color: activeTab === "history" ? theme.text.inverse : theme.text.primary,
+              }}
+            >
+              Order History
+            </button>
+          </div>
+        </div>
+
         {error && (
           <div
             className="rounded-xl p-6 mb-6"
@@ -264,7 +293,7 @@ export default function CustomerOrdersPage() {
                       >
                         {getStatusLabel(order.status)}
                       </span>
-                      {order.status === "PENDING_PAYMENT" && order.expiresAt && (
+                      {activeTab === "current" && order.status === "PENDING_PAYMENT" && order.expiresAt && (
                         <CountdownTimer expiresAt={order.expiresAt} />
                       )}
                       <span className="text-xs" style={{ color: theme.text.muted }}>
