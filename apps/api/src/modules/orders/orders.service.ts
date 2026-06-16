@@ -401,34 +401,32 @@ export class OrdersService {
         },
       });
 
-      // 4. If CASH, immediately set order → PAID, offer → PAID, bike → SOLD
-      if (dto.method === "CASH") {
-        await tx.order.update({
-          where: { id: orderId },
-          data: {
-            status: OrderStatus.PAID,
-            processedById: user.id,
-          },
-        });
+      // 4. Always set order → PAID, offer → PAID, bike → SOLD when admin records payment
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.PAID,
+          processedById: user.id,
+        },
+      });
 
-        if (order.offerId) {
-          await tx.offer.update({
-            where: { id: order.offerId },
-            data: {
-              status: "PAID",
-            },
-          });
-        }
-
-        await tx.bikeUnit.update({
-          where: { id: order.bikeId },
+      if (order.offerId) {
+        await tx.offer.update({
+          where: { id: order.offerId },
           data: {
-            status: BikeStatus.SOLD,
-            soldAt: new Date(),
-            reservedUntil: null,
+            status: "PAID",
           },
         });
       }
+
+      await tx.bikeUnit.update({
+        where: { id: order.bikeId },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
 
       await tx.auditLog.create({
         data: {
@@ -644,6 +642,77 @@ export class OrdersService {
           entityId: orderId,
           oldValue: JSON.stringify({ status: order.status }),
           newValue: JSON.stringify({ status: OrderStatus.DELIVERED, completedOnsite: true }),
+        },
+      });
+
+      return updatedOrder;
+    });
+  }
+
+  /**
+   * Mark order as picked up by customer (no delivery)
+   * Used when customer picks up the bike at the branch themselves
+   */
+  async markAsPickedByCustomer(orderId: string, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch order
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          bike: true,
+          delivery: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      // 2. Verify order is in CONFIRMED status
+      if (order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(
+          `Order must be in CONFIRMED status to be marked as picked by customer. Current status: ${order.status}`
+        );
+      }
+
+      // 3. Verify no delivery request exists (customer is picking up themselves)
+      if (order.delivery) {
+        throw new BadRequestException(
+          `Cannot mark order as picked by customer when a delivery request exists`
+        );
+      }
+
+      // 4. Update order status to DELIVERED
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.DELIVERED,
+          processedById: user.id,
+        },
+      });
+
+      // 5. Update bike status to SOLD
+      if (order.bike.status !== BikeStatus.SOLD) {
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
+          },
+        });
+      }
+
+      // 6. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "ORDER",
+          entityId: orderId,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, pickedByCustomer: true }),
         },
       });
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { PrismaService } from "../../prisma/prisma.service";
-import { OfferStatus, BikeStatus, OrderStatus } from "@khan/prisma";
+import { BikeStatus, OrderStatus } from "@khan/prisma";
 
 @Injectable()
 export class SchedulerService {
@@ -10,52 +10,7 @@ export class SchedulerService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Task 1 — Expire stale offers (every hour)
-   * Find all offers where status IN [PENDING, COUNTERED] AND expiresAt < now
-   * → Set those offers: status → EXPIRED
-   */
-  @Cron(CronExpression.EVERY_HOUR)
-  async expireOffers() {
-    this.logger.log("Running expireOffers cron job...");
-
-    try {
-      const now = new Date();
-
-      const expiredOffers = await this.prisma.client.offer.findMany({
-        where: {
-          status: {
-            in: [OfferStatus.PENDING, OfferStatus.COUNTERED],
-          },
-          expiresAt: {
-            lt: now,
-          },
-        },
-      });
-
-      if (expiredOffers.length === 0) {
-        this.logger.log("No expired offers found.");
-        return;
-      }
-
-      const updatedOffers = await this.prisma.client.offer.updateMany({
-        where: {
-          id: {
-            in: expiredOffers.map((offer) => offer.id),
-          },
-        },
-        data: {
-          status: OfferStatus.EXPIRED,
-        },
-      });
-
-      this.logger.log(`Expired ${updatedOffers.count} offers.`);
-    } catch (error) {
-      this.logger.error("Error in expireOffers cron job:", error);
-    }
-  }
-
-  /**
-   * Task 2 — Release expired reservations (every 15 minutes)
+   * Task 1 — Release expired reservations (every 15 minutes)
    * Find all bikes where status = RESERVED AND reservedUntil < now
    * → For each bike:
    *     Check if it has an Order with status = PENDING_PAYMENT and offerId linked

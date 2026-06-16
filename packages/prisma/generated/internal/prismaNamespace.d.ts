@@ -1599,7 +1599,6 @@ export declare const OfferScalarFieldEnum: {
     readonly message: "message";
     readonly adminResponse: "adminResponse";
     readonly status: "status";
-    readonly expiresAt: "expiresAt";
     readonly paymentMethod: "paymentMethod";
     readonly createdById: "createdById";
     readonly createdAt: "createdAt";

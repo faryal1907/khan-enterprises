@@ -23,7 +23,6 @@ interface Offer {
   message: string | null;
   adminResponse: string | null;
   status: string;
-  expiresAt: string | null;
   createdAt: string;
   bike: {
     id: string;
@@ -162,12 +161,6 @@ export default function OfferDetailPage() {
           backgroundColor: "#DBEAFE",
           color: "#1E40AF",
           border: "1px solid #3B82F6",
-        };
-      case "EXPIRED":
-        return {
-          backgroundColor: "#F3F4F6",
-          color: "#374151",
-          border: "1px solid #6B7280",
         };
       default:
         return {

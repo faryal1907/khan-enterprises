@@ -100,3 +100,8 @@ export async function downloadInvoice(id: string, isPart: boolean = false) {
   link.click();
   link.parentNode?.removeChild(link);
 }
+
+export async function markAsPickedByCustomer(id: string) {
+  const response = await api.patch(`/orders/${id}/picked-up`);
+  return response.data;
+}

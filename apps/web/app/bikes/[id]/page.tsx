@@ -379,7 +379,7 @@ export default function BikeDetailPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        CNIC (Optional)
+                        CNIC
                       </label>
                       <input
                         type="text"

@@ -12,7 +12,7 @@ export class OffersService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Create offer, verify bike is AVAILABLE, set expiresAt = now + 48h, status PENDING
+   * Create offer, verify bike is AVAILABLE, status PENDING
    */
   async createOffer(dto: CreateOfferDto, userId?: string) {
     // Verify bike exists and is AVAILABLE
@@ -28,10 +28,6 @@ export class OffersService {
       throw new BadRequestException(`Bike is not available for offer. Current status: ${bike.status}`);
     }
 
-    // Set expiresAt to 48 hours from now
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 48);
-
     return this.prisma.client.offer.create({
       data: {
         bikeId: dto.bikeId,
@@ -43,7 +39,6 @@ export class OffersService {
         offerAmount: dto.offerAmount,
         message: dto.message,
         status: OfferStatus.PENDING,
-        expiresAt,
         paymentMethod: dto.paymentMethod,
         createdById: userId,
       },
@@ -291,7 +286,7 @@ export class OffersService {
   }
 
   /**
-   * Set offer → COUNTERED, store counterAmount + adminResponse, reset expiresAt = now + 48h
+   * Set offer → COUNTERED, store counterAmount + adminResponse
    */
   async counterOffer(id: string, dto: CounterOfferDto, user: any) {
     const offer = await this.getOfferById(id);
@@ -300,10 +295,6 @@ export class OffersService {
       throw new BadRequestException(`Offer cannot be countered. Current status: ${offer.status}`);
     }
 
-    // Reset expiresAt to 48 hours from now
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 48);
-
     return this.prisma.client.$transaction(async (tx) => {
       const counteredOffer = await tx.offer.update({
         where: { id },
@@ -311,7 +302,6 @@ export class OffersService {
           status: OfferStatus.COUNTERED,
           counterAmount: dto.counterAmount,
           adminResponse: dto.adminResponse,
-          expiresAt,
         },
         include: {
           bike: {

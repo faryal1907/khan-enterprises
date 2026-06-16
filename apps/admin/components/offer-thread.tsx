@@ -4,7 +4,7 @@ import { theme } from "@/lib/colors";
 
 interface TimelineEvent {
   id: string;
-  type: "offer" | "counter" | "response" | "status_change" | "expiry";
+  type: "offer" | "counter" | "response" | "status_change";
   title: string;
   description?: string;
   amount?: number;
@@ -21,7 +21,6 @@ interface OfferThreadProps {
     adminResponse?: string | null;
     status: string;
     createdAt: string;
-    expiresAt?: string | null;
   };
   className?: string;
 }
@@ -71,14 +70,6 @@ export default function OfferThread({ offer, className = "" }: OfferThreadProps)
       timestamp: offer.createdAt, // In real implementation, this would have its own timestamp
       actor: "admin",
     });
-  } else if (offer.status === "EXPIRED") {
-    timelineEvents.push({
-      id: "expired",
-      type: "expiry",
-      title: "Offer Expired",
-      timestamp: offer.expiresAt || offer.createdAt,
-      actor: "system",
-    });
   }
 
   const getEventStyle = (event: TimelineEvent) => {
@@ -100,12 +91,6 @@ export default function OfferThread({ offer, className = "" }: OfferThreadProps)
           dotColor: event.title === "Offer Accepted" ? "#10B981" : "#EF4444",
           bgColor: event.title === "Offer Accepted" ? "#D1FAE5" : "#FEE2E2",
           borderColor: event.title === "Offer Accepted" ? "#10B981" : "#EF4444",
-        };
-      case "expiry":
-        return {
-          dotColor: "#6B7280",
-          bgColor: "#F3F4F6",
-          borderColor: "#6B7280",
         };
       default:
         return {

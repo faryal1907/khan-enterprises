@@ -501,11 +501,11 @@ function BikeTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <div className="flex gap-3">
-                    <Link href={`/bikes/${bike.id}`} style={{ color: theme.text.secondary }}>
+                    <Link href={`bikes/${bike.id}`} style={{ color: theme.text.secondary }}>
                       View
                     </Link>
                     {isAdmin && (
-                      <Link href={`/bikes/${bike.id}/edit`} style={{ color: theme.accents.primary }}>
+                      <Link href={`bikes/${bike.id}/edit`} style={{ color: theme.accents.primary }}>
                         Edit
                       </Link>
                     )}

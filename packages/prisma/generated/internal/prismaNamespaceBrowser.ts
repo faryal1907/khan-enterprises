@@ -233,7 +233,6 @@ export const OfferScalarFieldEnum = {
   message: 'message',
   adminResponse: 'adminResponse',
   status: 'status',
-  expiresAt: 'expiresAt',
   paymentMethod: 'paymentMethod',
   createdById: 'createdById',
   createdAt: 'createdAt',

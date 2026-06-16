@@ -95,4 +95,35 @@ export class DeliveriesController {
   ) {
     return this.deliveriesService.updateDeliveryStatus(id, dto, user.id);
   }
+
+  /**
+   * PATCH /api/deliveries/:id/approve
+   * @Roles(ADMIN, MANAGER)
+   * Approve delivery request
+   */
+  @Patch(":id/approve")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async approveDelivery(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    return this.deliveriesService.updateDeliveryStatus(id, { status: "APPROVED" }, user.id);
+  }
+
+  /**
+   * PATCH /api/deliveries/:id/reject
+   * @Roles(ADMIN, MANAGER)
+   * Reject delivery request
+   */
+  @Patch(":id/reject")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async rejectDelivery(
+    @Param("id") id: string,
+    @Body() body: { reason?: string },
+    @CurrentUser() user: any
+  ) {
+    return this.deliveriesService.updateDeliveryStatus(id, { status: "REQUESTED", notes: body.reason }, user.id);
+  }
 }

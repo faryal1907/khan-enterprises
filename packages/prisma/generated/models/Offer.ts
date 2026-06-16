@@ -49,7 +49,6 @@ export type OfferMinAggregateOutputType = {
   message: string | null
   adminResponse: string | null
   status: $Enums.OfferStatus | null
-  expiresAt: Date | null
   paymentMethod: $Enums.PaymentMethod | null
   createdById: string | null
   createdAt: Date | null
@@ -69,7 +68,6 @@ export type OfferMaxAggregateOutputType = {
   message: string | null
   adminResponse: string | null
   status: $Enums.OfferStatus | null
-  expiresAt: Date | null
   paymentMethod: $Enums.PaymentMethod | null
   createdById: string | null
   createdAt: Date | null
@@ -89,7 +87,6 @@ export type OfferCountAggregateOutputType = {
   message: number
   adminResponse: number
   status: number
-  expiresAt: number
   paymentMethod: number
   createdById: number
   createdAt: number
@@ -121,7 +118,6 @@ export type OfferMinAggregateInputType = {
   message?: true
   adminResponse?: true
   status?: true
-  expiresAt?: true
   paymentMethod?: true
   createdById?: true
   createdAt?: true
@@ -141,7 +137,6 @@ export type OfferMaxAggregateInputType = {
   message?: true
   adminResponse?: true
   status?: true
-  expiresAt?: true
   paymentMethod?: true
   createdById?: true
   createdAt?: true
@@ -161,7 +156,6 @@ export type OfferCountAggregateInputType = {
   message?: true
   adminResponse?: true
   status?: true
-  expiresAt?: true
   paymentMethod?: true
   createdById?: true
   createdAt?: true
@@ -261,14 +255,13 @@ export type OfferGroupByOutputType = {
   customerName: string
   customerPhone: string
   customerEmail: string | null
-  customerCNIC: string
+  customerCNIC: string | null
   customerAddress: string | null
   offerAmount: runtime.Decimal
   counterAmount: runtime.Decimal | null
   message: string | null
   adminResponse: string | null
   status: $Enums.OfferStatus
-  expiresAt: Date | null
   paymentMethod: $Enums.PaymentMethod | null
   createdById: string | null
   createdAt: Date
@@ -304,14 +297,13 @@ export type OfferWhereInput = {
   customerName?: Prisma.StringFilter<"Offer"> | string
   customerPhone?: Prisma.StringFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringFilter<"Offer"> | string
+  customerCNIC?: Prisma.StringNullableFilter<"Offer"> | string | null
   customerAddress?: Prisma.StringNullableFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.StringNullableFilter<"Offer"> | string | null
   adminResponse?: Prisma.StringNullableFilter<"Offer"> | string | null
   status?: Prisma.EnumOfferStatusFilter<"Offer"> | $Enums.OfferStatus
-  expiresAt?: Prisma.DateTimeNullableFilter<"Offer"> | Date | string | null
   paymentMethod?: Prisma.EnumPaymentMethodNullableFilter<"Offer"> | $Enums.PaymentMethod | null
   createdById?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
@@ -327,14 +319,13 @@ export type OfferOrderByWithRelationInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerEmail?: Prisma.SortOrderInput | Prisma.SortOrder
-  customerCNIC?: Prisma.SortOrder
+  customerCNIC?: Prisma.SortOrderInput | Prisma.SortOrder
   customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   offerAmount?: Prisma.SortOrder
   counterAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
   adminResponse?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -353,14 +344,13 @@ export type OfferWhereUniqueInput = Prisma.AtLeast<{
   customerName?: Prisma.StringFilter<"Offer"> | string
   customerPhone?: Prisma.StringFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringFilter<"Offer"> | string
+  customerCNIC?: Prisma.StringNullableFilter<"Offer"> | string | null
   customerAddress?: Prisma.StringNullableFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.StringNullableFilter<"Offer"> | string | null
   adminResponse?: Prisma.StringNullableFilter<"Offer"> | string | null
   status?: Prisma.EnumOfferStatusFilter<"Offer"> | $Enums.OfferStatus
-  expiresAt?: Prisma.DateTimeNullableFilter<"Offer"> | Date | string | null
   paymentMethod?: Prisma.EnumPaymentMethodNullableFilter<"Offer"> | $Enums.PaymentMethod | null
   createdById?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
@@ -376,14 +366,13 @@ export type OfferOrderByWithAggregationInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   customerEmail?: Prisma.SortOrderInput | Prisma.SortOrder
-  customerCNIC?: Prisma.SortOrder
+  customerCNIC?: Prisma.SortOrderInput | Prisma.SortOrder
   customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   offerAmount?: Prisma.SortOrder
   counterAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
   adminResponse?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -404,14 +393,13 @@ export type OfferScalarWhereWithAggregatesInput = {
   customerName?: Prisma.StringWithAggregatesFilter<"Offer"> | string
   customerPhone?: Prisma.StringWithAggregatesFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringWithAggregatesFilter<"Offer"> | string
+  customerCNIC?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   customerAddress?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalWithAggregatesFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   adminResponse?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   status?: Prisma.EnumOfferStatusWithAggregatesFilter<"Offer"> | $Enums.OfferStatus
-  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Offer"> | Date | string | null
   paymentMethod?: Prisma.EnumPaymentMethodNullableWithAggregatesFilter<"Offer"> | $Enums.PaymentMethod | null
   createdById?: Prisma.StringNullableWithAggregatesFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Offer"> | Date | string
@@ -423,14 +411,13 @@ export type OfferCreateInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -445,14 +432,13 @@ export type OfferUncheckedCreateInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdById?: string | null
   createdAt?: Date | string
@@ -465,14 +451,13 @@ export type OfferUpdateInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -487,14 +472,13 @@ export type OfferUncheckedUpdateInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -508,14 +492,13 @@ export type OfferCreateManyInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdById?: string | null
   createdAt?: Date | string
@@ -527,14 +510,13 @@ export type OfferUpdateManyMutationInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -546,14 +528,13 @@ export type OfferUncheckedUpdateManyInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -583,7 +564,6 @@ export type OfferCountOrderByAggregateInput = {
   message?: Prisma.SortOrder
   adminResponse?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -608,7 +588,6 @@ export type OfferMaxOrderByAggregateInput = {
   message?: Prisma.SortOrder
   adminResponse?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -628,7 +607,6 @@ export type OfferMinOrderByAggregateInput = {
   message?: Prisma.SortOrder
   adminResponse?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  expiresAt?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -758,14 +736,13 @@ export type OfferCreateWithoutCreatedByInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -779,14 +756,13 @@ export type OfferUncheckedCreateWithoutCreatedByInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -828,14 +804,13 @@ export type OfferScalarWhereInput = {
   customerName?: Prisma.StringFilter<"Offer"> | string
   customerPhone?: Prisma.StringFilter<"Offer"> | string
   customerEmail?: Prisma.StringNullableFilter<"Offer"> | string | null
-  customerCNIC?: Prisma.StringFilter<"Offer"> | string
+  customerCNIC?: Prisma.StringNullableFilter<"Offer"> | string | null
   customerAddress?: Prisma.StringNullableFilter<"Offer"> | string | null
   offerAmount?: Prisma.DecimalFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.DecimalNullableFilter<"Offer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.StringNullableFilter<"Offer"> | string | null
   adminResponse?: Prisma.StringNullableFilter<"Offer"> | string | null
   status?: Prisma.EnumOfferStatusFilter<"Offer"> | $Enums.OfferStatus
-  expiresAt?: Prisma.DateTimeNullableFilter<"Offer"> | Date | string | null
   paymentMethod?: Prisma.EnumPaymentMethodNullableFilter<"Offer"> | $Enums.PaymentMethod | null
   createdById?: Prisma.StringNullableFilter<"Offer"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Offer"> | Date | string
@@ -847,14 +822,13 @@ export type OfferCreateWithoutBikeInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -867,14 +841,13 @@ export type OfferUncheckedCreateWithoutBikeInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdById?: string | null
   createdAt?: Date | string
@@ -913,14 +886,13 @@ export type OfferCreateWithoutOrderInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -934,14 +906,13 @@ export type OfferUncheckedCreateWithoutOrderInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdById?: string | null
   createdAt?: Date | string
@@ -969,14 +940,13 @@ export type OfferUpdateWithoutOrderInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -990,14 +960,13 @@ export type OfferUncheckedUpdateWithoutOrderInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1010,14 +979,13 @@ export type OfferCreateManyCreatedByInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1028,14 +996,13 @@ export type OfferUpdateWithoutCreatedByInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1049,14 +1016,13 @@ export type OfferUncheckedUpdateWithoutCreatedByInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1069,14 +1035,13 @@ export type OfferUncheckedUpdateManyWithoutCreatedByInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1087,14 +1052,13 @@ export type OfferCreateManyBikeInput = {
   customerName: string
   customerPhone: string
   customerEmail?: string | null
-  customerCNIC: string
+  customerCNIC?: string | null
   customerAddress?: string | null
   offerAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: string | null
   adminResponse?: string | null
   status?: $Enums.OfferStatus
-  expiresAt?: Date | string | null
   paymentMethod?: $Enums.PaymentMethod | null
   createdById?: string | null
   createdAt?: Date | string
@@ -1106,14 +1070,13 @@ export type OfferUpdateWithoutBikeInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1126,14 +1089,13 @@ export type OfferUncheckedUpdateWithoutBikeInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1146,14 +1108,13 @@ export type OfferUncheckedUpdateManyWithoutBikeInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerCNIC?: Prisma.StringFieldUpdateOperationsInput | string
+  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   offerAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   counterAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOfferStatusFieldUpdateOperationsInput | $Enums.OfferStatus
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentMethod?: Prisma.NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1175,7 +1136,6 @@ export type OfferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   message?: boolean
   adminResponse?: boolean
   status?: boolean
-  expiresAt?: boolean
   paymentMethod?: boolean
   createdById?: boolean
   createdAt?: boolean
@@ -1198,7 +1158,6 @@ export type OfferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   message?: boolean
   adminResponse?: boolean
   status?: boolean
-  expiresAt?: boolean
   paymentMethod?: boolean
   createdById?: boolean
   createdAt?: boolean
@@ -1220,7 +1179,6 @@ export type OfferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   message?: boolean
   adminResponse?: boolean
   status?: boolean
-  expiresAt?: boolean
   paymentMethod?: boolean
   createdById?: boolean
   createdAt?: boolean
@@ -1242,14 +1200,13 @@ export type OfferSelectScalar = {
   message?: boolean
   adminResponse?: boolean
   status?: boolean
-  expiresAt?: boolean
   paymentMethod?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bikeId" | "customerName" | "customerPhone" | "customerEmail" | "customerCNIC" | "customerAddress" | "offerAmount" | "counterAmount" | "message" | "adminResponse" | "status" | "expiresAt" | "paymentMethod" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>
+export type OfferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bikeId" | "customerName" | "customerPhone" | "customerEmail" | "customerCNIC" | "customerAddress" | "offerAmount" | "counterAmount" | "message" | "adminResponse" | "status" | "paymentMethod" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["offer"]>
 export type OfferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.Offer$createdByArgs<ExtArgs>
@@ -1277,14 +1234,13 @@ export type $OfferPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     customerName: string
     customerPhone: string
     customerEmail: string | null
-    customerCNIC: string
+    customerCNIC: string | null
     customerAddress: string | null
     offerAmount: runtime.Decimal
     counterAmount: runtime.Decimal | null
     message: string | null
     adminResponse: string | null
     status: $Enums.OfferStatus
-    expiresAt: Date | null
     paymentMethod: $Enums.PaymentMethod | null
     createdById: string | null
     createdAt: Date
@@ -1727,7 +1683,6 @@ export interface OfferFieldRefs {
   readonly message: Prisma.FieldRef<"Offer", 'String'>
   readonly adminResponse: Prisma.FieldRef<"Offer", 'String'>
   readonly status: Prisma.FieldRef<"Offer", 'OfferStatus'>
-  readonly expiresAt: Prisma.FieldRef<"Offer", 'DateTime'>
   readonly paymentMethod: Prisma.FieldRef<"Offer", 'PaymentMethod'>
   readonly createdById: Prisma.FieldRef<"Offer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Offer", 'DateTime'>

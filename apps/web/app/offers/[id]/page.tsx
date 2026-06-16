@@ -17,7 +17,6 @@ interface Offer {
   message: string | null;
   adminResponse: string | null;
   status: string;
-  expiresAt: string | null;
   createdAt: string;
   bike: {
     id: string;
@@ -139,12 +138,6 @@ export default function OfferStatusPage() {
           color: "#1E40AF",
           border: "1px solid #3B82F6",
         };
-      case "EXPIRED":
-        return {
-          backgroundColor: "#F3F4F6",
-          color: "#374151",
-          border: "1px solid #6B7280",
-        };
       default:
         return {
           backgroundColor: theme.backgrounds.tertiary,
@@ -179,24 +172,6 @@ export default function OfferStatusPage() {
   const isAccepted = offer.status === "ACCEPTED";
   const isPending = offer.status === "PENDING";
   const isRejected = offer.status === "REJECTED";
-  const isExpired = offer.status === "EXPIRED";
-
-  // Calculate time remaining until expiry
-  const getTimeRemaining = () => {
-    if (!offer.expiresAt) return null;
-    const now = new Date();
-    const expiry = new Date(offer.expiresAt);
-    const diff = expiry.getTime() - now.getTime();
-    
-    if (diff <= 0) return null;
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
-    return { hours, minutes };
-  };
-
-  const timeRemaining = getTimeRemaining();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -219,11 +194,6 @@ export default function OfferStatusPage() {
           >
             {offer.status}
           </span>
-          {timeRemaining && (
-            <span className="ml-3 text-sm" style={{ color: theme.text.secondary }}>
-              Expires in {timeRemaining.hours}h {timeRemaining.minutes}m
-            </span>
-          )}
         </div>
 
         {/* Negotiation Timeline */}

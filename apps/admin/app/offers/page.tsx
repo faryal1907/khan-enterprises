@@ -12,7 +12,6 @@ interface Offer {
   offerAmount: number;
   counterAmount: number | null;
   status: string;
-  expiresAt: string | null;
   createdAt: string;
   bike: {
     id: string;
@@ -38,7 +37,6 @@ export default function OffersListPage() {
     { value: "COUNTERED", label: "Countered" },
     { value: "CONVERTED", label: "Converted" },
     { value: "REJECTED", label: "Rejected" },
-    { value: "EXPIRED", label: "Expired" },
   ];
 
   useEffect(() => {
@@ -88,12 +86,6 @@ export default function OffersListPage() {
           color: "#1E40AF",
           border: "1px solid #3B82F6",
         };
-      case "EXPIRED":
-        return {
-          backgroundColor: "#F3F4F6",
-          color: "#374151",
-          border: "1px solid #6B7280",
-        };
       default:
         return {
           backgroundColor: theme.backgrounds.tertiary,
@@ -103,33 +95,6 @@ export default function OffersListPage() {
     }
   };
 
-  const getTimeUntilExpiry = (expiresAt: string | null) => {
-    if (!expiresAt) return "—";
-    const now = new Date();
-    const expiry = new Date(expiresAt);
-    const diff = expiry.getTime() - now.getTime();
-
-    if (diff <= 0) return "Expired";
-
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (hours > 24) {
-      const days = Math.floor(hours / 24);
-      return `${days}d ${hours % 24}h`;
-    }
-
-    return `${hours}h ${minutes}m`;
-  };
-
-  const isExpiringSoon = (expiresAt: string | null) => {
-    if (!expiresAt) return false;
-    const now = new Date();
-    const expiry = new Date(expiresAt);
-    const diff = expiry.getTime() - now.getTime();
-    const twoHours = 2 * 60 * 60 * 1000;
-    return diff > 0 && diff < twoHours;
-  };
 
   return (
     <div className="p-8">
@@ -232,12 +197,6 @@ export default function OffersListPage() {
                   >
                     Submitted
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Expires In
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -285,22 +244,6 @@ export default function OffersListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.secondary }}>
                       {new Date(offer.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={
-                          isExpiringSoon(offer.expiresAt)
-                            ? "font-medium"
-                            : ""
-                        }
-                        style={{
-                          color: isExpiringSoon(offer.expiresAt)
-                            ? "#F59E0B"
-                            : theme.text.primary,
-                        }}
-                      >
-                        {getTimeUntilExpiry(offer.expiresAt)}
-                      </span>
                     </td>
                   </tr>
                 ))}

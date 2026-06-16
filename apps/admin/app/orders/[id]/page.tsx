@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, Order, PaymentTransaction } from "@/lib/types";
-import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice } from "@/lib/api/orders";
+import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
+import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 
 export default function OrderDetailPage() {
@@ -16,7 +17,9 @@ export default function OrderDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showRejectDeliveryModal, setShowRejectDeliveryModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [rejectReason, setRejectReason] = useState("");
   const [paymentData, setPaymentData] = useState({
     method: PaymentMethod.CASH,
     amount: 0,
@@ -110,6 +113,55 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handleMarkAsPickedByCustomer = async () => {
+    try {
+      setActionLoading(true);
+      await markAsPickedByCustomer(orderId);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      toast.success("Order marked as picked by customer");
+    } catch (error: any) {
+      console.warn("Failed to mark as picked by customer:", error?.message || error);
+      toast.error(error?.message || "Failed to mark as picked by customer");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleApproveDelivery = async () => {
+    if (!order?.delivery) return;
+    try {
+      setActionLoading(true);
+      await approveDelivery(order.delivery.id);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      toast.success("Delivery approved successfully");
+    } catch (error: any) {
+      console.warn("Failed to approve delivery:", error?.message || error);
+      toast.error(error?.message || "Failed to approve delivery");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRejectDelivery = async () => {
+    if (!order?.delivery) return;
+    try {
+      setActionLoading(true);
+      await rejectDelivery(order.delivery.id, rejectReason);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      setShowRejectDeliveryModal(false);
+      setRejectReason("");
+      toast.success("Delivery rejected successfully");
+    } catch (error: any) {
+      console.warn("Failed to reject delivery:", error?.message || error);
+      toast.error(error?.message || "Failed to reject delivery");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const getActionButton = () => {
     if (!order) return null;
 
@@ -144,6 +196,36 @@ export default function OrderDetailPage() {
         );
       case OrderStatus.CONFIRMED:
         if (order.delivery) {
+          // Customer requested delivery - show approve/reject buttons
+          if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
+            return (
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleApproveDelivery}
+                  disabled={actionLoading}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Approve Delivery
+                </button>
+                <button
+                  onClick={() => setShowRejectDeliveryModal(true)}
+                  disabled={actionLoading}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.secondary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Reject Delivery
+                </button>
+              </div>
+            );
+          }
+          // Delivery already approved - show mark ready for delivery
           return (
             <button
               onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
@@ -158,7 +240,20 @@ export default function OrderDetailPage() {
             </button>
           );
         }
-        return null;
+        // No delivery request - show picked by customer button
+        return (
+          <button
+            onClick={handleMarkAsPickedByCustomer}
+            disabled={actionLoading}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+            style={{
+              backgroundColor: theme.accents.primary,
+              color: theme.text.inverse,
+            }}
+          >
+            Picked by Customer
+          </button>
+        );
       case OrderStatus.READY_FOR_DELIVERY:
         return (
           <button
@@ -685,6 +780,64 @@ export default function OrderDetailPage() {
                 }}
               >
                 {actionLoading ? "Recording..." : "Record Payment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Delivery Modal */}
+      {showRejectDeliveryModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+          <div
+            className="rounded-lg p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Reject Delivery Request
+            </h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Reason for rejection (optional)
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                rows={4}
+                placeholder="Enter reason for rejection..."
+              />
+            </div>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => {
+                  setShowRejectDeliveryModal(false);
+                  setRejectReason("");
+                }}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRejectDelivery}
+                disabled={actionLoading}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: theme.text.inverse,
+                }}
+              >
+                {actionLoading ? "Rejecting..." : "Reject Delivery"}
               </button>
             </div>
           </div>
