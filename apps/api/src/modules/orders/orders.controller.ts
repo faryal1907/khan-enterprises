@@ -62,8 +62,21 @@ export class OrdersController {
   }
 
   /**
+   * GET /api/orders/branch/:branchId
+   * @Roles(ADMIN, MANAGER)
+   * NOTE: Must be defined before GET /orders/:id to avoid route shadowing
+   */
+  @Get("branch/:branchId")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async getOrdersByBranch(@Param("branchId") branchId: string) {
+    return this.ordersService.getOrdersByBranch(branchId);
+  }
+
+  /**
    * GET /api/orders/:id
    * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * NOTE: Must be defined after all specific routes to avoid shadowing them
    */
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -130,17 +143,6 @@ export class OrdersController {
     @CurrentUser() user: any,
   ) {
     return this.ordersService.recordPayment(id, dto, user);
-  }
-
-  /**
-   * GET /api/orders/branch/:branchId
-   * @Roles(ADMIN, MANAGER)
-   */
-  @Get("branch/:branchId")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MANAGER")
-  async getOrdersByBranch(@Param("branchId") branchId: string) {
-    return this.ordersService.getOrdersByBranch(branchId);
   }
 
   /**
