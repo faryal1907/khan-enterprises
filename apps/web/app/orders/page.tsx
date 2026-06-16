@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { theme } from "@/lib/colors";
+import { theme, colors } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { getOrders } from "@/lib/api/orders";
 import { getPartOrders } from "@/lib/api/part-orders";
@@ -304,7 +304,7 @@ export default function CustomerOrdersPage() {
                       <span
                         className="inline-block px-3 py-1 text-xs font-medium rounded-full uppercase"
                         style={{
-                          backgroundColor: order.type === "BIKE" ? theme.accents.tertiary : theme.accents.primary,
+                          backgroundColor: order.type === "BIKE" ? colors.lime : theme.accents.primary,
                           color: theme.text.inverse,
                         }}
                       >
