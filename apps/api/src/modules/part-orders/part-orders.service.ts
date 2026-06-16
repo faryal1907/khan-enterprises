@@ -172,12 +172,20 @@ export class PartOrdersService {
   /**
    * Paginated, filtered by status/branchId/date range. Include part, inventory, branch, processedBy
    * For CUSTOMER role: filters by customer phone/CNIC from user profile
+   * Supports isCompleted filter: true=DELIVERED/CANCELLED, false=active orders
    */
   async getPartOrders(query: any, user?: any) {
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
+    } else if (query.isCompleted !== undefined) {
+      // Filter by completion status
+      if (query.isCompleted) {
+        where.status = { in: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] };
+      } else {
+        where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] };
+      }
     }
 
     if (query.branchId) {
@@ -534,5 +542,104 @@ export class PartOrdersService {
     const day = String(date.getDate()).padStart(2, '0');
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
     return `PART-${year}${month}${day}-${random}`;
+  }
+
+  /**
+   * Mark part order as completed for onsite purchases
+   * Used when customer buys in person at branch
+   */
+  async markPartOrderAsCompletedOnsite(orderId: string, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch part order
+      const order = await tx.partOrder.findUnique({
+        where: { id: orderId },
+        include: {
+          partInventory: true,
+          delivery: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Part order with ID ${orderId} not found`);
+      }
+
+      // 2. Verify part order is in PAID or CONFIRMED status
+      if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(
+          `Part order must be in PAID or CONFIRMED status to be marked as completed onsite. Current status: ${order.status}`
+        );
+      }
+
+      // 3. Update part order status to DELIVERED
+      const updatedOrder = await tx.partOrder.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.DELIVERED,
+          processedById: user.id,
+        },
+      });
+
+      // 4. Update part inventory if order was not already confirmed (stock not yet deducted)
+      if (order.status === OrderStatus.PAID) {
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            quantity: {
+              decrement: order.quantity,
+            },
+            reservedQuantity: {
+              decrement: order.quantity,
+            },
+          },
+        });
+
+        // Create stock movement record
+        await tx.stockMovement.create({
+          data: {
+            inventoryId: order.partInventoryId,
+            movementType: "STOCK_OUT",
+            quantity: -order.quantity,
+            reason: `Part order completed onsite: ${updatedOrder.orderNumber}`,
+            performedById: user.id,
+          },
+        });
+      } else if (order.status === OrderStatus.CONFIRMED) {
+        // If already confirmed, just clear reserved quantity
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            reservedQuantity: {
+              decrement: order.quantity,
+            },
+          },
+        });
+      }
+
+      // 5. Handle delivery request if one exists
+      if (order.delivery) {
+        await tx.deliveryRequest.update({
+          where: { id: order.delivery.id },
+          data: {
+            status: "DELIVERED",
+            deliveredAt: new Date(),
+          },
+        });
+      }
+
+      // 6. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_ORDER",
+          entityId: orderId,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, completedOnsite: true }),
+        },
+      });
+
+      return updatedOrder;
+    });
   }
 }

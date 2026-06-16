@@ -36,7 +36,7 @@ export default function OffersListPage() {
     { value: "", label: "All" },
     { value: "PENDING", label: "Pending" },
     { value: "COUNTERED", label: "Countered" },
-    { value: "ACCEPTED", label: "Accepted" },
+    { value: "CONVERTED", label: "Converted" },
     { value: "REJECTED", label: "Rejected" },
     { value: "EXPIRED", label: "Expired" },
   ];
@@ -49,7 +49,8 @@ export default function OffersListPage() {
     try {
       setLoading(true);
       const response = await getOffers({
-        status: activeTab || undefined,
+        status: activeTab === "CONVERTED" ? "ACCEPTED" : activeTab || undefined,
+        includeConverted: activeTab === "CONVERTED" ? true : undefined,
         page,
         limit: 20,
       });

@@ -15,12 +15,20 @@ export class OrdersService {
   /**
    * Paginated, filtered by status/branchId/date range. Include bike, offer, branch, processedBy
    * For CUSTOMER role: filters by customer phone/CNIC from user profile
+   * Supports isCompleted filter: true=DELIVERED/CANCELLED, false=active orders
    */
   async getOrders(query: QueryOrdersDto, user?: any) {
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
+    } else if (query.isCompleted !== undefined) {
+      // Filter by completion status
+      if (query.isCompleted) {
+        where.status = { in: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] };
+      } else {
+        where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] };
+      }
     }
 
     if (query.branchId) {
@@ -560,6 +568,81 @@ export class OrdersService {
       });
 
       return order;
+    });
+  }
+
+  /**
+   * Mark order as completed for onsite purchases
+   * Used when customer buys in person at branch
+   */
+  async markOrderAsCompletedOnsite(orderId: string, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch order
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          bike: true,
+          delivery: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      // 2. Verify order is in PAID or CONFIRMED status
+      if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(
+          `Order must be in PAID or CONFIRMED status to be marked as completed onsite. Current status: ${order.status}`
+        );
+      }
+
+      // 3. Update order status to DELIVERED
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.DELIVERED,
+          processedById: user.id,
+        },
+      });
+
+      // 4. Update bike status to SOLD if not already
+      if (order.bike.status !== BikeStatus.SOLD) {
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
+          },
+        });
+      }
+
+      // 5. Handle delivery request if one exists
+      if (order.delivery) {
+        await tx.deliveryRequest.update({
+          where: { id: order.delivery.id },
+          data: {
+            status: "DELIVERED",
+            deliveredAt: new Date(),
+          },
+        });
+      }
+
+      // 6. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "ORDER",
+          entityId: orderId,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, completedOnsite: true }),
+        },
+      });
+
+      return updatedOrder;
     });
   }
 }

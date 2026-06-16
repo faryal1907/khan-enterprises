@@ -60,12 +60,16 @@ export class OffersService {
 
   /**
    * Paginated list with filters on status, bikeId. Include bike + model info
+   * By default excludes ACCEPTED offers (converted to orders) unless includeConverted=true
    */
   async getOffers(query: QueryOffersDto) {
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
+    } else if (!query.includeConverted) {
+      // By default, exclude ACCEPTED offers (they've been converted to orders)
+      where.status = { not: OfferStatus.ACCEPTED };
     }
 
     if (query.bikeId) {

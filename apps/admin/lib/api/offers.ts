@@ -7,6 +7,7 @@ import { api } from "../api-client";
 export async function getOffers(filters?: {
   status?: string;
   bikeId?: string;
+  includeConverted?: boolean;
   page?: number;
   limit?: number;
 }) {

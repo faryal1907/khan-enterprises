@@ -94,6 +94,21 @@ export class PartOrdersController {
   }
 
   /**
+   * POST /api/part-orders/:id/complete-onsite
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * Mark part order as completed for onsite purchases
+   */
+  @Post(":id/complete-onsite")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async markPartOrderAsCompletedOnsite(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.markPartOrderAsCompletedOnsite(id, user);
+  }
+
+  /**
    * GET /api/part-orders/:id/invoice
    * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
    */
