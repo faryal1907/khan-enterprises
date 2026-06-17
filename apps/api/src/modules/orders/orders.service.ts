@@ -310,8 +310,7 @@ export class OrdersService {
   }
 
   /**
-   * Atomic: set order → CANCELLED, revert bike → AVAILABLE, clear reservedUntil,
-   * if any transaction is SUCCESS flag for refund
+   * Atomic: set order → CANCELLED, revert bike → AVAILABLE, clear reservedUntil
    */
   async cancelOrder(id: string, dto: CancelOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -361,24 +360,6 @@ export class OrdersService {
         },
       });
 
-      // 4. Check for any SUCCESS transactions → if found, create AuditLog entry flagging refund needed
-      const successTransactions = order.transactions.filter(
-        (t) => t.status === PaymentStatus.SUCCESS
-      );
-
-      if (successTransactions.length > 0) {
-        await tx.auditLog.create({
-          data: {
-            userId: user.id,
-            userRole: user.role,
-            action: AuditAction.UPDATE,
-            entityType: "Order",
-            entityId: order.id,
-            oldValue: { status: order.status },
-            newValue: { status: OrderStatus.CANCELLED, refundRequired: true },
-          },
-        });
-      }
 
       await tx.auditLog.create({
         data: {
@@ -395,7 +376,6 @@ export class OrdersService {
       return {
         order: updatedOrder,
         message: "Order cancelled successfully",
-        refundRequired: successTransactions.length > 0,
       };
     });
   }
