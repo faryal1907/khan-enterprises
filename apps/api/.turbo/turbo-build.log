@@ -2,3 +2,145 @@
 > api@1.0.0 build
 > nest build
 
+[96msrc/lib/supabase.ts[0m:[93m1[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@supabase/supabase-js' or its corresponding type declarations.
+
+Found 23 error(s).
+
+[7m1[0m import { createClient } from '@supabase/supabase-js';
+[7m [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/auth/auth.controller.ts[0m:[93m26[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '@nestjs/config' or its corresponding type declarations.
+
+[7m26[0m import { ConfigService } from "@nestjs/config";
+[7m  [0m [91m                              ~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/auth/auth.module.ts[0m:[93m4[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@nestjs/config' or its corresponding type declarations.
+
+[7m4[0m import { ConfigModule } from "@nestjs/config";
+[7m [0m [91m                             ~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m90[0m:[93m78[0m - [91merror[0m[90m TS2339: [0mProperty 'branchId' does not exist on type 'QueryOffersDto'.
+
+[7m90[0m     const branchId = this.isAssignedBranchUser(user) ? user.branchId : query.branchId;
+[7m  [0m [91m                                                                             ~~~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m95[0m:[93m15[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m95[0m     if (query.search) {
+[7m  [0m [91m              ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m97[0m:[93m43[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m97[0m         { customerName: { contains: query.search, mode: "insensitive" } },
+[7m  [0m [91m                                          ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m98[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m98[0m         { customerPhone: { contains: query.search, mode: "insensitive" } },
+[7m  [0m [91m                                           ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m99[0m:[93m44[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m99[0m         { customerEmail: { contains: query.search, mode: "insensitive" } },
+[7m  [0m [91m                                           ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m100[0m:[93m58[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m100[0m         { bike: { is: { chassisNumber: { contains: query.search, mode: "insensitive" } } } },
+[7m   [0m [91m                                                         ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m101[0m:[93m65[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m101[0m         { bike: { is: { model: { is: { brand: { contains: query.search, mode: "insensitive" } } } } } },
+[7m   [0m [91m                                                                ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m102[0m:[93m69[0m - [91merror[0m[90m TS2339: [0mProperty 'search' does not exist on type 'QueryOffersDto'.
+
+[7m102[0m         { bike: { is: { model: { is: { modelName: { contains: query.search, mode: "insensitive" } } } } } },
+[7m   [0m [91m                                                                    ~~~~~~[0m
+[96msrc/modules/offers/offers.service.ts[0m:[93m219[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m219[0m           expiresAt: reservedUntil,
+[7m   [0m [91m          ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+[96msrc/modules/offers/offers.service.ts[0m:[93m304[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m304[0m           expiresAt: null,
+[7m   [0m [91m          ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+[96msrc/modules/offers/offers.service.ts[0m:[93m416[0m:[93m11[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m416[0m           expiresAt: reservedUntil,
+[7m   [0m [91m          ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+[96msrc/modules/offers/offers.service.ts[0m:[93m586[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m586[0m         expiresAt: null,
+[7m   [0m [91m        ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+[96msrc/modules/offers/offers.service.ts[0m:[93m613[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m613[0m         expiresAt: null,
+[7m   [0m [91m        ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+[96msrc/modules/orders/orders.service.ts[0m:[93m367[0m:[93m13[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m367[0m             expiresAt: null,
+[7m   [0m [91m            ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+[96msrc/modules/part-orders/part-orders.service.ts[0m:[93m372[0m:[93m20[0m - [91merror[0m[90m TS2339: [0mProperty 'restorePartOrderStock' does not exist on type 'PartOrdersService'.
+
+[7m372[0m         await this.restorePartOrderStock(tx, order);
+[7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/part-orders/part-orders.service.ts[0m:[93m469[0m:[93m18[0m - [91merror[0m[90m TS2339: [0mProperty 'restorePartOrderStock' does not exist on type 'PartOrdersService'.
+
+[7m469[0m       await this.restorePartOrderStock(tx, order);
+[7m   [0m [91m                 ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/modules/scheduler/scheduler.service.ts[0m:[93m71[0m:[93m27[0m - [91merror[0m[90m TS2552: [0mCannot find name 'OfferStatus'. Did you mean 'OrderStatus'?
+
+[7m71[0m                   status: OfferStatus.ACCEPTED,
+[7m  [0m [91m                          ~~~~~~~~~~~[0m
+[96msrc/modules/scheduler/scheduler.service.ts[0m:[93m74[0m:[93m27[0m - [91merror[0m[90m TS2552: [0mCannot find name 'OfferStatus'. Did you mean 'OrderStatus'?
+
+[7m74[0m                   status: OfferStatus.EXPIRED,
+[7m  [0m [91m                          ~~~~~~~~~~~[0m
+[96msrc/modules/scheduler/scheduler.service.ts[0m:[93m75[0m:[93m19[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateManyMutationInput, OfferUncheckedUpdateManyInput> & OfferUncheckedUpdateManyInput) | (Without<...> & OfferUpdateManyMutationInput)'.
+
+[7m75[0m                   expiresAt: null,
+[7m  [0m [91m                  ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1983[0m:[93m3[0m
+    [7m1983[0m   data: Prisma.XOR<Prisma.OfferUpdateManyMutationInput, Prisma.OfferUncheckedUpdateManyInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ data: (Without<OfferUpdateManyMutationInput, OfferUncheckedUpdateManyInput> & OfferUncheckedUpdateManyInput) | (Without<...> & OfferUpdateManyMutationInput); where?: OfferWhereInput | undefined; limit?: number | undefined; }'
+[96msrc/modules/transactions/transactions.service.ts[0m:[93m310[0m:[93m43[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'expiresAt' does not exist in type '(Without<OfferUpdateInput, OfferUncheckedUpdateInput> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput)'.
+
+[7m310[0m               data: { status: "REJECTED", expiresAt: null },
+[7m   [0m [91m                                          ~~~~~~~~~[0m
+
+  [96m../../packages/prisma/generated/models/Offer.ts[0m:[93m1969[0m:[93m3[0m
+    [7m1969[0m   data: Prisma.XOR<Prisma.OfferUpdateInput, Prisma.OfferUncheckedUpdateInput>
+    [7m    [0m [96m  ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: OfferSelect<DefaultArgs> | null | undefined; omit?: OfferOmit<DefaultArgs> | null | undefined; include?: OfferInclude<DefaultArgs> | null | undefined; data: (Without<...> & OfferUncheckedUpdateInput) | (Without<...> & OfferUpdateInput); where: OfferWhereUniqueInput; }'
+
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Ibsham Tariq\Desktop\khan Enterprise\khan-enterprises\apps\api
+npm error workspace api@1.0.0
+npm error location C:\Users\Ibsham Tariq\Desktop\khan Enterprise\khan-enterprises\apps\api
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c nest build

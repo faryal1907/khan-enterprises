@@ -92,6 +92,62 @@ export default function OffersListPage() {
     { value: "REJECTED", label: "Rejected" },
   ];
 
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [filters, setFilters] = useState({
+    status: searchParams.get("status") || "",
+    branchId: "",
+    search: "",
+  });
+  const debouncedSearch = useDebouncedValue(filters.search, 500);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [exporting, setExporting] = useState(false);
+  const activeTab = filters.status;
+
+  const handleExportCSV = async () => {
+    setExporting(true);
+    try {
+      const response = await getOffers({
+        status: activeTab === "CONVERTED" ? "ACCEPTED" : activeTab || undefined,
+        includeConverted: activeTab === "CONVERTED" ? true : undefined,
+        branchId: filters.branchId || undefined,
+        search: filters.search || undefined,
+        limit: 1000,
+      } as any);
+
+      const csvData = response.offers?.map((offer: any) => ({
+        Customer: offer.customerName,
+        Phone: offer.customerPhone,
+        Bike: `${offer.bike.model.brand} ${offer.bike.model.modelName}`,
+        Branch: offer.bike.branch ? `${offer.bike.branch.name}, ${offer.bike.branch.city}` : "-",
+        Offer: offer.offerAmount,
+        Counter: offer.counterAmount || "-",
+        Status: offer.status,
+      })) || [];
+
+      if (csvData.length === 0) return;
+
+      const headers = Object.keys(csvData[0]).join(",");
+      const rows = csvData.map((row: any) => Object.values(row).map(escapeCsv).join(",")).join("\n");
+      const csv = `${headers}\n${rows}`;
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "offers.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
 
