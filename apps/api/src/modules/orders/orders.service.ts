@@ -5,7 +5,7 @@ import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
-import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
+import { CreateManualOrderDto, OrderType } from "./dto/create-manual-order.dto";
 import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
@@ -543,13 +543,17 @@ export class OrdersService {
 
   /**
    * Manual sale registration (admin bypasses offer workflow)
+   * Handles both ONLINE and ONSITE order types
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
-      // 1. Find bike
+      // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
-        include: { branch: true },
+        include: { 
+          branch: true,
+          model: true,
+        },
       });
 
       if (!bike) {
@@ -564,14 +568,30 @@ export class OrdersService {
         throw new BadRequestException(`Bike is not available for sale`);
       }
 
-      // 2. Generate order number
+      // 2. Determine order type and calculate price
+      const orderType = dto.orderType || "ONSITE";
+      let finalSalePrice: number;
+      let isOnlineOrder: boolean;
+
+      if (orderType === "ONLINE") {
+        // ONLINE: auto-apply 2% discount from base price
+        const basePrice = Number(bike.model.basePrice);
+        finalSalePrice = basePrice * 0.98; // 2% discount
+        isOnlineOrder = true;
+      } else {
+        // ONSITE: use actualSalePrice if provided, otherwise use salePrice
+        finalSalePrice = dto.actualSalePrice || dto.salePrice;
+        isOnlineOrder = false;
+      }
+
+      // 3. Generate order number
       const orderNumber = `ORD-MAN-${Date.now()}`;
 
-      // 3. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
+      // 4. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      // 4. Create Order
+      // 5. Create Order
       const order = await tx.order.create({
         data: {
           orderNumber,
@@ -581,32 +601,34 @@ export class OrdersService {
           customerPhone: dto.customerPhone,
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
-          negotiatedAmount: dto.salePrice,
+          negotiatedAmount: finalSalePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.CONFIRMED,
           expiresAt,
           processedById: user.id,
-          isOnlineOrder: false,
-          orderType: "ONSITE",
-          pickupType: "ONSITE_PICKUP",
+          isOnlineOrder,
+          orderType,
+          pickupType: orderType === "ONLINE" ? "DELIVERY" : "ONSITE_PICKUP",
         },
       });
 
-      // 4. Update Bike
+      // 6. Update Bike
       await tx.bikeUnit.update({
         where: { id: bike.id },
         data: {
           status: BikeStatus.SOLD,
           soldAt: new Date(),
           reservedUntil: null,
+          actualSalePrice: finalSalePrice,
+          ...(orderType === "ONLINE" && { onlineDiscountPercent: 2 }),
         },
       });
 
-      // 5. Create PaymentTransaction
+      // 7. Create PaymentTransaction
       await tx.paymentTransaction.create({
         data: {
           orderId: order.id,
-          amount: dto.salePrice,
+          amount: finalSalePrice,
           method: dto.paymentMethod,
           status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
         },
@@ -619,12 +641,32 @@ export class OrdersService {
           action: AuditAction.CREATE,
           entityType: "ORDER",
           entityId: order.id,
-          newValue: JSON.stringify(dto),
+          newValue: JSON.stringify({ ...dto, finalSalePrice, orderType }),
         },
       });
 
       return order;
     });
+  }
+
+  /**
+   * Register an online sale with automatic 2% discount from base price
+   */
+  async registerOnlineSale(dto: CreateManualOrderDto, user: any) {
+    return this.createManualOrder(
+      { ...dto, orderType: OrderType.ONLINE },
+      user
+    );
+  }
+
+  /**
+   * Register an onsite sale with custom pricing (no validation)
+   */
+  async registerOnsiteSale(dto: CreateManualOrderDto, user: any) {
+    return this.createManualOrder(
+      { ...dto, orderType: OrderType.ONSITE, actualSalePrice: dto.salePrice },
+      user
+    );
   }
 
   /**
