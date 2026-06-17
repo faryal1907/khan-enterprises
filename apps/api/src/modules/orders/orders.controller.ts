@@ -177,6 +177,18 @@ export class OrdersController {
   }
 
   /**
+   * POST /api/orders/expire-reservations
+   * @Roles(ADMIN, MANAGER)
+   * Manually expire reservations that have passed their expiry date
+   */
+  @Post("expire-reservations")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async expireReservations() {
+    return this.ordersService.expireReservations();
+  }
+
+  /**
    * POST /api/orders/:id/payment
    * @Roles(ADMIN, MANAGER, SALES_STAFF)
    */

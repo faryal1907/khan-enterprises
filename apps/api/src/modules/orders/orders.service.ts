@@ -404,6 +404,7 @@ export class OrdersService {
    * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
    * + order → PAID + offer → PAID, set bike → SOLD — all in one transaction
    * For non-cash payments, set transaction to VERIFICATION_PENDING and order to PENDING_PAYMENT
+   * For cash payments, set reservationExpiry to 2 days from now
    */
   async recordPayment(orderId: string, dto: RecordPaymentDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -428,7 +429,14 @@ export class OrdersService {
         );
       }
 
-      // 2. Update order with payment method
+      // 2. Check if reservation has expired (for cash payments)
+      if (order.reservationExpiry && new Date() > order.reservationExpiry) {
+        throw new BadRequestException(
+          `Reservation has expired on ${order.reservationExpiry.toISOString()}`
+        );
+      }
+
+      // 3. Update order with payment method
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
@@ -436,7 +444,7 @@ export class OrdersService {
         },
       });
 
-      // 3. Create PaymentTransaction
+      // 4. Create PaymentTransaction
       const transaction = await tx.paymentTransaction.create({
         data: {
           orderId,
@@ -447,13 +455,18 @@ export class OrdersService {
         },
       });
 
-      // 4. For CASH payments: set order → PAID, offer → PAID, bike → SOLD
+      // 5. For CASH payments: set order → PAID, offer → PAID, bike → SOLD, set reservationExpiry to 2 days
       // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
       if (dto.method === "CASH") {
+        // Set reservation expiry to 2 days from now
+        const reservationExpiry = new Date();
+        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
+
         await tx.order.update({
           where: { id: orderId },
           data: {
             status: OrderStatus.PAID,
+            reservationExpiry,
             processedById: user.id,
           },
         });
@@ -978,5 +991,91 @@ export class OrdersService {
         transaction: updatedTransaction,
       };
     });
+  }
+
+  /**
+   * Expire reservations that have passed their reservationExpiry
+   * Sets order to CANCELLED, bike back to AVAILABLE
+   * Can be called by scheduled job or manually
+   */
+  async expireReservations() {
+    const now = new Date();
+    
+    const expiredOrders = await this.prisma.client.order.findMany({
+      where: {
+        reservationExpiry: {
+          lt: now,
+        },
+        status: {
+          in: [OrderStatus.PAID, OrderStatus.PENDING_PAYMENT],
+        },
+      },
+      include: {
+        bike: true,
+      },
+    });
+
+    const results: Array<{
+      orderId: string;
+      orderNumber: string;
+      success: boolean;
+      error?: string;
+    }> = [];
+
+    for (const order of expiredOrders) {
+      try {
+        await this.prisma.client.$transaction(async (tx) => {
+          // Update order to CANCELLED
+          await tx.order.update({
+            where: { id: order.id },
+            data: {
+              status: OrderStatus.CANCELLED,
+            },
+          });
+
+          // Update bike back to AVAILABLE
+          await tx.bikeUnit.update({
+            where: { id: order.bikeId },
+            data: {
+              status: BikeStatus.AVAILABLE,
+              soldAt: null,
+              reservedUntil: null,
+            },
+          });
+
+          // Create audit log
+          await tx.auditLog.create({
+            data: {
+              action: AuditAction.UPDATE,
+              entityType: "ORDER",
+              entityId: order.id,
+              newValue: JSON.stringify({ 
+                status: OrderStatus.CANCELLED, 
+                reason: "Reservation expired" 
+              }),
+            },
+          });
+        });
+
+        results.push({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          success: true,
+        });
+      } catch (error: any) {
+        results.push({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          success: false,
+          error: error.message,
+        });
+      }
+    }
+
+    return {
+      total: expiredOrders.length,
+      processed: results.length,
+      results,
+    };
   }
 }
