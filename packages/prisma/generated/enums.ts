@@ -38,18 +38,6 @@ export const BikeStatus = {
 export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus]
 
 
-export const OfferStatus = {
-  PENDING: 'PENDING',
-  COUNTERED: 'COUNTERED',
-  ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED',
-  EXPIRED: 'EXPIRED',
-  PAID: 'PAID'
-} as const
-
-export type OfferStatus = (typeof OfferStatus)[keyof typeof OfferStatus]
-
-
 export const OrderStatus = {
   PENDING_PAYMENT: 'PENDING_PAYMENT',
   PAID: 'PAID',

@@ -332,7 +332,6 @@ export type BikeUnitWhereInput = {
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   model?: Prisma.XOR<Prisma.BikeModelScalarRelationFilter, Prisma.BikeModelWhereInput>
   documents?: Prisma.DocumentListRelationFilter
-  offers?: Prisma.OfferListRelationFilter
   orders?: Prisma.OrderListRelationFilter
 }
 
@@ -359,7 +358,6 @@ export type BikeUnitOrderByWithRelationInput = {
   branch?: Prisma.BranchOrderByWithRelationInput
   model?: Prisma.BikeModelOrderByWithRelationInput
   documents?: Prisma.DocumentOrderByRelationAggregateInput
-  offers?: Prisma.OfferOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
 }
 
@@ -389,7 +387,6 @@ export type BikeUnitWhereUniqueInput = Prisma.AtLeast<{
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   model?: Prisma.XOR<Prisma.BikeModelScalarRelationFilter, Prisma.BikeModelWhereInput>
   documents?: Prisma.DocumentListRelationFilter
-  offers?: Prisma.OfferListRelationFilter
   orders?: Prisma.OrderListRelationFilter
 }, "id" | "chassisNumber" | "engineNumber">
 
@@ -463,7 +460,6 @@ export type BikeUnitCreateInput = {
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -487,7 +483,6 @@ export type BikeUnitUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -511,7 +506,6 @@ export type BikeUnitUpdateInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -535,7 +529,6 @@ export type BikeUnitUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -853,20 +846,6 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
-export type BikeUnitCreateNestedOneWithoutOffersInput = {
-  create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-  connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOffersInput
-  connect?: Prisma.BikeUnitWhereUniqueInput
-}
-
-export type BikeUnitUpdateOneRequiredWithoutOffersNestedInput = {
-  create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-  connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOffersInput
-  upsert?: Prisma.BikeUnitUpsertWithoutOffersInput
-  connect?: Prisma.BikeUnitWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.BikeUnitUpdateToOneWithWhereWithoutOffersInput, Prisma.BikeUnitUpdateWithoutOffersInput>, Prisma.BikeUnitUncheckedUpdateWithoutOffersInput>
-}
-
 export type BikeUnitCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOrdersInput, Prisma.BikeUnitUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOrdersInput
@@ -916,7 +895,6 @@ export type BikeUnitCreateWithoutBranchInput = {
   vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -939,7 +917,6 @@ export type BikeUnitUncheckedCreateWithoutBranchInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1012,7 +989,6 @@ export type BikeUnitCreateWithoutVendorInput = {
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -1035,7 +1011,6 @@ export type BikeUnitUncheckedCreateWithoutVendorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1084,7 +1059,6 @@ export type BikeUnitCreateWithoutModelInput = {
   vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -1107,7 +1081,6 @@ export type BikeUnitUncheckedCreateWithoutModelInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1137,114 +1110,6 @@ export type BikeUnitUpdateManyWithWhereWithoutModelInput = {
   data: Prisma.XOR<Prisma.BikeUnitUpdateManyMutationInput, Prisma.BikeUnitUncheckedUpdateManyWithoutModelInput>
 }
 
-export type BikeUnitCreateWithoutOffersInput = {
-  id?: string
-  chassisNumber: string
-  engineNumber: string
-  serialNumber?: string | null
-  status?: $Enums.BikeStatus
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: string | null
-  media?: Prisma.BikeUnitCreatemediaInput | string[]
-  negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Date | string | null
-  soldAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
-  branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
-  model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
-  documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
-}
-
-export type BikeUnitUncheckedCreateWithoutOffersInput = {
-  id?: string
-  vendorId: string
-  branchId: string
-  modelId: string
-  chassisNumber: string
-  engineNumber: string
-  serialNumber?: string | null
-  status?: $Enums.BikeStatus
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: string | null
-  media?: Prisma.BikeUnitCreatemediaInput | string[]
-  negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Date | string | null
-  soldAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
-}
-
-export type BikeUnitCreateOrConnectWithoutOffersInput = {
-  where: Prisma.BikeUnitWhereUniqueInput
-  create: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-}
-
-export type BikeUnitUpsertWithoutOffersInput = {
-  update: Prisma.XOR<Prisma.BikeUnitUpdateWithoutOffersInput, Prisma.BikeUnitUncheckedUpdateWithoutOffersInput>
-  create: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-  where?: Prisma.BikeUnitWhereInput
-}
-
-export type BikeUnitUpdateToOneWithWhereWithoutOffersInput = {
-  where?: Prisma.BikeUnitWhereInput
-  data: Prisma.XOR<Prisma.BikeUnitUpdateWithoutOffersInput, Prisma.BikeUnitUncheckedUpdateWithoutOffersInput>
-}
-
-export type BikeUnitUpdateWithoutOffersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  chassisNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  engineNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumBikeStatusFieldUpdateOperationsInput | $Enums.BikeStatus
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  media?: Prisma.BikeUnitUpdatemediaInput | string[]
-  negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
-  branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
-  model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
-  documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
-}
-
-export type BikeUnitUncheckedUpdateWithoutOffersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  branchId?: Prisma.StringFieldUpdateOperationsInput | string
-  modelId?: Prisma.StringFieldUpdateOperationsInput | string
-  chassisNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  engineNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumBikeStatusFieldUpdateOperationsInput | $Enums.BikeStatus
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  media?: Prisma.BikeUnitUpdatemediaInput | string[]
-  negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
-}
-
 export type BikeUnitCreateWithoutOrdersInput = {
   id?: string
   chassisNumber: string
@@ -1265,7 +1130,6 @@ export type BikeUnitCreateWithoutOrdersInput = {
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
 }
 
 export type BikeUnitUncheckedCreateWithoutOrdersInput = {
@@ -1288,7 +1152,6 @@ export type BikeUnitUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
 }
 
 export type BikeUnitCreateOrConnectWithoutOrdersInput = {
@@ -1327,7 +1190,6 @@ export type BikeUnitUpdateWithoutOrdersInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
 }
 
 export type BikeUnitUncheckedUpdateWithoutOrdersInput = {
@@ -1350,7 +1212,6 @@ export type BikeUnitUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
 }
 
 export type BikeUnitCreateWithoutDocumentsInput = {
@@ -1372,7 +1233,6 @@ export type BikeUnitCreateWithoutDocumentsInput = {
   vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -1395,7 +1255,6 @@ export type BikeUnitUncheckedCreateWithoutDocumentsInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1434,7 +1293,6 @@ export type BikeUnitUpdateWithoutDocumentsInput = {
   vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1457,7 +1315,6 @@ export type BikeUnitUncheckedUpdateWithoutDocumentsInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1500,7 +1357,6 @@ export type BikeUnitUpdateWithoutBranchInput = {
   vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1523,7 +1379,6 @@ export type BikeUnitUncheckedUpdateWithoutBranchInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1586,7 +1441,6 @@ export type BikeUnitUpdateWithoutVendorInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1609,7 +1463,6 @@ export type BikeUnitUncheckedUpdateWithoutVendorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1672,7 +1525,6 @@ export type BikeUnitUpdateWithoutModelInput = {
   vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1695,7 +1547,6 @@ export type BikeUnitUncheckedUpdateWithoutModelInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1726,13 +1577,11 @@ export type BikeUnitUncheckedUpdateManyWithoutModelInput = {
 
 export type BikeUnitCountOutputType = {
   documents: number
-  offers: number
   orders: number
 }
 
 export type BikeUnitCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   documents?: boolean | BikeUnitCountOutputTypeCountDocumentsArgs
-  offers?: boolean | BikeUnitCountOutputTypeCountOffersArgs
   orders?: boolean | BikeUnitCountOutputTypeCountOrdersArgs
 }
 
@@ -1751,13 +1600,6 @@ export type BikeUnitCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ext
  */
 export type BikeUnitCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DocumentWhereInput
-}
-
-/**
- * BikeUnitCountOutputType without action
- */
-export type BikeUnitCountOutputTypeCountOffersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.OfferWhereInput
 }
 
 /**
@@ -1791,7 +1633,6 @@ export type BikeUnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.BikeUnit$documentsArgs<ExtArgs>
-  offers?: boolean | Prisma.BikeUnit$offersArgs<ExtArgs>
   orders?: boolean | Prisma.BikeUnit$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.BikeUnitCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bikeUnit"]>
@@ -1871,7 +1712,6 @@ export type BikeUnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.BikeUnit$documentsArgs<ExtArgs>
-  offers?: boolean | Prisma.BikeUnit$offersArgs<ExtArgs>
   orders?: boolean | Prisma.BikeUnit$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.BikeUnitCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1893,7 +1733,6 @@ export type $BikeUnitPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     branch: Prisma.$BranchPayload<ExtArgs>
     model: Prisma.$BikeModelPayload<ExtArgs>
     documents: Prisma.$DocumentPayload<ExtArgs>[]
-    offers: Prisma.$OfferPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2313,7 +2152,6 @@ export interface Prisma__BikeUnitClient<T, Null = never, ExtArgs extends runtime
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   model<T extends Prisma.BikeModelDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeModelDefaultArgs<ExtArgs>>): Prisma.Prisma__BikeModelClient<runtime.Types.Result.GetResult<Prisma.$BikeModelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   documents<T extends Prisma.BikeUnit$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  offers<T extends Prisma.BikeUnit$offersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$offersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.BikeUnit$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2784,30 +2622,6 @@ export type BikeUnit$documentsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
-}
-
-/**
- * BikeUnit.offers
- */
-export type BikeUnit$offersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Offer
-   */
-  select?: Prisma.OfferSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Offer
-   */
-  omit?: Prisma.OfferOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.OfferInclude<ExtArgs> | null
-  where?: Prisma.OfferWhereInput
-  orderBy?: Prisma.OfferOrderByWithRelationInput | Prisma.OfferOrderByWithRelationInput[]
-  cursor?: Prisma.OfferWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.OfferScalarFieldEnum | Prisma.OfferScalarFieldEnum[]
 }
 
 /**

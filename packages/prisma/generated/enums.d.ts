@@ -18,15 +18,6 @@ export declare const BikeStatus: {
     readonly IN_DELIVERY: "IN_DELIVERY";
 };
 export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus];
-export declare const OfferStatus: {
-    readonly PENDING: "PENDING";
-    readonly COUNTERED: "COUNTERED";
-    readonly ACCEPTED: "ACCEPTED";
-    readonly REJECTED: "REJECTED";
-    readonly EXPIRED: "EXPIRED";
-    readonly PAID: "PAID";
-};
-export type OfferStatus = (typeof OfferStatus)[keyof typeof OfferStatus];
 export declare const OrderStatus: {
     readonly PENDING_PAYMENT: "PENDING_PAYMENT";
     readonly PAID: "PAID";

@@ -60,13 +60,11 @@ export const ModelName = {
   Part: 'Part',
   PartInventory: 'PartInventory',
   StockMovement: 'StockMovement',
-  Offer: 'Offer',
   Order: 'Order',
   OrderAlert: 'OrderAlert',
   PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
   PartPaymentTransaction: 'PartPaymentTransaction',
-  DeliveryPricing: 'DeliveryPricing',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
   AuditLog: 'AuditLog'
@@ -224,33 +222,10 @@ export const StockMovementScalarFieldEnum = {
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
 
 
-export const OfferScalarFieldEnum = {
-  id: 'id',
-  bikeId: 'bikeId',
-  customerName: 'customerName',
-  customerPhone: 'customerPhone',
-  customerEmail: 'customerEmail',
-  customerCNIC: 'customerCNIC',
-  customerAddress: 'customerAddress',
-  offerAmount: 'offerAmount',
-  counterAmount: 'counterAmount',
-  message: 'message',
-  adminResponse: 'adminResponse',
-  status: 'status',
-  paymentMethod: 'paymentMethod',
-  createdById: 'createdById',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type OfferScalarFieldEnum = (typeof OfferScalarFieldEnum)[keyof typeof OfferScalarFieldEnum]
-
-
 export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
   bikeId: 'bikeId',
-  offerId: 'offerId',
   branchId: 'branchId',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
@@ -354,18 +329,6 @@ export const PartPaymentTransactionScalarFieldEnum = {
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
 
 
-export const DeliveryPricingScalarFieldEnum = {
-  id: 'id',
-  freeDistanceKm: 'freeDistanceKm',
-  ratePerKm: 'ratePerKm',
-  ratePerKg: 'ratePerKg',
-  effectiveFrom: 'effectiveFrom',
-  effectiveTo: 'effectiveTo'
-} as const
-
-export type DeliveryPricingScalarFieldEnum = (typeof DeliveryPricingScalarFieldEnum)[keyof typeof DeliveryPricingScalarFieldEnum]
-
-
 export const DeliveryRequestScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
@@ -377,10 +340,6 @@ export const DeliveryRequestScalarFieldEnum = {
   approvedAt: 'approvedAt',
   deliveredAt: 'deliveredAt',
   notes: 'notes',
-  distanceKm: 'distanceKm',
-  estimatedWeight: 'estimatedWeight',
-  deliveryFee: 'deliveryFee',
-  calculatedAt: 'calculatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

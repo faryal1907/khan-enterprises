@@ -40,7 +40,6 @@ export type OrderMinAggregateOutputType = {
   id: string | null
   orderNumber: string | null
   bikeId: string | null
-  offerId: string | null
   branchId: string | null
   customerName: string | null
   customerPhone: string | null
@@ -65,7 +64,6 @@ export type OrderMaxAggregateOutputType = {
   id: string | null
   orderNumber: string | null
   bikeId: string | null
-  offerId: string | null
   branchId: string | null
   customerName: string | null
   customerPhone: string | null
@@ -90,7 +88,6 @@ export type OrderCountAggregateOutputType = {
   id: number
   orderNumber: number
   bikeId: number
-  offerId: number
   branchId: number
   customerName: number
   customerPhone: number
@@ -127,7 +124,6 @@ export type OrderMinAggregateInputType = {
   id?: true
   orderNumber?: true
   bikeId?: true
-  offerId?: true
   branchId?: true
   customerName?: true
   customerPhone?: true
@@ -152,7 +148,6 @@ export type OrderMaxAggregateInputType = {
   id?: true
   orderNumber?: true
   bikeId?: true
-  offerId?: true
   branchId?: true
   customerName?: true
   customerPhone?: true
@@ -177,7 +172,6 @@ export type OrderCountAggregateInputType = {
   id?: true
   orderNumber?: true
   bikeId?: true
-  offerId?: true
   branchId?: true
   customerName?: true
   customerPhone?: true
@@ -289,7 +283,6 @@ export type OrderGroupByOutputType = {
   id: string
   orderNumber: string
   bikeId: string
-  offerId: string | null
   branchId: string
   customerName: string
   customerPhone: string
@@ -337,7 +330,6 @@ export type OrderWhereInput = {
   id?: Prisma.StringFilter<"Order"> | string
   orderNumber?: Prisma.StringFilter<"Order"> | string
   bikeId?: Prisma.StringFilter<"Order"> | string
-  offerId?: Prisma.StringNullableFilter<"Order"> | string | null
   branchId?: Prisma.StringFilter<"Order"> | string
   customerName?: Prisma.StringFilter<"Order"> | string
   customerPhone?: Prisma.StringFilter<"Order"> | string
@@ -357,7 +349,6 @@ export type OrderWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   bike?: Prisma.XOR<Prisma.BikeUnitScalarRelationFilter, Prisma.BikeUnitWhereInput>
-  offer?: Prisma.XOR<Prisma.OfferNullableScalarRelationFilter, Prisma.OfferWhereInput> | null
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.PaymentTransactionListRelationFilter
@@ -370,7 +361,6 @@ export type OrderOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   bikeId?: Prisma.SortOrder
-  offerId?: Prisma.SortOrderInput | Prisma.SortOrder
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
@@ -390,7 +380,6 @@ export type OrderOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   bike?: Prisma.BikeUnitOrderByWithRelationInput
-  offer?: Prisma.OfferOrderByWithRelationInput
   branch?: Prisma.BranchOrderByWithRelationInput
   processedBy?: Prisma.UserOrderByWithRelationInput
   transactions?: Prisma.PaymentTransactionOrderByRelationAggregateInput
@@ -402,7 +391,6 @@ export type OrderOrderByWithRelationInput = {
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   orderNumber?: string
-  offerId?: string
   AND?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   OR?: Prisma.OrderWhereInput[]
   NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
@@ -426,20 +414,18 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   bike?: Prisma.XOR<Prisma.BikeUnitScalarRelationFilter, Prisma.BikeUnitWhereInput>
-  offer?: Prisma.XOR<Prisma.OfferNullableScalarRelationFilter, Prisma.OfferWhereInput> | null
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.PaymentTransactionListRelationFilter
   delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null
   documents?: Prisma.DocumentListRelationFilter
   alerts?: Prisma.OrderAlertListRelationFilter
-}, "id" | "orderNumber" | "offerId">
+}, "id" | "orderNumber">
 
 export type OrderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   bikeId?: Prisma.SortOrder
-  offerId?: Prisma.SortOrderInput | Prisma.SortOrder
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
@@ -472,7 +458,6 @@ export type OrderScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Order"> | string
   orderNumber?: Prisma.StringWithAggregatesFilter<"Order"> | string
   bikeId?: Prisma.StringWithAggregatesFilter<"Order"> | string
-  offerId?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   branchId?: Prisma.StringWithAggregatesFilter<"Order"> | string
   customerName?: Prisma.StringWithAggregatesFilter<"Order"> | string
   customerPhone?: Prisma.StringWithAggregatesFilter<"Order"> | string
@@ -501,19 +486,18 @@ export type OrderCreateInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
@@ -526,21 +510,20 @@ export type OrderUncheckedCreateInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -571,7 +554,6 @@ export type OrderUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
@@ -584,7 +566,6 @@ export type OrderUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -613,21 +594,20 @@ export type OrderCreateManyInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -659,7 +639,6 @@ export type OrderUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -690,16 +669,10 @@ export type OrderOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type OrderNullableScalarRelationFilter = {
-  is?: Prisma.OrderWhereInput | null
-  isNot?: Prisma.OrderWhereInput | null
-}
-
 export type OrderCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   bikeId?: Prisma.SortOrder
-  offerId?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
@@ -729,7 +702,6 @@ export type OrderMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   bikeId?: Prisma.SortOrder
-  offerId?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
@@ -754,7 +726,6 @@ export type OrderMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderNumber?: Prisma.SortOrder
   bikeId?: Prisma.SortOrder
-  offerId?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
@@ -783,6 +754,11 @@ export type OrderSumOrderByAggregateInput = {
 export type OrderScalarRelationFilter = {
   is?: Prisma.OrderWhereInput
   isNot?: Prisma.OrderWhereInput
+}
+
+export type OrderNullableScalarRelationFilter = {
+  is?: Prisma.OrderWhereInput | null
+  isNot?: Prisma.OrderWhereInput | null
 }
 
 export type OrderCreateNestedManyWithoutProcessedByInput = {
@@ -911,38 +887,6 @@ export type OrderUncheckedUpdateManyWithoutBikeNestedInput = {
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
 }
 
-export type OrderCreateNestedOneWithoutOfferInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutOfferInput, Prisma.OrderUncheckedCreateWithoutOfferInput>
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOfferInput
-  connect?: Prisma.OrderWhereUniqueInput
-}
-
-export type OrderUncheckedCreateNestedOneWithoutOfferInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutOfferInput, Prisma.OrderUncheckedCreateWithoutOfferInput>
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOfferInput
-  connect?: Prisma.OrderWhereUniqueInput
-}
-
-export type OrderUpdateOneWithoutOfferNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutOfferInput, Prisma.OrderUncheckedCreateWithoutOfferInput>
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOfferInput
-  upsert?: Prisma.OrderUpsertWithoutOfferInput
-  disconnect?: Prisma.OrderWhereInput | boolean
-  delete?: Prisma.OrderWhereInput | boolean
-  connect?: Prisma.OrderWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutOfferInput, Prisma.OrderUpdateWithoutOfferInput>, Prisma.OrderUncheckedUpdateWithoutOfferInput>
-}
-
-export type OrderUncheckedUpdateOneWithoutOfferNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutOfferInput, Prisma.OrderUncheckedCreateWithoutOfferInput>
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOfferInput
-  upsert?: Prisma.OrderUpsertWithoutOfferInput
-  disconnect?: Prisma.OrderWhereInput | boolean
-  delete?: Prisma.OrderWhereInput | boolean
-  connect?: Prisma.OrderWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutOfferInput, Prisma.OrderUpdateWithoutOfferInput>, Prisma.OrderUncheckedUpdateWithoutOfferInput>
-}
-
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
@@ -1031,19 +975,18 @@ export type OrderCreateWithoutProcessedByInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput
@@ -1055,21 +998,20 @@ export type OrderUncheckedCreateWithoutProcessedByInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1112,7 +1054,6 @@ export type OrderScalarWhereInput = {
   id?: Prisma.StringFilter<"Order"> | string
   orderNumber?: Prisma.StringFilter<"Order"> | string
   bikeId?: Prisma.StringFilter<"Order"> | string
-  offerId?: Prisma.StringNullableFilter<"Order"> | string | null
   branchId?: Prisma.StringFilter<"Order"> | string
   customerName?: Prisma.StringFilter<"Order"> | string
   customerPhone?: Prisma.StringFilter<"Order"> | string
@@ -1141,19 +1082,18 @@ export type OrderCreateWithoutBranchInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
   delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput
@@ -1165,20 +1105,19 @@ export type OrderUncheckedCreateWithoutBranchInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1223,18 +1162,17 @@ export type OrderCreateWithoutBikeInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
@@ -1246,21 +1184,20 @@ export type OrderCreateWithoutBikeInput = {
 export type OrderUncheckedCreateWithoutBikeInput = {
   id?: string
   orderNumber: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1297,134 +1234,6 @@ export type OrderUpdateManyWithWhereWithoutBikeInput = {
   data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutBikeInput>
 }
 
-export type OrderCreateWithoutOfferInput = {
-  id?: string
-  orderNumber: string
-  customerName: string
-  customerPhone: string
-  customerCNIC?: string | null
-  customerAddress?: string | null
-  negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
-  appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  paymentMethod: $Enums.PaymentMethod
-  status?: $Enums.OrderStatus
-  paymentVerified?: boolean
-  orderType: $Enums.OrderType
-  reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
-  expiresAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
-  processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
-  transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
-  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput
-  documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput
-  alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput
-}
-
-export type OrderUncheckedCreateWithoutOfferInput = {
-  id?: string
-  orderNumber: string
-  bikeId: string
-  branchId: string
-  customerName: string
-  customerPhone: string
-  customerCNIC?: string | null
-  customerAddress?: string | null
-  negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
-  appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  paymentMethod: $Enums.PaymentMethod
-  status?: $Enums.OrderStatus
-  paymentVerified?: boolean
-  orderType: $Enums.OrderType
-  reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
-  expiresAt?: Date | string | null
-  processedById?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput
-  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput
-  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput
-  alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput
-}
-
-export type OrderCreateOrConnectWithoutOfferInput = {
-  where: Prisma.OrderWhereUniqueInput
-  create: Prisma.XOR<Prisma.OrderCreateWithoutOfferInput, Prisma.OrderUncheckedCreateWithoutOfferInput>
-}
-
-export type OrderUpsertWithoutOfferInput = {
-  update: Prisma.XOR<Prisma.OrderUpdateWithoutOfferInput, Prisma.OrderUncheckedUpdateWithoutOfferInput>
-  create: Prisma.XOR<Prisma.OrderCreateWithoutOfferInput, Prisma.OrderUncheckedCreateWithoutOfferInput>
-  where?: Prisma.OrderWhereInput
-}
-
-export type OrderUpdateToOneWithWhereWithoutOfferInput = {
-  where?: Prisma.OrderWhereInput
-  data: Prisma.XOR<Prisma.OrderUpdateWithoutOfferInput, Prisma.OrderUncheckedUpdateWithoutOfferInput>
-}
-
-export type OrderUpdateWithoutOfferInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  customerName?: Prisma.StringFieldUpdateOperationsInput | string
-  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
-  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
-  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
-  processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
-  transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
-  delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput
-  documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput
-  alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput
-}
-
-export type OrderUncheckedUpdateWithoutOfferInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  branchId?: Prisma.StringFieldUpdateOperationsInput | string
-  customerName?: Prisma.StringFieldUpdateOperationsInput | string
-  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  negotiatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
-  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
-  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
-  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput
-  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput
-  documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput
-  alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput
-}
-
 export type OrderCreateWithoutAlertsInput = {
   id?: string
   orderNumber: string
@@ -1433,19 +1242,18 @@ export type OrderCreateWithoutAlertsInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
@@ -1457,21 +1265,20 @@ export type OrderUncheckedCreateWithoutAlertsInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1517,7 +1324,6 @@ export type OrderUpdateWithoutAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
@@ -1529,7 +1335,6 @@ export type OrderUncheckedUpdateWithoutAlertsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1561,19 +1366,18 @@ export type OrderCreateWithoutTransactionsInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput
@@ -1585,21 +1389,20 @@ export type OrderUncheckedCreateWithoutTransactionsInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1645,7 +1448,6 @@ export type OrderUpdateWithoutTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput
@@ -1657,7 +1459,6 @@ export type OrderUncheckedUpdateWithoutTransactionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1689,19 +1490,18 @@ export type OrderCreateWithoutDeliveryInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
@@ -1713,21 +1513,20 @@ export type OrderUncheckedCreateWithoutDeliveryInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1773,7 +1572,6 @@ export type OrderUpdateWithoutDeliveryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
@@ -1785,7 +1583,6 @@ export type OrderUncheckedUpdateWithoutDeliveryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1817,19 +1614,18 @@ export type OrderCreateWithoutDocumentsInput = {
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput
-  offer?: Prisma.OfferCreateNestedOneWithoutOrderInput
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput
   transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput
@@ -1841,21 +1637,20 @@ export type OrderUncheckedCreateWithoutDocumentsInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1901,7 +1696,6 @@ export type OrderUpdateWithoutDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
@@ -1913,7 +1707,6 @@ export type OrderUncheckedUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1941,21 +1734,20 @@ export type OrderCreateManyProcessedByInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1981,7 +1773,6 @@ export type OrderUpdateWithoutProcessedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput
@@ -1993,7 +1784,6 @@ export type OrderUncheckedUpdateWithoutProcessedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2021,7 +1811,6 @@ export type OrderUncheckedUpdateManyWithoutProcessedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2045,20 +1834,19 @@ export type OrderCreateManyBranchInput = {
   id?: string
   orderNumber: string
   bikeId: string
-  offerId?: string | null
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -2085,7 +1873,6 @@ export type OrderUpdateWithoutBranchInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
   delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput
@@ -2097,7 +1884,6 @@ export type OrderUncheckedUpdateWithoutBranchInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2125,7 +1911,6 @@ export type OrderUncheckedUpdateManyWithoutBranchInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   bikeId?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2148,21 +1933,20 @@ export type OrderUncheckedUpdateManyWithoutBranchInput = {
 export type OrderCreateManyBikeInput = {
   id?: string
   orderNumber: string
-  offerId?: string | null
   branchId: string
   customerName: string
   customerPhone: string
   customerCNIC?: string | null
   customerAddress?: string | null
   negotiatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  isOnlineOrder: boolean
+  isOnlineOrder?: boolean
   appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -2188,7 +1972,6 @@ export type OrderUpdateWithoutBikeInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  offer?: Prisma.OfferUpdateOneWithoutOrderNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput
   transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput
@@ -2200,7 +1983,6 @@ export type OrderUpdateWithoutBikeInput = {
 export type OrderUncheckedUpdateWithoutBikeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2228,7 +2010,6 @@ export type OrderUncheckedUpdateWithoutBikeInput = {
 export type OrderUncheckedUpdateManyWithoutBikeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  offerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2302,7 +2083,6 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   orderNumber?: boolean
   bikeId?: boolean
-  offerId?: boolean
   branchId?: boolean
   customerName?: boolean
   customerPhone?: boolean
@@ -2322,7 +2102,6 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
-  offer?: boolean | Prisma.Order$offerArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>
   transactions?: boolean | Prisma.Order$transactionsArgs<ExtArgs>
@@ -2336,7 +2115,6 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   orderNumber?: boolean
   bikeId?: boolean
-  offerId?: boolean
   branchId?: boolean
   customerName?: boolean
   customerPhone?: boolean
@@ -2356,7 +2134,6 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   createdAt?: boolean
   updatedAt?: boolean
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
-  offer?: boolean | Prisma.Order$offerArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
@@ -2365,7 +2142,6 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   orderNumber?: boolean
   bikeId?: boolean
-  offerId?: boolean
   branchId?: boolean
   customerName?: boolean
   customerPhone?: boolean
@@ -2385,7 +2161,6 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   createdAt?: boolean
   updatedAt?: boolean
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
-  offer?: boolean | Prisma.Order$offerArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
@@ -2394,7 +2169,6 @@ export type OrderSelectScalar = {
   id?: boolean
   orderNumber?: boolean
   bikeId?: boolean
-  offerId?: boolean
   branchId?: boolean
   customerName?: boolean
   customerPhone?: boolean
@@ -2415,10 +2189,9 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "bikeId" | "offerId" | "branchId" | "customerName" | "customerPhone" | "customerCNIC" | "customerAddress" | "negotiatedAmount" | "isOnlineOrder" | "appliedDiscount" | "paymentMethod" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "expiresAt" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "bikeId" | "branchId" | "customerName" | "customerPhone" | "customerCNIC" | "customerAddress" | "negotiatedAmount" | "isOnlineOrder" | "appliedDiscount" | "paymentMethod" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "expiresAt" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
-  offer?: boolean | Prisma.Order$offerArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>
   transactions?: boolean | Prisma.Order$transactionsArgs<ExtArgs>
@@ -2429,13 +2202,11 @@ export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 }
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
-  offer?: boolean | Prisma.Order$offerArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>
 }
 export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>
-  offer?: boolean | Prisma.Order$offerArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>
 }
@@ -2444,7 +2215,6 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Order"
   objects: {
     bike: Prisma.$BikeUnitPayload<ExtArgs>
-    offer: Prisma.$OfferPayload<ExtArgs> | null
     branch: Prisma.$BranchPayload<ExtArgs>
     processedBy: Prisma.$UserPayload<ExtArgs> | null
     transactions: Prisma.$PaymentTransactionPayload<ExtArgs>[]
@@ -2456,7 +2226,6 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     orderNumber: string
     bikeId: string
-    offerId: string | null
     branchId: string
     customerName: string
     customerPhone: string
@@ -2870,7 +2639,6 @@ readonly fields: OrderFieldRefs;
 export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   bike<T extends Prisma.BikeUnitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnitDefaultArgs<ExtArgs>>): Prisma.Prisma__BikeUnitClient<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  offer<T extends Prisma.Order$offerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$offerArgs<ExtArgs>>): Prisma.Prisma__OfferClient<runtime.Types.Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   processedBy<T extends Prisma.Order$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transactions<T extends Prisma.Order$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2909,7 +2677,6 @@ export interface OrderFieldRefs {
   readonly id: Prisma.FieldRef<"Order", 'String'>
   readonly orderNumber: Prisma.FieldRef<"Order", 'String'>
   readonly bikeId: Prisma.FieldRef<"Order", 'String'>
-  readonly offerId: Prisma.FieldRef<"Order", 'String'>
   readonly branchId: Prisma.FieldRef<"Order", 'String'>
   readonly customerName: Prisma.FieldRef<"Order", 'String'>
   readonly customerPhone: Prisma.FieldRef<"Order", 'String'>
@@ -3326,25 +3093,6 @@ export type OrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Orders to delete.
    */
   limit?: number
-}
-
-/**
- * Order.offer
- */
-export type Order$offerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Offer
-   */
-  select?: Prisma.OfferSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Offer
-   */
-  omit?: Prisma.OfferOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.OfferInclude<ExtArgs> | null
-  where?: Prisma.OfferWhereInput
 }
 
 /**

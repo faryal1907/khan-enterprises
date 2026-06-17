@@ -1854,7 +1854,6 @@ export declare const DeliveryPricingScalarFieldEnum: {
     readonly id: "id";
     readonly freeDistanceKm: "freeDistanceKm";
     readonly ratePerKm: "ratePerKm";
-    readonly ratePerKg: "ratePerKg";
     readonly effectiveFrom: "effectiveFrom";
     readonly effectiveTo: "effectiveTo";
 };
@@ -1871,7 +1870,6 @@ export declare const DeliveryRequestScalarFieldEnum: {
     readonly deliveredAt: "deliveredAt";
     readonly notes: "notes";
     readonly distanceKm: "distanceKm";
-    readonly estimatedWeight: "estimatedWeight";
     readonly deliveryFee: "deliveryFee";
     readonly calculatedAt: "calculatedAt";
     readonly createdAt: "createdAt";

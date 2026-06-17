@@ -474,9 +474,9 @@ export type PartOrderCreateInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -502,9 +502,9 @@ export type PartOrderUncheckedCreateInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -577,9 +577,9 @@ export type PartOrderCreateManyInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -936,9 +936,9 @@ export type PartOrderCreateWithoutProcessedByInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -963,9 +963,9 @@ export type PartOrderUncheckedCreateWithoutProcessedByInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1036,9 +1036,9 @@ export type PartOrderCreateWithoutBranchInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1062,9 +1062,9 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1110,9 +1110,9 @@ export type PartOrderCreateWithoutPartInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1136,9 +1136,9 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1184,9 +1184,9 @@ export type PartOrderCreateWithoutPartInventoryInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1210,9 +1210,9 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1258,9 +1258,9 @@ export type PartOrderCreateWithoutTransactionsInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1285,9 +1285,9 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1370,9 +1370,9 @@ export type PartOrderCreateWithoutDeliveryInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1397,9 +1397,9 @@ export type PartOrderUncheckedCreateWithoutDeliveryInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1485,9 +1485,9 @@ export type PartOrderCreateManyProcessedByInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1576,9 +1576,9 @@ export type PartOrderCreateManyBranchInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1668,9 +1668,9 @@ export type PartOrderCreateManyPartInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1760,9 +1760,9 @@ export type PartOrderCreateManyPartInventoryInput = {
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
   paymentVerified?: boolean
-  orderType: $Enums.OrderType
+  orderType?: $Enums.OrderType
   reservationExpiry?: Date | string | null
-  pickupType: $Enums.PickupType
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string

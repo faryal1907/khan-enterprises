@@ -38,15 +38,6 @@ enum BikeStatus {
   IN_DELIVERY
 }
 
-enum OfferStatus {
-  PENDING
-  COUNTERED
-  ACCEPTED
-  REJECTED
-  EXPIRED
-  PAID
-}
-
 enum OrderStatus {
   PENDING_PAYMENT
   PAID
@@ -141,7 +132,6 @@ model User {
 
   auditLogs AuditLog[]
 
-  createdOffers   Offer[] @relation("OfferCreatedBy")
   processedOrders Order[] @relation("OrderProcessedBy")
   processedPartOrders PartOrder[] @relation("PartOrderProcessedBy")
 
@@ -271,7 +261,6 @@ model BikeUnit {
 
   documents Document[]
 
-  offers Offer[]
   orders Order[]
 
   createdAt DateTime @default(now())
@@ -349,46 +338,6 @@ model StockMovement {
 }
 
 // ============================================================================
-// NEGOTIATION SYSTEM
-// ============================================================================
-
-model Offer {
-  id String @id @default(uuid())
-
-  bikeId String
-  bike   BikeUnit @relation(fields: [bikeId], references: [id])
-
-  customerName    String
-  customerPhone   String
-  customerEmail   String?
-  customerCNIC    String?
-  customerAddress String?
-
-  offerAmount Decimal @db.Decimal(12, 2)
-
-  counterAmount Decimal? @db.Decimal(12, 2)
-
-  message       String?
-  adminResponse String?
-
-  status OfferStatus @default(PENDING)
-
-  paymentMethod PaymentMethod?
-
-  createdById String?
-  createdBy   User?   @relation("OfferCreatedBy", fields: [createdById], references: [id])
-
-  order Order?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([bikeId])
-  @@index([status])
-  @@index([createdAt])
-}
-
-// ============================================================================
 // ORDERS
 // ============================================================================
 
@@ -400,9 +349,6 @@ model Order {
   bikeId String
   bike   BikeUnit @relation(fields: [bikeId], references: [id])
 
-  offerId String? @unique
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-
   branchId String
   branch   Branch @relation(fields: [branchId], references: [id])
 
@@ -413,7 +359,7 @@ model Order {
 
   negotiatedAmount Decimal @db.Decimal(12, 2)
 
-  isOnlineOrder   Boolean
+  isOnlineOrder   Boolean  @default(false)
   appliedDiscount Decimal? @db.Decimal(12, 2)
 
   paymentMethod PaymentMethod
@@ -421,9 +367,9 @@ model Order {
   status OrderStatus @default(PENDING_PAYMENT)
 
   paymentVerified   Boolean  @default(false)
-  orderType         OrderType
+  orderType         OrderType @default(ONSITE)
   reservationExpiry DateTime?
-  pickupType        PickupType
+  pickupType        PickupType @default(ONSITE_PICKUP)
 
   expiresAt DateTime?
 
@@ -485,9 +431,9 @@ model PartOrder {
   status OrderStatus @default(PENDING_PAYMENT)
 
   paymentVerified   Boolean  @default(false)
-  orderType         OrderType
+  orderType         OrderType @default(ONSITE)
   reservationExpiry DateTime?
-  pickupType        PickupType
+  pickupType        PickupType @default(ONSITE_PICKUP)
 
   expiresAt DateTime?
 
@@ -578,15 +524,6 @@ model PartPaymentTransaction {
 // DELIVERY
 // ============================================================================
 
-model DeliveryPricing {
-  id             String   @id @default(uuid())
-  freeDistanceKm Int      @default(10)
-  ratePerKm      Decimal  @db.Decimal(10, 2)
-  ratePerKg      Decimal? @db.Decimal(10, 2)
-  effectiveFrom  DateTime @default(now())
-  effectiveTo    DateTime?
-}
-
 model DeliveryRequest {
   id String @id @default(uuid())
 
@@ -606,11 +543,6 @@ model DeliveryRequest {
   deliveredAt DateTime?
 
   notes String?
-
-  distanceKm      Decimal?
-  estimatedWeight Decimal?
-  deliveryFee     Decimal?
-  calculatedAt    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

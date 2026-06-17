@@ -20,22 +20,8 @@ export type DeliveryRequestModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateDeliveryRequest = {
   _count: DeliveryRequestCountAggregateOutputType | null
-  _avg: DeliveryRequestAvgAggregateOutputType | null
-  _sum: DeliveryRequestSumAggregateOutputType | null
   _min: DeliveryRequestMinAggregateOutputType | null
   _max: DeliveryRequestMaxAggregateOutputType | null
-}
-
-export type DeliveryRequestAvgAggregateOutputType = {
-  distanceKm: runtime.Decimal | null
-  estimatedWeight: runtime.Decimal | null
-  deliveryFee: runtime.Decimal | null
-}
-
-export type DeliveryRequestSumAggregateOutputType = {
-  distanceKm: runtime.Decimal | null
-  estimatedWeight: runtime.Decimal | null
-  deliveryFee: runtime.Decimal | null
 }
 
 export type DeliveryRequestMinAggregateOutputType = {
@@ -49,10 +35,6 @@ export type DeliveryRequestMinAggregateOutputType = {
   approvedAt: Date | null
   deliveredAt: Date | null
   notes: string | null
-  distanceKm: runtime.Decimal | null
-  estimatedWeight: runtime.Decimal | null
-  deliveryFee: runtime.Decimal | null
-  calculatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -68,10 +50,6 @@ export type DeliveryRequestMaxAggregateOutputType = {
   approvedAt: Date | null
   deliveredAt: Date | null
   notes: string | null
-  distanceKm: runtime.Decimal | null
-  estimatedWeight: runtime.Decimal | null
-  deliveryFee: runtime.Decimal | null
-  calculatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -87,27 +65,11 @@ export type DeliveryRequestCountAggregateOutputType = {
   approvedAt: number
   deliveredAt: number
   notes: number
-  distanceKm: number
-  estimatedWeight: number
-  deliveryFee: number
-  calculatedAt: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
-
-export type DeliveryRequestAvgAggregateInputType = {
-  distanceKm?: true
-  estimatedWeight?: true
-  deliveryFee?: true
-}
-
-export type DeliveryRequestSumAggregateInputType = {
-  distanceKm?: true
-  estimatedWeight?: true
-  deliveryFee?: true
-}
 
 export type DeliveryRequestMinAggregateInputType = {
   id?: true
@@ -120,10 +82,6 @@ export type DeliveryRequestMinAggregateInputType = {
   approvedAt?: true
   deliveredAt?: true
   notes?: true
-  distanceKm?: true
-  estimatedWeight?: true
-  deliveryFee?: true
-  calculatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -139,10 +97,6 @@ export type DeliveryRequestMaxAggregateInputType = {
   approvedAt?: true
   deliveredAt?: true
   notes?: true
-  distanceKm?: true
-  estimatedWeight?: true
-  deliveryFee?: true
-  calculatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -158,10 +112,6 @@ export type DeliveryRequestCountAggregateInputType = {
   approvedAt?: true
   deliveredAt?: true
   notes?: true
-  distanceKm?: true
-  estimatedWeight?: true
-  deliveryFee?: true
-  calculatedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -205,18 +155,6 @@ export type DeliveryRequestAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: DeliveryRequestAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: DeliveryRequestSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: DeliveryRequestMinAggregateInputType
@@ -247,8 +185,6 @@ export type DeliveryRequestGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: DeliveryRequestCountAggregateInputType | true
-  _avg?: DeliveryRequestAvgAggregateInputType
-  _sum?: DeliveryRequestSumAggregateInputType
   _min?: DeliveryRequestMinAggregateInputType
   _max?: DeliveryRequestMaxAggregateInputType
 }
@@ -264,15 +200,9 @@ export type DeliveryRequestGroupByOutputType = {
   approvedAt: Date | null
   deliveredAt: Date | null
   notes: string | null
-  distanceKm: runtime.Decimal | null
-  estimatedWeight: runtime.Decimal | null
-  deliveryFee: runtime.Decimal | null
-  calculatedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: DeliveryRequestCountAggregateOutputType | null
-  _avg: DeliveryRequestAvgAggregateOutputType | null
-  _sum: DeliveryRequestSumAggregateOutputType | null
   _min: DeliveryRequestMinAggregateOutputType | null
   _max: DeliveryRequestMaxAggregateOutputType | null
 }
@@ -306,10 +236,6 @@ export type DeliveryRequestWhereInput = {
   approvedAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   deliveredAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   notes?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
-  distanceKm?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
   order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
@@ -327,10 +253,6 @@ export type DeliveryRequestOrderByWithRelationInput = {
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  distanceKm?: Prisma.SortOrderInput | Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrderInput | Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrderInput | Prisma.SortOrder
-  calculatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
@@ -351,10 +273,6 @@ export type DeliveryRequestWhereUniqueInput = Prisma.AtLeast<{
   approvedAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   deliveredAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   notes?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
-  distanceKm?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
   order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
@@ -372,17 +290,11 @@ export type DeliveryRequestOrderByWithAggregationInput = {
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  distanceKm?: Prisma.SortOrderInput | Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrderInput | Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrderInput | Prisma.SortOrder
-  calculatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DeliveryRequestCountOrderByAggregateInput
-  _avg?: Prisma.DeliveryRequestAvgOrderByAggregateInput
   _max?: Prisma.DeliveryRequestMaxOrderByAggregateInput
   _min?: Prisma.DeliveryRequestMinOrderByAggregateInput
-  _sum?: Prisma.DeliveryRequestSumOrderByAggregateInput
 }
 
 export type DeliveryRequestScalarWhereWithAggregatesInput = {
@@ -399,10 +311,6 @@ export type DeliveryRequestScalarWhereWithAggregatesInput = {
   approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DeliveryRequest"> | Date | string | null
   deliveredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DeliveryRequest"> | Date | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"DeliveryRequest"> | string | null
-  distanceKm?: Prisma.DecimalNullableWithAggregatesFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.DecimalNullableWithAggregatesFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.DecimalNullableWithAggregatesFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DeliveryRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DeliveryRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DeliveryRequest"> | Date | string
 }
@@ -416,10 +324,6 @@ export type DeliveryRequestCreateInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   order?: Prisma.OrderCreateNestedOneWithoutDeliveryInput
@@ -437,10 +341,6 @@ export type DeliveryRequestUncheckedCreateInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -454,10 +354,6 @@ export type DeliveryRequestUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneWithoutDeliveryNestedInput
@@ -475,10 +371,6 @@ export type DeliveryRequestUncheckedUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -494,10 +386,6 @@ export type DeliveryRequestCreateManyInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -511,10 +399,6 @@ export type DeliveryRequestUpdateManyMutationInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -530,10 +414,6 @@ export type DeliveryRequestUncheckedUpdateManyInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -554,18 +434,8 @@ export type DeliveryRequestCountOrderByAggregateInput = {
   approvedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   notes?: Prisma.SortOrder
-  distanceKm?: Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrder
-  calculatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type DeliveryRequestAvgOrderByAggregateInput = {
-  distanceKm?: Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrder
 }
 
 export type DeliveryRequestMaxOrderByAggregateInput = {
@@ -579,10 +449,6 @@ export type DeliveryRequestMaxOrderByAggregateInput = {
   approvedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   notes?: Prisma.SortOrder
-  distanceKm?: Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrder
-  calculatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -598,18 +464,8 @@ export type DeliveryRequestMinOrderByAggregateInput = {
   approvedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   notes?: Prisma.SortOrder
-  distanceKm?: Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrder
-  calculatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type DeliveryRequestSumOrderByAggregateInput = {
-  distanceKm?: Prisma.SortOrder
-  estimatedWeight?: Prisma.SortOrder
-  deliveryFee?: Prisma.SortOrder
 }
 
 export type DeliveryRequestCreateNestedOneWithoutOrderInput = {
@@ -689,10 +545,6 @@ export type DeliveryRequestCreateWithoutOrderInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   partOrder?: Prisma.PartOrderCreateNestedOneWithoutDeliveryInput
@@ -708,10 +560,6 @@ export type DeliveryRequestUncheckedCreateWithoutOrderInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -741,10 +589,6 @@ export type DeliveryRequestUpdateWithoutOrderInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partOrder?: Prisma.PartOrderUpdateOneWithoutDeliveryNestedInput
@@ -760,10 +604,6 @@ export type DeliveryRequestUncheckedUpdateWithoutOrderInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -777,10 +617,6 @@ export type DeliveryRequestCreateWithoutPartOrderInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   order?: Prisma.OrderCreateNestedOneWithoutDeliveryInput
@@ -796,10 +632,6 @@ export type DeliveryRequestUncheckedCreateWithoutPartOrderInput = {
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
   notes?: string | null
-  distanceKm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -829,10 +661,6 @@ export type DeliveryRequestUpdateWithoutPartOrderInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneWithoutDeliveryNestedInput
@@ -848,10 +676,6 @@ export type DeliveryRequestUncheckedUpdateWithoutPartOrderInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  distanceKm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  estimatedWeight?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  deliveryFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  calculatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -869,10 +693,6 @@ export type DeliveryRequestSelect<ExtArgs extends runtime.Types.Extensions.Inter
   approvedAt?: boolean
   deliveredAt?: boolean
   notes?: boolean
-  distanceKm?: boolean
-  estimatedWeight?: boolean
-  deliveryFee?: boolean
-  calculatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
@@ -890,10 +710,6 @@ export type DeliveryRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   approvedAt?: boolean
   deliveredAt?: boolean
   notes?: boolean
-  distanceKm?: boolean
-  estimatedWeight?: boolean
-  deliveryFee?: boolean
-  calculatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
@@ -911,10 +727,6 @@ export type DeliveryRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   approvedAt?: boolean
   deliveredAt?: boolean
   notes?: boolean
-  distanceKm?: boolean
-  estimatedWeight?: boolean
-  deliveryFee?: boolean
-  calculatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
@@ -932,15 +744,11 @@ export type DeliveryRequestSelectScalar = {
   approvedAt?: boolean
   deliveredAt?: boolean
   notes?: boolean
-  distanceKm?: boolean
-  estimatedWeight?: boolean
-  deliveryFee?: boolean
-  calculatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DeliveryRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partOrderId" | "deliveryAddress" | "preferredTimeWindow" | "contactNumber" | "status" | "approvedAt" | "deliveredAt" | "notes" | "distanceKm" | "estimatedWeight" | "deliveryFee" | "calculatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["deliveryRequest"]>
+export type DeliveryRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partOrderId" | "deliveryAddress" | "preferredTimeWindow" | "contactNumber" | "status" | "approvedAt" | "deliveredAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["deliveryRequest"]>
 export type DeliveryRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
@@ -971,10 +779,6 @@ export type $DeliveryRequestPayload<ExtArgs extends runtime.Types.Extensions.Int
     approvedAt: Date | null
     deliveredAt: Date | null
     notes: string | null
-    distanceKm: runtime.Decimal | null
-    estimatedWeight: runtime.Decimal | null
-    deliveryFee: runtime.Decimal | null
-    calculatedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["deliveryRequest"]>
@@ -1412,10 +1216,6 @@ export interface DeliveryRequestFieldRefs {
   readonly approvedAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>
   readonly deliveredAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>
   readonly notes: Prisma.FieldRef<"DeliveryRequest", 'String'>
-  readonly distanceKm: Prisma.FieldRef<"DeliveryRequest", 'Decimal'>
-  readonly estimatedWeight: Prisma.FieldRef<"DeliveryRequest", 'Decimal'>
-  readonly deliveryFee: Prisma.FieldRef<"DeliveryRequest", 'Decimal'>
-  readonly calculatedAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>
 }

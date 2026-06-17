@@ -263,7 +263,6 @@ exports.DeliveryPricingScalarFieldEnum = {
     id: 'id',
     freeDistanceKm: 'freeDistanceKm',
     ratePerKm: 'ratePerKm',
-    ratePerKg: 'ratePerKg',
     effectiveFrom: 'effectiveFrom',
     effectiveTo: 'effectiveTo'
 };
@@ -279,7 +278,6 @@ exports.DeliveryRequestScalarFieldEnum = {
     deliveredAt: 'deliveredAt',
     notes: 'notes',
     distanceKm: 'distanceKm',
-    estimatedWeight: 'estimatedWeight',
     deliveryFee: 'deliveryFee',
     calculatedAt: 'calculatedAt',
     createdAt: 'createdAt',

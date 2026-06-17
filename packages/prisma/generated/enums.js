@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.OfferStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
+exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
 exports.UserRole = {
     ADMIN: 'ADMIN',
     MANAGER: 'MANAGER',
@@ -17,14 +17,6 @@ exports.BikeStatus = {
     RESERVED: 'RESERVED',
     SOLD: 'SOLD',
     IN_DELIVERY: 'IN_DELIVERY'
-};
-exports.OfferStatus = {
-    PENDING: 'PENDING',
-    COUNTERED: 'COUNTERED',
-    ACCEPTED: 'ACCEPTED',
-    REJECTED: 'REJECTED',
-    EXPIRED: 'EXPIRED',
-    PAID: 'PAID'
 };
 exports.OrderStatus = {
     PENDING_PAYMENT: 'PENDING_PAYMENT',

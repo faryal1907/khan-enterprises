@@ -63,11 +63,6 @@ export type PartInventory = Prisma.PartInventoryModel
  */
 export type StockMovement = Prisma.StockMovementModel
 /**
- * Model Offer
- * 
- */
-export type Offer = Prisma.OfferModel
-/**
  * Model Order
  * 
  */
@@ -92,11 +87,6 @@ export type PaymentTransaction = Prisma.PaymentTransactionModel
  * 
  */
 export type PartPaymentTransaction = Prisma.PartPaymentTransactionModel
-/**
- * Model DeliveryPricing
- * 
- */
-export type DeliveryPricing = Prisma.DeliveryPricingModel
 /**
  * Model DeliveryRequest
  * 
