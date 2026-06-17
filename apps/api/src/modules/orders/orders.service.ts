@@ -6,6 +6,8 @@ import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
+import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
+import { VerifyPaymentDto } from "./dto/verify-payment.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
@@ -369,7 +371,7 @@ export class OrdersService {
           data: {
             userId: user.id,
             userRole: user.role,
-            action: AuditAction.REFUND,
+            action: AuditAction.UPDATE,
             entityType: "Order",
             entityId: order.id,
             oldValue: { status: order.status },
@@ -401,6 +403,7 @@ export class OrdersService {
   /**
    * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
    * + order → PAID + offer → PAID, set bike → SOLD — all in one transaction
+   * For non-cash payments, set transaction to VERIFICATION_PENDING and order to PENDING_PAYMENT
    */
   async recordPayment(orderId: string, dto: RecordPaymentDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -440,36 +443,39 @@ export class OrdersService {
           amount: dto.amount,
           method: dto.method,
           gatewayReference: dto.referenceNumber || null,
-          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
         },
       });
 
-      // 4. Always set order → PAID, offer → PAID, bike → SOLD when admin records payment
-      await tx.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.PAID,
-          processedById: user.id,
-        },
-      });
-
-      if (order.offerId) {
-        await tx.offer.update({
-          where: { id: order.offerId },
+      // 4. For CASH payments: set order → PAID, offer → PAID, bike → SOLD
+      // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
+      if (dto.method === "CASH") {
+        await tx.order.update({
+          where: { id: orderId },
           data: {
-            status: "PAID",
+            status: OrderStatus.PAID,
+            processedById: user.id,
+          },
+        });
+
+        if (order.offerId) {
+          await tx.offer.update({
+            where: { id: order.offerId },
+            data: {
+              status: "PAID",
+            },
+          });
+        }
+
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
           },
         });
       }
-
-      await tx.bikeUnit.update({
-        where: { id: order.bikeId },
-        data: {
-          status: BikeStatus.SOLD,
-          soldAt: new Date(),
-          reservedUntil: null,
-        },
-      });
 
       await tx.auditLog.create({
         data: {
@@ -587,6 +593,9 @@ export class OrdersService {
           status: OrderStatus.CONFIRMED,
           expiresAt,
           processedById: user.id,
+          isOnlineOrder: false,
+          orderType: "ONSITE",
+          pickupType: "ONSITE_PICKUP",
         },
       });
 
@@ -768,6 +777,206 @@ export class OrdersService {
       });
 
       return updatedOrder;
+    });
+  }
+
+  /**
+   * Get orders awaiting payment verification
+   * For ADMIN and MANAGER roles
+   */
+  async getPendingVerificationOrders(user: any) {
+    const where: any = {
+      transactions: {
+        some: {
+          status: PaymentStatus.VERIFICATION_PENDING,
+        },
+      },
+    };
+
+    this.applyBranchScope(where, user);
+
+    const orders = await this.prisma.client.order.findMany({
+      where,
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+        offer: true,
+        branch: true,
+        transactions: {
+          where: {
+            status: PaymentStatus.VERIFICATION_PENDING,
+          },
+        },
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return orders;
+  }
+
+  /**
+   * Upload payment proof for an order
+   * For ADMIN, MANAGER, SALES_STAFF, and CUSTOMER roles
+   */
+  async uploadPaymentProof(orderId: string, dto: UploadPaymentProofDto, user: any) {
+    const order = await this.getOrderById(orderId, user);
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Cannot upload payment proof for order in ${order.status} status`
+      );
+    }
+
+    // Find the pending transaction
+    const transaction = await this.prisma.client.paymentTransaction.findFirst({
+      where: {
+        orderId,
+        status: PaymentStatus.VERIFICATION_PENDING,
+      },
+    });
+
+    if (!transaction) {
+      throw new BadRequestException(
+        "No pending verification transaction found for this order"
+      );
+    }
+
+    // Update transaction with payment proof URL
+    const updatedTransaction = await this.prisma.client.paymentTransaction.update({
+      where: { id: transaction.id },
+      data: {
+        paymentProofUrl: dto.paymentProofUrl,
+      },
+    });
+
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: AuditAction.UPDATE,
+        entityType: "PAYMENT_TRANSACTION",
+        entityId: transaction.id,
+        newValue: JSON.stringify({ paymentProofUrl: dto.paymentProofUrl }),
+      },
+    });
+
+    return updatedTransaction;
+  }
+
+  /**
+   * Verify payment for an order
+   * For ADMIN and MANAGER roles
+   * Updates transaction to SUCCESS, order to PAID, and bike to SOLD
+   */
+  async verifyPayment(orderId: string, dto: VerifyPaymentDto, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch order
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          bike: true,
+          offer: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      this.assertOrderAccess(order, user);
+
+      if (order.status !== OrderStatus.PENDING_PAYMENT) {
+        throw new BadRequestException(
+          `Order is not in PENDING_PAYMENT status. Current status: ${order.status}`
+        );
+      }
+
+      // 2. Fetch transaction
+      const transaction = await tx.paymentTransaction.findUnique({
+        where: { id: dto.transactionId },
+      });
+
+      if (!transaction) {
+        throw new NotFoundException(`Transaction with ID ${dto.transactionId} not found`);
+      }
+
+      if (transaction.orderId !== orderId) {
+        throw new BadRequestException(`Transaction does not belong to this order`);
+      }
+
+      if (transaction.status !== PaymentStatus.VERIFICATION_PENDING) {
+        throw new BadRequestException(
+          `Transaction is not in VERIFICATION_PENDING status. Current status: ${transaction.status}`
+        );
+      }
+
+      // 3. Update transaction to SUCCESS
+      const updatedTransaction = await tx.paymentTransaction.update({
+        where: { id: dto.transactionId },
+        data: {
+          status: PaymentStatus.SUCCESS,
+          verifiedAt: new Date(),
+          verifiedById: user.id,
+        },
+      });
+
+      // 4. Update order to PAID
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.PAID,
+          paymentVerified: true,
+          processedById: user.id,
+        },
+      });
+
+      // 5. Update offer to PAID if exists
+      if (order.offerId) {
+        await tx.offer.update({
+          where: { id: order.offerId },
+          data: {
+            status: "PAID",
+          },
+        });
+      }
+
+      // 6. Update bike to SOLD
+      await tx.bikeUnit.update({
+        where: { id: order.bikeId },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
+
+      // 7. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.PAYMENT,
+          entityType: "ORDER",
+          entityId: orderId,
+          newValue: JSON.stringify({ paymentVerified: true }),
+        },
+      });
+
+      return {
+        order: updatedOrder,
+        transaction: updatedTransaction,
+      };
     });
   }
 }

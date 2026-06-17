@@ -43,6 +43,9 @@ export type PartPaymentTransactionMinAggregateOutputType = {
   method: $Enums.PaymentMethod | null
   status: $Enums.PaymentStatus | null
   failureReason: string | null
+  paymentProofUrl: string | null
+  verifiedAt: Date | null
+  verifiedById: string | null
   webhookReceivedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -57,6 +60,9 @@ export type PartPaymentTransactionMaxAggregateOutputType = {
   method: $Enums.PaymentMethod | null
   status: $Enums.PaymentStatus | null
   failureReason: string | null
+  paymentProofUrl: string | null
+  verifiedAt: Date | null
+  verifiedById: string | null
   webhookReceivedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -72,6 +78,9 @@ export type PartPaymentTransactionCountAggregateOutputType = {
   status: number
   gatewayResponse: number
   failureReason: number
+  paymentProofUrl: number
+  verifiedAt: number
+  verifiedById: number
   webhookReceivedAt: number
   createdAt: number
   updatedAt: number
@@ -96,6 +105,9 @@ export type PartPaymentTransactionMinAggregateInputType = {
   method?: true
   status?: true
   failureReason?: true
+  paymentProofUrl?: true
+  verifiedAt?: true
+  verifiedById?: true
   webhookReceivedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -110,6 +122,9 @@ export type PartPaymentTransactionMaxAggregateInputType = {
   method?: true
   status?: true
   failureReason?: true
+  paymentProofUrl?: true
+  verifiedAt?: true
+  verifiedById?: true
   webhookReceivedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -125,6 +140,9 @@ export type PartPaymentTransactionCountAggregateInputType = {
   status?: true
   gatewayResponse?: true
   failureReason?: true
+  paymentProofUrl?: true
+  verifiedAt?: true
+  verifiedById?: true
   webhookReceivedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -227,6 +245,9 @@ export type PartPaymentTransactionGroupByOutputType = {
   status: $Enums.PaymentStatus
   gatewayResponse: runtime.JsonValue | null
   failureReason: string | null
+  paymentProofUrl: string | null
+  verifiedAt: Date | null
+  verifiedById: string | null
   webhookReceivedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -265,6 +286,9 @@ export type PartPaymentTransactionWhereInput = {
   status?: Prisma.EnumPaymentStatusFilter<"PartPaymentTransaction"> | $Enums.PaymentStatus
   gatewayResponse?: Prisma.JsonNullableFilter<"PartPaymentTransaction">
   failureReason?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  paymentProofUrl?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
+  verifiedById?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
@@ -281,6 +305,9 @@ export type PartPaymentTransactionOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   gatewayResponse?: Prisma.SortOrderInput | Prisma.SortOrder
   failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentProofUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedById?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -300,6 +327,9 @@ export type PartPaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumPaymentStatusFilter<"PartPaymentTransaction"> | $Enums.PaymentStatus
   gatewayResponse?: Prisma.JsonNullableFilter<"PartPaymentTransaction">
   failureReason?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  paymentProofUrl?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
+  verifiedById?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
@@ -316,6 +346,9 @@ export type PartPaymentTransactionOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   gatewayResponse?: Prisma.SortOrderInput | Prisma.SortOrder
   failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentProofUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedById?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -339,6 +372,9 @@ export type PartPaymentTransactionScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumPaymentStatusWithAggregatesFilter<"PartPaymentTransaction"> | $Enums.PaymentStatus
   gatewayResponse?: Prisma.JsonNullableWithAggregatesFilter<"PartPaymentTransaction">
   failureReason?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
+  paymentProofUrl?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartPaymentTransaction"> | Date | string | null
+  verifiedById?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartPaymentTransaction"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartPaymentTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PartPaymentTransaction"> | Date | string
@@ -353,6 +389,9 @@ export type PartPaymentTransactionCreateInput = {
   status?: $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -369,6 +408,9 @@ export type PartPaymentTransactionUncheckedCreateInput = {
   status?: $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -383,6 +425,9 @@ export type PartPaymentTransactionUpdateInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -399,6 +444,9 @@ export type PartPaymentTransactionUncheckedUpdateInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -414,6 +462,9 @@ export type PartPaymentTransactionCreateManyInput = {
   status?: $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -428,6 +479,9 @@ export type PartPaymentTransactionUpdateManyMutationInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -443,6 +497,9 @@ export type PartPaymentTransactionUncheckedUpdateManyInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -468,6 +525,9 @@ export type PartPaymentTransactionCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   gatewayResponse?: Prisma.SortOrder
   failureReason?: Prisma.SortOrder
+  paymentProofUrl?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
+  verifiedById?: Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -486,6 +546,9 @@ export type PartPaymentTransactionMaxOrderByAggregateInput = {
   method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   failureReason?: Prisma.SortOrder
+  paymentProofUrl?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
+  verifiedById?: Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -500,6 +563,9 @@ export type PartPaymentTransactionMinOrderByAggregateInput = {
   method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   failureReason?: Prisma.SortOrder
+  paymentProofUrl?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
+  verifiedById?: Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -560,6 +626,9 @@ export type PartPaymentTransactionCreateWithoutPartOrderInput = {
   status?: $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -574,6 +643,9 @@ export type PartPaymentTransactionUncheckedCreateWithoutPartOrderInput = {
   status?: $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -618,6 +690,9 @@ export type PartPaymentTransactionScalarWhereInput = {
   status?: Prisma.EnumPaymentStatusFilter<"PartPaymentTransaction"> | $Enums.PaymentStatus
   gatewayResponse?: Prisma.JsonNullableFilter<"PartPaymentTransaction">
   failureReason?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  paymentProofUrl?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
+  verifiedById?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
@@ -632,6 +707,9 @@ export type PartPaymentTransactionCreateManyPartOrderInput = {
   status?: $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -646,6 +724,9 @@ export type PartPaymentTransactionUpdateWithoutPartOrderInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -660,6 +741,9 @@ export type PartPaymentTransactionUncheckedUpdateWithoutPartOrderInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -674,6 +758,9 @@ export type PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderInput = {
   status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -691,6 +778,9 @@ export type PartPaymentTransactionSelect<ExtArgs extends runtime.Types.Extension
   status?: boolean
   gatewayResponse?: boolean
   failureReason?: boolean
+  paymentProofUrl?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -707,6 +797,9 @@ export type PartPaymentTransactionSelectCreateManyAndReturn<ExtArgs extends runt
   status?: boolean
   gatewayResponse?: boolean
   failureReason?: boolean
+  paymentProofUrl?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -723,6 +816,9 @@ export type PartPaymentTransactionSelectUpdateManyAndReturn<ExtArgs extends runt
   status?: boolean
   gatewayResponse?: boolean
   failureReason?: boolean
+  paymentProofUrl?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -739,12 +835,15 @@ export type PartPaymentTransactionSelectScalar = {
   status?: boolean
   gatewayResponse?: boolean
   failureReason?: boolean
+  paymentProofUrl?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartPaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "partOrderId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "webhookReceivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partPaymentTransaction"]>
+export type PartPaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "partOrderId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "webhookReceivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partPaymentTransaction"]>
 export type PartPaymentTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
 }
@@ -770,6 +869,9 @@ export type $PartPaymentTransactionPayload<ExtArgs extends runtime.Types.Extensi
     status: $Enums.PaymentStatus
     gatewayResponse: runtime.JsonValue | null
     failureReason: string | null
+    paymentProofUrl: string | null
+    verifiedAt: Date | null
+    verifiedById: string | null
     webhookReceivedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -1206,6 +1308,9 @@ export interface PartPaymentTransactionFieldRefs {
   readonly status: Prisma.FieldRef<"PartPaymentTransaction", 'PaymentStatus'>
   readonly gatewayResponse: Prisma.FieldRef<"PartPaymentTransaction", 'Json'>
   readonly failureReason: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
+  readonly paymentProofUrl: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
+  readonly verifiedAt: Prisma.FieldRef<"PartPaymentTransaction", 'DateTime'>
+  readonly verifiedById: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
   readonly webhookReceivedAt: Prisma.FieldRef<"PartPaymentTransaction", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"PartPaymentTransaction", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PartPaymentTransaction", 'DateTime'>

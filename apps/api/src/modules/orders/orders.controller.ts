@@ -10,6 +10,8 @@ import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
+import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
+import { VerifyPaymentDto } from "./dto/verify-payment.dto";
 import { PdfService } from "../pdf/pdf.service";
 import { Response } from "express";
 
@@ -128,6 +130,50 @@ export class OrdersController {
     @CurrentUser() user: any,
   ) {
     return this.ordersService.cancelOrder(id, dto, user);
+  }
+
+  /**
+   * GET /api/orders/pending-verification
+   * @Roles(ADMIN, MANAGER)
+   * Get orders awaiting payment verification
+   */
+  @Get("pending-verification")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async getPendingVerificationOrders(@CurrentUser() user: any) {
+    return this.ordersService.getPendingVerificationOrders(user);
+  }
+
+  /**
+   * POST /api/orders/:id/upload-payment-proof
+   * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
+   * Upload payment proof image
+   */
+  @Post(":id/upload-payment-proof")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async uploadPaymentProof(
+    @Param("id") id: string,
+    @Body() dto: UploadPaymentProofDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.uploadPaymentProof(id, dto, user);
+  }
+
+  /**
+   * POST /api/orders/:id/verify-payment
+   * @Roles(ADMIN, MANAGER)
+   * Admin verifies payment
+   */
+  @Post(":id/verify-payment")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async verifyPayment(
+    @Param("id") id: string,
+    @Body() dto: VerifyPaymentDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.verifyPayment(id, dto, user);
   }
 
   /**

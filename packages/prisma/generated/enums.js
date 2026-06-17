@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.OfferStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
+exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.OfferStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
 exports.UserRole = {
     ADMIN: 'ADMIN',
     MANAGER: 'MANAGER',
@@ -45,7 +45,7 @@ exports.PaymentStatus = {
     PENDING: 'PENDING',
     SUCCESS: 'SUCCESS',
     FAILED: 'FAILED',
-    REFUNDED: 'REFUNDED'
+    VERIFICATION_PENDING: 'VERIFICATION_PENDING'
 };
 exports.PaymentMethod = {
     CASH: 'CASH',
@@ -53,6 +53,14 @@ exports.PaymentMethod = {
     SAFEPAY: 'SAFEPAY',
     JAZZCASH: 'JAZZCASH',
     RAAST: 'RAAST'
+};
+exports.OrderType = {
+    ONLINE: 'ONLINE',
+    ONSITE: 'ONSITE'
+};
+exports.PickupType = {
+    DELIVERY: 'DELIVERY',
+    ONSITE_PICKUP: 'ONSITE_PICKUP'
 };
 exports.AuditAction = {
     CREATE: 'CREATE',
@@ -62,8 +70,7 @@ exports.AuditAction = {
     LOGOUT: 'LOGOUT',
     APPROVE: 'APPROVE',
     REJECT: 'REJECT',
-    PAYMENT: 'PAYMENT',
-    REFUND: 'REFUND'
+    PAYMENT: 'PAYMENT'
 };
 exports.InventoryMovementType = {
     STOCK_IN: 'STOCK_IN',

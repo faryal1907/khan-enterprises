@@ -63,6 +63,9 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get order(): Prisma.OrderDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get orderAlert(): Prisma.OrderAlertDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get partOrder(): Prisma.PartOrderDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
@@ -70,6 +73,9 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
         omit: OmitOpts;
     }>;
     get partPaymentTransaction(): Prisma.PartPaymentTransactionDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get deliveryPricing(): Prisma.DeliveryPricingDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
     get deliveryRequest(): Prisma.DeliveryRequestDelegate<ExtArgs, {

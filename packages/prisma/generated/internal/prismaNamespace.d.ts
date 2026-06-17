@@ -168,9 +168,11 @@ export declare const ModelName: {
     readonly StockMovement: "StockMovement";
     readonly Offer: "Offer";
     readonly Order: "Order";
+    readonly OrderAlert: "OrderAlert";
     readonly PartOrder: "PartOrder";
     readonly PaymentTransaction: "PaymentTransaction";
     readonly PartPaymentTransaction: "PartPaymentTransaction";
+    readonly DeliveryPricing: "DeliveryPricing";
     readonly DeliveryRequest: "DeliveryRequest";
     readonly Document: "Document";
     readonly AuditLog: "AuditLog";
@@ -186,7 +188,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryRequest" | "document" | "auditLog";
+        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryPricing" | "deliveryRequest" | "document" | "auditLog";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1004,6 +1006,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        OrderAlert: {
+            payload: Prisma.$OrderAlertPayload<ExtArgs>;
+            fields: Prisma.OrderAlertFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.OrderAlertFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.OrderAlertFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>;
+                };
+                findFirst: {
+                    args: Prisma.OrderAlertFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.OrderAlertFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>;
+                };
+                findMany: {
+                    args: Prisma.OrderAlertFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>[];
+                };
+                create: {
+                    args: Prisma.OrderAlertCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>;
+                };
+                createMany: {
+                    args: Prisma.OrderAlertCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.OrderAlertCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>[];
+                };
+                delete: {
+                    args: Prisma.OrderAlertDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>;
+                };
+                update: {
+                    args: Prisma.OrderAlertUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.OrderAlertDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.OrderAlertUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.OrderAlertUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>[];
+                };
+                upsert: {
+                    args: Prisma.OrderAlertUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>;
+                };
+                aggregate: {
+                    args: Prisma.OrderAlertAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateOrderAlert>;
+                };
+                groupBy: {
+                    args: Prisma.OrderAlertGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.OrderAlertGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.OrderAlertCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.OrderAlertCountAggregateOutputType> | number;
+                };
+            };
+        };
         PartOrder: {
             payload: Prisma.$PartOrderPayload<ExtArgs>;
             fields: Prisma.PartOrderFieldRefs;
@@ -1223,6 +1299,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 count: {
                     args: Prisma.PartPaymentTransactionCountArgs<ExtArgs>;
                     result: runtime.Types.Utils.Optional<Prisma.PartPaymentTransactionCountAggregateOutputType> | number;
+                };
+            };
+        };
+        DeliveryPricing: {
+            payload: Prisma.$DeliveryPricingPayload<ExtArgs>;
+            fields: Prisma.DeliveryPricingFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.DeliveryPricingFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.DeliveryPricingFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>;
+                };
+                findFirst: {
+                    args: Prisma.DeliveryPricingFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.DeliveryPricingFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>;
+                };
+                findMany: {
+                    args: Prisma.DeliveryPricingFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>[];
+                };
+                create: {
+                    args: Prisma.DeliveryPricingCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>;
+                };
+                createMany: {
+                    args: Prisma.DeliveryPricingCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.DeliveryPricingCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>[];
+                };
+                delete: {
+                    args: Prisma.DeliveryPricingDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>;
+                };
+                update: {
+                    args: Prisma.DeliveryPricingUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.DeliveryPricingDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.DeliveryPricingUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.DeliveryPricingUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>[];
+                };
+                upsert: {
+                    args: Prisma.DeliveryPricingUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryPricingPayload>;
+                };
+                aggregate: {
+                    args: Prisma.DeliveryPricingAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryPricing>;
+                };
+                groupBy: {
+                    args: Prisma.DeliveryPricingGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.DeliveryPricingGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.DeliveryPricingCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.DeliveryPricingCountAggregateOutputType> | number;
                 };
             };
         };
@@ -1549,6 +1699,8 @@ export declare const BikeUnitScalarFieldEnum: {
     readonly color: "color";
     readonly media: "media";
     readonly negotiatedPrice: "negotiatedPrice";
+    readonly onlineDiscountPercent: "onlineDiscountPercent";
+    readonly actualSalePrice: "actualSalePrice";
     readonly reservedUntil: "reservedUntil";
     readonly soldAt: "soldAt";
     readonly createdAt: "createdAt";
@@ -1616,14 +1768,29 @@ export declare const OrderScalarFieldEnum: {
     readonly customerCNIC: "customerCNIC";
     readonly customerAddress: "customerAddress";
     readonly negotiatedAmount: "negotiatedAmount";
+    readonly isOnlineOrder: "isOnlineOrder";
+    readonly appliedDiscount: "appliedDiscount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
+    readonly paymentVerified: "paymentVerified";
+    readonly orderType: "orderType";
+    readonly reservationExpiry: "reservationExpiry";
+    readonly pickupType: "pickupType";
     readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum];
+export declare const OrderAlertScalarFieldEnum: {
+    readonly id: "id";
+    readonly orderId: "orderId";
+    readonly userId: "userId";
+    readonly isRead: "isRead";
+    readonly alertType: "alertType";
+    readonly createdAt: "createdAt";
+};
+export type OrderAlertScalarFieldEnum = (typeof OrderAlertScalarFieldEnum)[keyof typeof OrderAlertScalarFieldEnum];
 export declare const PartOrderScalarFieldEnum: {
     readonly id: "id";
     readonly orderNumber: "orderNumber";
@@ -1637,6 +1804,10 @@ export declare const PartOrderScalarFieldEnum: {
     readonly amount: "amount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
+    readonly paymentVerified: "paymentVerified";
+    readonly orderType: "orderType";
+    readonly reservationExpiry: "reservationExpiry";
+    readonly pickupType: "pickupType";
     readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly createdAt: "createdAt";
@@ -1653,6 +1824,9 @@ export declare const PaymentTransactionScalarFieldEnum: {
     readonly status: "status";
     readonly gatewayResponse: "gatewayResponse";
     readonly failureReason: "failureReason";
+    readonly paymentProofUrl: "paymentProofUrl";
+    readonly verifiedAt: "verifiedAt";
+    readonly verifiedById: "verifiedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -1668,11 +1842,23 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly status: "status";
     readonly gatewayResponse: "gatewayResponse";
     readonly failureReason: "failureReason";
+    readonly paymentProofUrl: "paymentProofUrl";
+    readonly verifiedAt: "verifiedAt";
+    readonly verifiedById: "verifiedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum];
+export declare const DeliveryPricingScalarFieldEnum: {
+    readonly id: "id";
+    readonly freeDistanceKm: "freeDistanceKm";
+    readonly ratePerKm: "ratePerKm";
+    readonly ratePerKg: "ratePerKg";
+    readonly effectiveFrom: "effectiveFrom";
+    readonly effectiveTo: "effectiveTo";
+};
+export type DeliveryPricingScalarFieldEnum = (typeof DeliveryPricingScalarFieldEnum)[keyof typeof DeliveryPricingScalarFieldEnum];
 export declare const DeliveryRequestScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
@@ -1684,6 +1870,10 @@ export declare const DeliveryRequestScalarFieldEnum: {
     readonly approvedAt: "approvedAt";
     readonly deliveredAt: "deliveredAt";
     readonly notes: "notes";
+    readonly distanceKm: "distanceKm";
+    readonly estimatedWeight: "estimatedWeight";
+    readonly deliveryFee: "deliveryFee";
+    readonly calculatedAt: "calculatedAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -1760,8 +1950,13 @@ export type EnumOfferStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
 export type ListEnumOfferStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OfferStatus[]'>;
 export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>;
 export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>;
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>;
 export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>;
+export type EnumOrderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderType'>;
+export type ListEnumOrderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderType[]'>;
+export type EnumPickupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PickupType'>;
+export type ListEnumPickupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PickupType[]'>;
 export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus'>;
 export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>;
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>;
@@ -1810,9 +2005,11 @@ export type GlobalOmitConfig = {
     stockMovement?: Prisma.StockMovementOmit;
     offer?: Prisma.OfferOmit;
     order?: Prisma.OrderOmit;
+    orderAlert?: Prisma.OrderAlertOmit;
     partOrder?: Prisma.PartOrderOmit;
     paymentTransaction?: Prisma.PaymentTransactionOmit;
     partPaymentTransaction?: Prisma.PartPaymentTransactionOmit;
+    deliveryPricing?: Prisma.DeliveryPricingOmit;
     deliveryRequest?: Prisma.DeliveryRequestOmit;
     document?: Prisma.DocumentOmit;
     auditLog?: Prisma.AuditLogOmit;

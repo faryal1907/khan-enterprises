@@ -62,9 +62,11 @@ export const ModelName = {
   StockMovement: 'StockMovement',
   Offer: 'Offer',
   Order: 'Order',
+  OrderAlert: 'OrderAlert',
   PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
   PartPaymentTransaction: 'PartPaymentTransaction',
+  DeliveryPricing: 'DeliveryPricing',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
   AuditLog: 'AuditLog'
@@ -171,6 +173,8 @@ export const BikeUnitScalarFieldEnum = {
   color: 'color',
   media: 'media',
   negotiatedPrice: 'negotiatedPrice',
+  onlineDiscountPercent: 'onlineDiscountPercent',
+  actualSalePrice: 'actualSalePrice',
   reservedUntil: 'reservedUntil',
   soldAt: 'soldAt',
   createdAt: 'createdAt',
@@ -253,8 +257,14 @@ export const OrderScalarFieldEnum = {
   customerCNIC: 'customerCNIC',
   customerAddress: 'customerAddress',
   negotiatedAmount: 'negotiatedAmount',
+  isOnlineOrder: 'isOnlineOrder',
+  appliedDiscount: 'appliedDiscount',
   paymentMethod: 'paymentMethod',
   status: 'status',
+  paymentVerified: 'paymentVerified',
+  orderType: 'orderType',
+  reservationExpiry: 'reservationExpiry',
+  pickupType: 'pickupType',
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   createdAt: 'createdAt',
@@ -262,6 +272,18 @@ export const OrderScalarFieldEnum = {
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderAlertScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  userId: 'userId',
+  isRead: 'isRead',
+  alertType: 'alertType',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderAlertScalarFieldEnum = (typeof OrderAlertScalarFieldEnum)[keyof typeof OrderAlertScalarFieldEnum]
 
 
 export const PartOrderScalarFieldEnum = {
@@ -277,6 +299,10 @@ export const PartOrderScalarFieldEnum = {
   amount: 'amount',
   paymentMethod: 'paymentMethod',
   status: 'status',
+  paymentVerified: 'paymentVerified',
+  orderType: 'orderType',
+  reservationExpiry: 'reservationExpiry',
+  pickupType: 'pickupType',
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   createdAt: 'createdAt',
@@ -296,6 +322,9 @@ export const PaymentTransactionScalarFieldEnum = {
   status: 'status',
   gatewayResponse: 'gatewayResponse',
   failureReason: 'failureReason',
+  paymentProofUrl: 'paymentProofUrl',
+  verifiedAt: 'verifiedAt',
+  verifiedById: 'verifiedById',
   webhookReceivedAt: 'webhookReceivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -314,12 +343,27 @@ export const PartPaymentTransactionScalarFieldEnum = {
   status: 'status',
   gatewayResponse: 'gatewayResponse',
   failureReason: 'failureReason',
+  paymentProofUrl: 'paymentProofUrl',
+  verifiedAt: 'verifiedAt',
+  verifiedById: 'verifiedById',
   webhookReceivedAt: 'webhookReceivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
+
+
+export const DeliveryPricingScalarFieldEnum = {
+  id: 'id',
+  freeDistanceKm: 'freeDistanceKm',
+  ratePerKm: 'ratePerKm',
+  ratePerKg: 'ratePerKg',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo'
+} as const
+
+export type DeliveryPricingScalarFieldEnum = (typeof DeliveryPricingScalarFieldEnum)[keyof typeof DeliveryPricingScalarFieldEnum]
 
 
 export const DeliveryRequestScalarFieldEnum = {
@@ -333,6 +377,10 @@ export const DeliveryRequestScalarFieldEnum = {
   approvedAt: 'approvedAt',
   deliveredAt: 'deliveredAt',
   notes: 'notes',
+  distanceKm: 'distanceKm',
+  estimatedWeight: 'estimatedWeight',
+  deliveryFee: 'deliveryFee',
+  calculatedAt: 'calculatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

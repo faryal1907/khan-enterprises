@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderScalarFieldEnum = exports.OfferScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.DeliveryPricingScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.OfferScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
 const runtime = require("@prisma/client/runtime/client");
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -38,9 +38,11 @@ exports.ModelName = {
     StockMovement: 'StockMovement',
     Offer: 'Offer',
     Order: 'Order',
+    OrderAlert: 'OrderAlert',
     PartOrder: 'PartOrder',
     PaymentTransaction: 'PaymentTransaction',
     PartPaymentTransaction: 'PartPaymentTransaction',
+    DeliveryPricing: 'DeliveryPricing',
     DeliveryRequest: 'DeliveryRequest',
     Document: 'Document',
     AuditLog: 'AuditLog'
@@ -116,6 +118,8 @@ exports.BikeUnitScalarFieldEnum = {
     color: 'color',
     media: 'media',
     negotiatedPrice: 'negotiatedPrice',
+    onlineDiscountPercent: 'onlineDiscountPercent',
+    actualSalePrice: 'actualSalePrice',
     reservedUntil: 'reservedUntil',
     soldAt: 'soldAt',
     createdAt: 'createdAt',
@@ -178,12 +182,26 @@ exports.OrderScalarFieldEnum = {
     customerCNIC: 'customerCNIC',
     customerAddress: 'customerAddress',
     negotiatedAmount: 'negotiatedAmount',
+    isOnlineOrder: 'isOnlineOrder',
+    appliedDiscount: 'appliedDiscount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    paymentVerified: 'paymentVerified',
+    orderType: 'orderType',
+    reservationExpiry: 'reservationExpiry',
+    pickupType: 'pickupType',
     expiresAt: 'expiresAt',
     processedById: 'processedById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+exports.OrderAlertScalarFieldEnum = {
+    id: 'id',
+    orderId: 'orderId',
+    userId: 'userId',
+    isRead: 'isRead',
+    alertType: 'alertType',
+    createdAt: 'createdAt'
 };
 exports.PartOrderScalarFieldEnum = {
     id: 'id',
@@ -198,6 +216,10 @@ exports.PartOrderScalarFieldEnum = {
     amount: 'amount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    paymentVerified: 'paymentVerified',
+    orderType: 'orderType',
+    reservationExpiry: 'reservationExpiry',
+    pickupType: 'pickupType',
     expiresAt: 'expiresAt',
     processedById: 'processedById',
     createdAt: 'createdAt',
@@ -213,6 +235,9 @@ exports.PaymentTransactionScalarFieldEnum = {
     status: 'status',
     gatewayResponse: 'gatewayResponse',
     failureReason: 'failureReason',
+    paymentProofUrl: 'paymentProofUrl',
+    verifiedAt: 'verifiedAt',
+    verifiedById: 'verifiedById',
     webhookReceivedAt: 'webhookReceivedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -227,9 +252,20 @@ exports.PartPaymentTransactionScalarFieldEnum = {
     status: 'status',
     gatewayResponse: 'gatewayResponse',
     failureReason: 'failureReason',
+    paymentProofUrl: 'paymentProofUrl',
+    verifiedAt: 'verifiedAt',
+    verifiedById: 'verifiedById',
     webhookReceivedAt: 'webhookReceivedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
+};
+exports.DeliveryPricingScalarFieldEnum = {
+    id: 'id',
+    freeDistanceKm: 'freeDistanceKm',
+    ratePerKm: 'ratePerKm',
+    ratePerKg: 'ratePerKg',
+    effectiveFrom: 'effectiveFrom',
+    effectiveTo: 'effectiveTo'
 };
 exports.DeliveryRequestScalarFieldEnum = {
     id: 'id',
@@ -242,6 +278,10 @@ exports.DeliveryRequestScalarFieldEnum = {
     approvedAt: 'approvedAt',
     deliveredAt: 'deliveredAt',
     notes: 'notes',
+    distanceKm: 'distanceKm',
+    estimatedWeight: 'estimatedWeight',
+    deliveryFee: 'deliveryFee',
+    calculatedAt: 'calculatedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };

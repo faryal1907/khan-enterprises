@@ -48,7 +48,7 @@ export declare const PaymentStatus: {
     readonly PENDING: "PENDING";
     readonly SUCCESS: "SUCCESS";
     readonly FAILED: "FAILED";
-    readonly REFUNDED: "REFUNDED";
+    readonly VERIFICATION_PENDING: "VERIFICATION_PENDING";
 };
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 export declare const PaymentMethod: {
@@ -59,6 +59,16 @@ export declare const PaymentMethod: {
     readonly RAAST: "RAAST";
 };
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+export declare const OrderType: {
+    readonly ONLINE: "ONLINE";
+    readonly ONSITE: "ONSITE";
+};
+export type OrderType = (typeof OrderType)[keyof typeof OrderType];
+export declare const PickupType: {
+    readonly DELIVERY: "DELIVERY";
+    readonly ONSITE_PICKUP: "ONSITE_PICKUP";
+};
+export type PickupType = (typeof PickupType)[keyof typeof PickupType];
 export declare const AuditAction: {
     readonly CREATE: "CREATE";
     readonly UPDATE: "UPDATE";
@@ -68,7 +78,6 @@ export declare const AuditAction: {
     readonly APPROVE: "APPROVE";
     readonly REJECT: "REJECT";
     readonly PAYMENT: "PAYMENT";
-    readonly REFUND: "REFUND";
 };
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export declare const InventoryMovementType: {

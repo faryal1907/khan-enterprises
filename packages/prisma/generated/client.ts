@@ -95,6 +95,11 @@ export type Offer = Prisma.OfferModel
  */
 export type Order = Prisma.OrderModel
 /**
+ * Model OrderAlert
+ * 
+ */
+export type OrderAlert = Prisma.OrderAlertModel
+/**
  * Model PartOrder
  * 
  */
@@ -109,6 +114,11 @@ export type PaymentTransaction = Prisma.PaymentTransactionModel
  * 
  */
 export type PartPaymentTransaction = Prisma.PartPaymentTransactionModel
+/**
+ * Model DeliveryPricing
+ * 
+ */
+export type DeliveryPricing = Prisma.DeliveryPricingModel
 /**
  * Model DeliveryRequest
  * 
