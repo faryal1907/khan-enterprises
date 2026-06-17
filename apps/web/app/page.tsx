@@ -240,11 +240,11 @@ export default function Home() {
                 Email
               </h3>
               <a
-                href="mailto:ghulam.ali@gmail.com"
+                href="mailto:ghulam.ali9366@gmail.com"
                 className="text-lg hover:opacity-80 transition-opacity"
                 style={{ color: theme.accents.primary }}
               >
-                ghulam.ali@gmail.com
+                ghulam.ali9366@gmail.com
               </a>
             </div>
           </div>
