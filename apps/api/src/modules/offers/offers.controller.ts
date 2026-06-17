@@ -93,7 +93,7 @@ export class OffersController {
     @Body() dto: RejectOfferDto,
     @CurrentUser() user: any,
   ) {
-    return this.offersService.rejectOffer(id, dto, user.id);
+    return this.offersService.rejectOffer(id, dto, user);
   }
 
   /**
@@ -108,7 +108,7 @@ export class OffersController {
     @Body() dto: CounterOfferDto,
     @CurrentUser() user: any,
   ) {
-    return this.offersService.counterOffer(id, dto, user.id);
+    return this.offersService.counterOffer(id, dto, user);
   }
 
   /**

@@ -57,7 +57,7 @@ export default function BikeDetailPage() {
       return;
     }
 
-    if (!offerAmount || !customerName || !customerPhone) {
+    if (!offerAmount || !customerName || !customerPhone || !customerAddress) {
       setErrorMessage("Please fill in all required fields");
       return;
     }
@@ -73,7 +73,7 @@ export default function BikeDetailPage() {
         customerPhone,
         customerEmail: customerEmail || undefined,
         customerCNIC: customerCNIC || undefined,
-        customerAddress: customerAddress || undefined,
+        customerAddress,
         offerAmount: parseFloat(offerAmount.replace(/,/g, "")),
         message: message || undefined,
         paymentMethod: paymentMethod as any,
@@ -379,7 +379,7 @@ export default function BikeDetailPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        CNIC (Optional)
+                        CNIC
                       </label>
                       <input
                         type="text"
@@ -396,7 +396,7 @@ export default function BikeDetailPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Address (Optional)
+                        Address *
                       </label>
                       <textarea
                         value={customerAddress}

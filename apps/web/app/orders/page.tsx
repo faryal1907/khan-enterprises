@@ -2,16 +2,67 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { theme } from "@/lib/colors";
+import { theme, colors } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { getOrders } from "@/lib/api/orders";
 import { getPartOrders } from "@/lib/api/part-orders";
+
+function CountdownTimer({ expiresAt }: { expiresAt: string }) {
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(expiresAt).getTime();
+      const difference = expiry - now;
+
+      if (difference <= 0) {
+        return "Expired";
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
+      } else if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
+      }
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [expiresAt]);
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-full"
+      style={{
+        backgroundColor: timeLeft === "Expired" ? "#FEE2E2" : "#FEF3C7",
+        color: timeLeft === "Expired" ? "#991B1B" : "#92400E",
+        border: timeLeft === "Expired" ? "1px solid #EF4444" : "1px solid #F59E0B",
+      }}
+    >
+      <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: timeLeft === "Expired" ? "#EF4444" : "#F59E0B" }} />
+      {timeLeft === "Expired" ? "Order Expired" : `Pay in: ${timeLeft}`}
+    </div>
+  );
+}
 
 interface UnifiedOrder {
   id: string;
   orderNumber: string;
   status: string;
   createdAt: string;
+  expiresAt?: string;
   type: "BIKE" | "PART";
   
   // Bike order fields
@@ -47,29 +98,35 @@ export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<UnifiedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<"current" | "history">("current");
 
   useEffect(() => {
+    console.log('activeTab changed to:', activeTab);
     if (!user) {
       router.push("/login");
       return;
     }
     fetchOrders();
-  }, [user, router]);
+  }, [user, router, activeTab]);
+
+  // Log initial state
+  console.log('Initial activeTab:', activeTab);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
+      console.log('fetchOrders called with activeTab:', activeTab, 'fetching all orders (no isCompleted filter)');
       const [bikesRes, partsRes] = await Promise.all([
-        getOrders().catch(err => ({ orders: [] })),
-        getPartOrders().catch(err => [])
+        getOrders({}).catch(err => ({ orders: [] })),
+        getPartOrders({}).catch(err => ({ orders: [] }))
       ]);
-      
+
       const bikes: UnifiedOrder[] = (bikesRes.orders || []).map((o: any) => ({
         ...o,
         type: "BIKE"
       }));
-      
-      const parts: UnifiedOrder[] = (partsRes.orders || partsRes || []).map((o: any) => ({
+
+      const parts: UnifiedOrder[] = (partsRes.orders || []).map((o: any) => ({
         ...o,
         type: "PART"
       }));
@@ -77,7 +134,10 @@ export default function CustomerOrdersPage() {
       const merged = [...bikes, ...parts].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      
+
+      console.log('API response - bikes:', bikes.length, 'parts:', parts.length, 'merged:', merged.length);
+      console.log('All orders with statuses:', merged.map(o => ({ orderNumber: o.orderNumber, status: o.status, type: o.type })));
+
       setOrders(merged);
     } catch (err: any) {
       console.error("Failed to fetch orders:", err);
@@ -138,6 +198,15 @@ export default function CustomerOrdersPage() {
     return status.replace(/_/g, " ");
   };
 
+  // Filter orders based on activeTab
+  const filteredOrders = orders.filter((order) => {
+    const isOrderCompleted =
+      order.status === "DELIVERED" || order.status === "CANCELLED";
+    return activeTab === "history" ? isOrderCompleted : !isOrderCompleted;
+  });
+
+  console.log('Filtered orders for display:', filteredOrders.map(o => ({ orderNumber: o.orderNumber, status: o.status, type: o.type })));
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -159,6 +228,38 @@ export default function CustomerOrdersPage() {
           </p>
         </div>
 
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                console.log('Switching to current tab');
+                setActiveTab("current");
+              }}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: activeTab === "current" ? theme.accents.primary : theme.backgrounds.tertiary,
+                color: activeTab === "current" ? theme.text.inverse : theme.text.primary,
+              }}
+            >
+              Current Orders
+            </button>
+            <button
+              onClick={() => {
+                console.log('Switching to history tab');
+                setActiveTab("history");
+              }}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{
+                backgroundColor: activeTab === "history" ? theme.accents.primary : theme.backgrounds.tertiary,
+                color: activeTab === "history" ? theme.text.inverse : theme.text.primary,
+              }}
+            >
+              Order History
+            </button>
+          </div>
+        </div>
+
         {error && (
           <div
             className="rounded-xl p-6 mb-6"
@@ -168,28 +269,30 @@ export default function CustomerOrdersPage() {
           </div>
         )}
 
-        {orders.length === 0 && !error ? (
+        {filteredOrders.length === 0 && !error ? (
           <div
             className="rounded-xl p-12 text-center"
             style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
           >
             <p className="text-lg mb-4" style={{ color: theme.text.secondary }}>
-              You don't have any orders yet
+              {activeTab === "current" ? "You don't have any current orders" : "You don't have any order history"}
             </p>
-            <Link
-              href="/bikes"
-              className="inline-block px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
-            >
-              Browse Shop
-            </Link>
+            {activeTab === "current" && (
+              <Link
+                href="/bikes"
+                className="inline-block px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                style={{
+                  backgroundColor: theme.accents.primary,
+                  color: theme.text.inverse,
+                }}
+              >
+                Browse Shop
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.id}
                 className="rounded-xl p-6"
@@ -197,11 +300,11 @@ export default function CustomerOrdersPage() {
               >
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-3 mb-3 flex-wrap">
                       <span
                         className="inline-block px-3 py-1 text-xs font-medium rounded-full uppercase"
                         style={{
-                          backgroundColor: order.type === "BIKE" ? theme.accents.tertiary : theme.accents.primary,
+                          backgroundColor: order.type === "BIKE" ? colors.lime : theme.accents.primary,
                           color: theme.text.inverse,
                         }}
                       >
@@ -213,6 +316,9 @@ export default function CustomerOrdersPage() {
                       >
                         {getStatusLabel(order.status)}
                       </span>
+                      {activeTab === "current" && order.status === "PENDING_PAYMENT" && order.expiresAt && (
+                        <CountdownTimer expiresAt={order.expiresAt} />
+                      )}
                       <span className="text-xs" style={{ color: theme.text.muted }}>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </span>
@@ -257,7 +363,7 @@ export default function CustomerOrdersPage() {
                       </>
                     ) : null}
                   </div>
-                  {order.type === "BIKE" ? (
+                  {(order.type === "BIKE" || order.type === "PART") ? (
                     <Link
                       href={`/orders/${order.orderNumber}`}
                       className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity text-center"

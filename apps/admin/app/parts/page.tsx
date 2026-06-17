@@ -207,7 +207,7 @@ export default function PartsListPage() {
   // Compute summary stats
   const totalParts = parts.length;
   const lowStockItems = lowStockCount;
-  const outOfStockItems = parts.filter((p) => p.quantity === 0).length;
+  const outOfStockItems = parts.filter((p) => p.quantity - p.reservedQuantity === 0).length;
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -263,17 +263,7 @@ export default function PartsListPage() {
           <SummaryCard label="Total Parts" value={totalParts} />
           <SummaryCard label="Low Stock Items" value={lowStockItems} color={theme.accents.secondary} />
           <SummaryCard label="Out of Stock Items" value={outOfStockItems} color={theme.accents.primary} />
-          <div
-            className="rounded-lg p-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            {/* <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Total Inventory Value
-            </p>
-            <p className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-              ${totalValue.toLocaleString()}
-            </p> */}
-          </div>
+          
         </div>
 
         {/* Filters */}
@@ -378,7 +368,7 @@ export default function PartsListPage() {
                   Branch
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Quantity
+                  Available Quantity
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Reorder Level
@@ -414,7 +404,7 @@ export default function PartsListPage() {
                     key={part.id}
                     style={{
                       borderBottom: `1px solid ${theme.borders.light}`,
-                      backgroundColor: part.quantity < part.reorderLevel ? "rgba(245, 158, 11, 0.1)" : undefined,
+                      backgroundColor: (part.quantity - part.reservedQuantity) < part.reorderLevel ? "rgba(245, 158, 11, 0.1)" : undefined,
                     }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -432,8 +422,21 @@ export default function PartsListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center space-x-2">
-                        <span style={{ color: theme.text.primary }}>{part.quantity}</span>
-                        {part.quantity < part.reorderLevel && (
+                        <span style={{ color: theme.text.primary }}>{part.quantity - part.reservedQuantity}</span>
+                        {part.reservedQuantity > 0 && (
+                          <span
+                            className="px-2 py-1 text-xs font-medium rounded"
+                            style={{
+                              backgroundColor: theme.backgrounds.tertiary,
+                              color: theme.text.secondary,
+                              border: `1px solid ${theme.borders.medium}`,
+                            }}
+                            title={`${part.reservedQuantity} reserved`}
+                          >
+                            {part.reservedQuantity} reserved
+                          </span>
+                        )}
+                        {(part.quantity - part.reservedQuantity) < part.reorderLevel && (
                           <span
                             className="px-2 py-1 text-xs font-medium rounded"
                             style={{

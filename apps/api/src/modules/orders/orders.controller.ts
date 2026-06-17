@@ -62,8 +62,21 @@ export class OrdersController {
   }
 
   /**
+   * GET /api/orders/branch/:branchId
+   * @Roles(ADMIN, MANAGER)
+   * NOTE: Must be defined before GET /orders/:id to avoid route shadowing
+   */
+  @Get("branch/:branchId")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async getOrdersByBranch(@Param("branchId") branchId: string) {
+    return this.ordersService.getOrdersByBranch(branchId);
+  }
+
+  /**
    * GET /api/orders/:id
    * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * NOTE: Must be defined after all specific routes to avoid shadowing them
    */
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -133,17 +146,6 @@ export class OrdersController {
   }
 
   /**
-   * GET /api/orders/branch/:branchId
-   * @Roles(ADMIN, MANAGER)
-   */
-  @Get("branch/:branchId")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MANAGER")
-  async getOrdersByBranch(@Param("branchId") branchId: string, @CurrentUser() user: any) {
-    return this.ordersService.getOrdersByBranch(branchId, user);
-  }
-
-  /**
    * POST /api/orders/manual
    * @Roles(ADMIN, MANAGER, SALES_STAFF)
    */
@@ -155,6 +157,36 @@ export class OrdersController {
     @CurrentUser() user: any,
   ) {
     return this.ordersService.createManualOrder(dto, user);
+  }
+
+  /**
+   * POST /api/orders/:id/complete-onsite
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * Mark order as completed for onsite purchases
+   */
+  @Post(":id/complete-onsite")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async markOrderAsCompletedOnsite(
+    @Param("id") id: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.markOrderAsCompletedOnsite(id, user);
+  }
+
+  /**
+   * PATCH /api/orders/:id/picked-up
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * Mark order as picked up by customer (no delivery)
+   */
+  @Patch(":id/picked-up")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async markAsPickedByCustomer(
+    @Param("id") id: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.markAsPickedByCustomer(id, user);
   }
 
   /**

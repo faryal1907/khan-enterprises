@@ -4,7 +4,58 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { getOrderByNumber } from "@/lib/api/orders";
+import { getPartOrderByNumber } from "@/lib/api/part-orders";
 import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
+
+function CountdownTimer({ expiresAt }: { expiresAt: string }) {
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const expiry = new Date(expiresAt).getTime();
+      const difference = expiry - now;
+
+      if (difference <= 0) {
+        return "Expired";
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`;
+      } else if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
+      }
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [expiresAt]);
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-full"
+      style={{
+        backgroundColor: timeLeft === "Expired" ? "#FEE2E2" : "#FEF3C7",
+        color: timeLeft === "Expired" ? "#991B1B" : "#92400E",
+        border: timeLeft === "Expired" ? "1px solid #EF4444" : "1px solid #F59E0B",
+      }}
+    >
+      <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: timeLeft === "Expired" ? "#EF4444" : "#F59E0B" }} />
+      {timeLeft === "Expired" ? "Order Expired" : `Pay in: ${timeLeft}`}
+    </div>
+  );
+}
 
 interface Order {
   id: string;
@@ -12,13 +63,18 @@ interface Order {
   status: string;
   customerName: string;
   customerPhone: string;
-  customerCNIC: string;
+  customerCNIC?: string;
   customerAddress: string;
-  negotiatedAmount: number;
+  negotiatedAmount?: number;
+  amount?: number;
   paymentMethod: string;
   createdAt: string;
   updatedAt: string;
-  bike: {
+  expiresAt?: string;
+  type: "BIKE" | "PART";
+  
+  // Bike order fields
+  bike?: {
     id: string;
     chassisNumber: string;
     engineNumber: string;
@@ -36,6 +92,22 @@ interface Order {
       phoneNumber: string | null;
     };
   };
+  
+  // Part order fields
+  part?: {
+    id: string;
+    name: string;
+    sku: string;
+  };
+  quantity?: number;
+  branch?: {
+    id: string;
+    name: string;
+    city: string;
+    address: string;
+    phoneNumber: string | null;
+  };
+  
   transactions: Array<{
     id: string;
     amount: number;
@@ -79,8 +151,16 @@ export default function OrderStatusPage() {
   const fetchOrder = async () => {
     try {
       setLoading(true);
-      const data = await getOrderByNumber(orderNumber as string);
-      setOrder(data);
+      const orderNum = orderNumber as string;
+      
+      // Detect if it's a part order by the order number prefix
+      if (orderNum.startsWith("PART-")) {
+        const data = await getPartOrderByNumber(orderNum);
+        setOrder({ ...data, type: "PART" });
+      } else {
+        const data = await getOrderByNumber(orderNum);
+        setOrder({ ...data, type: "BIKE" });
+      }
     } catch (err: any) {
       console.error("Failed to fetch order:", err);
       setError(err.response?.data?.message || "Failed to load order details");
@@ -95,7 +175,7 @@ export default function OrderStatusPage() {
     try {
       setSubmittingDelivery(true);
       setDeliveryError("");
-      await createDeliveryRequest(order.id, deliveryForm);
+      await createDeliveryRequest(order.id, deliveryForm, order.type);
       // Refresh order data to show delivery status
       await fetchOrder();
       setShowDeliveryForm(false);
@@ -219,10 +299,13 @@ export default function OrderStatusPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <div>
-                <h2 className="text-lg font-semibold mb-2" style={{ color: "#92400E" }}>
-                  Payment Pending
-                </h2>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-lg font-semibold" style={{ color: "#92400E" }}>
+                    Payment Pending
+                  </h2>
+                  <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />
+                </div>
                 <p className="text-sm" style={{ color: "#92400E" }}>
                   Please visit your nearest branch to complete payment and confirm your order.
                 </p>
@@ -412,7 +495,7 @@ export default function OrderStatusPage() {
             </div>
 
             {/* Payment Status */}
-            {order.transactions && order.transactions.length > 0 && (
+            {order.transactions && order.transactions.length > 0 && order.status !== "PENDING_PAYMENT" && (
               <div className="flex gap-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -507,34 +590,62 @@ export default function OrderStatusPage() {
         </div>
 
         {/* Bike Information */}
-        <div
-          className="rounded-xl p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
-            Bike Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Brand</p>
-              <p className="font-medium" style={{ color: theme.text.primary }}>{order.bike.model.brand}</p>
-            </div>
-            <div>
-              <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Model</p>
-              <p className="font-medium" style={{ color: theme.text.primary }}>
-                {order.bike.model.modelName} ({order.bike.model.year})
-              </p>
-            </div>
-            <div>
-              <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Chassis Number</p>
-              <p className="font-medium" style={{ color: theme.text.primary }}>{order.bike.chassisNumber}</p>
-            </div>
-            <div>
-              <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Engine Number</p>
-              <p className="font-medium" style={{ color: theme.text.primary }}>{order.bike.engineNumber}</p>
+        {order.type === "BIKE" && order.bike && (
+          <div
+            className="rounded-xl p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Bike Details
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Brand</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>{order.bike.model.brand}</p>
+              </div>
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Model</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>
+                  {order.bike.model.modelName} ({order.bike.model.year})
+                </p>
+              </div>
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Chassis Number</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>{order.bike.chassisNumber}</p>
+              </div>
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Engine Number</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>{order.bike.engineNumber}</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Part Information */}
+        {order.type === "PART" && order.part && (
+          <div
+            className="rounded-xl p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Part Details
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Part Name</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>{order.part.name}</p>
+              </div>
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>SKU</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>{order.part.sku}</p>
+              </div>
+              <div>
+                <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Quantity</p>
+                <p className="font-medium" style={{ color: theme.text.primary }}>{order.quantity}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Order Summary */}
         <div
@@ -546,9 +657,11 @@ export default function OrderStatusPage() {
           </h2>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm" style={{ color: theme.text.secondary }}>Negotiated Amount</span>
+              <span className="text-sm" style={{ color: theme.text.secondary }}>
+                {order.type === "BIKE" ? "Negotiated Amount" : "Amount"}
+              </span>
               <span className="font-semibold" style={{ color: theme.text.primary }}>
-                PKR {Number(order.negotiatedAmount).toLocaleString()}
+                PKR {Number(order.type === "BIKE" ? order.negotiatedAmount : order.amount).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
@@ -558,8 +671,10 @@ export default function OrderStatusPage() {
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: theme.text.secondary }}>Branch</span>
               <span className="font-medium" style={{ color: theme.text.primary }}>
-                {order.bike.branch?.name && order.bike.branch?.city
+                {order.type === "BIKE" && order.bike?.branch?.name && order.bike.branch?.city
                   ? `${order.bike.branch.name}, ${order.bike.branch.city}`
+                  : order.type === "PART" && order.branch?.name && order.branch?.city
+                  ? `${order.branch.name}, ${order.branch.city}`
                   : "Not available"}
               </span>
             </div>
@@ -606,7 +721,7 @@ export default function OrderStatusPage() {
         )}
 
         {/* Branch Information */}
-        {order.bike.branch && (
+        {(order.type === "BIKE" && order.bike?.branch) || (order.type === "PART" && order.branch) ? (
           <div
             className="rounded-xl p-6"
             style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
@@ -616,19 +731,19 @@ export default function OrderStatusPage() {
             </h2>
             <div className="space-y-2">
               <p className="text-sm" style={{ color: theme.text.secondary }}>
-                <span className="font-medium" style={{ color: theme.text.primary }}>Name:</span> {order.bike.branch.name}
+                <span className="font-medium" style={{ color: theme.text.primary }}>Name:</span> {order.type === "BIKE" ? order.bike?.branch?.name : order.branch?.name}
               </p>
               <p className="text-sm" style={{ color: theme.text.secondary }}>
-                <span className="font-medium" style={{ color: theme.text.primary }}>Address:</span> {order.bike.branch.address}
+                <span className="font-medium" style={{ color: theme.text.primary }}>Address:</span> {order.type === "BIKE" ? order.bike?.branch?.address : order.branch?.address}
               </p>
-              {order.bike.branch.phoneNumber && (
+              {(order.type === "BIKE" ? order.bike?.branch?.phoneNumber : order.branch?.phoneNumber) && (
                 <p className="text-sm" style={{ color: theme.text.secondary }}>
-                  <span className="font-medium" style={{ color: theme.text.primary }}>Phone:</span> {order.bike.branch.phoneNumber}
+                  <span className="font-medium" style={{ color: theme.text.primary }}>Phone:</span> {order.type === "BIKE" ? order.bike?.branch?.phoneNumber : order.branch?.phoneNumber}
                 </p>
               )}
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Bookmark Reminder */}
         <div

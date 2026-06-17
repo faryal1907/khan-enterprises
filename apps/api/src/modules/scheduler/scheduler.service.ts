@@ -1,28 +1,21 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { PrismaService } from "../../prisma/prisma.service";
-import { OfferStatus, BikeStatus, OrderStatus } from "@khan/prisma";
+import { BikeStatus, OrderStatus } from "@khan/prisma";
 
 @Injectable()
 export class SchedulerService {
   private readonly logger = new Logger(SchedulerService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
-   * Offer expiry is handled by reservation cleanup.
-   * Pending and countered offers do not have a countdown.
-   */
-  @Cron(CronExpression.EVERY_HOUR)
-  async expireOffers() {
-    this.logger.log("Running expireOffers cron job...");
-
-    this.logger.log("Offer expiry is handled by releaseExpiredReservations for accepted unpaid offers.");
-  }
-
-  /**
-   * Release expired accepted-unpaid reservations.
-   * The pending order is cancelled, the accepted offer expires, and the bike is released.
+   * Task 1 — Release expired reservations (every 15 minutes)
+   * Find all bikes where status = RESERVED AND reservedUntil < now
+   * → For each bike:
+   *     Check if it has an Order with status = PENDING_PAYMENT and offerId linked
+   *     If yes → update Order status → CANCELLED
+   *     Update bike: status → AVAILABLE, reservedUntil → null
    */
   @Cron(CronExpression.EVERY_10_MINUTES)
   async releaseExpiredReservations() {
@@ -108,6 +101,101 @@ export class SchedulerService {
       );
     } catch (error) {
       this.logger.error("Error in releaseExpiredReservations cron job:", error);
+    }
+  }
+
+  /**
+   * Task 3 — Expire orders with pending payment timeout (every hour)
+   * Find all orders (bike and part) where status = PENDING_PAYMENT AND expiresAt < now
+   * → Cancel those orders and return items to inventory
+   */
+  @Cron(CronExpression.EVERY_HOUR)
+  async expirePendingPaymentOrders() {
+    this.logger.log("Running expirePendingPaymentOrders cron job...");
+
+    try {
+      const now = new Date();
+
+      // Find expired bike orders
+      const expiredBikeOrders = await this.prisma.client.order.findMany({
+        where: {
+          status: OrderStatus.PENDING_PAYMENT,
+          expiresAt: {
+            lt: now,
+          },
+        },
+        include: {
+          bike: true,
+        },
+      });
+
+      // Find expired part orders
+      const expiredPartOrders = await this.prisma.client.partOrder.findMany({
+        where: {
+          status: OrderStatus.PENDING_PAYMENT,
+          expiresAt: {
+            lt: now,
+          },
+        },
+        include: {
+          partInventory: true,
+        },
+      });
+
+      if (expiredBikeOrders.length === 0 && expiredPartOrders.length === 0) {
+        this.logger.log("No expired orders found.");
+        return;
+      }
+
+      // Cancel expired bike orders
+      for (const order of expiredBikeOrders) {
+        await this.prisma.client.$transaction(async (tx) => {
+          await tx.order.update({
+            where: { id: order.id },
+            data: { status: OrderStatus.CANCELLED },
+          });
+
+          // Return bike to AVAILABLE status
+          await tx.bikeUnit.update({
+            where: { id: order.bikeId },
+            data: {
+              status: BikeStatus.AVAILABLE,
+              reservedUntil: null,
+              soldAt: null,
+            },
+          });
+
+          this.logger.log(`Cancelled expired bike order ${order.orderNumber}`);
+        });
+      }
+
+      // Cancel expired part orders
+      for (const order of expiredPartOrders) {
+        await this.prisma.client.$transaction(async (tx) => {
+          await tx.partOrder.update({
+            where: { id: order.id },
+            data: { status: OrderStatus.CANCELLED },
+          });
+
+          // Release reserved stock
+          await tx.partInventory.update({
+            where: { id: order.partInventoryId },
+            data: {
+              reservedQuantity: {
+                decrement: order.quantity,
+              },
+            },
+          });
+
+          this.logger.log(`Cancelled expired part order ${order.orderNumber}`);
+        });
+      }
+
+      this.logger.log(
+        `Expired ${expiredBikeOrders.length} bike order(s) and ${expiredPartOrders.length} part order(s).`,
+      );
+    } catch (error) {
+      this.logger.error("Error in expirePendingPaymentOrders cron job:", error);
     }
   }
 }

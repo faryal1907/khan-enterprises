@@ -17,7 +17,6 @@ interface Offer {
   message: string | null;
   adminResponse: string | null;
   status: string;
-  expiresAt: string | null;
   createdAt: string;
   bike: {
     id: string;
@@ -139,12 +138,6 @@ export default function OfferStatusPage() {
           color: "#1E40AF",
           border: "1px solid #3B82F6",
         };
-      case "EXPIRED":
-        return {
-          backgroundColor: "#F3F4F6",
-          color: "#374151",
-          border: "1px solid #6B7280",
-        };
       default:
         return {
           backgroundColor: theme.backgrounds.tertiary,
@@ -180,25 +173,6 @@ export default function OfferStatusPage() {
   const isPaid = offer.status === "PAID";
   const isPending = offer.status === "PENDING";
   const isRejected = offer.status === "REJECTED";
-  const isExpired = offer.status === "EXPIRED";
-
-  // Calculate time remaining until expiry
-  const getTimeRemaining = () => {
-    if (!isAccepted) return null;
-    if (!offer.expiresAt) return null;
-    const now = new Date();
-    const expiry = new Date(offer.expiresAt);
-    const diff = expiry.getTime() - now.getTime();
-    
-    if (diff <= 0) return null;
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
-    return { hours, minutes };
-  };
-
-  const timeRemaining = getTimeRemaining();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -221,11 +195,6 @@ export default function OfferStatusPage() {
           >
             {offer.status}
           </span>
-          {timeRemaining && (
-            <span className="ml-3 text-sm" style={{ color: theme.text.secondary }}>
-              Expires in {timeRemaining.hours}h {timeRemaining.minutes}m
-            </span>
-          )}
         </div>
 
         {/* Negotiation Timeline */}
@@ -310,7 +279,7 @@ export default function OfferStatusPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold mb-1" style={{ color: theme.text.primary }}>Offer Accepted</h3>
                   <p className="text-sm" style={{ color: theme.text.secondary }}>
-              Your offer was accepted and an order has been created. Complete payment before the reservation expires.
+                    Your offer was accepted and an order has been created. Complete payment before the reservation expires.
                   </p>
                 </div>
               </div>
@@ -340,7 +309,7 @@ export default function OfferStatusPage() {
             <div>
               <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Listed Price</p>
               <p className="font-medium" style={{ color: theme.text.primary }}>
-                PKR {Number(offer.bike.price || offer.bike.model.basePrice).toLocaleString()}
+                PKR {Number(offer.bike.model.basePrice).toLocaleString()}
               </p>
             </div>
             <div>

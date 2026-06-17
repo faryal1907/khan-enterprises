@@ -1599,7 +1599,6 @@ export declare const OfferScalarFieldEnum: {
     readonly message: "message";
     readonly adminResponse: "adminResponse";
     readonly status: "status";
-    readonly expiresAt: "expiresAt";
     readonly paymentMethod: "paymentMethod";
     readonly createdById: "createdById";
     readonly createdAt: "createdAt";
@@ -1619,6 +1618,7 @@ export declare const OrderScalarFieldEnum: {
     readonly negotiatedAmount: "negotiatedAmount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
+    readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -1637,6 +1637,7 @@ export declare const PartOrderScalarFieldEnum: {
     readonly amount: "amount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
+    readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -1675,6 +1676,7 @@ export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransacti
 export declare const DeliveryRequestScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
+    readonly partOrderId: "partOrderId";
     readonly deliveryAddress: "deliveryAddress";
     readonly preferredTimeWindow: "preferredTimeWindow";
     readonly contactNumber: "contactNumber";

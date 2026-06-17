@@ -28,8 +28,7 @@ export class OffersService {
   }
 
   /**
-   * Create offer, verify bike is AVAILABLE, status PENDING.
-   * expiresAt is only used for accepted offers while payment is pending.
+   * Create offer, verify bike is AVAILABLE, status PENDING
    */
   async createOffer(dto: CreateOfferDto, userId?: string) {
     // Verify bike exists and is AVAILABLE
@@ -56,7 +55,6 @@ export class OffersService {
         offerAmount: dto.offerAmount,
         message: dto.message,
         status: OfferStatus.PENDING,
-        expiresAt: null,
         paymentMethod: dto.paymentMethod,
         createdById: userId,
       },
@@ -73,12 +71,16 @@ export class OffersService {
 
   /**
    * Paginated list with filters on status, bikeId. Include bike + model info
+   * By default excludes ACCEPTED and PAID offers (converted to orders) unless includeConverted=true
    */
   async getOffers(query: QueryOffersDto, user?: any) {
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
+    } else if (!query.includeConverted) {
+      // By default, exclude ACCEPTED and PAID offers (they've been converted to orders)
+      where.status = { notIn: [OfferStatus.ACCEPTED, OfferStatus.PAID] };
     }
 
     if (query.bikeId) {
@@ -238,6 +240,10 @@ export class OffersService {
       // 5. Create Order
       const orderNumber = generateOrderNumber();
       const negotiatedAmount = offer.counterAmount || offer.offerAmount;
+      
+      // Set expiresAt to 1 week from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
       const order = await tx.order.create({
         data: {
@@ -247,11 +253,12 @@ export class OffersService {
           branchId: bike.branchId,
           customerName: offer.customerName,
           customerPhone: offer.customerPhone,
-          customerCNIC: offer.customerCNIC || "",
+          customerCNIC: offer.customerCNIC,
           customerAddress: offer.customerAddress || "",
           negotiatedAmount,
           paymentMethod: offer.paymentMethod || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
+          expiresAt,
           processedById: user.id,
         },
       });
@@ -323,8 +330,7 @@ export class OffersService {
   }
 
   /**
-   * Set offer -> COUNTERED, store counterAmount + adminResponse.
-   * Expiry is only set once an offer is accepted and awaiting payment.
+   * Set offer → COUNTERED, store counterAmount + adminResponse
    */
   async counterOffer(id: string, dto: CounterOfferDto, user: any) {
     const offer = await this.getOfferById(id, user);
@@ -340,7 +346,6 @@ export class OffersService {
           status: OfferStatus.COUNTERED,
           counterAmount: dto.counterAmount,
           adminResponse: dto.adminResponse,
-          expiresAt: null,
         },
         include: {
           bike: {
@@ -432,6 +437,10 @@ export class OffersService {
       // 5. Create Order (without processedById since customer is accepting)
       const orderNumber = generateOrderNumber();
       const negotiatedAmount = offer.counterAmount || offer.offerAmount;
+      
+      // Set expiresAt to 1 week from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
       const order = await tx.order.create({
         data: {
@@ -441,11 +450,12 @@ export class OffersService {
           branchId: bike.branchId,
           customerName: offer.customerName,
           customerPhone: offer.customerPhone,
-          customerCNIC: offer.customerCNIC || "",
+          customerCNIC: offer.customerCNIC,
           customerAddress: offer.customerAddress || "",
           negotiatedAmount,
           paymentMethod: (paymentMethod as PaymentMethod) || PaymentMethod.CASH,
           status: OrderStatus.PENDING_PAYMENT,
+          expiresAt,
           processedById: null,
         },
       });
@@ -519,6 +529,9 @@ export class OffersService {
 
     if (query.status) {
       where.status = query.status;
+    } else if (!query.includeConverted) {
+      // By default, exclude ACCEPTED and PAID offers (they've been converted to orders)
+      where.status = { notIn: [OfferStatus.ACCEPTED, OfferStatus.PAID] };
     }
 
     const page = query.page || 1;

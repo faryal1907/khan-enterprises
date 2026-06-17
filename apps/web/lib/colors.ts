@@ -1,9 +1,16 @@
+// lib/colors.ts
 export const colors = {
-  navy: "#0A1931",
-  sky: "#B3CFE5",
-  azure: "#4A7FA7",
-  ocean: "#1A3D63",
-  ice: "#F6FAFD",
+  // Maroon family (replaces the old navy/blue tones)
+  maroon: "#5E1414", // deepest maroon  (was navy)
+  maroonDeep: "#7A1F1F", // primary maroon (was ocean)
+  maroonSoft: "#9E3B3B", // lighter maroon (was azure)
+  maroonTint: "#E9C9C9", // soft maroon tint (was sky)
+  blush: "#FBF4F4", // very light maroon-tinted background (was ice)
+
+  // Lime accent
+  lime: "#B7D640",
+  limeSoft: "#D3E883",
+
   white: "#FFFFFF",
   gray50: "#FAFAFA",
   gray100: "#F5F5F5",
@@ -20,22 +27,22 @@ export const colors = {
 export const theme = {
   colors,
   backgrounds: {
-    primary: colors.ice,
+    primary: colors.blush,
     secondary: colors.white,
     tertiary: colors.gray50,
-    dark: colors.navy,
+    dark: colors.maroon,
   },
   text: {
-    primary: colors.navy,
+    primary: colors.maroon,
     secondary: colors.gray600,
     muted: colors.gray400,
     inverse: colors.white,
   },
   accents: {
-    primary: colors.ocean,
-    secondary: colors.azure,
-    tertiary: colors.sky,
-    highlight: colors.navy,
+    primary: colors.maroonDeep,
+    secondary: colors.lime,
+    tertiary: colors.maroonTint,
+    highlight: colors.lime,
   },
   borders: {
     light: colors.gray200,

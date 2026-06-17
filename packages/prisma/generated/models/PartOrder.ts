@@ -49,6 +49,7 @@ export type PartOrderMinAggregateOutputType = {
   amount: runtime.Decimal | null
   paymentMethod: $Enums.PaymentMethod | null
   status: $Enums.OrderStatus | null
+  expiresAt: Date | null
   processedById: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -67,6 +68,7 @@ export type PartOrderMaxAggregateOutputType = {
   amount: runtime.Decimal | null
   paymentMethod: $Enums.PaymentMethod | null
   status: $Enums.OrderStatus | null
+  expiresAt: Date | null
   processedById: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -85,6 +87,7 @@ export type PartOrderCountAggregateOutputType = {
   amount: number
   paymentMethod: number
   status: number
+  expiresAt: number
   processedById: number
   createdAt: number
   updatedAt: number
@@ -115,6 +118,7 @@ export type PartOrderMinAggregateInputType = {
   amount?: true
   paymentMethod?: true
   status?: true
+  expiresAt?: true
   processedById?: true
   createdAt?: true
   updatedAt?: true
@@ -133,6 +137,7 @@ export type PartOrderMaxAggregateInputType = {
   amount?: true
   paymentMethod?: true
   status?: true
+  expiresAt?: true
   processedById?: true
   createdAt?: true
   updatedAt?: true
@@ -151,6 +156,7 @@ export type PartOrderCountAggregateInputType = {
   amount?: true
   paymentMethod?: true
   status?: true
+  expiresAt?: true
   processedById?: true
   createdAt?: true
   updatedAt?: true
@@ -256,6 +262,7 @@ export type PartOrderGroupByOutputType = {
   amount: runtime.Decimal
   paymentMethod: $Enums.PaymentMethod
   status: $Enums.OrderStatus
+  expiresAt: Date | null
   processedById: string | null
   createdAt: Date
   updatedAt: Date
@@ -297,6 +304,7 @@ export type PartOrderWhereInput = {
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus
+  expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
@@ -305,6 +313,7 @@ export type PartOrderWhereInput = {
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.PartPaymentTransactionListRelationFilter
+  delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null
 }
 
 export type PartOrderOrderByWithRelationInput = {
@@ -320,6 +329,7 @@ export type PartOrderOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -328,6 +338,7 @@ export type PartOrderOrderByWithRelationInput = {
   branch?: Prisma.BranchOrderByWithRelationInput
   processedBy?: Prisma.UserOrderByWithRelationInput
   transactions?: Prisma.PartPaymentTransactionOrderByRelationAggregateInput
+  delivery?: Prisma.DeliveryRequestOrderByWithRelationInput
 }
 
 export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
@@ -346,6 +357,7 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus
+  expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
@@ -354,6 +366,7 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.PartPaymentTransactionListRelationFilter
+  delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null
 }, "id" | "orderNumber">
 
 export type PartOrderOrderByWithAggregationInput = {
@@ -369,6 +382,7 @@ export type PartOrderOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -395,6 +409,7 @@ export type PartOrderScalarWhereWithAggregatesInput = {
   amount?: Prisma.DecimalWithAggregatesFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodWithAggregatesFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"PartOrder"> | $Enums.OrderStatus
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartOrder"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PartOrder"> | Date | string
@@ -410,6 +425,7 @@ export type PartOrderCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
@@ -417,6 +433,7 @@ export type PartOrderCreateInput = {
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateInput = {
@@ -432,10 +449,12 @@ export type PartOrderUncheckedCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUpdateInput = {
@@ -448,6 +467,7 @@ export type PartOrderUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
@@ -455,6 +475,7 @@ export type PartOrderUpdateInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateInput = {
@@ -470,10 +491,12 @@ export type PartOrderUncheckedUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderCreateManyInput = {
@@ -489,6 +512,7 @@ export type PartOrderCreateManyInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -504,6 +528,7 @@ export type PartOrderUpdateManyMutationInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -521,6 +546,7 @@ export type PartOrderUncheckedUpdateManyInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -549,6 +575,7 @@ export type PartOrderCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   processedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -572,6 +599,7 @@ export type PartOrderMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   processedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -590,6 +618,7 @@ export type PartOrderMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   processedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -603,6 +632,11 @@ export type PartOrderSumOrderByAggregateInput = {
 export type PartOrderScalarRelationFilter = {
   is?: Prisma.PartOrderWhereInput
   isNot?: Prisma.PartOrderWhereInput
+}
+
+export type PartOrderNullableScalarRelationFilter = {
+  is?: Prisma.PartOrderWhereInput | null
+  isNot?: Prisma.PartOrderWhereInput | null
 }
 
 export type PartOrderCreateNestedManyWithoutProcessedByInput = {
@@ -787,6 +821,22 @@ export type PartOrderUpdateOneRequiredWithoutTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartOrderUpdateToOneWithWhereWithoutTransactionsInput, Prisma.PartOrderUpdateWithoutTransactionsInput>, Prisma.PartOrderUncheckedUpdateWithoutTransactionsInput>
 }
 
+export type PartOrderCreateNestedOneWithoutDeliveryInput = {
+  create?: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+  connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutDeliveryInput
+  connect?: Prisma.PartOrderWhereUniqueInput
+}
+
+export type PartOrderUpdateOneWithoutDeliveryNestedInput = {
+  create?: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+  connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutDeliveryInput
+  upsert?: Prisma.PartOrderUpsertWithoutDeliveryInput
+  disconnect?: Prisma.PartOrderWhereInput | boolean
+  delete?: Prisma.PartOrderWhereInput | boolean
+  connect?: Prisma.PartOrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartOrderUpdateToOneWithWhereWithoutDeliveryInput, Prisma.PartOrderUpdateWithoutDeliveryInput>, Prisma.PartOrderUncheckedUpdateWithoutDeliveryInput>
+}
+
 export type PartOrderCreateWithoutProcessedByInput = {
   id?: string
   orderNumber: string
@@ -797,12 +847,14 @@ export type PartOrderCreateWithoutProcessedByInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutProcessedByInput = {
@@ -818,9 +870,11 @@ export type PartOrderUncheckedCreateWithoutProcessedByInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutProcessedByInput = {
@@ -865,6 +919,7 @@ export type PartOrderScalarWhereInput = {
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus
+  expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
@@ -880,12 +935,14 @@ export type PartOrderCreateWithoutBranchInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutBranchInput = {
@@ -900,10 +957,12 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutBranchInput = {
@@ -942,12 +1001,14 @@ export type PartOrderCreateWithoutPartInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutPartInput = {
@@ -962,10 +1023,12 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutPartInput = {
@@ -1004,12 +1067,14 @@ export type PartOrderCreateWithoutPartInventoryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
   transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
@@ -1024,10 +1089,12 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutPartInventoryInput = {
@@ -1066,12 +1133,14 @@ export type PartOrderCreateWithoutTransactionsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
   partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
   branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
+  delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderUncheckedCreateWithoutTransactionsInput = {
@@ -1087,9 +1156,11 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput
 }
 
 export type PartOrderCreateOrConnectWithoutTransactionsInput = {
@@ -1118,12 +1189,14 @@ export type PartOrderUpdateWithoutTransactionsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
@@ -1139,9 +1212,107 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
+}
+
+export type PartOrderCreateWithoutDeliveryInput = {
+  id?: string
+  orderNumber: string
+  customerName: string
+  customerPhone: string
+  customerAddress: string
+  quantity: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod: $Enums.PaymentMethod
+  status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  part: Prisma.PartCreateNestedOneWithoutPartOrdersInput
+  partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput
+  branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput
+  processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput
+  transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput
+}
+
+export type PartOrderUncheckedCreateWithoutDeliveryInput = {
+  id?: string
+  orderNumber: string
+  partId: string
+  partInventoryId: string
+  branchId: string
+  customerName: string
+  customerPhone: string
+  customerAddress: string
+  quantity: number
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod: $Enums.PaymentMethod
+  status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
+  processedById?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput
+}
+
+export type PartOrderCreateOrConnectWithoutDeliveryInput = {
+  where: Prisma.PartOrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+}
+
+export type PartOrderUpsertWithoutDeliveryInput = {
+  update: Prisma.XOR<Prisma.PartOrderUpdateWithoutDeliveryInput, Prisma.PartOrderUncheckedUpdateWithoutDeliveryInput>
+  create: Prisma.XOR<Prisma.PartOrderCreateWithoutDeliveryInput, Prisma.PartOrderUncheckedCreateWithoutDeliveryInput>
+  where?: Prisma.PartOrderWhereInput
+}
+
+export type PartOrderUpdateToOneWithWhereWithoutDeliveryInput = {
+  where?: Prisma.PartOrderWhereInput
+  data: Prisma.XOR<Prisma.PartOrderUpdateWithoutDeliveryInput, Prisma.PartOrderUncheckedUpdateWithoutDeliveryInput>
+}
+
+export type PartOrderUpdateWithoutDeliveryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
+  partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
+  branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
+  processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
+  transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+}
+
+export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  partId?: Prisma.StringFieldUpdateOperationsInput | string
+  partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
 }
 
 export type PartOrderCreateManyProcessedByInput = {
@@ -1157,6 +1328,7 @@ export type PartOrderCreateManyProcessedByInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1171,12 +1343,14 @@ export type PartOrderUpdateWithoutProcessedByInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
@@ -1192,9 +1366,11 @@ export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
@@ -1210,6 +1386,7 @@ export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1226,6 +1403,7 @@ export type PartOrderCreateManyBranchInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1241,12 +1419,14 @@ export type PartOrderUpdateWithoutBranchInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutBranchInput = {
@@ -1261,10 +1441,12 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
@@ -1279,6 +1461,7 @@ export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1296,6 +1479,7 @@ export type PartOrderCreateManyPartInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1311,12 +1495,14 @@ export type PartOrderUpdateWithoutPartInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutPartInput = {
@@ -1331,10 +1517,12 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutPartInput = {
@@ -1349,6 +1537,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1366,6 +1555,7 @@ export type PartOrderCreateManyPartInventoryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1381,12 +1571,14 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput
   transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
@@ -1401,10 +1593,12 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
+  delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput
 }
 
 export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
@@ -1419,6 +1613,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1468,6 +1663,7 @@ export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1476,6 +1672,7 @@ export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>
   transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>
+  delivery?: boolean | Prisma.PartOrder$deliveryArgs<ExtArgs>
   _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partOrder"]>
 
@@ -1492,6 +1689,7 @@ export type PartOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1514,6 +1712,7 @@ export type PartOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1536,18 +1735,20 @@ export type PartOrderSelectScalar = {
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "status" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>
+export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "status" | "expiresAt" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>
 export type PartOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>
   transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>
+  delivery?: boolean | Prisma.PartOrder$deliveryArgs<ExtArgs>
   _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1571,6 +1772,7 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     branch: Prisma.$BranchPayload<ExtArgs>
     processedBy: Prisma.$UserPayload<ExtArgs> | null
     transactions: Prisma.$PartPaymentTransactionPayload<ExtArgs>[]
+    delivery: Prisma.$DeliveryRequestPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1585,6 +1787,7 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     amount: runtime.Decimal
     paymentMethod: $Enums.PaymentMethod
     status: $Enums.OrderStatus
+    expiresAt: Date | null
     processedById: string | null
     createdAt: Date
     updatedAt: Date
@@ -1987,6 +2190,7 @@ export interface Prisma__PartOrderClient<T, Null = never, ExtArgs extends runtim
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   processedBy<T extends Prisma.PartOrder$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transactions<T extends Prisma.PartOrder$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  delivery<T extends Prisma.PartOrder$deliveryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$deliveryArgs<ExtArgs>>): Prisma.Prisma__DeliveryRequestClient<runtime.Types.Result.GetResult<Prisma.$DeliveryRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2028,6 +2232,7 @@ export interface PartOrderFieldRefs {
   readonly amount: Prisma.FieldRef<"PartOrder", 'Decimal'>
   readonly paymentMethod: Prisma.FieldRef<"PartOrder", 'PaymentMethod'>
   readonly status: Prisma.FieldRef<"PartOrder", 'OrderStatus'>
+  readonly expiresAt: Prisma.FieldRef<"PartOrder", 'DateTime'>
   readonly processedById: Prisma.FieldRef<"PartOrder", 'String'>
   readonly createdAt: Prisma.FieldRef<"PartOrder", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PartOrder", 'DateTime'>
@@ -2472,6 +2677,25 @@ export type PartOrder$transactionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PartPaymentTransactionScalarFieldEnum | Prisma.PartPaymentTransactionScalarFieldEnum[]
+}
+
+/**
+ * PartOrder.delivery
+ */
+export type PartOrder$deliveryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryRequest
+   */
+  select?: Prisma.DeliveryRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryRequest
+   */
+  omit?: Prisma.DeliveryRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryRequestInclude<ExtArgs> | null
+  where?: Prisma.DeliveryRequestWhereInput
 }
 
 /**

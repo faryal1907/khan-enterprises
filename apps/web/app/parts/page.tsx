@@ -159,10 +159,6 @@ export default function PartsPage() {
                       border: `1px solid ${theme.borders.light}`,
                     }}
                   >
-                    <div
-                      className="aspect-square mb-4 rounded-lg"
-                      style={{ backgroundColor: theme.backgrounds.tertiary }}
-                    />
                     <h3
                       className="text-lg font-semibold mb-2"
                       style={{ color: theme.text.primary }}

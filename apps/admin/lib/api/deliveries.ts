@@ -87,3 +87,13 @@ export async function updateDeliveryStatus(id: string, data: UpdateDeliveryStatu
   const response = await api.patch(`/deliveries/${id}/status`, data);
   return response.data;
 }
+
+export async function approveDelivery(id: string) {
+  const response = await api.patch(`/deliveries/${id}/approve`);
+  return response.data;
+}
+
+export async function rejectDelivery(id: string, reason?: string) {
+  const response = await api.patch(`/deliveries/${id}/reject`, { reason });
+  return response.data;
+}

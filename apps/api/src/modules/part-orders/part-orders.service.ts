@@ -2,11 +2,12 @@ import { Injectable, NotFoundException, BadRequestException } from "@nestjs/comm
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
-import { OrderStatus, PaymentStatus, AuditAction } from "@khan/prisma";
+import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
+import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class PartOrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -65,7 +66,11 @@ export class PartOrdersService {
       // 4. Calculate total amount
       const amount = part.sellingPrice.mul(dto.quantity);
 
-      // 5. Create part order
+      // 5. Set expiresAt to 1 week from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      // 6. Create part order
       const partOrder = await tx.partOrder.create({
         data: {
           orderNumber,
@@ -79,6 +84,7 @@ export class PartOrdersService {
           amount,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.PENDING_PAYMENT,
+          expiresAt,
         },
         include: {
           part: true,
@@ -111,28 +117,6 @@ export class PartOrdersService {
         },
       });
 
-      // 8. If CASH payment, immediately confirm order and reduce stock
-      if (dto.paymentMethod === "CASH") {
-        await tx.partOrder.update({
-          where: { id: partOrder.id },
-          data: {
-            status: OrderStatus.CONFIRMED,
-          },
-        });
-
-        await tx.partInventory.update({
-          where: { id: dto.partInventoryId },
-          data: {
-            quantity: {
-              decrement: dto.quantity,
-            },
-            reservedQuantity: {
-              decrement: dto.quantity,
-            },
-          },
-        });
-      }
-
       return {
         order: partOrder,
         transaction,
@@ -155,6 +139,7 @@ export class PartOrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
         processedBy: {
           select: {
             id: true,
@@ -189,6 +174,7 @@ export class PartOrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
         processedBy: {
           select: {
             id: true,
@@ -211,12 +197,25 @@ export class PartOrdersService {
   /**
    * Paginated, filtered by status/branchId/date range. Include part, inventory, branch, processedBy
    * For CUSTOMER role: filters by customer phone/CNIC from user profile
+   * Supports isCompleted filter: true=DELIVERED/CANCELLED, false=active orders
    */
-  async getPartOrders(query: any, user?: any) {
+  async getPartOrders(query: QueryPartOrdersDto, user?: any) {
+    console.log('getPartOrders called with query:', query);
+    console.log('isCompleted value:', query.isCompleted, 'type:', typeof query.isCompleted, 'is undefined:', query.isCompleted === undefined);
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
+    } else if (query.isCompleted !== undefined) {
+      console.log('Filtering by isCompleted:', query.isCompleted);
+      // Filter by completion status
+      if (query.isCompleted) {
+        where.status = { in: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] };
+        console.log('Setting where.status for completed orders:', where.status);
+      } else {
+        where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] };
+        console.log('Setting where.status for current orders:', where.status);
+      }
     }
 
     if (query.branchId) {
@@ -312,6 +311,7 @@ export class PartOrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
       },
       orderBy: { createdAt: "desc" },
     });
@@ -388,6 +388,32 @@ export class PartOrdersService {
           branch: true,
         },
       });
+
+      // When order is confirmed, deduct the actual inventory quantity
+      if (status === OrderStatus.CONFIRMED && currentStatus === OrderStatus.PAID) {
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            quantity: {
+              decrement: order.quantity,
+            },
+            reservedQuantity: {
+              decrement: order.quantity,
+            },
+          },
+        });
+
+        // Create stock movement record
+        await tx.stockMovement.create({
+          data: {
+            inventoryId: order.partInventoryId,
+            movementType: "STOCK_OUT",
+            quantity: -order.quantity,
+            reason: `Part order confirmed: ${updatedOrder.orderNumber}`,
+            performedById: user.id,
+          },
+        });
+      }
 
       await tx.auditLog.create({
         data: {
@@ -567,36 +593,185 @@ export class PartOrdersService {
     return `PART-${year}${month}${day}-${random}`;
   }
 
-  private async restorePartOrderStock(tx: any, order: { status: OrderStatus; partInventoryId: string; quantity: number }) {
-    if (order.status === OrderStatus.PENDING_PAYMENT || order.status === OrderStatus.PAID) {
-      const inventory = await tx.partInventory.findUnique({
-        where: { id: order.partInventoryId },
-        select: { reservedQuantity: true },
+  /**
+   * Mark part order as completed for onsite purchases
+   * Used when customer buys in person at branch
+   */
+  async markPartOrderAsCompletedOnsite(orderId: string, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch part order
+      const order = await tx.partOrder.findUnique({
+        where: { id: orderId },
+        include: {
+          partInventory: true,
+          delivery: true,
+        },
       });
-      const reservedToRelease = Math.min(inventory?.reservedQuantity || 0, order.quantity);
 
-      if (reservedToRelease > 0) {
+      if (!order) {
+        throw new NotFoundException(`Part order with ID ${orderId} not found`);
+      }
+
+      // 2. Verify part order is in PAID or CONFIRMED status
+      if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(
+          `Part order must be in PAID or CONFIRMED status to be marked as completed onsite. Current status: ${order.status}`
+        );
+      }
+
+      // 3. Update part order status to DELIVERED
+      const updatedOrder = await tx.partOrder.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.DELIVERED,
+          processedById: user.id,
+        },
+      });
+
+      // 4. Update part inventory if order was not already confirmed (stock not yet deducted)
+      if (order.status === OrderStatus.PAID) {
+        await tx.partInventory.update({
+          where: { id: order.partInventoryId },
+          data: {
+            quantity: {
+              decrement: order.quantity,
+            },
+            reservedQuantity: {
+              decrement: order.quantity,
+            },
+          },
+        });
+
+        // Create stock movement record
+        await tx.stockMovement.create({
+          data: {
+            inventoryId: order.partInventoryId,
+            movementType: "STOCK_OUT",
+            quantity: -order.quantity,
+            reason: `Part order completed onsite: ${updatedOrder.orderNumber}`,
+            performedById: user.id,
+          },
+        });
+      } else if (order.status === OrderStatus.CONFIRMED) {
+        // If already confirmed, just clear reserved quantity
         await tx.partInventory.update({
           where: { id: order.partInventoryId },
           data: {
             reservedQuantity: {
-              decrement: reservedToRelease,
+              decrement: order.quantity,
             },
           },
         });
       }
-      return;
-    }
 
-    if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
+      // 5. Handle delivery request if one exists
+      if (order.delivery) {
+        await tx.deliveryRequest.update({
+          where: { id: order.delivery.id },
+          data: {
+            status: "DELIVERED",
+            deliveredAt: new Date(),
+          },
+        });
+      }
+
+      // 6. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_ORDER",
+          entityId: orderId,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, completedOnsite: true }),
+        },
+      });
+
+      return updatedOrder;
+    });
+  }
+
+  /**
+   * Mark part order as picked up by customer (no delivery)
+   * Used when customer picks up the parts at the branch themselves
+   */
+  async markAsPickedByCustomer(orderId: string, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch part order
+      const order = await tx.partOrder.findUnique({
+        where: { id: orderId },
+        include: {
+          partInventory: true,
+          delivery: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Part order with ID ${orderId} not found`);
+      }
+
+      // 2. Verify part order is in CONFIRMED status
+      if (order.status !== OrderStatus.CONFIRMED) {
+        throw new BadRequestException(
+          `Part order must be in CONFIRMED status to be marked as picked by customer. Current status: ${order.status}`
+        );
+      }
+
+      // 3. Verify no delivery request exists (customer is picking up themselves)
+      if (order.delivery) {
+        throw new BadRequestException(
+          `Cannot mark part order as picked by customer when a delivery request exists`
+        );
+      }
+
+      // 4. Update part order status to DELIVERED
+      const updatedOrder = await tx.partOrder.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.DELIVERED,
+          processedById: user.id,
+        },
+      });
+
+      // 5. Update part inventory (clear reserved quantity and deduct stock)
       await tx.partInventory.update({
         where: { id: order.partInventoryId },
         data: {
           quantity: {
-            increment: order.quantity,
+            decrement: order.quantity,
+          },
+          reservedQuantity: {
+            decrement: order.quantity,
           },
         },
       });
-    }
+
+      // Create stock movement record
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: order.partInventoryId,
+          movementType: "STOCK_OUT",
+          quantity: -order.quantity,
+          reason: `Part order picked by customer: ${updatedOrder.orderNumber}`,
+          performedById: user.id,
+        },
+      });
+
+      // 6. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_ORDER",
+          entityId: orderId,
+          oldValue: JSON.stringify({ status: order.status }),
+          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, pickedByCustomer: true }),
+        },
+      });
+
+      return updatedOrder;
+    });
   }
 }

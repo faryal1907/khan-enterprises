@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Khan Admin",
-  description: "Khan Enterprises Admin Portal",
+  description: "Ali & Khan's Admin Portal",
 };
 
 export default function RootLayout({

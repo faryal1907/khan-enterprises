@@ -76,7 +76,7 @@ export default function BikesPage() {
             Motorcycle Inventory
           </h1>
           <p style={{ color: theme.text.secondary }}>
-            Browse our exclusive collection of premium motorcycles
+            Browse bikes, their specs and start negotitation process!
           </p>
         </div>
 
@@ -195,32 +195,7 @@ export default function BikesPage() {
                 </select>
               </div>
 
-              {/* Availability */}
-              <div className="mb-6">
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Availability
-                </label>
-                <select
-                  value={filters.availability}
-                  onChange={(e) =>
-                    setFilters({ ...filters, availability: e.target.value })
-                  }
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                >
-                  <option value="">All</option>
-                  <option value="AVAILABLE">Available</option>
-                  <option value="RESERVED">Reserved</option>
-                  <option value="SOLD">Sold</option>
-                </select>
-              </div>
+            
 
               <button
                 onClick={() =>

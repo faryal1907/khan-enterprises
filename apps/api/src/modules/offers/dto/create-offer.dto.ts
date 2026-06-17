@@ -19,12 +19,12 @@ export class CreateOfferDto {
   customerEmail?: string;
 
   @IsString()
-  @IsOptional()
-  customerCNIC?: string;
+  @IsNotEmpty()
+  customerCNIC: string;
 
   @IsString()
-  @IsOptional()
-  customerAddress?: string;
+  @IsNotEmpty()
+  customerAddress: string;
 
   @IsNumber()
   @Min(1)

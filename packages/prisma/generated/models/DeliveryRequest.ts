@@ -27,6 +27,7 @@ export type AggregateDeliveryRequest = {
 export type DeliveryRequestMinAggregateOutputType = {
   id: string | null
   orderId: string | null
+  partOrderId: string | null
   deliveryAddress: string | null
   preferredTimeWindow: string | null
   contactNumber: string | null
@@ -41,6 +42,7 @@ export type DeliveryRequestMinAggregateOutputType = {
 export type DeliveryRequestMaxAggregateOutputType = {
   id: string | null
   orderId: string | null
+  partOrderId: string | null
   deliveryAddress: string | null
   preferredTimeWindow: string | null
   contactNumber: string | null
@@ -55,6 +57,7 @@ export type DeliveryRequestMaxAggregateOutputType = {
 export type DeliveryRequestCountAggregateOutputType = {
   id: number
   orderId: number
+  partOrderId: number
   deliveryAddress: number
   preferredTimeWindow: number
   contactNumber: number
@@ -71,6 +74,7 @@ export type DeliveryRequestCountAggregateOutputType = {
 export type DeliveryRequestMinAggregateInputType = {
   id?: true
   orderId?: true
+  partOrderId?: true
   deliveryAddress?: true
   preferredTimeWindow?: true
   contactNumber?: true
@@ -85,6 +89,7 @@ export type DeliveryRequestMinAggregateInputType = {
 export type DeliveryRequestMaxAggregateInputType = {
   id?: true
   orderId?: true
+  partOrderId?: true
   deliveryAddress?: true
   preferredTimeWindow?: true
   contactNumber?: true
@@ -99,6 +104,7 @@ export type DeliveryRequestMaxAggregateInputType = {
 export type DeliveryRequestCountAggregateInputType = {
   id?: true
   orderId?: true
+  partOrderId?: true
   deliveryAddress?: true
   preferredTimeWindow?: true
   contactNumber?: true
@@ -185,7 +191,8 @@ export type DeliveryRequestGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 
 export type DeliveryRequestGroupByOutputType = {
   id: string
-  orderId: string
+  orderId: string | null
+  partOrderId: string | null
   deliveryAddress: string
   preferredTimeWindow: string | null
   contactNumber: string
@@ -220,7 +227,8 @@ export type DeliveryRequestWhereInput = {
   OR?: Prisma.DeliveryRequestWhereInput[]
   NOT?: Prisma.DeliveryRequestWhereInput | Prisma.DeliveryRequestWhereInput[]
   id?: Prisma.StringFilter<"DeliveryRequest"> | string
-  orderId?: Prisma.StringFilter<"DeliveryRequest"> | string
+  orderId?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
+  partOrderId?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
   deliveryAddress?: Prisma.StringFilter<"DeliveryRequest"> | string
   preferredTimeWindow?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
   contactNumber?: Prisma.StringFilter<"DeliveryRequest"> | string
@@ -230,12 +238,14 @@ export type DeliveryRequestWhereInput = {
   notes?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
+  partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
 }
 
 export type DeliveryRequestOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  orderId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  partOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
@@ -246,11 +256,13 @@ export type DeliveryRequestOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
+  partOrder?: Prisma.PartOrderOrderByWithRelationInput
 }
 
 export type DeliveryRequestWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   orderId?: string
+  partOrderId?: string
   AND?: Prisma.DeliveryRequestWhereInput | Prisma.DeliveryRequestWhereInput[]
   OR?: Prisma.DeliveryRequestWhereInput[]
   NOT?: Prisma.DeliveryRequestWhereInput | Prisma.DeliveryRequestWhereInput[]
@@ -263,12 +275,14 @@ export type DeliveryRequestWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DeliveryRequest"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
-}, "id" | "orderId">
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
+  partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
+}, "id" | "orderId" | "partOrderId">
 
 export type DeliveryRequestOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  orderId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  partOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
@@ -288,7 +302,8 @@ export type DeliveryRequestScalarWhereWithAggregatesInput = {
   OR?: Prisma.DeliveryRequestScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DeliveryRequestScalarWhereWithAggregatesInput | Prisma.DeliveryRequestScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"DeliveryRequest"> | string
-  orderId?: Prisma.StringWithAggregatesFilter<"DeliveryRequest"> | string
+  orderId?: Prisma.StringNullableWithAggregatesFilter<"DeliveryRequest"> | string | null
+  partOrderId?: Prisma.StringNullableWithAggregatesFilter<"DeliveryRequest"> | string | null
   deliveryAddress?: Prisma.StringWithAggregatesFilter<"DeliveryRequest"> | string
   preferredTimeWindow?: Prisma.StringNullableWithAggregatesFilter<"DeliveryRequest"> | string | null
   contactNumber?: Prisma.StringWithAggregatesFilter<"DeliveryRequest"> | string
@@ -311,12 +326,14 @@ export type DeliveryRequestCreateInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  order: Prisma.OrderCreateNestedOneWithoutDeliveryInput
+  order?: Prisma.OrderCreateNestedOneWithoutDeliveryInput
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutDeliveryInput
 }
 
 export type DeliveryRequestUncheckedCreateInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
+  partOrderId?: string | null
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
@@ -339,12 +356,14 @@ export type DeliveryRequestUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneRequiredWithoutDeliveryNestedInput
+  order?: Prisma.OrderUpdateOneWithoutDeliveryNestedInput
+  partOrder?: Prisma.PartOrderUpdateOneWithoutDeliveryNestedInput
 }
 
 export type DeliveryRequestUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -358,7 +377,8 @@ export type DeliveryRequestUncheckedUpdateInput = {
 
 export type DeliveryRequestCreateManyInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
+  partOrderId?: string | null
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
@@ -385,7 +405,8 @@ export type DeliveryRequestUpdateManyMutationInput = {
 
 export type DeliveryRequestUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -405,6 +426,7 @@ export type DeliveryRequestNullableScalarRelationFilter = {
 export type DeliveryRequestCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrder
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
@@ -419,6 +441,7 @@ export type DeliveryRequestCountOrderByAggregateInput = {
 export type DeliveryRequestMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrder
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
@@ -433,6 +456,7 @@ export type DeliveryRequestMaxOrderByAggregateInput = {
 export type DeliveryRequestMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrder
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
@@ -476,6 +500,38 @@ export type DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DeliveryRequestUpdateToOneWithWhereWithoutOrderInput, Prisma.DeliveryRequestUpdateWithoutOrderInput>, Prisma.DeliveryRequestUncheckedUpdateWithoutOrderInput>
 }
 
+export type DeliveryRequestCreateNestedOneWithoutPartOrderInput = {
+  create?: Prisma.XOR<Prisma.DeliveryRequestCreateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedCreateWithoutPartOrderInput>
+  connectOrCreate?: Prisma.DeliveryRequestCreateOrConnectWithoutPartOrderInput
+  connect?: Prisma.DeliveryRequestWhereUniqueInput
+}
+
+export type DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput = {
+  create?: Prisma.XOR<Prisma.DeliveryRequestCreateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedCreateWithoutPartOrderInput>
+  connectOrCreate?: Prisma.DeliveryRequestCreateOrConnectWithoutPartOrderInput
+  connect?: Prisma.DeliveryRequestWhereUniqueInput
+}
+
+export type DeliveryRequestUpdateOneWithoutPartOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.DeliveryRequestCreateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedCreateWithoutPartOrderInput>
+  connectOrCreate?: Prisma.DeliveryRequestCreateOrConnectWithoutPartOrderInput
+  upsert?: Prisma.DeliveryRequestUpsertWithoutPartOrderInput
+  disconnect?: Prisma.DeliveryRequestWhereInput | boolean
+  delete?: Prisma.DeliveryRequestWhereInput | boolean
+  connect?: Prisma.DeliveryRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DeliveryRequestUpdateToOneWithWhereWithoutPartOrderInput, Prisma.DeliveryRequestUpdateWithoutPartOrderInput>, Prisma.DeliveryRequestUncheckedUpdateWithoutPartOrderInput>
+}
+
+export type DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.DeliveryRequestCreateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedCreateWithoutPartOrderInput>
+  connectOrCreate?: Prisma.DeliveryRequestCreateOrConnectWithoutPartOrderInput
+  upsert?: Prisma.DeliveryRequestUpsertWithoutPartOrderInput
+  disconnect?: Prisma.DeliveryRequestWhereInput | boolean
+  delete?: Prisma.DeliveryRequestWhereInput | boolean
+  connect?: Prisma.DeliveryRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DeliveryRequestUpdateToOneWithWhereWithoutPartOrderInput, Prisma.DeliveryRequestUpdateWithoutPartOrderInput>, Prisma.DeliveryRequestUncheckedUpdateWithoutPartOrderInput>
+}
+
 export type EnumDeliveryStatusFieldUpdateOperationsInput = {
   set?: $Enums.DeliveryStatus
 }
@@ -491,10 +547,12 @@ export type DeliveryRequestCreateWithoutOrderInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutDeliveryInput
 }
 
 export type DeliveryRequestUncheckedCreateWithoutOrderInput = {
   id?: string
+  partOrderId?: string | null
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
@@ -533,10 +591,84 @@ export type DeliveryRequestUpdateWithoutOrderInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partOrder?: Prisma.PartOrderUpdateOneWithoutDeliveryNestedInput
 }
 
 export type DeliveryRequestUncheckedUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type DeliveryRequestCreateWithoutPartOrderInput = {
+  id?: string
+  deliveryAddress: string
+  preferredTimeWindow?: string | null
+  contactNumber: string
+  status?: $Enums.DeliveryStatus
+  approvedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  order?: Prisma.OrderCreateNestedOneWithoutDeliveryInput
+}
+
+export type DeliveryRequestUncheckedCreateWithoutPartOrderInput = {
+  id?: string
+  orderId?: string | null
+  deliveryAddress: string
+  preferredTimeWindow?: string | null
+  contactNumber: string
+  status?: $Enums.DeliveryStatus
+  approvedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type DeliveryRequestCreateOrConnectWithoutPartOrderInput = {
+  where: Prisma.DeliveryRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.DeliveryRequestCreateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedCreateWithoutPartOrderInput>
+}
+
+export type DeliveryRequestUpsertWithoutPartOrderInput = {
+  update: Prisma.XOR<Prisma.DeliveryRequestUpdateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedUpdateWithoutPartOrderInput>
+  create: Prisma.XOR<Prisma.DeliveryRequestCreateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedCreateWithoutPartOrderInput>
+  where?: Prisma.DeliveryRequestWhereInput
+}
+
+export type DeliveryRequestUpdateToOneWithWhereWithoutPartOrderInput = {
+  where?: Prisma.DeliveryRequestWhereInput
+  data: Prisma.XOR<Prisma.DeliveryRequestUpdateWithoutPartOrderInput, Prisma.DeliveryRequestUncheckedUpdateWithoutPartOrderInput>
+}
+
+export type DeliveryRequestUpdateWithoutPartOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  order?: Prisma.OrderUpdateOneWithoutDeliveryNestedInput
+}
+
+export type DeliveryRequestUncheckedUpdateWithoutPartOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
@@ -553,6 +685,7 @@ export type DeliveryRequestUncheckedUpdateWithoutOrderInput = {
 export type DeliveryRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
@@ -562,12 +695,14 @@ export type DeliveryRequestSelect<ExtArgs extends runtime.Types.Extensions.Inter
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryRequest"]>
 
 export type DeliveryRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
@@ -577,12 +712,14 @@ export type DeliveryRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryRequest"]>
 
 export type DeliveryRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
@@ -592,12 +729,14 @@ export type DeliveryRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryRequest"]>
 
 export type DeliveryRequestSelectScalar = {
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
@@ -609,25 +748,30 @@ export type DeliveryRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type DeliveryRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "deliveryAddress" | "preferredTimeWindow" | "contactNumber" | "status" | "approvedAt" | "deliveredAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["deliveryRequest"]>
+export type DeliveryRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partOrderId" | "deliveryAddress" | "preferredTimeWindow" | "contactNumber" | "status" | "approvedAt" | "deliveredAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["deliveryRequest"]>
 export type DeliveryRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
 }
 export type DeliveryRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
 }
 export type DeliveryRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
 }
 
 export type $DeliveryRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "DeliveryRequest"
   objects: {
-    order: Prisma.$OrderPayload<ExtArgs>
+    order: Prisma.$OrderPayload<ExtArgs> | null
+    partOrder: Prisma.$PartOrderPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    orderId: string
+    orderId: string | null
+    partOrderId: string | null
     deliveryAddress: string
     preferredTimeWindow: string | null
     contactNumber: string
@@ -1031,7 +1175,8 @@ readonly fields: DeliveryRequestFieldRefs;
  */
 export interface Prisma__DeliveryRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  order<T extends Prisma.DeliveryRequest$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DeliveryRequest$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  partOrder<T extends Prisma.DeliveryRequest$partOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DeliveryRequest$partOrderArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1063,6 +1208,7 @@ export interface Prisma__DeliveryRequestClient<T, Null = never, ExtArgs extends 
 export interface DeliveryRequestFieldRefs {
   readonly id: Prisma.FieldRef<"DeliveryRequest", 'String'>
   readonly orderId: Prisma.FieldRef<"DeliveryRequest", 'String'>
+  readonly partOrderId: Prisma.FieldRef<"DeliveryRequest", 'String'>
   readonly deliveryAddress: Prisma.FieldRef<"DeliveryRequest", 'String'>
   readonly preferredTimeWindow: Prisma.FieldRef<"DeliveryRequest", 'String'>
   readonly contactNumber: Prisma.FieldRef<"DeliveryRequest", 'String'>
@@ -1470,6 +1616,44 @@ export type DeliveryRequestDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many DeliveryRequests to delete.
    */
   limit?: number
+}
+
+/**
+ * DeliveryRequest.order
+ */
+export type DeliveryRequest$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+}
+
+/**
+ * DeliveryRequest.partOrder
+ */
+export type DeliveryRequest$partOrderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartOrder
+   */
+  select?: Prisma.PartOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartOrder
+   */
+  omit?: Prisma.PartOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartOrderInclude<ExtArgs> | null
+  where?: Prisma.PartOrderWhereInput
 }
 
 /**

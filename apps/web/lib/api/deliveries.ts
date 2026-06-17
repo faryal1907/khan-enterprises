@@ -41,8 +41,10 @@ export interface DeliveryRequest {
   };
 }
 
-export async function createDeliveryRequest(orderId: string, data: CreateDeliveryData) {
-  const response = await api.post(`/deliveries/order/${orderId}`, data);
+export async function createDeliveryRequest(orderId: string, data: CreateDeliveryData, orderType: "BIKE" | "PART" = "BIKE") {
+  const response = await api.post(`/deliveries/order/${orderId}`, data, {
+    params: { orderType }
+  });
   return response.data;
 }
 
@@ -64,7 +66,9 @@ export async function getDeliveryById(id: string) {
   return response.data;
 }
 
-export async function getDeliveryByOrderId(orderId: string) {
-  const response = await api.get(`/deliveries/order/${orderId}`);
+export async function getDeliveryByOrderId(orderId: string, orderType: "BIKE" | "PART" = "BIKE") {
+  const response = await api.get(`/deliveries/order/${orderId}`, {
+    params: { orderType }
+  });
   return response.data;
 }

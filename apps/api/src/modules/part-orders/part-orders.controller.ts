@@ -5,6 +5,7 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
+import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { OrderStatus } from "@khan/prisma";
 import { PdfService } from "../pdf/pdf.service";
@@ -27,15 +28,6 @@ export class PartOrdersController {
   }
 
   /**
-   * GET /api/part-orders/:orderNumber
-   * Get part order by order number (public endpoint)
-   */
-  @Get(":orderNumber")
-  async getPartOrderByNumber(@Param("orderNumber") orderNumber: string) {
-    return this.partOrdersService.getPartOrderByNumber(orderNumber);
-  }
-
-  /**
    * GET /api/part-orders/id/:id
    * Get part order by ID
    */
@@ -47,13 +39,21 @@ export class PartOrdersController {
   }
 
   /**
+   * GET /api/part-orders/:orderNumber
+   * Get part order by order number (public endpoint)
+   */
+  @Get(":orderNumber")
+  async getPartOrderByNumber(@Param("orderNumber") orderNumber: string) {
+    return this.partOrdersService.getPartOrderByNumber(orderNumber);
+  }
+
+  /**
    * GET /api/part-orders
    * Get part orders (paginated, filtered)
    */
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
-  async getPartOrders(@Query() query: any, @CurrentUser() user: any) {
+  @UseGuards(JwtAuthGuard)
+  async getPartOrders(@Query() query: QueryPartOrdersDto, @CurrentUser() user: any) {
     return this.partOrdersService.getPartOrders(query, user);
   }
 
@@ -95,6 +95,36 @@ export class PartOrdersController {
     @CurrentUser() user: any
   ) {
     return this.partOrdersService.createManualPartOrder(dto, user);
+  }
+
+  /**
+   * POST /api/part-orders/:id/complete-onsite
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * Mark part order as completed for onsite purchases
+   */
+  @Post(":id/complete-onsite")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async markPartOrderAsCompletedOnsite(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.markPartOrderAsCompletedOnsite(id, user);
+  }
+
+  /**
+   * PATCH /api/part-orders/:id/picked-up
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   * Mark part order as picked up by customer (no delivery)
+   */
+  @Patch(":id/picked-up")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async markAsPickedByCustomer(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.markAsPickedByCustomer(id, user);
   }
 
   /**

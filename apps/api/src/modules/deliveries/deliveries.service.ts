@@ -10,85 +10,122 @@ export class DeliveriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Create delivery request for an order
+   * Create delivery request for an order or part order
    * Only allowed when order is in CONFIRMED or PAID status
    */
-  async createDeliveryRequest(orderId: string, dto: CreateDeliveryDto) {
+  async createDeliveryRequest(orderId: string, dto: CreateDeliveryDto, orderType: "BIKE" | "PART" = "BIKE") {
     return this.prisma.client.$transaction(async (tx) => {
-      // 1. Fetch order and verify status
-      const order = await tx.order.findUnique({
-        where: { id: orderId },
-        include: {
-          bike: {
-            include: {
-              model: true,
-            },
-          },
-          branch: true,
-        },
-      });
-
-      if (!order) {
-        throw new NotFoundException(`Order with ID ${orderId} not found`);
-      }
-
-      if (order.status !== OrderStatus.CONFIRMED && order.status !== OrderStatus.PAID) {
-        throw new BadRequestException(
-          `Delivery request can only be created for CONFIRMED or PAID orders. Current status: ${order.status}`
-        );
-      }
-
-      // 2. Check if delivery request already exists
-      const existingDelivery = await tx.deliveryRequest.findUnique({
-        where: { orderId },
-      });
-
-      if (existingDelivery) {
-        throw new BadRequestException(
-          `Delivery request already exists for this order`
-        );
-      }
-
-      // 3. Create delivery request
-      const delivery = await tx.deliveryRequest.create({
-        data: {
-          orderId,
-          deliveryAddress: dto.deliveryAddress,
-          preferredTimeWindow: dto.preferredTimeWindow,
-          contactNumber: dto.contactNumber,
-          status: DeliveryStatus.REQUESTED,
-        },
-        include: {
-          order: {
-            include: {
-              bike: {
-                include: {
-                  model: true,
-                },
+      if (orderType === "BIKE") {
+        // 1. Fetch order and verify status
+        const order = await tx.order.findUnique({
+          where: { id: orderId },
+          include: {
+            bike: {
+              include: {
+                model: true,
               },
-              branch: true,
+            },
+            branch: true,
+          },
+        });
+
+        if (!order) {
+          throw new NotFoundException(`Order with ID ${orderId} not found`);
+        }
+
+        if (order.status !== OrderStatus.CONFIRMED && order.status !== OrderStatus.PAID) {
+          throw new BadRequestException(
+            `Delivery request can only be created for CONFIRMED or PAID orders. Current status: ${order.status}`
+          );
+        }
+
+        // 2. Check if delivery request already exists
+        const existingDelivery = await tx.deliveryRequest.findUnique({
+          where: { orderId },
+        });
+
+        if (existingDelivery) {
+          throw new BadRequestException(
+            `Delivery request already exists for this order`
+          );
+        }
+
+        // 3. Create delivery request
+        const delivery = await tx.deliveryRequest.create({
+          data: {
+            orderId,
+            deliveryAddress: dto.deliveryAddress,
+            preferredTimeWindow: dto.preferredTimeWindow,
+            contactNumber: dto.contactNumber,
+            status: DeliveryStatus.REQUESTED,
+          },
+          include: {
+            order: {
+              include: {
+                bike: {
+                  include: {
+                    model: true,
+                  },
+                },
+                branch: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      // 4. Update order status to READY_FOR_DELIVERY
-      await tx.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.READY_FOR_DELIVERY,
-        },
-      });
+        return delivery;
+      } else {
+        // PART order handling
+        const partOrder = await tx.partOrder.findUnique({
+          where: { id: orderId },
+          include: {
+            part: true,
+            branch: true,
+          },
+        });
 
-      // 5. Update bike status to IN_DELIVERY
-      await tx.bikeUnit.update({
-        where: { id: order.bikeId },
-        data: {
-          status: BikeStatus.IN_DELIVERY,
-        },
-      });
+        if (!partOrder) {
+          throw new NotFoundException(`Part order with ID ${orderId} not found`);
+        }
 
-      return delivery;
+        if (partOrder.status !== OrderStatus.CONFIRMED && partOrder.status !== OrderStatus.PAID) {
+          throw new BadRequestException(
+            `Delivery request can only be created for CONFIRMED or PAID part orders. Current status: ${partOrder.status}`
+          );
+        }
+
+        // Check if delivery request already exists
+        const existingDelivery = await tx.deliveryRequest.findUnique({
+          where: { partOrderId: orderId },
+        });
+
+        if (existingDelivery) {
+          throw new BadRequestException(
+            `Delivery request already exists for this part order`
+          );
+        }
+
+        // Create delivery request
+        const delivery = await tx.deliveryRequest.create({
+          data: {
+            partOrderId: orderId,
+            deliveryAddress: dto.deliveryAddress,
+            preferredTimeWindow: dto.preferredTimeWindow,
+            contactNumber: dto.contactNumber,
+            status: DeliveryStatus.REQUESTED,
+          },
+          include: {
+            partOrder: {
+              include: {
+                part: true,
+                branch: true,
+              },
+            },
+          },
+        });
+
+        return delivery;
+      }
     });
   }
 
@@ -159,6 +196,12 @@ export class DeliveriesService {
               },
             },
           },
+          partOrder: {
+            include: {
+              part: true,
+              branch: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       }),
@@ -201,6 +244,12 @@ export class DeliveriesService {
                 email: true,
               },
             },
+          },
+        },
+        partOrder: {
+          include: {
+            part: true,
+            branch: true,
           },
         },
       },
@@ -275,25 +324,69 @@ export class DeliveriesService {
               branch: true,
             },
           },
+          partOrder: {
+            include: {
+              part: true,
+              branch: true,
+            },
+          },
         },
       });
 
-      // If delivery is DELIVERED, update order and bike status
-      if (newStatus === DeliveryStatus.DELIVERED) {
-        await tx.order.update({
-          where: { id: delivery.orderId },
-          data: {
-            status: OrderStatus.DELIVERED,
-            processedById: adminId,
-          },
-        });
+      // When admin approves delivery: flip order to READY_FOR_DELIVERY and bike to IN_DELIVERY
+      if (newStatus === DeliveryStatus.APPROVED) {
+        if (delivery.orderId && delivery.order) {
+          await tx.order.update({
+            where: { id: delivery.orderId },
+            data: {
+              status: OrderStatus.READY_FOR_DELIVERY,
+              processedById: adminId,
+            },
+          });
 
-        await tx.bikeUnit.update({
-          where: { id: delivery.order.bikeId },
-          data: {
-            status: BikeStatus.SOLD,
-          },
-        });
+          await tx.bikeUnit.update({
+            where: { id: delivery.order.bikeId },
+            data: {
+              status: BikeStatus.IN_DELIVERY,
+            },
+          });
+        } else if (delivery.partOrderId) {
+          await tx.partOrder.update({
+            where: { id: delivery.partOrderId },
+            data: {
+              status: OrderStatus.READY_FOR_DELIVERY,
+              processedById: adminId,
+            },
+          });
+        }
+      }
+
+      // If delivery is DELIVERED, update order/part order status
+      if (newStatus === DeliveryStatus.DELIVERED) {
+        if (delivery.orderId && delivery.order) {
+          await tx.order.update({
+            where: { id: delivery.orderId },
+            data: {
+              status: OrderStatus.DELIVERED,
+              processedById: adminId,
+            },
+          });
+
+          await tx.bikeUnit.update({
+            where: { id: delivery.order.bikeId },
+            data: {
+              status: BikeStatus.SOLD,
+            },
+          });
+        } else if (delivery.partOrderId) {
+          await tx.partOrder.update({
+            where: { id: delivery.partOrderId },
+            data: {
+              status: OrderStatus.DELIVERED,
+              processedById: adminId,
+            },
+          });
+        }
       }
 
       // Create audit log for status change
@@ -314,27 +407,39 @@ export class DeliveriesService {
   }
 
   /**
-   * Get delivery by order ID
+   * Get delivery by order ID (bike or part order)
    */
-  async getDeliveryByOrderId(orderId: string) {
-    const delivery = await this.prisma.client.deliveryRequest.findUnique({
-      where: { orderId },
-      include: {
-        order: {
-          include: {
-            bike: {
-              include: {
-                model: true,
+  async getDeliveryByOrderId(orderId: string, orderType: "BIKE" | "PART" = "BIKE") {
+    const where = orderType === "BIKE" ? { orderId } : { partOrderId: orderId };
+    const include = orderType === "BIKE" 
+      ? {
+          order: {
+            include: {
+              bike: {
+                include: {
+                  model: true,
+                },
               },
+              branch: true,
             },
-            branch: true,
           },
-        },
-      },
+        }
+      : {
+          partOrder: {
+            include: {
+              part: true,
+              branch: true,
+            },
+          },
+        };
+
+    const delivery = await this.prisma.client.deliveryRequest.findUnique({
+      where,
+      include,
     });
 
     if (!delivery) {
-      throw new NotFoundException(`Delivery request for order ${orderId} not found`);
+      throw new NotFoundException(`Delivery request for ${orderType.toLowerCase()} order ${orderId} not found`);
     }
 
     return delivery;

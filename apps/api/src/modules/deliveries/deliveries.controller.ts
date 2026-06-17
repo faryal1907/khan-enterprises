@@ -23,9 +23,10 @@ export class DeliveriesController {
   async createDeliveryRequest(
     @Param("orderId") orderId: string,
     @Body() dto: CreateDeliveryDto,
+    @Query("orderType") orderType: "BIKE" | "PART" = "BIKE",
     @CurrentUser() user: any
   ) {
-    return this.deliveriesService.createDeliveryRequest(orderId, dto);
+    return this.deliveriesService.createDeliveryRequest(orderId, dto, orderType);
   }
 
   /**
@@ -72,8 +73,11 @@ export class DeliveriesController {
   @Get("order/:orderId")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
-  async getDeliveryByOrderId(@Param("orderId") orderId: string) {
-    return this.deliveriesService.getDeliveryByOrderId(orderId);
+  async getDeliveryByOrderId(
+    @Param("orderId") orderId: string,
+    @Query("orderType") orderType: "BIKE" | "PART" = "BIKE"
+  ) {
+    return this.deliveriesService.getDeliveryByOrderId(orderId, orderType);
   }
 
   /**
@@ -90,5 +94,36 @@ export class DeliveriesController {
     @CurrentUser() user: any
   ) {
     return this.deliveriesService.updateDeliveryStatus(id, dto, user.id);
+  }
+
+  /**
+   * PATCH /api/deliveries/:id/approve
+   * @Roles(ADMIN, MANAGER)
+   * Approve delivery request
+   */
+  @Patch(":id/approve")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async approveDelivery(
+    @Param("id") id: string,
+    @CurrentUser() user: any
+  ) {
+    return this.deliveriesService.updateDeliveryStatus(id, { status: "APPROVED" }, user.id);
+  }
+
+  /**
+   * PATCH /api/deliveries/:id/reject
+   * @Roles(ADMIN, MANAGER)
+   * Reject delivery request
+   */
+  @Patch(":id/reject")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async rejectDelivery(
+    @Param("id") id: string,
+    @Body() body: { reason?: string },
+    @CurrentUser() user: any
+  ) {
+    return this.deliveriesService.updateDeliveryStatus(id, { status: "REQUESTED", notes: body.reason }, user.id);
   }
 }

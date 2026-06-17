@@ -28,8 +28,10 @@ export class DashboardService {
       availablePartsAgg,
       lowStockAlerts,
       pendingDeliveries,
-      ordersWaitingPayment,
-      cancelledOrders,
+      bikeOrdersWaitingPayment,
+      partOrdersWaitingPayment,
+      cancelledBikeOrders,
+      cancelledPartOrders,
     ] = await Promise.all([
       branchId
         ? this.prisma.client.branch.findUnique({
@@ -67,12 +69,16 @@ export class DashboardService {
         where: branchFilter,
         _sum: { quantity: true, reservedQuantity: true },
       }),
-      this.prisma.client.partInventory.count({
-        where: {
-          ...branchFilter,
-          quantity: { lt: this.prisma.client.partInventory.fields.reorderLevel },
+      this.prisma.client.partInventory.findMany({
+        where: branchFilter,
+        select: {
+          quantity: true,
+          reservedQuantity: true,
+          reorderLevel: true,
         },
-      }),
+      }).then(inventories => 
+        inventories.filter(inv => inv.quantity - inv.reservedQuantity < inv.reorderLevel).length
+      ),
       this.prisma.client.deliveryRequest.count({
         where: {
           order: relatedBranchFilter,
@@ -89,7 +95,13 @@ export class DashboardService {
       this.prisma.client.order.count({
         where: { ...branchFilter, status: OrderStatus.PENDING_PAYMENT },
       }),
+      this.prisma.client.partOrder.count({
+        where: { ...branchFilter, status: OrderStatus.PENDING_PAYMENT },
+      }),
       this.prisma.client.order.count({
+        where: { ...branchFilter, status: OrderStatus.CANCELLED },
+      }),
+      this.prisma.client.partOrder.count({
         where: { ...branchFilter, status: OrderStatus.CANCELLED },
       }),
     ]);
@@ -99,6 +111,8 @@ export class DashboardService {
     const availableParts =
       (availablePartsAgg._sum.quantity ?? 0) -
       (availablePartsAgg._sum.reservedQuantity ?? 0);
+    const ordersWaitingPayment = bikeOrdersWaitingPayment + partOrdersWaitingPayment;
+    const cancelledOrders = cancelledBikeOrders + cancelledPartOrders;
     const commonStats = {
       scope: branch
         ? { type: 'BRANCH' as const, branch }

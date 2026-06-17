@@ -162,7 +162,6 @@ exports.OfferScalarFieldEnum = {
     message: 'message',
     adminResponse: 'adminResponse',
     status: 'status',
-    expiresAt: 'expiresAt',
     paymentMethod: 'paymentMethod',
     createdById: 'createdById',
     createdAt: 'createdAt',
@@ -181,6 +180,7 @@ exports.OrderScalarFieldEnum = {
     negotiatedAmount: 'negotiatedAmount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    expiresAt: 'expiresAt',
     processedById: 'processedById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -198,6 +198,7 @@ exports.PartOrderScalarFieldEnum = {
     amount: 'amount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    expiresAt: 'expiresAt',
     processedById: 'processedById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -233,6 +234,7 @@ exports.PartPaymentTransactionScalarFieldEnum = {
 exports.DeliveryRequestScalarFieldEnum = {
     id: 'id',
     orderId: 'orderId',
+    partOrderId: 'partOrderId',
     deliveryAddress: 'deliveryAddress',
     preferredTimeWindow: 'preferredTimeWindow',
     contactNumber: 'contactNumber',

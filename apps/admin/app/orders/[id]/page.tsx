@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
-import { OrderStatus, PaymentMethod, Order, PaymentTransaction, UserRole } from "@/lib/types";
-import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice } from "@/lib/api/orders";
+import { OrderStatus, PaymentMethod, Order, PaymentTransaction } from "@/lib/types";
+import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
+import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
 import { ActionModal } from "@/components/action-modal";
@@ -22,7 +23,9 @@ export default function OrderDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showRejectDeliveryModal, setShowRejectDeliveryModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [rejectReason, setRejectReason] = useState("");
   const [paymentData, setPaymentData] = useState({
     method: PaymentMethod.CASH,
     amount: 0,
@@ -94,6 +97,55 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handleMarkAsPickedByCustomer = async () => {
+    try {
+      setActionLoading(true);
+      await markAsPickedByCustomer(orderId);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      toast.success("Order marked as picked by customer");
+    } catch (error: any) {
+      console.warn("Failed to mark as picked by customer:", error?.message || error);
+      toast.error(error?.message || "Failed to mark as picked by customer");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleApproveDelivery = async () => {
+    if (!order?.delivery) return;
+    try {
+      setActionLoading(true);
+      await approveDelivery(order.delivery.id);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      toast.success("Delivery approved successfully");
+    } catch (error: any) {
+      console.warn("Failed to approve delivery:", error?.message || error);
+      toast.error(error?.message || "Failed to approve delivery");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRejectDelivery = async () => {
+    if (!order?.delivery) return;
+    try {
+      setActionLoading(true);
+      await rejectDelivery(order.delivery.id, rejectReason);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      setShowRejectDeliveryModal(false);
+      setRejectReason("");
+      toast.success("Delivery rejected successfully");
+    } catch (error: any) {
+      console.warn("Failed to reject delivery:", error?.message || error);
+      toast.error(error?.message || "Failed to reject delivery");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const getActionButton = () => {
     if (!order) return null;
 
@@ -120,15 +172,64 @@ export default function OrderDetailPage() {
           </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        if (!canManageLifecycle) return null;
+        if (order.delivery) {
+          // Customer requested delivery - show approve/reject buttons
+          if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
+            return (
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleApproveDelivery}
+                  disabled={actionLoading}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Approve Delivery
+                </button>
+                <button
+                  onClick={() => setShowRejectDeliveryModal(true)}
+                  disabled={actionLoading}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.secondary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Reject Delivery
+                </button>
+              </div>
+            );
+          }
+          // Delivery already approved - show mark ready for delivery
+          return (
+            <button
+              onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
+              disabled={actionLoading}
+              className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+              style={{
+                backgroundColor: theme.accents.primary,
+                color: theme.text.inverse,
+              }}
+            >
+              Mark Ready for Delivery
+            </button>
+          );
+        }
+        // No delivery request - show picked by customer button
         return (
-          <AsyncButton
-            onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
-            loading={actionLoading}
-            className="px-6"
+          <button
+            onClick={handleMarkAsPickedByCustomer}
+            disabled={actionLoading}
+            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+            style={{
+              backgroundColor: theme.accents.primary,
+              color: theme.text.inverse,
+            }}
           >
-            Mark Ready for Delivery
-          </AsyncButton>
+            Picked by Customer
+          </button>
         );
       case OrderStatus.READY_FOR_DELIVERY:
         if (!canManageLifecycle) return null;
@@ -508,51 +609,51 @@ export default function OrderDetailPage() {
             setCancelReason("");
           }}
         >
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                Reason for cancellation
-              </label>
-              <textarea
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                rows={4}
-                placeholder="Enter reason for cancellation..."
-                disabled={actionLoading}
-              />
-            </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                  setCancelReason("");
-                }}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <AsyncButton
-                onClick={handleCancelOrder}
-                disabled={!cancelReason.trim() || actionLoading}
-                loading={actionLoading}
-                loadingLabel="Cancelling..."
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                }}
-              >
-                Confirm Cancellation
-              </AsyncButton>
-            </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+              Reason for cancellation
+            </label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+              rows={4}
+              placeholder="Enter reason for cancellation..."
+              disabled={actionLoading}
+            />
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => {
+                setShowCancelModal(false);
+                setCancelReason("");
+              }}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleCancelOrder}
+              disabled={!cancelReason.trim() || actionLoading}
+              loading={actionLoading}
+              loadingLabel="Cancelling..."
+              style={{
+                backgroundColor: theme.accents.secondary,
+              }}
+            >
+              Confirm Cancellation
+            </AsyncButton>
+          </div>
         </ActionModal>
       )}
 
@@ -565,37 +666,55 @@ export default function OrderDetailPage() {
             setShowPaymentModal(false);
           }}
         >
-            <div className="space-y-4 mb-4">
+          <div className="space-y-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Payment Method
+              </label>
+              <select
+                value={paymentData.method}
+                onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value as PaymentMethod })}
+                disabled={actionLoading}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              >
+                <option value={PaymentMethod.CASH}>Cash</option>
+                <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
+                <option value={PaymentMethod.SAFEPAY}>Safepay</option>
+                <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
+                <option value={PaymentMethod.RAAST}>Raast</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Amount
+              </label>
+              <input
+                type="number"
+                value={paymentData.amount}
+                onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
+                disabled={actionLoading}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              />
+            </div>
+            {paymentData.method !== PaymentMethod.CASH && (
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                  Payment Method
-                </label>
-                <select
-                  value={paymentData.method}
-                  onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value as PaymentMethod })}
-                  disabled={actionLoading}
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                >
-                  <option value={PaymentMethod.CASH}>Cash</option>
-                  <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
-                  <option value={PaymentMethod.SAFEPAY}>Safepay</option>
-                  <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
-                  <option value={PaymentMethod.RAAST}>Raast</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                  Amount
+                  Reference Number (optional)
                 </label>
                 <input
-                  type="number"
-                  value={paymentData.amount}
-                  onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
+                  type="text"
+                  value={paymentData.referenceNumber}
+                  onChange={(e) => setPaymentData({ ...paymentData, referenceNumber: e.target.value })}
                   disabled={actionLoading}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
@@ -603,32 +722,68 @@ export default function OrderDetailPage() {
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
+                  placeholder="Enter reference number..."
                 />
               </div>
-              {paymentData.method !== PaymentMethod.CASH && (
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                    Reference Number (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={paymentData.referenceNumber}
-                    onChange={(e) => setPaymentData({ ...paymentData, referenceNumber: e.target.value })}
-                    disabled={actionLoading}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter reference number..."
-                  />
-                </div>
-              )}
+            )}
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => setShowPaymentModal(false)}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleRecordPayment}
+              disabled={paymentData.amount <= 0 || actionLoading}
+              loading={actionLoading}
+              loadingLabel="Recording..."
+            >
+              Record Payment
+            </AsyncButton>
+          </div>
+        </ActionModal>
+      )}
+
+      {/* Reject Delivery Modal */}
+      {showRejectDeliveryModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+          <div
+            className="rounded-lg p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Reject Delivery Request
+            </h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Reason for rejection (optional)
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                rows={4}
+                placeholder="Enter reason for rejection..."
+              />
             </div>
             <div className="flex justify-end space-x-4">
               <button
-                onClick={() => setShowPaymentModal(false)}
+                onClick={() => {
+                  setShowRejectDeliveryModal(false);
+                  setRejectReason("");
+                }}
                 className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -638,16 +793,20 @@ export default function OrderDetailPage() {
               >
                 Cancel
               </button>
-              <AsyncButton
-                onClick={handleRecordPayment}
-                disabled={paymentData.amount <= 0 || actionLoading}
-                loading={actionLoading}
-                loadingLabel="Recording..."
+              <button
+                onClick={handleRejectDelivery}
+                disabled={actionLoading}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: theme.text.inverse,
+                }}
               >
-                Record Payment
-              </AsyncButton>
+                {actionLoading ? "Rejecting..." : "Reject Delivery"}
+              </button>
             </div>
-        </ActionModal>
+          </div>
+        </div>
       )}
     </div>
   );

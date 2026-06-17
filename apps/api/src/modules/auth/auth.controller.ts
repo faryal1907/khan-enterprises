@@ -10,9 +10,12 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Req,
+  Res,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
+import { SupabaseAuthService } from "./supabase-auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { RefreshDto } from "./dto/refresh.dto";
@@ -20,10 +23,15 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./decorators/roles.decorator";
 import { CurrentUser } from "./decorators/current-user.decorator";
+import { ConfigService } from "@nestjs/config";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly supabaseAuthService: SupabaseAuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get()
   getRoot() {
@@ -164,5 +172,49 @@ export class AuthController {
   @Roles("ADMIN")
   async activateUser(@Param("id") id: string, @CurrentUser() admin: any) {
     return this.authService.activateUser(id, admin.id);
+  }
+
+  // ─── OAuth Endpoints (Supabase) ─────────────────────────────────────────
+
+  /**
+   * GET /api/auth/google
+   * Initiates Google OAuth flow via Supabase
+   */
+  @Get("google")
+  async googleAuth() {
+    return this.supabaseAuthService.signInWithGoogle();
+  }
+
+  /**
+   * GET /api/auth/facebook
+   * Initiates Facebook OAuth flow via Supabase
+   */
+  @Get("facebook")
+  async facebookAuth() {
+    return this.supabaseAuthService.signInWithFacebook();
+  }
+
+  /**
+   * POST /api/auth/oauth/callback
+   * Handles OAuth callback from frontend with Supabase tokens
+   */
+  @Post("oauth/callback")
+  async oauthCallback(@Body() dto: { accessToken: string; refreshToken: string }) {
+    const user = await this.supabaseAuthService.handleOAuthCallback(dto.accessToken, dto.refreshToken);
+
+    // Issue tokens
+    const tokens = await this.authService.issueTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.branchId,
+      user.vendorId,
+    );
+
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user,
+    };
   }
 }

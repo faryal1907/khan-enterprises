@@ -23,7 +23,6 @@ interface Offer {
   message: string | null;
   adminResponse: string | null;
   status: string;
-  expiresAt: string | null;
   createdAt: string;
   bike: {
     id: string;
@@ -165,8 +164,8 @@ export default function OfferDetailPage() {
     try {
       setActionLoading("counter");
       await counterOffer(offerId, {
-        counterAmount: amount,
-        adminResponse: adminResponse.trim() || undefined,
+        counterAmount: parseFloat(counterAmount.replace(/,/g, "")),
+        ...(adminResponse.trim() && { adminResponse }),
       });
       setModal(null);
       setCounterAmount("");
@@ -176,7 +175,42 @@ export default function OfferDetailPage() {
     } catch (counterError: any) {
       toast.error(counterError.response?.data?.message || "Failed to send counter offer");
     } finally {
-      setActionLoading(null);
+      setActionLoading(false);
+    }
+  };
+
+  const getStatusBadgeStyle = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return {
+          backgroundColor: "#FEF3C7",
+          color: "#92400E",
+          border: "1px solid #F59E0B",
+        };
+      case "ACCEPTED":
+        return {
+          backgroundColor: "#D1FAE5",
+          color: "#065F46",
+          border: "1px solid #10B981",
+        };
+      case "REJECTED":
+        return {
+          backgroundColor: "#FEE2E2",
+          color: "#991B1B",
+          border: "1px solid #EF4444",
+        };
+      case "COUNTERED":
+        return {
+          backgroundColor: "#DBEAFE",
+          color: "#1E40AF",
+          border: "1px solid #3B82F6",
+        };
+      default:
+        return {
+          backgroundColor: theme.backgrounds.tertiary,
+          color: theme.text.secondary,
+          border: `1px solid ${theme.borders.medium}`,
+        };
     }
   };
 

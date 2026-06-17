@@ -40,16 +40,9 @@ export function Navigation() {
 
         {/* Logo / Brand */}
         <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: theme.accents.primary }}
-          >
-            <span className="font-bold text-xl" style={{ color: theme.text.inverse }}>
-              K
-            </span>
-          </div>
+          
           <span className="font-bold text-xl hidden sm:block" style={{ color: theme.text.primary }}>
-            Khan Enterprises
+            ALI & KHAN'S
           </span>
         </Link>
 

@@ -4,7 +4,11 @@ import Cookies from "js-cookie";
 const WEB_ACCESS_TOKEN_COOKIE = "webAccessToken";
 
 export const api = axios.create({
-  baseURL: "http://localhost:4000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api",
+  headers: {
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+  },
 });
 
 let isRefreshing = false;
@@ -27,6 +31,8 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  console.log('API Request:', config.method?.toUpperCase(), config.url, 'params:', JSON.stringify(config.params));
 
   return config;
 });
@@ -59,7 +65,7 @@ api.interceptors.response.use(
           throw new Error("No refresh token available");
         }
 
-        const response = await axios.post("http://localhost:4000/api/auth/refresh", {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"}/auth/refresh`, {
           refreshToken,
         });
 
@@ -82,6 +88,7 @@ api.interceptors.response.use(
 
         // Retry original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        console.log('Retrying original request:', originalRequest.method?.toUpperCase(), originalRequest.url, 'params:', originalRequest.params);
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, clear auth and redirect to login

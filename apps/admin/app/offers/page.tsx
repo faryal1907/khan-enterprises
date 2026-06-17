@@ -19,7 +19,6 @@ interface Offer {
   offerAmount: number;
   counterAmount: number | null;
   status: string;
-  expiresAt: string | null;
   createdAt: string;
   bike: {
     id: string;
@@ -85,19 +84,13 @@ export default function OffersListPage() {
   const isAdmin = user?.role === UserRole.ADMIN;
   const isBranchScoped = !isAdmin && Boolean(user?.branchId);
 
-  const [filters, setFilters] = useState({
-    status: searchParams.get("status") || "PENDING",
-    branchId: "",
-    search: "",
-  });
-  const debouncedSearch = useDebouncedValue(filters.search, 300);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [exporting, setExporting] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const statusTabs = [
+    { value: "", label: "All" },
+    { value: "PENDING", label: "Pending" },
+    { value: "COUNTERED", label: "Countered" },
+    { value: "CONVERTED", label: "Converted" },
+    { value: "REJECTED", label: "Rejected" },
+  ];
 
   useEffect(() => {
     if (!user) return;
@@ -129,7 +122,13 @@ export default function OffersListPage() {
     setError("");
 
     try {
-      const response = await getOffers(requestFilters);
+      setLoading(true);
+      const response = await getOffers({
+        status: activeTab === "CONVERTED" ? "ACCEPTED" : activeTab || undefined,
+        includeConverted: activeTab === "CONVERTED" ? true : undefined,
+        page,
+        limit: 20,
+      });
       setOffers(response.offers || []);
       setTotalPages(response.pagination?.totalPages || 1);
     } catch (fetchError: any) {
@@ -151,40 +150,41 @@ export default function OffersListPage() {
     setPage(1);
   };
 
-  const handleExportCSV = () => {
-    setExporting(true);
-    try {
-      const headers = ["Customer", "Phone", "Bike", "Branch", "Offer", "Counter", "Status", "Submitted", "Reservation Expires"];
-      const rows = offers.map((offer) => [
-        offer.customerName,
-        offer.customerPhone,
-        `${offer.bike.model.brand} ${offer.bike.model.modelName}`.trim(),
-        offer.bike.branch?.name || "",
-        offer.offerAmount,
-        offer.counterAmount || "",
-        offer.status,
-        new Date(offer.createdAt).toLocaleDateString(),
-        offer.status === "ACCEPTED" && offer.expiresAt ? new Date(offer.expiresAt).toLocaleString() : "",
-      ]);
-
-      const csv = [
-        headers.map(escapeCsv).join(","),
-        ...rows.map((row) => row.map(escapeCsv).join(",")),
-      ].join("\n");
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `offers_${new Date().toISOString().split("T")[0]}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } finally {
-      setExporting(false);
+  const getStatusBadgeStyle = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return {
+          backgroundColor: "#FEF3C7",
+          color: "#92400E",
+          border: "1px solid #F59E0B",
+        };
+      case "ACCEPTED":
+        return {
+          backgroundColor: "#D1FAE5",
+          color: "#065F46",
+          border: "1px solid #10B981",
+        };
+      case "REJECTED":
+        return {
+          backgroundColor: "#FEE2E2",
+          color: "#991B1B",
+          border: "1px solid #EF4444",
+        };
+      case "COUNTERED":
+        return {
+          backgroundColor: "#DBEAFE",
+          color: "#1E40AF",
+          border: "1px solid #3B82F6",
+        };
+      default:
+        return {
+          backgroundColor: theme.backgrounds.tertiary,
+          color: theme.text.secondary,
+          border: `1px solid ${theme.borders.medium}`,
+        };
     }
   };
+
 
   return (
     <div className="p-8">
@@ -293,15 +293,42 @@ export default function OffersListPage() {
             <table className="w-full">
               <thead>
                 <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                  {["Customer", "Bike", "Branch", "Offer", "Counter", "Status", "Submitted", "Reservation Expires"].map((header) => (
-                    <th
-                      key={header}
-                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                      style={{ color: theme.text.secondary }}
-                    >
-                      {header}
-                    </th>
-                  ))}
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Customer
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Bike Model
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Offer Amount
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Counter Amount
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Status
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    Submitted
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -336,14 +363,6 @@ export default function OffersListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.secondary }}>
                       {new Date(offer.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={isExpiringSoon(offer.status, offer.expiresAt) ? "font-medium" : ""}
-                        style={{ color: isExpiringSoon(offer.status, offer.expiresAt) ? "#F59E0B" : theme.text.primary }}
-                      >
-                        {getReservationExpiryLabel(offer.status, offer.expiresAt)}
-                      </span>
                     </td>
                   </tr>
                 ))}
