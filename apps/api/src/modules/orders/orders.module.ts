@@ -9,5 +9,6 @@ import { OrderAlertsModule } from "../order-alerts/order-alerts.module";
   imports: [PrismaModule, PdfModule, OrderAlertsModule],
   controllers: [OrdersController],
   providers: [OrdersService],
+  exports: [OrdersService],
 })
 export class OrdersModule {}
