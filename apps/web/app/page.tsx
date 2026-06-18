@@ -11,7 +11,7 @@ export default function Home() {
     const el = marqueeRef.current;
     if (!el) return;
 
-    let pos = window.innerWidth;
+    let pos = 0;
     const speed = 1.2;
 
     const animate = () => {

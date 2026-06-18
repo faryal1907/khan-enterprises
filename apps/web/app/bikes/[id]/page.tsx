@@ -124,6 +124,35 @@ export default function BikeDetailPage() {
                 </div>
               </>
             )}
+
+            {/* Title & Pricing below image */}
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-1" style={{ color: theme.text.muted }}>
+                {bike.model?.brand} • {bike.model?.year}
+              </p>
+              <div className="mb-2">
+                <span className="text-sm" style={{ color: theme.text.muted }}>
+                  Store Price
+                </span>
+                <span className="text-3xl font-bold ml-2" style={{ color: theme.text.primary }}>
+                  PKR {price.toLocaleString()}
+                </span>
+              </div>
+              <div
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: `${theme.accents.tertiary}20`, border: `1px solid ${theme.accents.tertiary}40` }}
+              >
+                <p className="text-sm font-medium mb-1" style={{ color: theme.accents.primary }}>
+                  Online Special Price
+                </p>
+                <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
+                  PKR {onlinePrice.toLocaleString()}
+                </p>
+                <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
+                  2% discount applied! You save PKR {discountAmount.toLocaleString()}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Right: Bike Information */}
@@ -145,32 +174,6 @@ export default function BikeDetailPage() {
             <h1 className="text-4xl font-bold mb-2" style={{ color: theme.text.primary }}>
               {bike.model?.modelName}
             </h1>
-            <p className="text-lg mb-4" style={{ color: theme.text.secondary }}>
-              {bike.model?.brand} • {bike.model?.year}
-            </p>
-
-            {/* Store Price */}
-            <div className="mb-2">
-              <span className="text-sm" style={{ color: theme.text.muted }}>
-                Store Price
-              </span>
-              <span className="text-4xl font-bold ml-3" style={{ color: theme.text.primary }}>
-                PKR {price.toLocaleString()}
-              </span>
-            </div>
-
-            {/* Online Price with 2% Discount */}
-            <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: `${theme.accents.tertiary}20`, border: `1px solid ${theme.accents.tertiary}40` }}>
-              <p className="text-sm font-medium mb-1" style={{ color: theme.accents.primary }}>
-                🎉 Online Special Price
-              </p>
-              <p className="text-3xl font-bold" style={{ color: theme.accents.primary }}>
-                PKR {onlinePrice.toLocaleString()}
-              </p>
-              <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
-                2% discount applied — You save PKR {discountAmount.toLocaleString()}
-              </p>
-            </div>
 
             {/* Branch */}
             <div className="mb-6">
@@ -197,7 +200,7 @@ export default function BikeDetailPage() {
                   color: theme.text.inverse,
                 }}
               >
-                Buy Online — PKR {onlinePrice.toLocaleString()}
+                Order Now 
               </button>
               <p className="text-xs mb-4 text-center" style={{ color: theme.text.muted }}>
                 Online Price: PKR {onlinePrice.toLocaleString()} (2% discount applied)
@@ -209,7 +212,7 @@ export default function BikeDetailPage() {
                   Or Visit a Branch
                 </p>
                 <p className="text-xs" style={{ color: theme.text.secondary }}>
-                  Visit our branch at <span style={{ color: theme.text.primary }}>{bike.branch?.name}</span> to purchase this motorcycle at the store price of PKR {price.toLocaleString()}.
+                  Or reserve now by ordering with cash payment option and pick up from <span style={{ color: theme.text.primary }}>{bike.branch?.name}</span> to purchase this motorcycle at discounted price.
                 </p>
               </div>
             </div>
