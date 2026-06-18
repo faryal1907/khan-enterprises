@@ -2,8 +2,32 @@
 
 import Link from "next/link";
 import { theme } from "@/lib/colors";
+import { useEffect, useRef } from "react";
 
 export default function Home() {
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = marqueeRef.current;
+    if (!el) return;
+
+    let pos = window.innerWidth;
+    const speed = 1.2;
+
+    const animate = () => {
+      pos -= speed;
+      const textWidth = el.scrollWidth;
+      if (pos < -textWidth) {
+        pos = window.innerWidth;
+      }
+      el.style.transform = `translateX(${pos}px)`;
+      requestAnimationFrame(animate);
+    };
+
+    const frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
   return (
     <div
       className="min-h-screen"
@@ -11,6 +35,22 @@ export default function Home() {
         backgroundColor: "#f8f8f8",
       }}
     >
+      {/* Discount Marquee */}
+      <div
+        className="w-full overflow-hidden py-1.5"
+        style={{
+          backgroundColor: `${theme.accents.tertiary}18`,
+          borderBottom: `1px solid ${theme.accents.tertiary}30`,
+        }}
+      >
+        <div
+          ref={marqueeRef}
+          className="whitespace-nowrap text-sm font-medium"
+          style={{ color: theme.accents.primary }}
+        >
+          Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount! Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount! Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount!Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount! &nbsp;·&nbsp; Online orders receive an automatic 2% discount!
+        </div>
+      </div>
       {/* Hero */}
       <section className="overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 pt-8 md:pt-12">

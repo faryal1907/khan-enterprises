@@ -73,18 +73,7 @@ export function Navigation() {
           {/* Orders — for all authenticated users */}
           {user && (
             <>
-              <Link
-                href="/offers"
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                style={{
-                  color: isActive("/offers") ? theme.accents.primary : theme.text.secondary,
-                  backgroundColor: isActive("/offers")
-                    ? `${theme.accents.tertiary}30`
-                    : "transparent",
-                }}
-              >
-                Negotiations
-              </Link>
+            
               <Link
                 href="/orders"
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -210,19 +199,6 @@ export function Navigation() {
             {/* Authenticated user links */}
             {user && (
               <>
-                <Link
-                  href="/offers"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                  style={{
-                    color: isActive("/offers") ? theme.accents.primary : theme.text.secondary,
-                    backgroundColor: isActive("/offers")
-                      ? `${theme.accents.tertiary}30`
-                      : "transparent",
-                  }}
-                >
-                  Negotiations
-                </Link>
                 <Link
                   href="/orders"
                   onClick={() => setMobileMenuOpen(false)}
