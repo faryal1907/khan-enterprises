@@ -234,7 +234,6 @@ export class DeliveriesService {
               },
             },
             branch: true,
-            offer: true,
             transactions: true,
             documents: true,
             processedBy: {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.DeliveryPricingScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.OfferScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
 const runtime = require("@prisma/client/runtime/client");
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -36,13 +36,11 @@ exports.ModelName = {
     Part: 'Part',
     PartInventory: 'PartInventory',
     StockMovement: 'StockMovement',
-    Offer: 'Offer',
     Order: 'Order',
     OrderAlert: 'OrderAlert',
     PartOrder: 'PartOrder',
     PaymentTransaction: 'PaymentTransaction',
     PartPaymentTransaction: 'PartPaymentTransaction',
-    DeliveryPricing: 'DeliveryPricing',
     DeliveryRequest: 'DeliveryRequest',
     Document: 'Document',
     AuditLog: 'AuditLog'
@@ -153,29 +151,10 @@ exports.StockMovementScalarFieldEnum = {
     performedById: 'performedById',
     createdAt: 'createdAt'
 };
-exports.OfferScalarFieldEnum = {
-    id: 'id',
-    bikeId: 'bikeId',
-    customerName: 'customerName',
-    customerPhone: 'customerPhone',
-    customerEmail: 'customerEmail',
-    customerCNIC: 'customerCNIC',
-    customerAddress: 'customerAddress',
-    offerAmount: 'offerAmount',
-    counterAmount: 'counterAmount',
-    message: 'message',
-    adminResponse: 'adminResponse',
-    status: 'status',
-    paymentMethod: 'paymentMethod',
-    createdById: 'createdById',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-};
 exports.OrderScalarFieldEnum = {
     id: 'id',
     orderNumber: 'orderNumber',
     bikeId: 'bikeId',
-    offerId: 'offerId',
     branchId: 'branchId',
     customerName: 'customerName',
     customerPhone: 'customerPhone',
@@ -259,13 +238,6 @@ exports.PartPaymentTransactionScalarFieldEnum = {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
-exports.DeliveryPricingScalarFieldEnum = {
-    id: 'id',
-    freeDistanceKm: 'freeDistanceKm',
-    ratePerKm: 'ratePerKm',
-    effectiveFrom: 'effectiveFrom',
-    effectiveTo: 'effectiveTo'
-};
 exports.DeliveryRequestScalarFieldEnum = {
     id: 'id',
     orderId: 'orderId',
@@ -277,9 +249,6 @@ exports.DeliveryRequestScalarFieldEnum = {
     approvedAt: 'approvedAt',
     deliveredAt: 'deliveredAt',
     notes: 'notes',
-    distanceKm: 'distanceKm',
-    deliveryFee: 'deliveryFee',
-    calculatedAt: 'calculatedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };

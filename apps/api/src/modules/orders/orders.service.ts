@@ -114,7 +114,6 @@ export class OrdersService {
               branch: true,
             },
           },
-          offer: true,
           branch: true,
           processedBy: {
             select: {
@@ -154,7 +153,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         transactions: true,
         processedBy: {
@@ -190,7 +188,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         transactions: true,
         delivery: true,
@@ -252,7 +249,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         processedBy: {
           select: {
@@ -302,7 +298,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         processedBy: {
           select: {
@@ -399,7 +394,6 @@ export class OrdersService {
         where: { id: orderId },
         include: {
           bike: true,
-          offer: true,
         },
       });
 
@@ -457,15 +451,6 @@ export class OrdersService {
           },
         });
 
-        if (order.offerId) {
-          await tx.offer.update({
-            where: { id: order.offerId },
-            data: {
-              status: "PAID",
-            },
-          });
-        }
-
         await tx.bikeUnit.update({
           where: { id: order.bikeId },
           data: {
@@ -516,7 +501,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         processedBy: {
           select: {
             id: true,
@@ -853,7 +837,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         transactions: {
           where: {
@@ -935,7 +918,6 @@ export class OrdersService {
         where: { id: orderId },
         include: {
           bike: true,
-          offer: true,
         },
       });
 
@@ -990,17 +972,7 @@ export class OrdersService {
         },
       });
 
-      // 5. Update offer to PAID if exists
-      if (order.offerId) {
-        await tx.offer.update({
-          where: { id: order.offerId },
-          data: {
-            status: "PAID",
-          },
-        });
-      }
-
-      // 6. Update bike to SOLD
+      // 5. Update bike to SOLD
       await tx.bikeUnit.update({
         where: { id: order.bikeId },
         data: {
