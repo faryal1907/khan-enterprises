@@ -8,11 +8,17 @@ import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { CreateManualOrderDto, OrderType } from "./dto/create-manual-order.dto";
 import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
+import { RevenueQueryDto, RevenueDuration } from "./dto/revenue-query.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
+import { OrderAlertsService } from "../order-alerts/order-alerts.service";
+import { AlertType } from "../order-alerts/dto/get-alerts.dto";
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly orderAlertsService: OrderAlertsService,
+  ) {}
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -481,6 +487,11 @@ export class OrdersService {
         },
       });
 
+      // Create alert for payment verification pending (non-CASH payments)
+      if (dto.method !== "CASH") {
+        await this.orderAlertsService.createAlertsForOrder(orderId, AlertType.PAYMENT_PENDING);
+      }
+
       return {
         order: updatedOrder,
         transaction,
@@ -644,6 +655,9 @@ export class OrdersService {
           newValue: JSON.stringify({ ...dto, finalSalePrice, orderType }),
         },
       });
+
+      // Create alerts for users based on their role
+      await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.NEW_ORDER);
 
       return order;
     });
@@ -1077,6 +1091,9 @@ export class OrdersService {
               }),
             },
           });
+
+          // Create alert for reservation expiry
+          await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.EXPIRY_WARNING);
         });
 
         results.push({
@@ -1098,6 +1115,113 @@ export class OrdersService {
       total: expiredOrders.length,
       processed: results.length,
       results,
+    };
+  }
+
+  /**
+   * Get revenue summary with filters
+   */
+  async revenueSummary(query: RevenueQueryDto, user?: any) {
+    const now = new Date();
+    let dateFrom: Date;
+    let dateTo: Date;
+
+    // Calculate date range based on duration
+    switch (query.duration) {
+      case RevenueDuration.WEEKLY:
+        dateFrom = new Date(now);
+        dateFrom.setDate(dateFrom.getDate() - 7);
+        dateTo = now;
+        break;
+      case RevenueDuration.MONTHLY:
+        dateFrom = new Date(now);
+        dateFrom.setMonth(dateFrom.getMonth() - 1);
+        dateTo = now;
+        break;
+      case RevenueDuration.ANNUAL:
+        dateFrom = new Date(now);
+        dateFrom.setFullYear(dateFrom.getFullYear() - 1);
+        dateTo = now;
+        break;
+      case RevenueDuration.CUSTOM:
+        if (!query.dateFrom || !query.dateTo) {
+          throw new BadRequestException("dateFrom and dateTo are required for CUSTOM duration");
+        }
+        dateFrom = new Date(query.dateFrom);
+        dateTo = new Date(query.dateTo);
+        break;
+      default:
+        throw new BadRequestException("Invalid duration");
+    }
+
+    const where: any = {
+      createdAt: {
+        gte: dateFrom,
+        lte: dateTo,
+      },
+      status: {
+        in: [OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY, OrderStatus.DELIVERED],
+      },
+    };
+
+    // Apply branch filter
+    if (query.branchId) {
+      where.branchId = query.branchId;
+    }
+
+    // Apply branch scope for non-admin users
+    this.applyBranchScope(where, user);
+
+    // Get orders with transactions
+    const orders = await this.prisma.client.order.findMany({
+      where,
+      include: {
+        transactions: {
+          where: {
+            status: PaymentStatus.SUCCESS,
+          },
+        },
+        branch: true,
+      },
+    });
+
+    // Calculate revenue metrics
+    const totalRevenue = orders.reduce((sum, order) => {
+      const orderRevenue = order.transactions.reduce((txSum, tx) => txSum + Number(tx.amount), 0);
+      return sum + orderRevenue;
+    }, 0);
+
+    const totalOrders = orders.length;
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    // Group by branch
+    const revenueByBranch = orders.reduce((acc, order) => {
+      const branchId = order.branchId;
+      const branchRevenue = order.transactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
+      
+      if (!acc[branchId]) {
+        acc[branchId] = {
+          branchId,
+          branchName: order.branch.name,
+          revenue: 0,
+          orderCount: 0,
+        };
+      }
+      
+      acc[branchId].revenue += branchRevenue;
+      acc[branchId].orderCount += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    return {
+      duration: query.duration,
+      dateFrom,
+      dateTo,
+      totalRevenue,
+      totalOrders,
+      averageOrderValue,
+      revenueByBranch: Object.values(revenueByBranch),
     };
   }
 }

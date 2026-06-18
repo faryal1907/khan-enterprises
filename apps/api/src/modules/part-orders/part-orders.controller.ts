@@ -6,6 +6,7 @@ import { Roles } from "../auth/decorators/roles.decorator";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
 import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
+import { RevenueQueryDto } from "../orders/dto/revenue-query.dto";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { OrderStatus } from "@khan/prisma";
 import { PdfService } from "../pdf/pdf.service";
@@ -148,5 +149,16 @@ export class PartOrdersController {
     });
 
     pdfStream.pipe(res);
+  }
+
+  /**
+   * GET /api/part-orders/revenue
+   * Get revenue summary with filters
+   */
+  @Get("revenue")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async getRevenueSummary(@Query() query: RevenueQueryDto, @CurrentUser() user: any) {
+    return this.partOrdersService.revenueSummary(query, user);
   }
 }

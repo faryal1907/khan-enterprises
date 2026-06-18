@@ -12,6 +12,7 @@ import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
 import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
+import { RevenueQueryDto } from "./dto/revenue-query.dto";
 import { PdfService } from "../pdf/pdf.service";
 import { Response } from "express";
 
@@ -267,5 +268,16 @@ export class OrdersController {
     });
 
     pdfStream.pipe(res);
+  }
+
+  /**
+   * GET /api/orders/revenue
+   * Get revenue summary with filters
+   */
+  @Get("revenue")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async getRevenueSummary(@Query() query: RevenueQueryDto, @CurrentUser() user: any) {
+    return this.ordersService.revenueSummary(query, user);
   }
 }
