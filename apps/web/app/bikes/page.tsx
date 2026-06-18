@@ -166,36 +166,44 @@ export default function BikesPage() {
                 </div>
               </div>
 
-              {/* Branch */}
-              <div className="mb-6">
+              {/* Branch - More Prominent */}
+              <div className="mb-6" style={{
+                backgroundColor: theme.accents.primary + '10',
+                borderRadius: '10px',
+                padding: '14px',
+                border: `1.5px solid ${theme.accents.primary}30`,
+              }}>
                 <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: theme.text.secondary }}
+                  className="block text-sm font-semibold mb-3 flex items-center gap-2"
+                  style={{ color: theme.accents.primary }}
                 >
-                  Branch
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Branch Location
                 </label>
                 <select
                   value={filters.branchId}
                   onChange={(e) =>
                     setFilters({ ...filters, branchId: e.target.value })
                   }
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
+                    fontWeight: 500,
                   }}
                 >
-                  <option value="">All Branches</option>
+                  <option value="">📍 All Branches</option>
                   {branches.map((branch) => (
                     <option key={branch.id} value={branch.id}>
-                      {branch.name}
+                      {branch.name} — {branch.city}
                     </option>
                   ))}
                 </select>
               </div>
-
-            
 
               <button
                 onClick={() =>
@@ -275,9 +283,18 @@ export default function BikesPage() {
                       <p className="text-sm mb-4" style={{ color: theme.text.muted }}>
                         {bike.model?.engineCapacity || "N/A"}
                       </p>
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm" style={{ color: theme.text.muted }}>
-                          {bike.branch?.name}
+                      <div style={{ backgroundColor: theme.accents.primary + '15', borderRadius: '8px', padding: '8px 12px', marginBottom: '12px' }}>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.accents.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                          <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                            {bike.branch?.name}
+                          </span>
+                        </div>
+                        <span className="text-xs" style={{ color: theme.text.secondary }}>
+                          {bike.branch?.city}{bike.branch?.city && bike.branch?.address ? ', ' : ''}{bike.branch?.address || ''}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">

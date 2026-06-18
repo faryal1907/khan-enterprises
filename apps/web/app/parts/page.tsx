@@ -6,18 +6,22 @@ import { api } from "@/lib/api-client";
 
 export default function PartsPage() {
   const [parts, setParts] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     category: "",
     search: "",
+    branchId: "",
   });
 
   useEffect(() => {
     const fetchParts = async () => {
       try {
+        setLoading(true);
         const params: any = {};
         if (filters.category) params.category = filters.category;
         if (filters.search) params.search = filters.search;
+        if (filters.branchId) params.branchId = filters.branchId;
 
         const response = await api.get("/catalog/parts", { params });
         setParts(response.data);
@@ -29,6 +33,32 @@ export default function PartsPage() {
     };
     fetchParts();
   }, [filters]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await api.get("/catalog/branches");
+        setBranches(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Failed to fetch branches:", error);
+        setBranches([]);
+      }
+    };
+    fetchBranches();
+  }, []);
+
+  // Get best branch info for a part (first in-stock inventory)
+  const getBranchInfo = (part: any) => {
+    if (!part.inventories || part.inventories.length === 0) return null;
+    const sorted = [...part.inventories].sort((a: any, b: any) => b.quantity - a.quantity);
+    return sorted[0];
+  };
+
+  // Get total stock across all branches
+  const getTotalStock = (part: any) => {
+    if (!part.inventories || part.inventories.length === 0) return 0;
+    return part.inventories.reduce((sum: number, inv: any) => sum + (inv.quantity || 0), 0);
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -114,8 +144,47 @@ export default function PartsPage() {
                 </select>
               </div>
 
+              {/* Branch Filter */}
+              <div className="mb-6" style={{
+                backgroundColor: theme.accents.primary + '10',
+                borderRadius: '10px',
+                padding: '14px',
+                border: `1.5px solid ${theme.accents.primary}30`,
+              }}>
+                <label
+                  className="block text-sm font-semibold mb-3 flex items-center gap-2"
+                  style={{ color: theme.accents.primary }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Branch Availability
+                </label>
+                <select
+                  value={filters.branchId}
+                  onChange={(e) =>
+                    setFilters({ ...filters, branchId: e.target.value })
+                  }
+                  className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                    fontWeight: 500,
+                  }}
+                >
+                  <option value="">All Branches</option>
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.name} — {branch.city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <button
-                onClick={() => setFilters({ category: "", search: "" })}
+                onClick={() => setFilters({ category: "", search: "", branchId: "" })}
                 className="w-full px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                 style={{
                   backgroundColor: theme.accents.secondary,
@@ -150,47 +219,110 @@ export default function PartsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {parts.map((part) => (
-                  <div
-                    key={part.id}
-                    className="rounded-xl p-6"
-                    style={{
-                      backgroundColor: theme.backgrounds.secondary,
-                      border: `1px solid ${theme.borders.light}`,
-                    }}
-                  >
-                    <h3
-                      className="text-lg font-semibold mb-2"
-                      style={{ color: theme.text.primary }}
+                {parts.map((part) => {
+                  const topBranch = getBranchInfo(part);
+                  const totalStock = getTotalStock(part);
+                  return (
+                    <div
+                      key={part.id}
+                      className="rounded-xl p-6"
+                      style={{
+                        backgroundColor: theme.backgrounds.secondary,
+                        border: `1px solid ${theme.borders.light}`,
+                      }}
                     >
-                      {part.name}
-                    </h3>
-                    <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
-                      SKU: {part.sku}
-                    </p>
-                    <p className="text-sm mb-4" style={{ color: theme.text.muted }}>
-                      {part.category}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span
-                        className="text-xl font-bold"
+                      <h3
+                        className="text-lg font-semibold mb-2"
                         style={{ color: theme.text.primary }}
                       >
-                        PKR {part.sellingPrice?.toLocaleString()}
-                      </span>
-                      <Link
-                        href={`/parts/${part.id}`}
-                        className="inline-block px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-                        style={{
-                          backgroundColor: theme.accents.secondary,
-                          color: theme.text.inverse,
-                        }}
-                      >
-                        View Details
-                      </Link>
+                        {part.name}
+                      </h3>
+                      <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                        SKU: {part.sku}
+                      </p>
+                      <p className="text-sm mb-4" style={{ color: theme.text.muted }}>
+                        {part.category}
+                      </p>
+
+                      {/* Stock Availability Indicator */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span
+                          className="inline-block w-2.5 h-2.5 rounded-full"
+                          style={{
+                            backgroundColor: totalStock > 10 ? '#22c55e' : totalStock > 0 ? '#f59e0b' : '#ef4444',
+                          }}
+                        />
+                        <span className="text-xs font-medium" style={{ color: theme.text.secondary }}>
+                          {totalStock > 10
+                            ? 'In Stock'
+                            : totalStock > 0
+                            ? `Low Stock (${totalStock} left)`
+                            : 'Out of Stock'}
+                        </span>
+                      </div>
+
+                      {/* Branch Info */}
+                      {part.inventories && part.inventories.length > 0 && (
+                        <div className="mb-4 space-y-1.5">
+                          {part.inventories.slice(0, 2).map((inv: any) => (
+                            <div
+                              key={inv.id}
+                              className="flex items-center justify-between text-xs rounded-lg px-2.5 py-1.5"
+                              style={{
+                                backgroundColor: theme.backgrounds.tertiary,
+                                color: theme.text.secondary,
+                              }}
+                            >
+                              <span className="flex items-center gap-1">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                  <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                {inv.branch?.name} — {inv.branch?.city}
+                              </span>
+                              <span style={{
+                                color: inv.quantity > 10 ? '#22c55e' : inv.quantity > 0 ? '#f59e0b' : '#ef4444',
+                                fontWeight: 600,
+                              }}>
+                                {inv.quantity} pcs
+                              </span>
+                            </div>
+                          ))}
+                          {part.inventories.length > 2 && (
+                            <p className="text-xs text-center" style={{ color: theme.text.muted }}>
+                              +{part.inventories.length - 2} more branches
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {!part.inventories || part.inventories.length === 0 ? (
+                        <div className="text-xs mb-4 p-2 rounded-lg text-center" style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.muted }}>
+                          No branch inventory data available
+                        </div>
+                      ) : null}
+
+                      <div className="flex items-center justify-between">
+                        <span
+                          className="text-xl font-bold"
+                          style={{ color: theme.text.primary }}
+                        >
+                          PKR {part.sellingPrice?.toLocaleString()}
+                        </span>
+                        <Link
+                          href={`/parts/${part.id}`}
+                          className="inline-block px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                          style={{
+                            backgroundColor: theme.accents.secondary,
+                            color: theme.text.inverse,
+                          }}
+                        >
+                          View Details
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -46,10 +46,12 @@ export class CatalogController {
   async getParts(
     @Query("category") category?: string,
     @Query("search") search?: string,
+    @Query("branchId") branchId?: string,
   ) {
     const filters: any = {};
     if (category) filters.category = category;
     if (search) filters.search = search;
+    if (branchId) filters.branchId = branchId;
 
     return this.catalogService.getParts(filters);
   }

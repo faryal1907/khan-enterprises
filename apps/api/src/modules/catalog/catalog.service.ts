@@ -88,6 +88,7 @@ export class CatalogService {
   async getParts(filters: {
     category?: string;
     search?: string;
+    branchId?: string;
   }) {
     const where: any = {};
 
@@ -102,8 +103,27 @@ export class CatalogService {
       ];
     }
 
+    if (filters.branchId) {
+      where.inventories = {
+        some: {
+          branchId: filters.branchId,
+          quantity: { gt: 0 },
+        },
+      };
+    }
+
     const parts = await this.prisma.client.part.findMany({
       where,
+      include: {
+        inventories: {
+          include: {
+            branch: true,
+          },
+          where: {
+            quantity: { gt: 0 },
+          },
+        },
+      },
     });
 
     return parts;
