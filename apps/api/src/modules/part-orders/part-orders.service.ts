@@ -233,6 +233,14 @@ export class PartOrdersService {
       where.processedById = query.processedById;
     }
 
+    if (query.orderType) {
+      where.orderType = query.orderType;
+    }
+
+    if (query.pickupType) {
+      where.pickupType = query.pickupType;
+    }
+
     if (query.dateFrom || query.dateTo) {
       where.createdAt = {};
       if (query.dateFrom) {
@@ -359,14 +367,6 @@ export class PartOrdersService {
         if (order.partInventory.quantity < order.quantity || reservedQuantity < order.quantity) {
           throw new BadRequestException("Insufficient reserved stock to confirm this order");
         }
-
-        await tx.partInventory.update({
-          where: { id: order.partInventoryId },
-          data: {
-            quantity: { decrement: order.quantity },
-            reservedQuantity: { decrement: order.quantity },
-          },
-        });
       }
 
       if (status === OrderStatus.CANCELLED) {
@@ -881,5 +881,40 @@ export class PartOrdersService {
       averageOrderValue,
       revenueByBranch: Object.values(revenueByBranch),
     };
+  }
+
+  /**
+   * Helper method to restore part stock depending on the status of the cancelled order
+   */
+  private async restorePartOrderStock(tx: any, order: any) {
+    if (order.status === OrderStatus.PENDING_PAYMENT || order.status === OrderStatus.PAID) {
+      // Stock was only reserved, not fully deducted
+      await tx.partInventory.update({
+        where: { id: order.partInventoryId },
+        data: {
+          reservedQuantity: { decrement: order.quantity },
+        },
+      });
+    } else if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
+      // Stock was fully deducted and reservation was cleared.
+      // Increment quantity back.
+      await tx.partInventory.update({
+        where: { id: order.partInventoryId },
+        data: {
+          quantity: { increment: order.quantity },
+        },
+      });
+
+      // Create stock movement record for restoration
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: order.partInventoryId,
+          movementType: "STOCK_IN",
+          quantity: order.quantity,
+          reason: `Part order cancelled: ${order.orderNumber}`,
+          performedById: order.processedById,
+        },
+      });
+    }
   }
 }

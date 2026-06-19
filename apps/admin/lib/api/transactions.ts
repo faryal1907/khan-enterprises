@@ -36,10 +36,6 @@ export async function getTransactions(filters: TransactionFilters = {}) {
   return response.data as { count: number; transactions: TransactionRecord[] };
 }
 
-export async function refundTransaction(id: string) {
-  const response = await api.post(`/transactions/${id}/refund`);
-  return response.data;
-}
 
 export async function downloadReceipt(id: string) {
   const response = await api.get(`/transactions/${id}/receipt`, {

@@ -49,6 +49,8 @@ export default function OrdersListPage() {
     dateFrom: "",
     dateTo: "",
     search: "",
+    orderType: "",
+    pickupType: "",
   });
   const debouncedSearch = useDebouncedValue(filters.search, 300);
 
@@ -79,8 +81,10 @@ export default function OrdersListPage() {
     dateFrom: filters.dateFrom || undefined,
     dateTo: filters.dateTo || undefined,
     search: debouncedSearch || undefined,
+    orderType: filters.orderType || undefined,
+    pickupType: filters.pickupType || undefined,
     limit: 100,
-  }), [debouncedSearch, filters.branchId, filters.dateFrom, filters.dateTo, filters.status]);
+  }), [debouncedSearch, filters.branchId, filters.dateFrom, filters.dateTo, filters.status, filters.orderType, filters.pickupType]);
 
   const fetchOrders = useCallback(async () => {
     if (!user) return;
@@ -115,10 +119,12 @@ export default function OrdersListPage() {
   };
 
   const handleExportCSV = () => {
-    const headers = ["Order Number", "Type", "Customer", "Item", "Branch", "Amount", "Payment Method", "Status", "Created Date"];
+    const headers = ["Order Number", "Item Type", "Order Type", "Pickup Type", "Customer", "Item", "Branch", "Amount", "Payment Method", "Status", "Created Date"];
     const rows = orders.map((order) => [
       order.orderNumber,
       order.type,
+      order.orderType || "-",
+      order.pickupType || "-",
       order.customerName,
       getOrderItemLabel(order),
       order.branch?.name || "",
@@ -176,7 +182,7 @@ export default function OrdersListPage() {
           className="rounded-lg p-4 mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Status
@@ -277,6 +283,44 @@ export default function OrdersListPage() {
                 placeholder="Order, customer, phone, chassis"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Order Type
+              </label>
+              <select
+                value={filters.orderType}
+                onChange={(event) => handleFilterChange("orderType", event.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              >
+                <option value="">All Types</option>
+                <option value="ONLINE">Online</option>
+                <option value="ONSITE">Onsite</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Pickup Type
+              </label>
+              <select
+                value={filters.pickupType}
+                onChange={(event) => handleFilterChange("pickupType", event.target.value)}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              >
+                <option value="">All Pickups</option>
+                <option value="DELIVERY">Delivery</option>
+                <option value="ONSITE_PICKUP">Onsite Pickup</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -287,7 +331,7 @@ export default function OrdersListPage() {
           <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                {["Order Number", "Customer", "Item", "Branch", "Amount", "Payment Method", "Status", "Created Date"].map((header) => (
+                {["Order Number", "Type", "Pickup", "Customer", "Item", "Branch", "Amount", "Payment Method", "Status", "Created Date"].map((header) => (
                   <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
@@ -297,13 +341,13 @@ export default function OrdersListPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                  <td colSpan={10} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
                     Loading orders...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                  <td colSpan={10} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
                     <div className="flex flex-col items-center gap-3">
                       <span>{error}</span>
                       <AsyncButton onClick={fetchOrders}>Retry</AsyncButton>
@@ -312,7 +356,7 @@ export default function OrdersListPage() {
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                  <td colSpan={10} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
                     No orders found
                   </td>
                 </tr>
@@ -325,6 +369,12 @@ export default function OrdersListPage() {
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
                     {order.orderNumber}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {order.orderType === "ONLINE" ? "Online" : "Onsite"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    {order.pickupType === "DELIVERY" ? "Delivery" : "Pickup"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.customerName}

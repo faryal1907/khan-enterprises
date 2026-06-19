@@ -74,6 +74,14 @@ export class OrdersService {
       where.processedById = query.processedById;
     }
 
+    if (query.orderType) {
+      where.orderType = query.orderType;
+    }
+
+    if (query.pickupType) {
+      where.pickupType = query.pickupType;
+    }
+
     if (query.dateFrom || query.dateTo) {
       where.createdAt = {};
       if (query.dateFrom) {

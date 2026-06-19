@@ -36,7 +36,6 @@ const operationLinks = [
   { href: "/bikes", label: "Bikes", icon: Bike },
   { href: "/models", label: "Models", icon: Bike },
   { href: "/parts", label: "Parts", icon: Wrench },
-  { href: "/offers", label: "Offers", icon: BadgeDollarSign },
   { href: "/orders", label: "Orders", icon: ShoppingCart },
   { href: "/sales", label: "Sales", icon: DollarSign },
   { href: "/deliveries", label: "Delivery", icon: Truck },
@@ -49,13 +48,13 @@ const adminLinks = [
   { href: "/branches", label: "Branches", icon: Building2 },
 ];
 
-export function Navigation() {
+export function Navigation({ children }: { children?: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [collapsed, setCollapsed] = useState(false);
-  const [lowStockCount, setLowStockCount] = useState(0); // ← was missing
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [lowStockCount, setLowStockCount] = useState(0);
 
   useEffect(() => {
     const fetchLowStockCount = async () => {
@@ -72,10 +71,10 @@ export function Navigation() {
     fetchLowStockCount();
   }, [user?.branchId, user?.role]);
 
-  if (!user) return null;
+  if (!user) return <>{children}</>;
 
   if (!["ADMIN", "MANAGER", "SALES_STAFF"].includes(user.role)) {
-    return null;
+    return <>{children}</>;
   }
 
   const isAdmin = user.role === UserRole.ADMIN;
@@ -331,6 +330,11 @@ export function Navigation() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Main Content Wrapper */}
+      <div className={`transition-all duration-300 ease-in-out flex-1 flex flex-col ${collapsed ? 'lg:ml-[80px]' : 'lg:ml-[260px]'}`}>
+        {children}
+      </div>
     </>
   );
 }

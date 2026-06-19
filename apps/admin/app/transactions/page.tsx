@@ -10,7 +10,6 @@ import { getBranches } from "@/lib/api/inventory";
 import {
   downloadReceipt,
   getTransactions,
-  refundTransaction,
   type TransactionRecord,
 } from "@/lib/api/transactions";
 import { theme } from "@/lib/colors";
@@ -28,7 +27,6 @@ type TransactionFilters = {
 function getStatusColor(status: string) {
   if (status === PaymentStatus.SUCCESS) return "#22c55e";
   if (status === PaymentStatus.FAILED) return "#ef4444";
-  if (status === PaymentStatus.REFUNDED) return "#f59e0b";
   return theme.text.secondary;
 }
 
@@ -61,7 +59,6 @@ export default function TransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionRecord | null>(null);
-  const [refundLoading, setRefundLoading] = useState(false);
   const [receiptLoadingId, setReceiptLoadingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -114,7 +111,6 @@ export default function TransactionsPage() {
       revenue: successful.reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0),
       successful: successful.length,
       pending: transactions.filter((transaction) => transaction.status === PaymentStatus.PENDING).length,
-      refunded: transactions.filter((transaction) => transaction.status === PaymentStatus.REFUNDED).length,
     };
   }, [transactions]);
 
@@ -135,21 +131,7 @@ export default function TransactionsPage() {
     }
   };
 
-  const executeRefund = async () => {
-    if (!selectedTransaction) return;
 
-    setRefundLoading(true);
-    try {
-      await refundTransaction(selectedTransaction.id);
-      toast.success("Refund processed successfully");
-      setSelectedTransaction(null);
-      await fetchTransactions();
-    } catch (refundError: any) {
-      toast.error(refundError.response?.data?.message || "Failed to process refund");
-    } finally {
-      setRefundLoading(false);
-    }
-  };
 
   const handleExportCSV = () => {
     const headers = ["Transaction ID", "Order", "Type", "Customer", "Branch", "Amount", "Method", "Status", "Date"];
@@ -207,11 +189,10 @@ export default function TransactionsPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <SummaryCard label="Total Revenue" value={`PKR ${summary.revenue.toLocaleString()}`} />
           <SummaryCard label="Successful" value={summary.successful} color="#22c55e" />
           <SummaryCard label="Pending" value={summary.pending} color="#f59e0b" />
-          <SummaryCard label="Refunded" value={summary.refunded} color="#ef4444" />
         </div>
 
         <div
@@ -240,7 +221,6 @@ export default function TransactionsPage() {
                 <option value={PaymentStatus.SUCCESS}>Success</option>
                 <option value={PaymentStatus.PENDING}>Pending</option>
                 <option value={PaymentStatus.FAILED}>Failed</option>
-                <option value={PaymentStatus.REFUNDED}>Refunded</option>
               </select>
             </div>
 
@@ -425,15 +405,6 @@ export default function TransactionsPage() {
                         >
                           Receipt
                         </AsyncButton>
-                        {isAdmin && transaction.status === PaymentStatus.SUCCESS && (
-                          <button
-                            onClick={() => setSelectedTransaction(transaction)}
-                            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                            style={{ backgroundColor: theme.accents.secondary, color: theme.text.inverse }}
-                          >
-                            Refund
-                          </button>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -443,37 +414,6 @@ export default function TransactionsPage() {
           </table>
         </div>
       </div>
-
-      {selectedTransaction && (
-        <ActionModal title="Confirm Refund" onClose={() => setSelectedTransaction(null)}>
-          <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
-            Refund transaction {selectedTransaction.id} for PKR {Number(selectedTransaction.amount || 0).toLocaleString()}?
-            This will mark the payment as refunded and cancel the linked order.
-          </p>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={() => setSelectedTransaction(null)}
-              disabled={refundLoading}
-              className="px-4 py-2 rounded font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.primary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
-            >
-              Cancel
-            </button>
-            <AsyncButton
-              onClick={executeRefund}
-              loading={refundLoading}
-              loadingLabel="Refunding..."
-              style={{ backgroundColor: theme.accents.secondary }}
-            >
-              Yes, Refund
-            </AsyncButton>
-          </div>
-        </ActionModal>
-      )}
     </div>
   );
 }

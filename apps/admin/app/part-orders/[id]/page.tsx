@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
-import { OrderStatus, PaymentMethod } from "@/lib/types";
+import { OrderStatus, PaymentMethod, UserRole } from "@/lib/types";
 import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice, markPartOrderAsPickedByCustomer } from "@/lib/api/orders";
 import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
@@ -146,7 +146,8 @@ export default function PartOrderDetailPage() {
           </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        if (order.delivery) {
+        if (order.pickupType === "DELIVERY") {
+          if (!order.delivery) return null;
           // Customer requested delivery - show approve/reject buttons
           if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
             return (
@@ -397,10 +398,18 @@ export default function PartOrderDetailPage() {
                   {order.paymentMethod}
                 </p>
               </div>
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Payment Verified
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.paymentVerified ? "Yes" : "No"}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Branch Info Card */}
+          {/* Fulfillment Details Card */}
           <div
             className="rounded-lg p-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -409,9 +418,25 @@ export default function PartOrderDetailPage() {
               className="text-lg font-semibold mb-4"
               style={{ color: theme.text.primary }}
             >
-              Location Info
+              Fulfillment Details
             </h3>
             <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Order Type
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.orderType === "ONLINE" ? "Online" : "Onsite"}
+                </p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Pickup Type
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.pickupType === "DELIVERY" ? "Delivery" : "Onsite Pickup"}
+                </p>
+              </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Branch
@@ -420,6 +445,26 @@ export default function PartOrderDetailPage() {
                   {order.branch?.name}
                 </p>
               </div>
+              {order.pickupType === "DELIVERY" && order.delivery && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                      Delivery Status
+                    </label>
+                    <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                      {order.delivery.status}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                      Delivery Address
+                    </label>
+                    <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                      {order.delivery.deliveryAddress}
+                    </p>
+                  </div>
+                </>
+              )}
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Processed By

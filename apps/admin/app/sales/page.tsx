@@ -85,10 +85,7 @@ function getSaleItemLabel(sale: SaleRecord) {
   return `${sale.part?.name || "Part"} (x${sale.quantity || 0})`;
 }
 
-function isRefundedSale(sale: SaleRecord) {
-  return sale.status === OrderStatus.CANCELLED
-    && sale.transactions?.some((transaction) => transaction.status === PaymentStatus.REFUNDED);
-}
+
 
 function escapeCsv(value: unknown) {
   const text = String(value ?? "");
@@ -169,7 +166,7 @@ export default function SalesRecordsPage() {
       ];
 
       const completed = records
-        .filter((sale) => completedStatuses.has(sale.status) || isRefundedSale(sale))
+        .filter((sale) => completedStatuses.has(sale.status))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       setSales(completed);
@@ -199,7 +196,7 @@ export default function SalesRecordsPage() {
       getSaleItemLabel(sale),
       getSaleAmount(sale),
       sale.type,
-      isRefundedSale(sale) ? "REFUNDED" : sale.status,
+      sale.status,
       sale.processedBy?.fullName || "",
       new Date(sale.createdAt).toLocaleDateString(),
     ]);
@@ -369,8 +366,7 @@ export default function SalesRecordsPage() {
                   </td>
                 </tr>
               ) : sales.map((sale) => {
-                const refunded = isRefundedSale(sale);
-                const statusColor = refunded ? "#ef4444" : "#22c55e";
+                const statusColor = "#22c55e";
 
                 return (
                   <tr
@@ -412,7 +408,7 @@ export default function SalesRecordsPage() {
                           border: `1px solid ${statusColor}`,
                         }}
                       >
-                        {refunded ? "REFUNDED" : sale.status.replace(/_/g, " ")}
+                        {sale.status.replace(/_/g, " ")}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>

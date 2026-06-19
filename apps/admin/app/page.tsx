@@ -120,12 +120,6 @@ function DashboardCards({
 }) {
   const operationalCards: MetricCard[] = [
     {
-      label: "Pending Offers",
-      field: "pendingOffers",
-      href: "/offers?status=PENDING",
-      emphasis: "primary",
-    },
-    {
       label: "Orders Waiting Payment",
       field: "ordersWaitingPayment",
       href: "/orders?status=PENDING_PAYMENT",
@@ -186,7 +180,6 @@ function DashboardCards({
     <>
       <MetricGrid cards={summaryCards} stats={stats} columns={4} />
       <MetricGrid cards={operationalCards.slice(1, 5)} stats={stats} columns={4} />
-      <MetricGrid cards={operationalCards.slice(5)} stats={stats} columns={2} />
     </>
   );
 }

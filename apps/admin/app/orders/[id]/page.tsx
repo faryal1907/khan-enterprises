@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
-import { OrderStatus, PaymentMethod, Order, PaymentTransaction } from "@/lib/types";
+import { OrderStatus, PaymentMethod, Order, PaymentTransaction, UserRole } from "@/lib/types";
 import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
 import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
@@ -172,7 +172,8 @@ export default function OrderDetailPage() {
           </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        if (order.delivery) {
+        if (order.pickupType === "DELIVERY") {
+          if (!order.delivery) return null;
           // Customer requested delivery - show approve/reject buttons
           if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
             return (
@@ -430,20 +431,16 @@ export default function OrderDetailPage() {
                   {order.paymentMethod}
                 </p>
               </div>
-              {order.offerId && (
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
-                    Originating Offer
-                  </label>
-                  <a
-                    href={`/offers/${order.offerId}`}
-                    className="text-sm font-medium transition-colors hover:opacity-70"
-                    style={{ color: theme.accents.primary }}
-                  >
-                    View Offer #{order.offerId}
-                  </a>
-                </div>
-              )}
+
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Payment Verified
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.paymentVerified ? "Yes" : "No"}
+                </p>
+              </div>
+
             </div>
           </div>
 
@@ -456,9 +453,25 @@ export default function OrderDetailPage() {
               className="text-lg font-semibold mb-4"
               style={{ color: theme.text.primary }}
             >
-              Delivery Status
+              Fulfillment Details
             </h3>
             <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Order Type
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.orderType === "ONLINE" ? "Online" : "Onsite"}
+                </p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Pickup Type
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.pickupType === "DELIVERY" ? "Delivery" : "Onsite Pickup"}
+                </p>
+              </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Branch

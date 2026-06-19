@@ -14,7 +14,7 @@ import { getAuditLogById, getAuditLogs, type AuditLogRecord } from "@/lib/api/au
 import { toast } from "sonner";
 
 const EMPTY = "-";
-const ACTIONS = ["CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT", "APPROVE", "REJECT", "PAYMENT", "REFUND"];
+const ACTIONS = ["CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT", "APPROVE", "REJECT", "PAYMENT"];
 const ENTITIES = [
   "BIKE",
   "BIKE_MODEL",
