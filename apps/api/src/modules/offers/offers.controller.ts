@@ -30,7 +30,7 @@ export class OffersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async getOffers(@Query() query: QueryOffersDto, @CurrentUser() user: any) {
-    return this.offersService.getOffers(query, user);
+    return this.offersService.getOffers(query);
   }
 
   /**
@@ -62,7 +62,7 @@ export class OffersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async getAdminOfferById(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.offersService.getOfferById(id, user);
+    return this.offersService.getOfferById(id);
   }
 
   @Get(":id")

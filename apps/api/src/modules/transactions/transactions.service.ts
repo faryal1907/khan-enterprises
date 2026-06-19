@@ -64,30 +64,33 @@ export class TransactionsService {
       });
     }
 
+    const isPart = 'partOrder' in transaction;
+    const orderData = isPart ? transaction.partOrder : transaction.order;
+
     return {
-      id: partTransaction.id,
-      amount: partTransaction.amount,
-      method: partTransaction.method,
-      status: partTransaction.status,
-      gatewayReference: partTransaction.gatewayReference,
-      failureReason: partTransaction.failureReason,
-      gatewayResponse: partTransaction.gatewayResponse,
-      webhookReceivedAt: partTransaction.webhookReceivedAt,
-      createdAt: partTransaction.createdAt,
-      updatedAt: partTransaction.updatedAt,
-      type: "PART",
+      id: transaction.id,
+      amount: transaction.amount,
+      method: transaction.method,
+      status: transaction.status,
+      gatewayReference: transaction.gatewayReference,
+      failureReason: transaction.failureReason,
+      gatewayResponse: transaction.gatewayResponse,
+      webhookReceivedAt: transaction.webhookReceivedAt,
+      createdAt: transaction.createdAt,
+      updatedAt: transaction.updatedAt,
+      type: isPart ? "PART" : "BIKE",
       order: {
-        id: partTransaction.partOrder.id,
-        orderNumber: partTransaction.partOrder.orderNumber,
-        customerName: partTransaction.partOrder.customerName,
-        customerPhone: partTransaction.partOrder.customerPhone,
-        customerAddress: partTransaction.partOrder.customerAddress,
-        negotiatedAmount: partTransaction.partOrder.amount,
-        paymentMethod: partTransaction.partOrder.paymentMethod,
-        status: partTransaction.partOrder.status,
-        branch: partTransaction.partOrder.branch,
+        id: orderData.id,
+        orderNumber: orderData.orderNumber,
+        customerName: orderData.customerName,
+        customerPhone: orderData.customerPhone,
+        customerAddress: orderData.customerAddress,
+        negotiatedAmount: isPart ? orderData.amount : orderData.negotiatedAmount,
+        paymentMethod: orderData.paymentMethod,
+        status: orderData.status,
+        branch: orderData.branch,
       },
-      timeline: this.buildTimeline(partTransaction),
+      timeline,
     };
   }
 

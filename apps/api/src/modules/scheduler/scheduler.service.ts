@@ -64,22 +64,6 @@ export class SchedulerService {
               },
             });
 
-            const offerIds = bike.orders
-              .map((order) => order.offerId)
-              .filter((offerId): offerId is string => Boolean(offerId));
-
-            if (offerIds.length > 0) {
-              await tx.offer.updateMany({
-                where: {
-                  id: { in: offerIds },
-                  status: OfferStatus.ACCEPTED,
-                },
-                data: {
-                  status: OfferStatus.EXPIRED,
-                  expiresAt: null,
-                },
-              });
-            }
             this.logger.log(
               `Cancelled ${bike.orders.length} order(s) for bike ${bike.id}`,
             );

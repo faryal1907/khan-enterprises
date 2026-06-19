@@ -28,6 +28,6 @@ export class TransactionsController {
    */
   @Get(":id")
   async getTransaction(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.transactionsService.getTransactionById(id, user);
+    return this.transactionsService.getTransactionById(id);
   }
 }

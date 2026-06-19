@@ -552,7 +552,7 @@ export class OrdersService {
    * Handles both ONLINE and ONSITE order types
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
-    return this.prisma.client.$transaction(async (tx) => {
+    const createdOrder = await this.prisma.client.$transaction(async (tx) => {
       // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
@@ -651,11 +651,13 @@ export class OrdersService {
         },
       });
 
-      // Create alerts for users based on their role
-      await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.NEW_ORDER);
-
       return order;
     });
+
+    // Create alerts for users based on their role AFTER transaction commits
+    await this.orderAlertsService.createAlertsForOrder(createdOrder.id, AlertType.NEW_ORDER);
+
+    return createdOrder;
   }
 
   /**

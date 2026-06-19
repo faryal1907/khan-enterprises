@@ -98,7 +98,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
     <>
       {/* Mobile toggle */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg shadow-lg"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg shadow-lg"
         style={{
           backgroundColor: theme.backgrounds.secondary,
           color: theme.text.primary,
@@ -112,7 +112,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
       <aside
         className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        } md:translate-x-0`}
         style={{
           width: collapsed ? "80px" : "260px",
           backgroundColor: theme.backgrounds.secondary,
@@ -143,7 +143,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
             )}
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg"
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg"
               style={{
                 backgroundColor: theme.backgrounds.primary,
                 color: theme.text.secondary,
@@ -326,13 +326,18 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main Content Wrapper */}
-      <div className={`transition-all duration-300 ease-in-out flex-1 flex flex-col ${collapsed ? 'lg:ml-[80px]' : 'lg:ml-[260px]'}`}>
+      <div 
+        className={`transition-all duration-300 ease-in-out flex-1 flex flex-col ${
+          sidebarOpen ? (collapsed ? "ml-[80px]" : "ml-[260px]") : "ml-0"
+        } ${collapsed ? 'md:ml-[80px]' : 'md:ml-[260px]'}`}
+      >
+        <div className="md:hidden" style={{ height: "64px" }} /> {/* Spacer for mobile menu button */}
         {children}
       </div>
     </>
