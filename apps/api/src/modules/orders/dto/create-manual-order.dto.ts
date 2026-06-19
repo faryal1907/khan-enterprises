@@ -2,6 +2,11 @@ import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, IsEnum } from 'class-v
 import { Type } from 'class-transformer';
 import { PaymentMethod } from '@khan/prisma';
 
+export enum OrderType {
+  ONLINE = 'ONLINE',
+  ONSITE = 'ONSITE',
+}
+
 export class CreateManualOrderDto {
   @IsString()
   @IsNotEmpty()
@@ -30,4 +35,13 @@ export class CreateManualOrderDto {
 
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
+
+  @IsEnum(OrderType)
+  @IsOptional()
+  orderType?: OrderType;
+
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  actualSalePrice?: number;
 }

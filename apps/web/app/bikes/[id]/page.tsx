@@ -1,31 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
-import { createOffer } from "@/lib/api/offers";
-import { numberToWords } from "@repo/utils";
 
 export default function BikeDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { user } = useAuthStore();
   const [bike, setBike] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [showOfferForm, setShowOfferForm] = useState(false);
-  const [offerAmount, setOfferAmount] = useState("");
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerCNIC, setCustomerCNIC] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
-  const [message, setMessage] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("CASH");
-  const [successMessage, setSuccessMessage] = useState("");
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchBike = async () => {
@@ -41,57 +28,17 @@ export default function BikeDetailPage() {
     fetchBike();
   }, [id]);
 
-  // Pre-fill customer details if logged in
-  useEffect(() => {
-    if (user) {
-      if (!customerName) setCustomerName(user.fullName || "");
-      if (!customerPhone) setCustomerPhone(user.phoneNumber || "");
-      if (!customerEmail) setCustomerEmail(user.email || "");
-    }
-  }, [user]);
+  const price = bike ? (bike.price || bike.model?.basePrice) : 0;
+  const onlinePrice = price * 0.98;
+  const discountAmount = price - onlinePrice;
 
-  const handleMakeOffer = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleBuyOnline = () => {
     if (!user) {
       window.location.href = "/login";
       return;
     }
-
-    if (!offerAmount || !customerName || !customerPhone || !customerAddress) {
-      setErrorMessage("Please fill in all required fields");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      setErrorMessage("");
-      setSuccessMessage("");
-
-      const result = await createOffer({
-        bikeId: id as string,
-        customerName,
-        customerPhone,
-        customerEmail: customerEmail || undefined,
-        customerCNIC: customerCNIC || undefined,
-        customerAddress,
-        offerAmount: parseFloat(offerAmount.replace(/,/g, "")),
-        message: message || undefined,
-        paymentMethod: paymentMethod as any,
-      }, user?.id);
-
-      // Redirect to offer status page
-      window.location.href = `/offers/${result.id}`;
-    } catch (error: any) {
-      console.error("Failed to submit offer:", error);
-      const data = error.response?.data;
-      if (data?.message && Array.isArray(data.message)) {
-        setErrorMessage(data.message.join(", "));
-      } else {
-        setErrorMessage(data?.message || "Failed to submit offer. Please try again.");
-      }
-    } finally {
-      setSubmitting(false);
-    }
+    // Redirect to order creation page with bike-id and online discount flag
+    router.push(`/orders/new?bikeId=${id}&onlineDiscount=true`);
   };
 
   if (loading) {
@@ -177,6 +124,35 @@ export default function BikeDetailPage() {
                 </div>
               </>
             )}
+
+            {/* Title & Pricing below image */}
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-1" style={{ color: theme.text.muted }}>
+                {bike.model?.brand} • {bike.model?.year}
+              </p>
+              <div className="mb-2">
+                <span className="text-sm" style={{ color: theme.text.muted }}>
+                  Store Price
+                </span>
+                <span className="text-3xl font-bold ml-2" style={{ color: theme.text.primary }}>
+                  PKR {price.toLocaleString()}
+                </span>
+              </div>
+              <div
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: `${theme.accents.tertiary}20`, border: `1px solid ${theme.accents.tertiary}40` }}
+              >
+                <p className="text-sm font-medium mb-1" style={{ color: theme.accents.primary }}>
+                  Online Special Price
+                </p>
+                <p className="text-2xl font-bold" style={{ color: theme.accents.primary }}>
+                  PKR {onlinePrice.toLocaleString()}
+                </p>
+                <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
+                  2% discount applied! You save PKR {discountAmount.toLocaleString()}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Right: Bike Information */}
@@ -198,22 +174,47 @@ export default function BikeDetailPage() {
             <h1 className="text-4xl font-bold mb-2" style={{ color: theme.text.primary }}>
               {bike.model?.modelName}
             </h1>
-            <p className="text-lg mb-4" style={{ color: theme.text.secondary }}>
-              {bike.model?.brand} • {bike.model?.year}
-            </p>
-
-            {/* Price */}
-            <div className="mb-6">
-              <span className="text-4xl font-bold" style={{ color: theme.text.primary }}>
-                PKR {(bike.price || bike.model?.basePrice)?.toLocaleString()}
-              </span>
-            </div>
 
             {/* Branch */}
             <div className="mb-6">
               <p className="text-sm" style={{ color: theme.text.muted }}>
                 Available at: <span style={{ color: theme.text.primary }}>{bike.branch?.name}</span>
               </p>
+            </div>
+
+            {/* Purchase Options */}
+            <div
+              className="rounded-xl p-6 mb-6"
+              style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+            >
+              <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
+                Purchase Options
+              </h2>
+
+              {/* Buy Online */}
+              <button
+                onClick={handleBuyOnline}
+                className="w-full px-6 py-4 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity mb-3"
+                style={{
+                  backgroundColor: theme.accents.primary,
+                  color: theme.text.inverse,
+                }}
+              >
+                Order Now 
+              </button>
+              <p className="text-xs mb-4 text-center" style={{ color: theme.text.muted }}>
+                Online Price: PKR {onlinePrice.toLocaleString()} (2% discount applied)
+              </p>
+
+              {/* Visit Branch */}
+              <div className="border-t pt-4" style={{ borderColor: theme.borders.light }}>
+                <p className="text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
+                  Or Visit a Branch
+                </p>
+                <p className="text-xs" style={{ color: theme.text.secondary }}>
+                  Or reserve now by ordering with cash payment option and pick up from <span style={{ color: theme.text.primary }}>{bike.branch?.name}</span> to purchase this motorcycle at discounted price.
+                </p>
+              </div>
             </div>
 
             {/* Specifications */}
@@ -243,256 +244,6 @@ export default function BikeDetailPage() {
                 </div>
               </div>
             </div>
-
-            {/* Make Offer Section */}
-            <div
-              className="rounded-xl p-6"
-              style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <h2 className="text-xl font-semibold mb-4" style={{ color: theme.text.primary }}>
-                Make an Offer
-              </h2>
-              <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                Submit your offer and we'll get back to you within 24 hours.
-              </p>
-
-              {successMessage && (
-                <div
-                  className="mb-4 p-4 rounded-lg"
-                  style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}
-                >
-                  {successMessage}
-                </div>
-              )}
-
-              {errorMessage && (
-                <div
-                  className="mb-4 p-4 rounded-lg"
-                  style={{ backgroundColor: "#FEE2E2", color: "#991B1B" }}
-                >
-                  {errorMessage}
-                </div>
-              )}
-
-              {!showOfferForm ? (
-                <button
-                  onClick={() => {
-                    if (!user) {
-                      window.location.href = "/login";
-                      return;
-                    }
-                    setCustomerName(user.fullName || "");
-                    setCustomerPhone(user.phoneNumber || "");
-                    setCustomerEmail(user.email || "");
-                    setShowOfferForm(true);
-                  }}
-                  className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                  }}
-                >
-                  Start Offer Process
-                </button>
-              ) : (
-                <form onSubmit={handleMakeOffer}>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Your Offer (PKR) *
-                      </label>
-                      <input
-                        type="text"
-                        value={offerAmount}
-                        onChange={(e) => {
-                          const val = e.target.value.replace(/\D/g, "");
-                          if (val) {
-                            setOfferAmount(Number(val).toLocaleString());
-                          } else {
-                            setOfferAmount("");
-                          }
-                        }}
-                        placeholder="Enter your offer amount"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                      {offerAmount && (
-                        <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
-                          {numberToWords(parseFloat(offerAmount.replace(/,/g, "")))}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        placeholder="Enter your full name"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
-                        placeholder="Enter your phone number"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Email (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        value={customerEmail}
-                        onChange={(e) => setCustomerEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        CNIC
-                      </label>
-                      <input
-                        type="text"
-                        value={customerCNIC}
-                        onChange={(e) => setCustomerCNIC(e.target.value)}
-                        placeholder="Enter your CNIC number"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Address *
-                      </label>
-                      <textarea
-                        value={customerAddress}
-                        onChange={(e) => setCustomerAddress(e.target.value)}
-                        rows={2}
-                        placeholder="Enter your address"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Message (Optional)
-                      </label>
-                      <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        rows={2}
-                        placeholder="Add any additional notes"
-                        className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          border: `1px solid ${theme.borders.medium}`,
-                          color: theme.text.primary,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                        Payment Method *
-                      </label>
-                      <div className="space-y-3">
-                        <label className="flex items-center p-4 rounded-lg cursor-pointer" style={{ backgroundColor: theme.backgrounds.tertiary, border: paymentMethod === "CASH" ? `2px solid ${theme.accents.primary}` : `1px solid ${theme.borders.medium}` }}>
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="CASH"
-                            checked={paymentMethod === "CASH"}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="mr-3"
-                          />
-                          <div>
-                            <p className="font-medium" style={{ color: theme.text.primary }}>Cash</p>
-                            <p className="text-xs" style={{ color: theme.text.secondary }}>Pay at your nearest branch</p>
-                          </div>
-                        </label>
-
-                        <label className="flex items-center p-4 rounded-lg cursor-pointer" style={{ backgroundColor: theme.backgrounds.tertiary, border: paymentMethod === "BANK_TRANSFER" ? `2px solid ${theme.accents.primary}` : `1px solid ${theme.borders.medium}` }}>
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="BANK_TRANSFER"
-                            checked={paymentMethod === "BANK_TRANSFER"}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="mr-3"
-                          />
-                          <div>
-                            <p className="font-medium" style={{ color: theme.text.primary }}>Bank Transfer</p>
-                            <p className="text-xs" style={{ color: theme.text.secondary }}>Transfer via online banking</p>
-                          </div>
-                        </label>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setShowOfferForm(false)}
-                        className="flex-1 px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity"
-                        style={{
-                          backgroundColor: theme.backgrounds.tertiary,
-                          color: theme.text.secondary,
-                          border: `1px solid ${theme.borders.medium}`,
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={submitting}
-                        className="flex-1 px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                        style={{
-                          backgroundColor: theme.accents.primary,
-                          color: theme.text.inverse,
-                        }}
-                      >
-                        {submitting ? "Submitting..." : "Submit Offer"}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              )}
-            </div>
           </div>
         </div>
 
@@ -508,62 +259,6 @@ export default function BikeDetailPage() {
             <p className="leading-relaxed" style={{ color: theme.text.secondary }}>
               {bike.model?.description || "No description available."}
             </p>
-          </div>
-        </div>
-
-        {/* Negotiation Process */}
-        <div className="mt-12">
-          <div
-            className="rounded-xl p-8"
-            style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h2 className="text-2xl font-semibold mb-4" style={{ color: theme.text.primary }}>
-              How Negotiation Works
-            </h2>
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-                >
-                  1
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1" style={{ color: theme.text.primary }}>Submit Your Offer</h3>
-                  <p className="text-sm" style={{ color: theme.text.secondary }}>
-                    Enter your desired price and submit your offer through our secure platform.
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-                >
-                  2
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1" style={{ color: theme.text.primary }}>Review & Response</h3>
-                  <p className="text-sm" style={{ color: theme.text.secondary }}>
-                    Our team will review your offer and respond within 24 hours with acceptance or counter-offer.
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-                >
-                  3
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1" style={{ color: theme.text.primary }}>Complete Purchase</h3>
-                  <p className="text-sm" style={{ color: theme.text.secondary }}>
-                    Once agreed, proceed with payment and delivery scheduling.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

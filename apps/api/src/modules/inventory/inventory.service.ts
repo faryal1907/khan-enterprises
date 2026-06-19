@@ -10,7 +10,7 @@ import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
-import { AuditAction, BikeStatus, InventoryMovementType, OfferStatus, OrderStatus, UserRole } from "@khan/prisma";
+import { AuditAction, BikeStatus, InventoryMovementType, OrderStatus, UserRole } from "@khan/prisma";
 
 type InventoryUser = {
   id: string;
@@ -292,17 +292,13 @@ export class InventoryService {
       throw new BadRequestException(`Cannot manually release a bike in ${oldBike.status} status.`);
     }
 
-    const [activeOrders, activeOffers] = await Promise.all([
-      this.prisma.client.order.count({
-        where: { bikeId: id, status: { not: OrderStatus.CANCELLED } },
-      }),
-      this.prisma.client.offer.count({
-        where: { bikeId: id, status: { in: [OfferStatus.ACCEPTED, OfferStatus.PAID] } },
-      }),
-    ]);
-    if (activeOrders > 0 || activeOffers > 0) {
+    // Check for any active non-cancelled orders
+    const activeOrders = await this.prisma.client.order.count({
+      where: { bikeId: id, status: { not: OrderStatus.CANCELLED } },
+    });
+    if (activeOrders > 0) {
       throw new BadRequestException(
-        "This bike has an active offer or order. Resolve that workflow instead of changing inventory status.",
+        "This bike has an active order. Resolve that workflow instead of changing inventory status.",
       );
     }
 

@@ -57,10 +57,10 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get stockMovement(): Prisma.StockMovementDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
-    get offer(): Prisma.OfferDelegate<ExtArgs, {
+    get order(): Prisma.OrderDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
-    get order(): Prisma.OrderDelegate<ExtArgs, {
+    get orderAlert(): Prisma.OrderAlertDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
     get partOrder(): Prisma.PartOrderDelegate<ExtArgs, {

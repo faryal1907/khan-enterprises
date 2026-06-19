@@ -63,15 +63,15 @@ export type PartInventory = Prisma.PartInventoryModel
  */
 export type StockMovement = Prisma.StockMovementModel
 /**
- * Model Offer
- * 
- */
-export type Offer = Prisma.OfferModel
-/**
  * Model Order
  * 
  */
 export type Order = Prisma.OrderModel
+/**
+ * Model OrderAlert
+ * 
+ */
+export type OrderAlert = Prisma.OrderAlertModel
 /**
  * Model PartOrder
  * 

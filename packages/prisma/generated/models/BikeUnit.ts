@@ -29,11 +29,15 @@ export type AggregateBikeUnit = {
 export type BikeUnitAvgAggregateOutputType = {
   price: runtime.Decimal | null
   negotiatedPrice: runtime.Decimal | null
+  onlineDiscountPercent: runtime.Decimal | null
+  actualSalePrice: runtime.Decimal | null
 }
 
 export type BikeUnitSumAggregateOutputType = {
   price: runtime.Decimal | null
   negotiatedPrice: runtime.Decimal | null
+  onlineDiscountPercent: runtime.Decimal | null
+  actualSalePrice: runtime.Decimal | null
 }
 
 export type BikeUnitMinAggregateOutputType = {
@@ -48,6 +52,8 @@ export type BikeUnitMinAggregateOutputType = {
   price: runtime.Decimal | null
   color: string | null
   negotiatedPrice: runtime.Decimal | null
+  onlineDiscountPercent: runtime.Decimal | null
+  actualSalePrice: runtime.Decimal | null
   reservedUntil: Date | null
   soldAt: Date | null
   createdAt: Date | null
@@ -66,6 +72,8 @@ export type BikeUnitMaxAggregateOutputType = {
   price: runtime.Decimal | null
   color: string | null
   negotiatedPrice: runtime.Decimal | null
+  onlineDiscountPercent: runtime.Decimal | null
+  actualSalePrice: runtime.Decimal | null
   reservedUntil: Date | null
   soldAt: Date | null
   createdAt: Date | null
@@ -85,6 +93,8 @@ export type BikeUnitCountAggregateOutputType = {
   color: number
   media: number
   negotiatedPrice: number
+  onlineDiscountPercent: number
+  actualSalePrice: number
   reservedUntil: number
   soldAt: number
   createdAt: number
@@ -96,11 +106,15 @@ export type BikeUnitCountAggregateOutputType = {
 export type BikeUnitAvgAggregateInputType = {
   price?: true
   negotiatedPrice?: true
+  onlineDiscountPercent?: true
+  actualSalePrice?: true
 }
 
 export type BikeUnitSumAggregateInputType = {
   price?: true
   negotiatedPrice?: true
+  onlineDiscountPercent?: true
+  actualSalePrice?: true
 }
 
 export type BikeUnitMinAggregateInputType = {
@@ -115,6 +129,8 @@ export type BikeUnitMinAggregateInputType = {
   price?: true
   color?: true
   negotiatedPrice?: true
+  onlineDiscountPercent?: true
+  actualSalePrice?: true
   reservedUntil?: true
   soldAt?: true
   createdAt?: true
@@ -133,6 +149,8 @@ export type BikeUnitMaxAggregateInputType = {
   price?: true
   color?: true
   negotiatedPrice?: true
+  onlineDiscountPercent?: true
+  actualSalePrice?: true
   reservedUntil?: true
   soldAt?: true
   createdAt?: true
@@ -152,6 +170,8 @@ export type BikeUnitCountAggregateInputType = {
   color?: true
   media?: true
   negotiatedPrice?: true
+  onlineDiscountPercent?: true
+  actualSalePrice?: true
   reservedUntil?: true
   soldAt?: true
   createdAt?: true
@@ -258,6 +278,8 @@ export type BikeUnitGroupByOutputType = {
   color: string | null
   media: string[]
   negotiatedPrice: runtime.Decimal | null
+  onlineDiscountPercent: runtime.Decimal
+  actualSalePrice: runtime.Decimal | null
   reservedUntil: Date | null
   soldAt: Date | null
   createdAt: Date
@@ -300,6 +322,8 @@ export type BikeUnitWhereInput = {
   color?: Prisma.StringNullableFilter<"BikeUnit"> | string | null
   media?: Prisma.StringNullableListFilter<"BikeUnit">
   negotiatedPrice?: Prisma.DecimalNullableFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.DecimalNullableFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.DateTimeNullableFilter<"BikeUnit"> | Date | string | null
   soldAt?: Prisma.DateTimeNullableFilter<"BikeUnit"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
@@ -308,7 +332,6 @@ export type BikeUnitWhereInput = {
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   model?: Prisma.XOR<Prisma.BikeModelScalarRelationFilter, Prisma.BikeModelWhereInput>
   documents?: Prisma.DocumentListRelationFilter
-  offers?: Prisma.OfferListRelationFilter
   orders?: Prisma.OrderListRelationFilter
 }
 
@@ -325,6 +348,8 @@ export type BikeUnitOrderByWithRelationInput = {
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   media?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrderInput | Prisma.SortOrder
   reservedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   soldAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -333,7 +358,6 @@ export type BikeUnitOrderByWithRelationInput = {
   branch?: Prisma.BranchOrderByWithRelationInput
   model?: Prisma.BikeModelOrderByWithRelationInput
   documents?: Prisma.DocumentOrderByRelationAggregateInput
-  offers?: Prisma.OfferOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
 }
 
@@ -353,6 +377,8 @@ export type BikeUnitWhereUniqueInput = Prisma.AtLeast<{
   color?: Prisma.StringNullableFilter<"BikeUnit"> | string | null
   media?: Prisma.StringNullableListFilter<"BikeUnit">
   negotiatedPrice?: Prisma.DecimalNullableFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.DecimalNullableFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.DateTimeNullableFilter<"BikeUnit"> | Date | string | null
   soldAt?: Prisma.DateTimeNullableFilter<"BikeUnit"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
@@ -361,7 +387,6 @@ export type BikeUnitWhereUniqueInput = Prisma.AtLeast<{
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   model?: Prisma.XOR<Prisma.BikeModelScalarRelationFilter, Prisma.BikeModelWhereInput>
   documents?: Prisma.DocumentListRelationFilter
-  offers?: Prisma.OfferListRelationFilter
   orders?: Prisma.OrderListRelationFilter
 }, "id" | "chassisNumber" | "engineNumber">
 
@@ -378,6 +403,8 @@ export type BikeUnitOrderByWithAggregationInput = {
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   media?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrderInput | Prisma.SortOrder
   reservedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   soldAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -405,6 +432,8 @@ export type BikeUnitScalarWhereWithAggregatesInput = {
   color?: Prisma.StringNullableWithAggregatesFilter<"BikeUnit"> | string | null
   media?: Prisma.StringNullableListFilter<"BikeUnit">
   negotiatedPrice?: Prisma.DecimalNullableWithAggregatesFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalWithAggregatesFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.DecimalNullableWithAggregatesFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"BikeUnit"> | Date | string | null
   soldAt?: Prisma.DateTimeNullableWithAggregatesFilter<"BikeUnit"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"BikeUnit"> | Date | string
@@ -421,6 +450,8 @@ export type BikeUnitCreateInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -429,7 +460,6 @@ export type BikeUnitCreateInput = {
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -446,12 +476,13 @@ export type BikeUnitUncheckedCreateInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -465,6 +496,8 @@ export type BikeUnitUpdateInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -473,7 +506,6 @@ export type BikeUnitUpdateInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -490,12 +522,13 @@ export type BikeUnitUncheckedUpdateInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -512,6 +545,8 @@ export type BikeUnitCreateManyInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -528,6 +563,8 @@ export type BikeUnitUpdateManyMutationInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -547,6 +584,8 @@ export type BikeUnitUncheckedUpdateManyInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -584,6 +623,8 @@ export type BikeUnitCountOrderByAggregateInput = {
   color?: Prisma.SortOrder
   media?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrder
   reservedUntil?: Prisma.SortOrder
   soldAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -593,6 +634,8 @@ export type BikeUnitCountOrderByAggregateInput = {
 export type BikeUnitAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrder
 }
 
 export type BikeUnitMaxOrderByAggregateInput = {
@@ -607,6 +650,8 @@ export type BikeUnitMaxOrderByAggregateInput = {
   price?: Prisma.SortOrder
   color?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrder
   reservedUntil?: Prisma.SortOrder
   soldAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -625,6 +670,8 @@ export type BikeUnitMinOrderByAggregateInput = {
   price?: Prisma.SortOrder
   color?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrder
   reservedUntil?: Prisma.SortOrder
   soldAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -634,6 +681,8 @@ export type BikeUnitMinOrderByAggregateInput = {
 export type BikeUnitSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
   negotiatedPrice?: Prisma.SortOrder
+  onlineDiscountPercent?: Prisma.SortOrder
+  actualSalePrice?: Prisma.SortOrder
 }
 
 export type BikeUnitScalarRelationFilter = {
@@ -797,20 +846,6 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
-export type BikeUnitCreateNestedOneWithoutOffersInput = {
-  create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-  connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOffersInput
-  connect?: Prisma.BikeUnitWhereUniqueInput
-}
-
-export type BikeUnitUpdateOneRequiredWithoutOffersNestedInput = {
-  create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-  connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOffersInput
-  upsert?: Prisma.BikeUnitUpsertWithoutOffersInput
-  connect?: Prisma.BikeUnitWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.BikeUnitUpdateToOneWithWhereWithoutOffersInput, Prisma.BikeUnitUpdateWithoutOffersInput>, Prisma.BikeUnitUncheckedUpdateWithoutOffersInput>
-}
-
 export type BikeUnitCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOrdersInput, Prisma.BikeUnitUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOrdersInput
@@ -851,6 +886,8 @@ export type BikeUnitCreateWithoutBranchInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -858,7 +895,6 @@ export type BikeUnitCreateWithoutBranchInput = {
   vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -874,12 +910,13 @@ export type BikeUnitUncheckedCreateWithoutBranchInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -925,6 +962,8 @@ export type BikeUnitScalarWhereInput = {
   color?: Prisma.StringNullableFilter<"BikeUnit"> | string | null
   media?: Prisma.StringNullableListFilter<"BikeUnit">
   negotiatedPrice?: Prisma.DecimalNullableFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.DecimalNullableFilter<"BikeUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.DateTimeNullableFilter<"BikeUnit"> | Date | string | null
   soldAt?: Prisma.DateTimeNullableFilter<"BikeUnit"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
@@ -941,6 +980,8 @@ export type BikeUnitCreateWithoutVendorInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -948,7 +989,6 @@ export type BikeUnitCreateWithoutVendorInput = {
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -964,12 +1004,13 @@ export type BikeUnitUncheckedCreateWithoutVendorInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1009,6 +1050,8 @@ export type BikeUnitCreateWithoutModelInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -1016,7 +1059,6 @@ export type BikeUnitCreateWithoutModelInput = {
   vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -1032,12 +1074,13 @@ export type BikeUnitUncheckedCreateWithoutModelInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1067,106 +1110,6 @@ export type BikeUnitUpdateManyWithWhereWithoutModelInput = {
   data: Prisma.XOR<Prisma.BikeUnitUpdateManyMutationInput, Prisma.BikeUnitUncheckedUpdateManyWithoutModelInput>
 }
 
-export type BikeUnitCreateWithoutOffersInput = {
-  id?: string
-  chassisNumber: string
-  engineNumber: string
-  serialNumber?: string | null
-  status?: $Enums.BikeStatus
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: string | null
-  media?: Prisma.BikeUnitCreatemediaInput | string[]
-  negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Date | string | null
-  soldAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
-  branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
-  model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
-  documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
-}
-
-export type BikeUnitUncheckedCreateWithoutOffersInput = {
-  id?: string
-  vendorId: string
-  branchId: string
-  modelId: string
-  chassisNumber: string
-  engineNumber: string
-  serialNumber?: string | null
-  status?: $Enums.BikeStatus
-  price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: string | null
-  media?: Prisma.BikeUnitCreatemediaInput | string[]
-  negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Date | string | null
-  soldAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
-}
-
-export type BikeUnitCreateOrConnectWithoutOffersInput = {
-  where: Prisma.BikeUnitWhereUniqueInput
-  create: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-}
-
-export type BikeUnitUpsertWithoutOffersInput = {
-  update: Prisma.XOR<Prisma.BikeUnitUpdateWithoutOffersInput, Prisma.BikeUnitUncheckedUpdateWithoutOffersInput>
-  create: Prisma.XOR<Prisma.BikeUnitCreateWithoutOffersInput, Prisma.BikeUnitUncheckedCreateWithoutOffersInput>
-  where?: Prisma.BikeUnitWhereInput
-}
-
-export type BikeUnitUpdateToOneWithWhereWithoutOffersInput = {
-  where?: Prisma.BikeUnitWhereInput
-  data: Prisma.XOR<Prisma.BikeUnitUpdateWithoutOffersInput, Prisma.BikeUnitUncheckedUpdateWithoutOffersInput>
-}
-
-export type BikeUnitUpdateWithoutOffersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  chassisNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  engineNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumBikeStatusFieldUpdateOperationsInput | $Enums.BikeStatus
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  media?: Prisma.BikeUnitUpdatemediaInput | string[]
-  negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
-  branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
-  model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
-  documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
-}
-
-export type BikeUnitUncheckedUpdateWithoutOffersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  vendorId?: Prisma.StringFieldUpdateOperationsInput | string
-  branchId?: Prisma.StringFieldUpdateOperationsInput | string
-  modelId?: Prisma.StringFieldUpdateOperationsInput | string
-  chassisNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  engineNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  serialNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumBikeStatusFieldUpdateOperationsInput | $Enums.BikeStatus
-  price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  media?: Prisma.BikeUnitUpdatemediaInput | string[]
-  negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
-}
-
 export type BikeUnitCreateWithoutOrdersInput = {
   id?: string
   chassisNumber: string
@@ -1177,6 +1120,8 @@ export type BikeUnitCreateWithoutOrdersInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -1185,7 +1130,6 @@ export type BikeUnitCreateWithoutOrdersInput = {
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
 }
 
 export type BikeUnitUncheckedCreateWithoutOrdersInput = {
@@ -1201,12 +1145,13 @@ export type BikeUnitUncheckedCreateWithoutOrdersInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutBikeInput
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
 }
 
 export type BikeUnitCreateOrConnectWithoutOrdersInput = {
@@ -1235,6 +1180,8 @@ export type BikeUnitUpdateWithoutOrdersInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1243,7 +1190,6 @@ export type BikeUnitUpdateWithoutOrdersInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
 }
 
 export type BikeUnitUncheckedUpdateWithoutOrdersInput = {
@@ -1259,12 +1205,13 @@ export type BikeUnitUncheckedUpdateWithoutOrdersInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
 }
 
 export type BikeUnitCreateWithoutDocumentsInput = {
@@ -1277,6 +1224,8 @@ export type BikeUnitCreateWithoutDocumentsInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -1284,7 +1233,6 @@ export type BikeUnitCreateWithoutDocumentsInput = {
   vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
-  offers?: Prisma.OfferCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -1301,11 +1249,12 @@ export type BikeUnitUncheckedCreateWithoutDocumentsInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBikeInput
 }
 
@@ -1335,6 +1284,8 @@ export type BikeUnitUpdateWithoutDocumentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1342,7 +1293,6 @@ export type BikeUnitUpdateWithoutDocumentsInput = {
   vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1359,11 +1309,12 @@ export type BikeUnitUncheckedUpdateWithoutDocumentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1379,6 +1330,8 @@ export type BikeUnitCreateManyBranchInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -1395,6 +1348,8 @@ export type BikeUnitUpdateWithoutBranchInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1402,7 +1357,6 @@ export type BikeUnitUpdateWithoutBranchInput = {
   vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1418,12 +1372,13 @@ export type BikeUnitUncheckedUpdateWithoutBranchInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1439,6 +1394,8 @@ export type BikeUnitUncheckedUpdateManyWithoutBranchInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1457,6 +1414,8 @@ export type BikeUnitCreateManyVendorInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -1473,6 +1432,8 @@ export type BikeUnitUpdateWithoutVendorInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1480,7 +1441,6 @@ export type BikeUnitUpdateWithoutVendorInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1496,12 +1456,13 @@ export type BikeUnitUncheckedUpdateWithoutVendorInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1517,6 +1478,8 @@ export type BikeUnitUncheckedUpdateManyWithoutVendorInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1535,6 +1498,8 @@ export type BikeUnitCreateManyModelInput = {
   color?: string | null
   media?: Prisma.BikeUnitCreatemediaInput | string[]
   negotiatedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Date | string | null
   soldAt?: Date | string | null
   createdAt?: Date | string
@@ -1551,6 +1516,8 @@ export type BikeUnitUpdateWithoutModelInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1558,7 +1525,6 @@ export type BikeUnitUpdateWithoutModelInput = {
   vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1574,12 +1540,13 @@ export type BikeUnitUncheckedUpdateWithoutModelInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutBikeNestedInput
-  offers?: Prisma.OfferUncheckedUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBikeNestedInput
 }
 
@@ -1595,6 +1562,8 @@ export type BikeUnitUncheckedUpdateManyWithoutModelInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   media?: Prisma.BikeUnitUpdatemediaInput | string[]
   negotiatedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  onlineDiscountPercent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  actualSalePrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reservedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1608,13 +1577,11 @@ export type BikeUnitUncheckedUpdateManyWithoutModelInput = {
 
 export type BikeUnitCountOutputType = {
   documents: number
-  offers: number
   orders: number
 }
 
 export type BikeUnitCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   documents?: boolean | BikeUnitCountOutputTypeCountDocumentsArgs
-  offers?: boolean | BikeUnitCountOutputTypeCountOffersArgs
   orders?: boolean | BikeUnitCountOutputTypeCountOrdersArgs
 }
 
@@ -1638,13 +1605,6 @@ export type BikeUnitCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Ty
 /**
  * BikeUnitCountOutputType without action
  */
-export type BikeUnitCountOutputTypeCountOffersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.OfferWhereInput
-}
-
-/**
- * BikeUnitCountOutputType without action
- */
 export type BikeUnitCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderWhereInput
 }
@@ -1663,6 +1623,8 @@ export type BikeUnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   color?: boolean
   media?: boolean
   negotiatedPrice?: boolean
+  onlineDiscountPercent?: boolean
+  actualSalePrice?: boolean
   reservedUntil?: boolean
   soldAt?: boolean
   createdAt?: boolean
@@ -1671,7 +1633,6 @@ export type BikeUnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.BikeUnit$documentsArgs<ExtArgs>
-  offers?: boolean | Prisma.BikeUnit$offersArgs<ExtArgs>
   orders?: boolean | Prisma.BikeUnit$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.BikeUnitCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bikeUnit"]>
@@ -1689,6 +1650,8 @@ export type BikeUnitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   color?: boolean
   media?: boolean
   negotiatedPrice?: boolean
+  onlineDiscountPercent?: boolean
+  actualSalePrice?: boolean
   reservedUntil?: boolean
   soldAt?: boolean
   createdAt?: boolean
@@ -1711,6 +1674,8 @@ export type BikeUnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   color?: boolean
   media?: boolean
   negotiatedPrice?: boolean
+  onlineDiscountPercent?: boolean
+  actualSalePrice?: boolean
   reservedUntil?: boolean
   soldAt?: boolean
   createdAt?: boolean
@@ -1733,19 +1698,20 @@ export type BikeUnitSelectScalar = {
   color?: boolean
   media?: boolean
   negotiatedPrice?: boolean
+  onlineDiscountPercent?: boolean
+  actualSalePrice?: boolean
   reservedUntil?: boolean
   soldAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BikeUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "branchId" | "modelId" | "chassisNumber" | "engineNumber" | "serialNumber" | "status" | "price" | "color" | "media" | "negotiatedPrice" | "reservedUntil" | "soldAt" | "createdAt" | "updatedAt", ExtArgs["result"]["bikeUnit"]>
+export type BikeUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "branchId" | "modelId" | "chassisNumber" | "engineNumber" | "serialNumber" | "status" | "price" | "color" | "media" | "negotiatedPrice" | "onlineDiscountPercent" | "actualSalePrice" | "reservedUntil" | "soldAt" | "createdAt" | "updatedAt", ExtArgs["result"]["bikeUnit"]>
 export type BikeUnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.BikeUnit$documentsArgs<ExtArgs>
-  offers?: boolean | Prisma.BikeUnit$offersArgs<ExtArgs>
   orders?: boolean | Prisma.BikeUnit$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.BikeUnitCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1767,7 +1733,6 @@ export type $BikeUnitPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     branch: Prisma.$BranchPayload<ExtArgs>
     model: Prisma.$BikeModelPayload<ExtArgs>
     documents: Prisma.$DocumentPayload<ExtArgs>[]
-    offers: Prisma.$OfferPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1783,6 +1748,8 @@ export type $BikeUnitPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     color: string | null
     media: string[]
     negotiatedPrice: runtime.Decimal | null
+    onlineDiscountPercent: runtime.Decimal
+    actualSalePrice: runtime.Decimal | null
     reservedUntil: Date | null
     soldAt: Date | null
     createdAt: Date
@@ -2185,7 +2152,6 @@ export interface Prisma__BikeUnitClient<T, Null = never, ExtArgs extends runtime
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   model<T extends Prisma.BikeModelDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeModelDefaultArgs<ExtArgs>>): Prisma.Prisma__BikeModelClient<runtime.Types.Result.GetResult<Prisma.$BikeModelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   documents<T extends Prisma.BikeUnit$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  offers<T extends Prisma.BikeUnit$offersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$offersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.BikeUnit$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2228,6 +2194,8 @@ export interface BikeUnitFieldRefs {
   readonly color: Prisma.FieldRef<"BikeUnit", 'String'>
   readonly media: Prisma.FieldRef<"BikeUnit", 'String[]'>
   readonly negotiatedPrice: Prisma.FieldRef<"BikeUnit", 'Decimal'>
+  readonly onlineDiscountPercent: Prisma.FieldRef<"BikeUnit", 'Decimal'>
+  readonly actualSalePrice: Prisma.FieldRef<"BikeUnit", 'Decimal'>
   readonly reservedUntil: Prisma.FieldRef<"BikeUnit", 'DateTime'>
   readonly soldAt: Prisma.FieldRef<"BikeUnit", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"BikeUnit", 'DateTime'>
@@ -2654,30 +2622,6 @@ export type BikeUnit$documentsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
-}
-
-/**
- * BikeUnit.offers
- */
-export type BikeUnit$offersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Offer
-   */
-  select?: Prisma.OfferSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Offer
-   */
-  omit?: Prisma.OfferOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.OfferInclude<ExtArgs> | null
-  where?: Prisma.OfferWhereInput
-  orderBy?: Prisma.OfferOrderByWithRelationInput | Prisma.OfferOrderByWithRelationInput[]
-  cursor?: Prisma.OfferWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.OfferScalarFieldEnum | Prisma.OfferScalarFieldEnum[]
 }
 
 /**

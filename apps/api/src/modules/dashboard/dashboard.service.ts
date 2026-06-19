@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { UserRole, OrderStatus, BikeStatus, DeliveryStatus, OfferStatus, PaymentStatus } from '@khan/prisma';
+import { UserRole, OrderStatus, BikeStatus, DeliveryStatus, PaymentStatus } from '@khan/prisma';
 
 type DashboardUser = {
   role: UserRole;
@@ -39,12 +39,8 @@ export class DashboardService {
             select: { id: true, name: true, city: true },
           })
         : Promise.resolve(null),
-      this.prisma.client.offer.count({
-        where: {
-          bike: relatedBranchFilter,
-          status: OfferStatus.PENDING,
-        },
-      }),
+      // Offers module removed - always return 0
+      Promise.resolve(0),
       this.prisma.client.paymentTransaction.aggregate({
         where: {
           status: PaymentStatus.SUCCESS,

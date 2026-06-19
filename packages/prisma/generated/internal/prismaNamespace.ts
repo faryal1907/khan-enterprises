@@ -393,8 +393,8 @@ export const ModelName = {
   Part: 'Part',
   PartInventory: 'PartInventory',
   StockMovement: 'StockMovement',
-  Offer: 'Offer',
   Order: 'Order',
+  OrderAlert: 'OrderAlert',
   PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
   PartPaymentTransaction: 'PartPaymentTransaction',
@@ -416,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "offer" | "order" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryRequest" | "document" | "auditLog"
+    modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryRequest" | "document" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1086,80 +1086,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Offer: {
-      payload: Prisma.$OfferPayload<ExtArgs>
-      fields: Prisma.OfferFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.OfferFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.OfferFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>
-        }
-        findFirst: {
-          args: Prisma.OfferFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.OfferFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>
-        }
-        findMany: {
-          args: Prisma.OfferFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>[]
-        }
-        create: {
-          args: Prisma.OfferCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>
-        }
-        createMany: {
-          args: Prisma.OfferCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.OfferCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>[]
-        }
-        delete: {
-          args: Prisma.OfferDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>
-        }
-        update: {
-          args: Prisma.OfferUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>
-        }
-        deleteMany: {
-          args: Prisma.OfferDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.OfferUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.OfferUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>[]
-        }
-        upsert: {
-          args: Prisma.OfferUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferPayload>
-        }
-        aggregate: {
-          args: Prisma.OfferAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateOffer>
-        }
-        groupBy: {
-          args: Prisma.OfferGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OfferGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.OfferCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OfferCountAggregateOutputType> | number
-        }
-      }
-    }
     Order: {
       payload: Prisma.$OrderPayload<ExtArgs>
       fields: Prisma.OrderFieldRefs
@@ -1231,6 +1157,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrderCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrderCountAggregateOutputType> | number
+        }
+      }
+    }
+    OrderAlert: {
+      payload: Prisma.$OrderAlertPayload<ExtArgs>
+      fields: Prisma.OrderAlertFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OrderAlertFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OrderAlertFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>
+        }
+        findFirst: {
+          args: Prisma.OrderAlertFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OrderAlertFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>
+        }
+        findMany: {
+          args: Prisma.OrderAlertFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>[]
+        }
+        create: {
+          args: Prisma.OrderAlertCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>
+        }
+        createMany: {
+          args: Prisma.OrderAlertCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OrderAlertCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>[]
+        }
+        delete: {
+          args: Prisma.OrderAlertDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>
+        }
+        update: {
+          args: Prisma.OrderAlertUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>
+        }
+        deleteMany: {
+          args: Prisma.OrderAlertDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OrderAlertUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OrderAlertUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>[]
+        }
+        upsert: {
+          args: Prisma.OrderAlertUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderAlertPayload>
+        }
+        aggregate: {
+          args: Prisma.OrderAlertAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOrderAlert>
+        }
+        groupBy: {
+          args: Prisma.OrderAlertGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderAlertGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OrderAlertCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderAlertCountAggregateOutputType> | number
         }
       }
     }
@@ -1802,6 +1802,8 @@ export const BikeUnitScalarFieldEnum = {
   color: 'color',
   media: 'media',
   negotiatedPrice: 'negotiatedPrice',
+  onlineDiscountPercent: 'onlineDiscountPercent',
+  actualSalePrice: 'actualSalePrice',
   reservedUntil: 'reservedUntil',
   soldAt: 'soldAt',
   createdAt: 'createdAt',
@@ -1851,41 +1853,24 @@ export const StockMovementScalarFieldEnum = {
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
 
 
-export const OfferScalarFieldEnum = {
-  id: 'id',
-  bikeId: 'bikeId',
-  customerName: 'customerName',
-  customerPhone: 'customerPhone',
-  customerEmail: 'customerEmail',
-  customerCNIC: 'customerCNIC',
-  customerAddress: 'customerAddress',
-  offerAmount: 'offerAmount',
-  counterAmount: 'counterAmount',
-  message: 'message',
-  adminResponse: 'adminResponse',
-  status: 'status',
-  paymentMethod: 'paymentMethod',
-  createdById: 'createdById',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type OfferScalarFieldEnum = (typeof OfferScalarFieldEnum)[keyof typeof OfferScalarFieldEnum]
-
-
 export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
   bikeId: 'bikeId',
-  offerId: 'offerId',
   branchId: 'branchId',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   customerCNIC: 'customerCNIC',
   customerAddress: 'customerAddress',
   negotiatedAmount: 'negotiatedAmount',
+  isOnlineOrder: 'isOnlineOrder',
+  appliedDiscount: 'appliedDiscount',
   paymentMethod: 'paymentMethod',
   status: 'status',
+  paymentVerified: 'paymentVerified',
+  orderType: 'orderType',
+  reservationExpiry: 'reservationExpiry',
+  pickupType: 'pickupType',
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   createdAt: 'createdAt',
@@ -1893,6 +1878,18 @@ export const OrderScalarFieldEnum = {
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderAlertScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  userId: 'userId',
+  isRead: 'isRead',
+  alertType: 'alertType',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderAlertScalarFieldEnum = (typeof OrderAlertScalarFieldEnum)[keyof typeof OrderAlertScalarFieldEnum]
 
 
 export const PartOrderScalarFieldEnum = {
@@ -1908,6 +1905,10 @@ export const PartOrderScalarFieldEnum = {
   amount: 'amount',
   paymentMethod: 'paymentMethod',
   status: 'status',
+  paymentVerified: 'paymentVerified',
+  orderType: 'orderType',
+  reservationExpiry: 'reservationExpiry',
+  pickupType: 'pickupType',
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   createdAt: 'createdAt',
@@ -1927,6 +1928,9 @@ export const PaymentTransactionScalarFieldEnum = {
   status: 'status',
   gatewayResponse: 'gatewayResponse',
   failureReason: 'failureReason',
+  paymentProofUrl: 'paymentProofUrl',
+  verifiedAt: 'verifiedAt',
+  verifiedById: 'verifiedById',
   webhookReceivedAt: 'webhookReceivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1945,6 +1949,9 @@ export const PartPaymentTransactionScalarFieldEnum = {
   status: 'status',
   gatewayResponse: 'gatewayResponse',
   failureReason: 'failureReason',
+  paymentProofUrl: 'paymentProofUrl',
+  verifiedAt: 'verifiedAt',
+  verifiedById: 'verifiedById',
   webhookReceivedAt: 'webhookReceivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -2163,16 +2170,9 @@ export type ListEnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefI
 
 
 /**
- * Reference to a field of type 'OfferStatus'
+ * Reference to a field of type 'Boolean'
  */
-export type EnumOfferStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OfferStatus'>
-    
-
-
-/**
- * Reference to a field of type 'OfferStatus[]'
- */
-export type ListEnumOfferStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OfferStatus[]'>
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -2201,6 +2201,34 @@ export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'OrderStatus[]'
  */
 export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OrderType'
+ */
+export type EnumOrderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderType'>
+    
+
+
+/**
+ * Reference to a field of type 'OrderType[]'
+ */
+export type ListEnumOrderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PickupType'
+ */
+export type EnumPickupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PickupType'>
+    
+
+
+/**
+ * Reference to a field of type 'PickupType[]'
+ */
+export type ListEnumPickupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PickupType[]'>
     
 
 
@@ -2406,8 +2434,8 @@ export type GlobalOmitConfig = {
   part?: Prisma.PartOmit
   partInventory?: Prisma.PartInventoryOmit
   stockMovement?: Prisma.StockMovementOmit
-  offer?: Prisma.OfferOmit
   order?: Prisma.OrderOmit
+  orderAlert?: Prisma.OrderAlertOmit
   partOrder?: Prisma.PartOrderOmit
   paymentTransaction?: Prisma.PaymentTransactionOmit
   partPaymentTransaction?: Prisma.PartPaymentTransactionOmit

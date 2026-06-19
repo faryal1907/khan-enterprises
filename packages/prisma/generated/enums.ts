@@ -38,18 +38,6 @@ export const BikeStatus = {
 export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus]
 
 
-export const OfferStatus = {
-  PENDING: 'PENDING',
-  COUNTERED: 'COUNTERED',
-  ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED',
-  EXPIRED: 'EXPIRED',
-  PAID: 'PAID'
-} as const
-
-export type OfferStatus = (typeof OfferStatus)[keyof typeof OfferStatus]
-
-
 export const OrderStatus = {
   PENDING_PAYMENT: 'PENDING_PAYMENT',
   PAID: 'PAID',
@@ -77,7 +65,7 @@ export const PaymentStatus = {
   PENDING: 'PENDING',
   SUCCESS: 'SUCCESS',
   FAILED: 'FAILED',
-  REFUNDED: 'REFUNDED'
+  VERIFICATION_PENDING: 'VERIFICATION_PENDING'
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
@@ -94,6 +82,22 @@ export const PaymentMethod = {
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
 
 
+export const OrderType = {
+  ONLINE: 'ONLINE',
+  ONSITE: 'ONSITE'
+} as const
+
+export type OrderType = (typeof OrderType)[keyof typeof OrderType]
+
+
+export const PickupType = {
+  DELIVERY: 'DELIVERY',
+  ONSITE_PICKUP: 'ONSITE_PICKUP'
+} as const
+
+export type PickupType = (typeof PickupType)[keyof typeof PickupType]
+
+
 export const AuditAction = {
   CREATE: 'CREATE',
   UPDATE: 'UPDATE',
@@ -102,8 +106,7 @@ export const AuditAction = {
   LOGOUT: 'LOGOUT',
   APPROVE: 'APPROVE',
   REJECT: 'REJECT',
-  PAYMENT: 'PAYMENT',
-  REFUND: 'REFUND'
+  PAYMENT: 'PAYMENT'
 } as const
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

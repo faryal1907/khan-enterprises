@@ -3,6 +3,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
 import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
+import { RevenueQueryDto, RevenueDuration } from "../orders/dto/revenue-query.dto";
 import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
@@ -773,5 +774,112 @@ export class PartOrdersService {
 
       return updatedOrder;
     });
+  }
+
+  /**
+   * Get revenue summary with filters for part orders
+   */
+  async revenueSummary(query: RevenueQueryDto, user?: any) {
+    const now = new Date();
+    let dateFrom: Date;
+    let dateTo: Date;
+
+    // Calculate date range based on duration
+    switch (query.duration) {
+      case RevenueDuration.WEEKLY:
+        dateFrom = new Date(now);
+        dateFrom.setDate(dateFrom.getDate() - 7);
+        dateTo = now;
+        break;
+      case RevenueDuration.MONTHLY:
+        dateFrom = new Date(now);
+        dateFrom.setMonth(dateFrom.getMonth() - 1);
+        dateTo = now;
+        break;
+      case RevenueDuration.ANNUAL:
+        dateFrom = new Date(now);
+        dateFrom.setFullYear(dateFrom.getFullYear() - 1);
+        dateTo = now;
+        break;
+      case RevenueDuration.CUSTOM:
+        if (!query.dateFrom || !query.dateTo) {
+          throw new BadRequestException("dateFrom and dateTo are required for CUSTOM duration");
+        }
+        dateFrom = new Date(query.dateFrom);
+        dateTo = new Date(query.dateTo);
+        break;
+      default:
+        throw new BadRequestException("Invalid duration");
+    }
+
+    const where: any = {
+      createdAt: {
+        gte: dateFrom,
+        lte: dateTo,
+      },
+      status: {
+        in: [OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY, OrderStatus.DELIVERED],
+      },
+    };
+
+    // Apply branch filter
+    if (query.branchId) {
+      where.branchId = query.branchId;
+    }
+
+    // Apply branch scope for non-admin users
+    this.applyBranchScope(where, user);
+
+    // Get part orders with transactions
+    const partOrders = await this.prisma.client.partOrder.findMany({
+      where,
+      include: {
+        transactions: {
+          where: {
+            status: PaymentStatus.SUCCESS,
+          },
+        },
+        branch: true,
+      },
+    });
+
+    // Calculate revenue metrics
+    const totalRevenue = partOrders.reduce((sum, order) => {
+      const orderRevenue = order.transactions.reduce((txSum, tx) => txSum + Number(tx.amount), 0);
+      return sum + orderRevenue;
+    }, 0);
+
+    const totalOrders = partOrders.length;
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    // Group by branch
+    const revenueByBranch = partOrders.reduce((acc, order) => {
+      const branchId = order.branchId;
+      const branchRevenue = order.transactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
+      
+      if (!acc[branchId]) {
+        acc[branchId] = {
+          branchId,
+          branchName: order.branch.name,
+          revenue: 0,
+          orderCount: 0,
+        };
+      }
+      
+      acc[branchId].revenue += branchRevenue;
+      acc[branchId].orderCount += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    return {
+      duration: query.duration,
+      dateFrom,
+      dateTo,
+      totalRevenue,
+      totalOrders,
+      averageOrderValue,
+      revenueByBranch: Object.values(revenueByBranch),
+    };
   }
 }

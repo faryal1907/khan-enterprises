@@ -248,35 +248,9 @@ export type EnumInventoryMovementTypeWithAggregatesFilter<$PrismaModel = never> 
     _min?: Prisma.NestedEnumInventoryMovementTypeFilter<$PrismaModel>;
     _max?: Prisma.NestedEnumInventoryMovementTypeFilter<$PrismaModel>;
 };
-export type EnumOfferStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.OfferStatus | Prisma.EnumOfferStatusFieldRefInput<$PrismaModel>;
-    in?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    notIn?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    not?: Prisma.NestedEnumOfferStatusFilter<$PrismaModel> | $Enums.OfferStatus;
-};
-export type EnumPaymentMethodNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    in?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    notIn?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    not?: Prisma.NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null;
-};
-export type EnumOfferStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.OfferStatus | Prisma.EnumOfferStatusFieldRefInput<$PrismaModel>;
-    in?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    notIn?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    not?: Prisma.NestedEnumOfferStatusWithAggregatesFilter<$PrismaModel> | $Enums.OfferStatus;
-    _count?: Prisma.NestedIntFilter<$PrismaModel>;
-    _min?: Prisma.NestedEnumOfferStatusFilter<$PrismaModel>;
-    _max?: Prisma.NestedEnumOfferStatusFilter<$PrismaModel>;
-};
-export type EnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    in?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    notIn?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    not?: Prisma.NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod | null;
-    _count?: Prisma.NestedIntNullableFilter<$PrismaModel>;
-    _min?: Prisma.NestedEnumPaymentMethodNullableFilter<$PrismaModel>;
-    _max?: Prisma.NestedEnumPaymentMethodNullableFilter<$PrismaModel>;
+export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean;
 };
 export type EnumPaymentMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel>;
@@ -289,6 +263,25 @@ export type EnumOrderStatusFilter<$PrismaModel = never> = {
     in?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>;
     notIn?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>;
     not?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus;
+};
+export type EnumOrderTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderType | Prisma.EnumOrderTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumOrderTypeFilter<$PrismaModel> | $Enums.OrderType;
+};
+export type EnumPickupTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PickupType | Prisma.EnumPickupTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumPickupTypeFilter<$PrismaModel> | $Enums.PickupType;
+};
+export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedBoolFilter<$PrismaModel>;
+    _max?: Prisma.NestedBoolFilter<$PrismaModel>;
 };
 export type EnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel>;
@@ -307,6 +300,24 @@ export type EnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
     _count?: Prisma.NestedIntFilter<$PrismaModel>;
     _min?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>;
     _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>;
+};
+export type EnumOrderTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderType | Prisma.EnumOrderTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumOrderTypeWithAggregatesFilter<$PrismaModel> | $Enums.OrderType;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumOrderTypeFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumOrderTypeFilter<$PrismaModel>;
+};
+export type EnumPickupTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PickupType | Prisma.EnumPickupTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumPickupTypeWithAggregatesFilter<$PrismaModel> | $Enums.PickupType;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumPickupTypeFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumPickupTypeFilter<$PrismaModel>;
 };
 export type EnumPaymentStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentStatus | Prisma.EnumPaymentStatusFieldRefInput<$PrismaModel>;
@@ -679,35 +690,9 @@ export type NestedEnumInventoryMovementTypeWithAggregatesFilter<$PrismaModel = n
     _min?: Prisma.NestedEnumInventoryMovementTypeFilter<$PrismaModel>;
     _max?: Prisma.NestedEnumInventoryMovementTypeFilter<$PrismaModel>;
 };
-export type NestedEnumOfferStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.OfferStatus | Prisma.EnumOfferStatusFieldRefInput<$PrismaModel>;
-    in?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    notIn?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    not?: Prisma.NestedEnumOfferStatusFilter<$PrismaModel> | $Enums.OfferStatus;
-};
-export type NestedEnumPaymentMethodNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    in?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    notIn?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    not?: Prisma.NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null;
-};
-export type NestedEnumOfferStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.OfferStatus | Prisma.EnumOfferStatusFieldRefInput<$PrismaModel>;
-    in?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    notIn?: $Enums.OfferStatus[] | Prisma.ListEnumOfferStatusFieldRefInput<$PrismaModel>;
-    not?: Prisma.NestedEnumOfferStatusWithAggregatesFilter<$PrismaModel> | $Enums.OfferStatus;
-    _count?: Prisma.NestedIntFilter<$PrismaModel>;
-    _min?: Prisma.NestedEnumOfferStatusFilter<$PrismaModel>;
-    _max?: Prisma.NestedEnumOfferStatusFilter<$PrismaModel>;
-};
-export type NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    in?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    notIn?: $Enums.PaymentMethod[] | Prisma.ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null;
-    not?: Prisma.NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod | null;
-    _count?: Prisma.NestedIntNullableFilter<$PrismaModel>;
-    _min?: Prisma.NestedEnumPaymentMethodNullableFilter<$PrismaModel>;
-    _max?: Prisma.NestedEnumPaymentMethodNullableFilter<$PrismaModel>;
+export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean;
 };
 export type NestedEnumPaymentMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel>;
@@ -720,6 +705,25 @@ export type NestedEnumOrderStatusFilter<$PrismaModel = never> = {
     in?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>;
     notIn?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>;
     not?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus;
+};
+export type NestedEnumOrderTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderType | Prisma.EnumOrderTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumOrderTypeFilter<$PrismaModel> | $Enums.OrderType;
+};
+export type NestedEnumPickupTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PickupType | Prisma.EnumPickupTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumPickupTypeFilter<$PrismaModel> | $Enums.PickupType;
+};
+export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedBoolWithAggregatesFilter<$PrismaModel> | boolean;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedBoolFilter<$PrismaModel>;
+    _max?: Prisma.NestedBoolFilter<$PrismaModel>;
 };
 export type NestedEnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentMethod | Prisma.EnumPaymentMethodFieldRefInput<$PrismaModel>;
@@ -738,6 +742,24 @@ export type NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
     _count?: Prisma.NestedIntFilter<$PrismaModel>;
     _min?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>;
     _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>;
+};
+export type NestedEnumOrderTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OrderType | Prisma.EnumOrderTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumOrderTypeWithAggregatesFilter<$PrismaModel> | $Enums.OrderType;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumOrderTypeFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumOrderTypeFilter<$PrismaModel>;
+};
+export type NestedEnumPickupTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PickupType | Prisma.EnumPickupTypeFieldRefInput<$PrismaModel>;
+    in?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    notIn?: $Enums.PickupType[] | Prisma.ListEnumPickupTypeFieldRefInput<$PrismaModel>;
+    not?: Prisma.NestedEnumPickupTypeWithAggregatesFilter<$PrismaModel> | $Enums.PickupType;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumPickupTypeFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumPickupTypeFilter<$PrismaModel>;
 };
 export type NestedEnumPaymentStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentStatus | Prisma.EnumPaymentStatusFieldRefInput<$PrismaModel>;

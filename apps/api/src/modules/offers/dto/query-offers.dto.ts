@@ -1,11 +1,10 @@
-import { IsEnum, IsString, IsOptional, IsInt, Min, IsBoolean } from "class-validator";
+import { IsString, IsOptional, IsInt, Min, IsBoolean } from "class-validator";
 import { Type } from "class-transformer";
-import { OfferStatus } from "@khan/prisma";
 
 export class QueryOffersDto {
-  @IsEnum(OfferStatus)
+  @IsString()
   @IsOptional()
-  status?: OfferStatus;
+  status?: string;
 
   @IsString()
   @IsOptional()

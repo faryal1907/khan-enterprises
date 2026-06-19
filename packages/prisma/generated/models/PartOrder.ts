@@ -49,6 +49,10 @@ export type PartOrderMinAggregateOutputType = {
   amount: runtime.Decimal | null
   paymentMethod: $Enums.PaymentMethod | null
   status: $Enums.OrderStatus | null
+  paymentVerified: boolean | null
+  orderType: $Enums.OrderType | null
+  reservationExpiry: Date | null
+  pickupType: $Enums.PickupType | null
   expiresAt: Date | null
   processedById: string | null
   createdAt: Date | null
@@ -68,6 +72,10 @@ export type PartOrderMaxAggregateOutputType = {
   amount: runtime.Decimal | null
   paymentMethod: $Enums.PaymentMethod | null
   status: $Enums.OrderStatus | null
+  paymentVerified: boolean | null
+  orderType: $Enums.OrderType | null
+  reservationExpiry: Date | null
+  pickupType: $Enums.PickupType | null
   expiresAt: Date | null
   processedById: string | null
   createdAt: Date | null
@@ -87,6 +95,10 @@ export type PartOrderCountAggregateOutputType = {
   amount: number
   paymentMethod: number
   status: number
+  paymentVerified: number
+  orderType: number
+  reservationExpiry: number
+  pickupType: number
   expiresAt: number
   processedById: number
   createdAt: number
@@ -118,6 +130,10 @@ export type PartOrderMinAggregateInputType = {
   amount?: true
   paymentMethod?: true
   status?: true
+  paymentVerified?: true
+  orderType?: true
+  reservationExpiry?: true
+  pickupType?: true
   expiresAt?: true
   processedById?: true
   createdAt?: true
@@ -137,6 +153,10 @@ export type PartOrderMaxAggregateInputType = {
   amount?: true
   paymentMethod?: true
   status?: true
+  paymentVerified?: true
+  orderType?: true
+  reservationExpiry?: true
+  pickupType?: true
   expiresAt?: true
   processedById?: true
   createdAt?: true
@@ -156,6 +176,10 @@ export type PartOrderCountAggregateInputType = {
   amount?: true
   paymentMethod?: true
   status?: true
+  paymentVerified?: true
+  orderType?: true
+  reservationExpiry?: true
+  pickupType?: true
   expiresAt?: true
   processedById?: true
   createdAt?: true
@@ -262,6 +286,10 @@ export type PartOrderGroupByOutputType = {
   amount: runtime.Decimal
   paymentMethod: $Enums.PaymentMethod
   status: $Enums.OrderStatus
+  paymentVerified: boolean
+  orderType: $Enums.OrderType
+  reservationExpiry: Date | null
+  pickupType: $Enums.PickupType
   expiresAt: Date | null
   processedById: string | null
   createdAt: Date
@@ -304,6 +332,10 @@ export type PartOrderWhereInput = {
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFilter<"PartOrder"> | boolean
+  orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType
+  reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType
   expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
@@ -329,6 +361,10 @@ export type PartOrderOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  paymentVerified?: Prisma.SortOrder
+  orderType?: Prisma.SortOrder
+  reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
+  pickupType?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -357,6 +393,10 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFilter<"PartOrder"> | boolean
+  orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType
+  reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType
   expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
@@ -382,6 +422,10 @@ export type PartOrderOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  paymentVerified?: Prisma.SortOrder
+  orderType?: Prisma.SortOrder
+  reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
+  pickupType?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -409,6 +453,10 @@ export type PartOrderScalarWhereWithAggregatesInput = {
   amount?: Prisma.DecimalWithAggregatesFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodWithAggregatesFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"PartOrder"> | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolWithAggregatesFilter<"PartOrder"> | boolean
+  orderType?: Prisma.EnumOrderTypeWithAggregatesFilter<"PartOrder"> | $Enums.OrderType
+  reservationExpiry?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeWithAggregatesFilter<"PartOrder"> | $Enums.PickupType
   expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartOrder"> | Date | string
@@ -425,6 +473,10 @@ export type PartOrderCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -449,6 +501,10 @@ export type PartOrderUncheckedCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -467,6 +523,10 @@ export type PartOrderUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -491,6 +551,10 @@ export type PartOrderUncheckedUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -512,6 +576,10 @@ export type PartOrderCreateManyInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -528,6 +596,10 @@ export type PartOrderUpdateManyMutationInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -546,6 +618,10 @@ export type PartOrderUncheckedUpdateManyInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -575,6 +651,10 @@ export type PartOrderCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  paymentVerified?: Prisma.SortOrder
+  orderType?: Prisma.SortOrder
+  reservationExpiry?: Prisma.SortOrder
+  pickupType?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   processedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -599,6 +679,10 @@ export type PartOrderMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  paymentVerified?: Prisma.SortOrder
+  orderType?: Prisma.SortOrder
+  reservationExpiry?: Prisma.SortOrder
+  pickupType?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   processedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -618,6 +702,10 @@ export type PartOrderMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  paymentVerified?: Prisma.SortOrder
+  orderType?: Prisma.SortOrder
+  reservationExpiry?: Prisma.SortOrder
+  pickupType?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   processedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -847,6 +935,10 @@ export type PartOrderCreateWithoutProcessedByInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -870,6 +962,10 @@ export type PartOrderUncheckedCreateWithoutProcessedByInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -919,6 +1015,10 @@ export type PartOrderScalarWhereInput = {
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFilter<"PartOrder"> | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFilter<"PartOrder"> | boolean
+  orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType
+  reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType
   expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null
   processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string
@@ -935,6 +1035,10 @@ export type PartOrderCreateWithoutBranchInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -957,6 +1061,10 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1001,6 +1109,10 @@ export type PartOrderCreateWithoutPartInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1023,6 +1135,10 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1067,6 +1183,10 @@ export type PartOrderCreateWithoutPartInventoryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1089,6 +1209,10 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1133,6 +1257,10 @@ export type PartOrderCreateWithoutTransactionsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1156,6 +1284,10 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1189,6 +1321,10 @@ export type PartOrderUpdateWithoutTransactionsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1212,6 +1348,10 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1229,6 +1369,10 @@ export type PartOrderCreateWithoutDeliveryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1252,6 +1396,10 @@ export type PartOrderUncheckedCreateWithoutDeliveryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1285,6 +1433,10 @@ export type PartOrderUpdateWithoutDeliveryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1308,6 +1460,10 @@ export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1328,6 +1484,10 @@ export type PartOrderCreateManyProcessedByInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1343,6 +1503,10 @@ export type PartOrderUpdateWithoutProcessedByInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1366,6 +1530,10 @@ export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1386,6 +1554,10 @@ export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1403,6 +1575,10 @@ export type PartOrderCreateManyBranchInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1419,6 +1595,10 @@ export type PartOrderUpdateWithoutBranchInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1441,6 +1621,10 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1461,6 +1645,10 @@ export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1479,6 +1667,10 @@ export type PartOrderCreateManyPartInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1495,6 +1687,10 @@ export type PartOrderUpdateWithoutPartInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1517,6 +1713,10 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1537,6 +1737,10 @@ export type PartOrderUncheckedUpdateManyWithoutPartInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1555,6 +1759,10 @@ export type PartOrderCreateManyPartInventoryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
   status?: $Enums.OrderStatus
+  paymentVerified?: boolean
+  orderType?: $Enums.OrderType
+  reservationExpiry?: Date | string | null
+  pickupType?: $Enums.PickupType
   expiresAt?: Date | string | null
   processedById?: string | null
   createdAt?: Date | string
@@ -1571,6 +1779,10 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1593,6 +1805,10 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1613,6 +1829,10 @@ export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType
+  reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1663,6 +1883,10 @@ export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  paymentVerified?: boolean
+  orderType?: boolean
+  reservationExpiry?: boolean
+  pickupType?: boolean
   expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
@@ -1689,6 +1913,10 @@ export type PartOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  paymentVerified?: boolean
+  orderType?: boolean
+  reservationExpiry?: boolean
+  pickupType?: boolean
   expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
@@ -1712,6 +1940,10 @@ export type PartOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  paymentVerified?: boolean
+  orderType?: boolean
+  reservationExpiry?: boolean
+  pickupType?: boolean
   expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
@@ -1735,13 +1967,17 @@ export type PartOrderSelectScalar = {
   amount?: boolean
   paymentMethod?: boolean
   status?: boolean
+  paymentVerified?: boolean
+  orderType?: boolean
+  reservationExpiry?: boolean
+  pickupType?: boolean
   expiresAt?: boolean
   processedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "status" | "expiresAt" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>
+export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "expiresAt" | "processedById" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>
 export type PartOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>
@@ -1787,6 +2023,10 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     amount: runtime.Decimal
     paymentMethod: $Enums.PaymentMethod
     status: $Enums.OrderStatus
+    paymentVerified: boolean
+    orderType: $Enums.OrderType
+    reservationExpiry: Date | null
+    pickupType: $Enums.PickupType
     expiresAt: Date | null
     processedById: string | null
     createdAt: Date
@@ -2232,6 +2472,10 @@ export interface PartOrderFieldRefs {
   readonly amount: Prisma.FieldRef<"PartOrder", 'Decimal'>
   readonly paymentMethod: Prisma.FieldRef<"PartOrder", 'PaymentMethod'>
   readonly status: Prisma.FieldRef<"PartOrder", 'OrderStatus'>
+  readonly paymentVerified: Prisma.FieldRef<"PartOrder", 'Boolean'>
+  readonly orderType: Prisma.FieldRef<"PartOrder", 'OrderType'>
+  readonly reservationExpiry: Prisma.FieldRef<"PartOrder", 'DateTime'>
+  readonly pickupType: Prisma.FieldRef<"PartOrder", 'PickupType'>
   readonly expiresAt: Prisma.FieldRef<"PartOrder", 'DateTime'>
   readonly processedById: Prisma.FieldRef<"PartOrder", 'String'>
   readonly createdAt: Prisma.FieldRef<"PartOrder", 'DateTime'>

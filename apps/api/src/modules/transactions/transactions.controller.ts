@@ -18,40 +18,8 @@ export class TransactionsController {
    * Returns all payment transactions
    */
   @Get()
-  async getAllTransactions(@Query() query: QueryTransactionsDto, @CurrentUser() user: any) {
-    const transactions = await this.transactionsService.getAllTransactions(query, user);
-    return { count: transactions.length, transactions };
-  }
-
-  /**
-   * POST /api/transactions/:id/refund
-   * Initiates a refund for a transaction
-   */
-  @Post(":id/refund")
-  @Roles("ADMIN")
-  async refundTransaction(
-    @Param("id") id: string,
-    @CurrentUser() user: any
-  ) {
-    return this.transactionsService.refundTransaction(id, user);
-  }
-
-  /**
-   * GET /api/transactions/:id/receipt
-   * Downloads the receipt (invoice) PDF for a transaction
-   */
-  @Get(":id/receipt")
-  async getReceipt(
-    @Param("id") id: string,
-    @CurrentUser() user: any,
-    @Res() res: Response
-  ) {
-    const stream = await this.transactionsService.getReceiptStream(id, user);
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="receipt-${id}.pdf"`,
-    });
-    stream.pipe(res);
+  async getAllTransactions(@Query() query: QueryTransactionsDto) {
+    return this.transactionsService.getTransactionStats();
   }
 
   /**

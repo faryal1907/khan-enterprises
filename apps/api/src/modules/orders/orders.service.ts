@@ -5,12 +5,20 @@ import { UpdateOrderStatusDto } from "./dto/update-order-status.dto";
 import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
-import { CreateManualOrderDto } from "./dto/create-manual-order.dto";
-import { OrderStatus, BikeStatus, PaymentStatus, AuditAction, OfferStatus } from "@khan/prisma";
+import { CreateManualOrderDto, OrderType } from "./dto/create-manual-order.dto";
+import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
+import { VerifyPaymentDto } from "./dto/verify-payment.dto";
+import { RevenueQueryDto, RevenueDuration } from "./dto/revenue-query.dto";
+import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
+import { OrderAlertsService } from "../order-alerts/order-alerts.service";
+import { AlertType } from "../order-alerts/dto/get-alerts.dto";
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly orderAlertsService: OrderAlertsService,
+  ) {}
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -106,7 +114,6 @@ export class OrdersService {
               branch: true,
             },
           },
-          offer: true,
           branch: true,
           processedBy: {
             select: {
@@ -146,7 +153,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         transactions: true,
         processedBy: {
@@ -182,7 +188,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         transactions: true,
         delivery: true,
@@ -244,7 +249,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         processedBy: {
           select: {
@@ -294,7 +298,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         branch: true,
         processedBy: {
           select: {
@@ -308,8 +311,7 @@ export class OrdersService {
   }
 
   /**
-   * Atomic: set order → CANCELLED, revert bike → AVAILABLE, clear reservedUntil,
-   * if any transaction is SUCCESS flag for refund
+   * Atomic: set order → CANCELLED, revert bike → AVAILABLE, clear reservedUntil
    */
   async cancelOrder(id: string, dto: CancelOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -359,34 +361,6 @@ export class OrdersService {
         },
       });
 
-      if (order.offerId) {
-        await tx.offer.update({
-          where: { id: order.offerId },
-          data: {
-            status: OfferStatus.REJECTED,
-            expiresAt: null,
-          },
-        });
-      }
-
-      // 4. Check for any SUCCESS transactions → if found, create AuditLog entry flagging refund needed
-      const successTransactions = order.transactions.filter(
-        (t) => t.status === PaymentStatus.SUCCESS
-      );
-
-      if (successTransactions.length > 0) {
-        await tx.auditLog.create({
-          data: {
-            userId: user.id,
-            userRole: user.role,
-            action: AuditAction.REFUND,
-            entityType: "Order",
-            entityId: order.id,
-            oldValue: { status: order.status },
-            newValue: { status: OrderStatus.CANCELLED, refundRequired: true },
-          },
-        });
-      }
 
       await tx.auditLog.create({
         data: {
@@ -403,7 +377,6 @@ export class OrdersService {
       return {
         order: updatedOrder,
         message: "Order cancelled successfully",
-        refundRequired: successTransactions.length > 0,
       };
     });
   }
@@ -411,6 +384,8 @@ export class OrdersService {
   /**
    * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
    * + order → PAID + offer → PAID, set bike → SOLD — all in one transaction
+   * For non-cash payments, set transaction to VERIFICATION_PENDING and order to PENDING_PAYMENT
+   * For cash payments, set reservationExpiry to 2 days from now
    */
   async recordPayment(orderId: string, dto: RecordPaymentDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -419,7 +394,6 @@ export class OrdersService {
         where: { id: orderId },
         include: {
           bike: true,
-          offer: true,
         },
       });
 
@@ -435,7 +409,14 @@ export class OrdersService {
         );
       }
 
-      // 2. Update order with payment method
+      // 2. Check if reservation has expired (for cash payments)
+      if (order.reservationExpiry && new Date() > order.reservationExpiry) {
+        throw new BadRequestException(
+          `Reservation has expired on ${order.reservationExpiry.toISOString()}`
+        );
+      }
+
+      // 3. Update order with payment method
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
@@ -443,43 +424,42 @@ export class OrdersService {
         },
       });
 
-      // 3. Create PaymentTransaction
+      // 4. Create PaymentTransaction
       const transaction = await tx.paymentTransaction.create({
         data: {
           orderId,
           amount: dto.amount,
           method: dto.method,
           gatewayReference: dto.referenceNumber || null,
-          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
         },
       });
 
-      // 4. Always set order → PAID, offer → PAID, bike → SOLD when admin records payment
-      await tx.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.PAID,
-          processedById: user.id,
-        },
-      });
+      // 5. For CASH payments: set order → PAID, offer → PAID, bike → SOLD, set reservationExpiry to 2 days
+      // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
+      if (dto.method === "CASH") {
+        // Set reservation expiry to 2 days from now
+        const reservationExpiry = new Date();
+        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
 
-      if (order.offerId) {
-        await tx.offer.update({
-          where: { id: order.offerId },
+        await tx.order.update({
+          where: { id: orderId },
           data: {
-            status: "PAID",
+            status: OrderStatus.PAID,
+            reservationExpiry,
+            processedById: user.id,
+          },
+        });
+
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
           },
         });
       }
-
-      await tx.bikeUnit.update({
-        where: { id: order.bikeId },
-        data: {
-          status: BikeStatus.SOLD,
-          soldAt: new Date(),
-          reservedUntil: null,
-        },
-      });
 
       await tx.auditLog.create({
         data: {
@@ -491,6 +471,11 @@ export class OrdersService {
           newValue: JSON.stringify(dto),
         },
       });
+
+      // Create alert for payment verification pending (non-CASH payments)
+      if (dto.method !== "CASH") {
+        await this.orderAlertsService.createAlertsForOrder(orderId, AlertType.PAYMENT_PENDING);
+      }
 
       return {
         order: updatedOrder,
@@ -516,7 +501,6 @@ export class OrdersService {
             branch: true,
           },
         },
-        offer: true,
         processedBy: {
           select: {
             id: true,
@@ -557,13 +541,17 @@ export class OrdersService {
 
   /**
    * Manual sale registration (admin bypasses offer workflow)
+   * Handles both ONLINE and ONSITE order types
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
-      // 1. Find bike
+      // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
-        include: { branch: true },
+        include: { 
+          branch: true,
+          model: true,
+        },
       });
 
       if (!bike) {
@@ -578,14 +566,30 @@ export class OrdersService {
         throw new BadRequestException(`Bike is not available for sale`);
       }
 
-      // 2. Generate order number
+      // 2. Determine order type and calculate price
+      const orderType = dto.orderType || "ONSITE";
+      let finalSalePrice: number;
+      let isOnlineOrder: boolean;
+
+      if (orderType === "ONLINE") {
+        // ONLINE: auto-apply 2% discount from base price
+        const basePrice = Number(bike.model.basePrice);
+        finalSalePrice = basePrice * 0.98; // 2% discount
+        isOnlineOrder = true;
+      } else {
+        // ONSITE: use actualSalePrice if provided, otherwise use salePrice
+        finalSalePrice = dto.actualSalePrice || dto.salePrice;
+        isOnlineOrder = false;
+      }
+
+      // 3. Generate order number
       const orderNumber = `ORD-MAN-${Date.now()}`;
 
-      // 3. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
+      // 4. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      // 4. Create Order
+      // 5. Create Order
       const order = await tx.order.create({
         data: {
           orderNumber,
@@ -595,29 +599,34 @@ export class OrdersService {
           customerPhone: dto.customerPhone,
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
-          negotiatedAmount: dto.salePrice,
+          negotiatedAmount: finalSalePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.CONFIRMED,
           expiresAt,
           processedById: user.id,
+          isOnlineOrder,
+          orderType,
+          pickupType: orderType === "ONLINE" ? "DELIVERY" : "ONSITE_PICKUP",
         },
       });
 
-      // 4. Update Bike
+      // 6. Update Bike
       await tx.bikeUnit.update({
         where: { id: bike.id },
         data: {
           status: BikeStatus.SOLD,
           soldAt: new Date(),
           reservedUntil: null,
+          actualSalePrice: finalSalePrice,
+          ...(orderType === "ONLINE" && { onlineDiscountPercent: 2 }),
         },
       });
 
-      // 5. Create PaymentTransaction
+      // 7. Create PaymentTransaction
       await tx.paymentTransaction.create({
         data: {
           orderId: order.id,
-          amount: dto.salePrice,
+          amount: finalSalePrice,
           method: dto.paymentMethod,
           status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
         },
@@ -630,12 +639,35 @@ export class OrdersService {
           action: AuditAction.CREATE,
           entityType: "ORDER",
           entityId: order.id,
-          newValue: JSON.stringify(dto),
+          newValue: JSON.stringify({ ...dto, finalSalePrice, orderType }),
         },
       });
 
+      // Create alerts for users based on their role
+      await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.NEW_ORDER);
+
       return order;
     });
+  }
+
+  /**
+   * Register an online sale with automatic 2% discount from base price
+   */
+  async registerOnlineSale(dto: CreateManualOrderDto, user: any) {
+    return this.createManualOrder(
+      { ...dto, orderType: OrderType.ONLINE },
+      user
+    );
+  }
+
+  /**
+   * Register an onsite sale with custom pricing (no validation)
+   */
+  async registerOnsiteSale(dto: CreateManualOrderDto, user: any) {
+    return this.createManualOrder(
+      { ...dto, orderType: OrderType.ONSITE, actualSalePrice: dto.salePrice },
+      user
+    );
   }
 
   /**
@@ -782,5 +814,389 @@ export class OrdersService {
 
       return updatedOrder;
     });
+  }
+
+  /**
+   * Get orders awaiting payment verification
+   * For ADMIN and MANAGER roles
+   */
+  async getPendingVerificationOrders(user: any) {
+    const where: any = {
+      transactions: {
+        some: {
+          status: PaymentStatus.VERIFICATION_PENDING,
+        },
+      },
+    };
+
+    this.applyBranchScope(where, user);
+
+    const orders = await this.prisma.client.order.findMany({
+      where,
+      include: {
+        bike: {
+          include: {
+            model: true,
+            branch: true,
+          },
+        },
+        branch: true,
+        transactions: {
+          where: {
+            status: PaymentStatus.VERIFICATION_PENDING,
+          },
+        },
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return orders;
+  }
+
+  /**
+   * Upload payment proof for an order
+   * For ADMIN, MANAGER, SALES_STAFF, and CUSTOMER roles
+   */
+  async uploadPaymentProof(orderId: string, dto: UploadPaymentProofDto, user: any) {
+    const order = await this.getOrderById(orderId, user);
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Cannot upload payment proof for order in ${order.status} status`
+      );
+    }
+
+    // Find the pending transaction
+    const transaction = await this.prisma.client.paymentTransaction.findFirst({
+      where: {
+        orderId,
+        status: PaymentStatus.VERIFICATION_PENDING,
+      },
+    });
+
+    if (!transaction) {
+      throw new BadRequestException(
+        "No pending verification transaction found for this order"
+      );
+    }
+
+    // Update transaction with payment proof URL
+    const updatedTransaction = await this.prisma.client.paymentTransaction.update({
+      where: { id: transaction.id },
+      data: {
+        paymentProofUrl: dto.paymentProofUrl,
+      },
+    });
+
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: AuditAction.UPDATE,
+        entityType: "PAYMENT_TRANSACTION",
+        entityId: transaction.id,
+        newValue: JSON.stringify({ paymentProofUrl: dto.paymentProofUrl }),
+      },
+    });
+
+    return updatedTransaction;
+  }
+
+  /**
+   * Verify payment for an order
+   * For ADMIN and MANAGER roles
+   * Updates transaction to SUCCESS, order to PAID, and bike to SOLD
+   */
+  async verifyPayment(orderId: string, dto: VerifyPaymentDto, user: any) {
+    return this.prisma.client.$transaction(async (tx) => {
+      // 1. Fetch order
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          bike: true,
+        },
+      });
+
+      if (!order) {
+        throw new NotFoundException(`Order with ID ${orderId} not found`);
+      }
+
+      this.assertOrderAccess(order, user);
+
+      if (order.status !== OrderStatus.PENDING_PAYMENT) {
+        throw new BadRequestException(
+          `Order is not in PENDING_PAYMENT status. Current status: ${order.status}`
+        );
+      }
+
+      // 2. Fetch transaction
+      const transaction = await tx.paymentTransaction.findUnique({
+        where: { id: dto.transactionId },
+      });
+
+      if (!transaction) {
+        throw new NotFoundException(`Transaction with ID ${dto.transactionId} not found`);
+      }
+
+      if (transaction.orderId !== orderId) {
+        throw new BadRequestException(`Transaction does not belong to this order`);
+      }
+
+      if (transaction.status !== PaymentStatus.VERIFICATION_PENDING) {
+        throw new BadRequestException(
+          `Transaction is not in VERIFICATION_PENDING status. Current status: ${transaction.status}`
+        );
+      }
+
+      // 3. Update transaction to SUCCESS
+      const updatedTransaction = await tx.paymentTransaction.update({
+        where: { id: dto.transactionId },
+        data: {
+          status: PaymentStatus.SUCCESS,
+          verifiedAt: new Date(),
+          verifiedById: user.id,
+        },
+      });
+
+      // 4. Update order to PAID
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.PAID,
+          paymentVerified: true,
+          processedById: user.id,
+        },
+      });
+
+      // 5. Update bike to SOLD
+      await tx.bikeUnit.update({
+        where: { id: order.bikeId },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
+
+      // 7. Create audit log entry
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.PAYMENT,
+          entityType: "ORDER",
+          entityId: orderId,
+          newValue: JSON.stringify({ paymentVerified: true }),
+        },
+      });
+
+      return {
+        order: updatedOrder,
+        transaction: updatedTransaction,
+      };
+    });
+  }
+
+  /**
+   * Expire reservations that have passed their reservationExpiry
+   * Sets order to CANCELLED, bike back to AVAILABLE
+   * Can be called by scheduled job or manually
+   */
+  async expireReservations() {
+    const now = new Date();
+    
+    const expiredOrders = await this.prisma.client.order.findMany({
+      where: {
+        reservationExpiry: {
+          lt: now,
+        },
+        status: {
+          in: [OrderStatus.PAID, OrderStatus.PENDING_PAYMENT],
+        },
+      },
+      include: {
+        bike: true,
+      },
+    });
+
+    const results: Array<{
+      orderId: string;
+      orderNumber: string;
+      success: boolean;
+      error?: string;
+    }> = [];
+
+    for (const order of expiredOrders) {
+      try {
+        await this.prisma.client.$transaction(async (tx) => {
+          // Update order to CANCELLED
+          await tx.order.update({
+            where: { id: order.id },
+            data: {
+              status: OrderStatus.CANCELLED,
+            },
+          });
+
+          // Update bike back to AVAILABLE
+          await tx.bikeUnit.update({
+            where: { id: order.bikeId },
+            data: {
+              status: BikeStatus.AVAILABLE,
+              soldAt: null,
+              reservedUntil: null,
+            },
+          });
+
+          // Create audit log
+          await tx.auditLog.create({
+            data: {
+              action: AuditAction.UPDATE,
+              entityType: "ORDER",
+              entityId: order.id,
+              newValue: JSON.stringify({ 
+                status: OrderStatus.CANCELLED, 
+                reason: "Reservation expired" 
+              }),
+            },
+          });
+
+          // Create alert for reservation expiry
+          await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.EXPIRY_WARNING);
+        });
+
+        results.push({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          success: true,
+        });
+      } catch (error: any) {
+        results.push({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          success: false,
+          error: error.message,
+        });
+      }
+    }
+
+    return {
+      total: expiredOrders.length,
+      processed: results.length,
+      results,
+    };
+  }
+
+  /**
+   * Get revenue summary with filters
+   */
+  async revenueSummary(query: RevenueQueryDto, user?: any) {
+    const now = new Date();
+    let dateFrom: Date;
+    let dateTo: Date;
+
+    // Calculate date range based on duration
+    switch (query.duration) {
+      case RevenueDuration.WEEKLY:
+        dateFrom = new Date(now);
+        dateFrom.setDate(dateFrom.getDate() - 7);
+        dateTo = now;
+        break;
+      case RevenueDuration.MONTHLY:
+        dateFrom = new Date(now);
+        dateFrom.setMonth(dateFrom.getMonth() - 1);
+        dateTo = now;
+        break;
+      case RevenueDuration.ANNUAL:
+        dateFrom = new Date(now);
+        dateFrom.setFullYear(dateFrom.getFullYear() - 1);
+        dateTo = now;
+        break;
+      case RevenueDuration.CUSTOM:
+        if (!query.dateFrom || !query.dateTo) {
+          throw new BadRequestException("dateFrom and dateTo are required for CUSTOM duration");
+        }
+        dateFrom = new Date(query.dateFrom);
+        dateTo = new Date(query.dateTo);
+        break;
+      default:
+        throw new BadRequestException("Invalid duration");
+    }
+
+    const where: any = {
+      createdAt: {
+        gte: dateFrom,
+        lte: dateTo,
+      },
+      status: {
+        in: [OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY, OrderStatus.DELIVERED],
+      },
+    };
+
+    // Apply branch filter
+    if (query.branchId) {
+      where.branchId = query.branchId;
+    }
+
+    // Apply branch scope for non-admin users
+    this.applyBranchScope(where, user);
+
+    // Get orders with transactions
+    const orders = await this.prisma.client.order.findMany({
+      where,
+      include: {
+        transactions: {
+          where: {
+            status: PaymentStatus.SUCCESS,
+          },
+        },
+        branch: true,
+      },
+    });
+
+    // Calculate revenue metrics
+    const totalRevenue = orders.reduce((sum, order) => {
+      const orderRevenue = order.transactions.reduce((txSum, tx) => txSum + Number(tx.amount), 0);
+      return sum + orderRevenue;
+    }, 0);
+
+    const totalOrders = orders.length;
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    // Group by branch
+    const revenueByBranch = orders.reduce((acc, order) => {
+      const branchId = order.branchId;
+      const branchRevenue = order.transactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
+      
+      if (!acc[branchId]) {
+        acc[branchId] = {
+          branchId,
+          branchName: order.branch.name,
+          revenue: 0,
+          orderCount: 0,
+        };
+      }
+      
+      acc[branchId].revenue += branchRevenue;
+      acc[branchId].orderCount += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    return {
+      duration: query.duration,
+      dateFrom,
+      dateTo,
+      totalRevenue,
+      totalOrders,
+      averageOrderValue,
+      revenueByBranch: Object.values(revenueByBranch),
+    };
   }
 }
