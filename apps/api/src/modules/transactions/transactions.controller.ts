@@ -19,7 +19,7 @@ export class TransactionsController {
    */
   @Get()
   async getAllTransactions(@Query() query: QueryTransactionsDto) {
-    return this.transactionsService.getTransactionStats();
+    return this.transactionsService.getTransactions(query);
   }
 
   /**
