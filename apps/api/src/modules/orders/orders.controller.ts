@@ -96,7 +96,7 @@ export class OrdersController {
     if (user?.role === "CUSTOMER" && phone !== user.phoneNumber) {
       throw new NotFoundException("Orders not found");
     }
-    return this.ordersService.getOrdersByCustomerPhone(phone);
+    return this.ordersService.getOrdersByCustomerPhone(phone, user);
   }
 
   /**

@@ -10,6 +10,22 @@ import { AuditAction } from "@khan/prisma";
 export class OffersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private isAssignedBranchUser(user?: any) {
+    return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
+  }
+
+  private assertOfferAccess(offer: { bike?: { branchId: string } | null }, user?: any) {
+    if (this.isAssignedBranchUser(user) && offer.bike?.branchId !== user.branchId) {
+      throw new NotFoundException("Offer not found");
+    }
+  }
+
+  private getReservationExpiry() {
+    const reservedUntil = new Date();
+    reservedUntil.setHours(reservedUntil.getHours() + 48);
+    return reservedUntil;
+  }
+
   /**
    * Offers/negotiation feature has been removed.
    * This module is kept for backward compatibility and returns placeholder results.

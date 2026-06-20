@@ -1,10 +1,9 @@
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Post, Query, Res, UseGuards } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
-import { Post, Query, Res } from "@nestjs/common";
 import { QueryTransactionsDto } from "./dto/query-transactions.dto";
 import { Response } from "express";
 
@@ -20,7 +19,7 @@ export class TransactionsController {
    */
   @Get()
   async getAllTransactions(@Query() query: QueryTransactionsDto) {
-    return this.transactionsService.getTransactionStats();
+    return this.transactionsService.getTransactions(query);
   }
 
   /**
@@ -28,7 +27,7 @@ export class TransactionsController {
    * Returns a single transaction by ID
    */
   @Get(":id")
-  async getTransaction(@Param("id") id: string) {
+  async getTransaction(@Param("id") id: string, @CurrentUser() user: any) {
     return this.transactionsService.getTransactionById(id);
   }
 }

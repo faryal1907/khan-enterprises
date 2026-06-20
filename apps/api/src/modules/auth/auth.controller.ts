@@ -97,8 +97,13 @@ export class AuthController {
   @Get("users")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async listUsers() {
-    const users = await this.authService.getAllUsers();
+  async listUsers(
+    @Query("role") role?: "ADMIN" | "MANAGER" | "SALES_STAFF",
+    @Query("status") status?: "ACTIVE" | "INACTIVE" | "SUSPENDED",
+    @Query("branchId") branchId?: string,
+    @Query("search") search?: string,
+  ) {
+    const users = await this.authService.getAllUsers({ role, status, branchId, search });
     return { count: users.length, users };
   }
 
@@ -122,7 +127,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async createUser(@Body() dto: any, @CurrentUser() admin: any) {
-    return this.authService.createUser(dto, admin.sub);
+    return this.authService.createUser(dto, admin.id);
   }
 
   /**
@@ -144,7 +149,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async updateUser(@Param("id") id: string, @Body() dto: any, @CurrentUser() admin: any) {
-    return this.authService.updateUser(id, dto, admin.sub);
+    return this.authService.updateUser(id, dto, admin.id);
   }
 
   /**
@@ -155,7 +160,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async deactivateUser(@Param("id") id: string, @CurrentUser() admin: any) {
-    return this.authService.deactivateUser(id, admin.sub);
+    return this.authService.deactivateUser(id, admin.id);
   }
 
   /**
@@ -166,7 +171,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
   async activateUser(@Param("id") id: string, @CurrentUser() admin: any) {
-    return this.authService.activateUser(id, admin.sub);
+    return this.authService.activateUser(id, admin.id);
   }
 
   // ─── OAuth Endpoints (Supabase) ─────────────────────────────────────────

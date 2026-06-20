@@ -63,6 +63,7 @@ export class SchedulerService {
                 status: OrderStatus.CANCELLED,
               },
             });
+
             this.logger.log(
               `Cancelled ${bike.orders.length} order(s) for bike ${bike.id}`,
             );

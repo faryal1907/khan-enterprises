@@ -106,7 +106,8 @@ export const AuditAction = {
   LOGOUT: 'LOGOUT',
   APPROVE: 'APPROVE',
   REJECT: 'REJECT',
-  PAYMENT: 'PAYMENT'
+  PAYMENT: 'PAYMENT',
+  REFUND: 'REFUND'
 } as const
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

@@ -2,15 +2,21 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
-import { OrderStatus, PaymentMethod, Order, PaymentTransaction } from "@/lib/types";
+import { OrderStatus, PaymentMethod, Order, PaymentTransaction, UserRole } from "@/lib/types";
 import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
 import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
+import { useAuthStore } from "@/lib/auth-store";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { OrderStatusBadge } from "@/components/order-status-badge";
 
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuthStore();
   const orderId = params.id as string;
+  const canManageLifecycle = user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,26 +47,6 @@ export default function OrderDetailPage() {
     };
     fetchOrder();
   }, [orderId]);
-
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case OrderStatus.PENDING_PAYMENT:
-        return "#f59e0b"; // amber
-      case OrderStatus.PAID:
-        return "#3b82f6"; // blue
-      case OrderStatus.CONFIRMED:
-        return "#6366f1"; // indigo
-      case OrderStatus.READY_FOR_DELIVERY:
-        return "#a855f7"; // purple
-      case OrderStatus.DELIVERED:
-        return "#22c55e"; // green
-      case OrderStatus.CANCELLED:
-        return "#ef4444"; // red
-      default:
-        return "#6b7280"; // gray
-    }
-  };
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
@@ -95,8 +81,6 @@ export default function OrderDetailPage() {
   const handleRecordPayment = async () => {
     try {
       setActionLoading(true);
-      console.log("Recording payment with data:", paymentData);
-      // Ensure amount is a number
       const paymentPayload = {
         ...paymentData,
         amount: Number(paymentData.amount),
@@ -168,34 +152,28 @@ export default function OrderDetailPage() {
     switch (order.status) {
       case OrderStatus.PENDING_PAYMENT:
         return (
-          <button
+          <AsyncButton
             onClick={() => setShowPaymentModal(true)}
             disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            className="px-6"
           >
             Record Payment
-          </button>
+          </AsyncButton>
         );
       case OrderStatus.PAID:
+        if (!canManageLifecycle) return null;
         return (
-          <button
+          <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.CONFIRMED)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={actionLoading}
+            className="px-6"
           >
             Confirm Order
-          </button>
+          </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        if (order.delivery) {
+        if (order.pickupType === "DELIVERY") {
+          if (!order.delivery) return null;
           // Customer requested delivery - show approve/reject buttons
           if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
             return (
@@ -255,18 +233,15 @@ export default function OrderDetailPage() {
           </button>
         );
       case OrderStatus.READY_FOR_DELIVERY:
+        if (!canManageLifecycle) return null;
         return (
-          <button
+          <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.DELIVERED)}
-            disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            loading={actionLoading}
+            className="px-6"
           >
             Mark Delivered
-          </button>
+          </AsyncButton>
         );
       default:
         return null;
@@ -330,7 +305,7 @@ export default function OrderDetailPage() {
               color: theme.text.inverse,
             }}
           >
-            Download Invoice
+            {actionLoading ? "Working..." : "Download Invoice"}
           </button>
         </div>
 
@@ -446,16 +421,7 @@ export default function OrderDetailPage() {
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Order Status
                 </label>
-                <span
-                  className="inline-block px-2 py-1 text-xs font-medium rounded"
-                  style={{
-                    backgroundColor: `${getStatusColor(order.status)}20`,
-                    color: getStatusColor(order.status),
-                    border: `1px solid ${getStatusColor(order.status)}`,
-                  }}
-                >
-                  {order.status.replace(/_/g, " ")}
-                </span>
+                <OrderStatusBadge status={order.status} />
               </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
@@ -465,20 +431,16 @@ export default function OrderDetailPage() {
                   {order.paymentMethod}
                 </p>
               </div>
-              {order.offerId && (
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
-                    Originating Offer
-                  </label>
-                  <a
-                    href={`/offers/${order.offerId}`}
-                    className="text-sm font-medium transition-colors hover:opacity-70"
-                    style={{ color: theme.accents.primary }}
-                  >
-                    View Offer #{order.offerId}
-                  </a>
-                </div>
-              )}
+
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Payment Verified
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.paymentVerified ? "Yes" : "No"}
+                </p>
+              </div>
+
             </div>
           </div>
 
@@ -491,9 +453,25 @@ export default function OrderDetailPage() {
               className="text-lg font-semibold mb-4"
               style={{ color: theme.text.primary }}
             >
-              Delivery Status
+              Fulfillment Details
             </h3>
             <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Order Type
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.orderType === "ONLINE" ? "Online" : "Onsite"}
+                </p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Pickup Type
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.pickupType === "DELIVERY" ? "Delivery" : "Onsite Pickup"}
+                </p>
+              </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Branch
@@ -602,17 +580,19 @@ export default function OrderDetailPage() {
             </h3>
             <div className="flex space-x-4">
               {getActionButton()}
-              <button
-                onClick={() => setShowCancelModal(true)}
-                disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
-              >
-                Cancel Order
-              </button>
+              {canManageLifecycle && (
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={actionLoading}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.secondary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Cancel Order
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -634,156 +614,154 @@ export default function OrderDetailPage() {
 
       {/* Cancel Modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-          <div
-            className="rounded-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-              Cancel Order
-            </h3>
-            <div className="mb-4">
+        <ActionModal
+          title="Cancel Order"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowCancelModal(false);
+            setCancelReason("");
+          }}
+        >
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+              Reason for cancellation
+            </label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+              rows={4}
+              placeholder="Enter reason for cancellation..."
+              disabled={actionLoading}
+            />
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => {
+                setShowCancelModal(false);
+                setCancelReason("");
+              }}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleCancelOrder}
+              disabled={!cancelReason.trim() || actionLoading}
+              loading={actionLoading}
+              loadingLabel="Cancelling..."
+              style={{
+                backgroundColor: theme.accents.secondary,
+              }}
+            >
+              Confirm Cancellation
+            </AsyncButton>
+          </div>
+        </ActionModal>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <ActionModal
+          title="Record Payment"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowPaymentModal(false);
+          }}
+        >
+          <div className="space-y-4 mb-4">
+            <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                Reason for cancellation
+                Payment Method
               </label>
-              <textarea
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
+              <select
+                value={paymentData.method}
+                onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value as PaymentMethod })}
+                disabled={actionLoading}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
                 }}
-                rows={4}
-                placeholder="Enter reason for cancellation..."
+              >
+                <option value={PaymentMethod.CASH}>Cash</option>
+                <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
+                <option value={PaymentMethod.SAFEPAY}>Safepay</option>
+                <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
+                <option value={PaymentMethod.RAAST}>Raast</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Amount
+              </label>
+              <input
+                type="number"
+                value={paymentData.amount}
+                onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
+                disabled={actionLoading}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
               />
             </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                  setCancelReason("");
-                }}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCancelOrder}
-                disabled={!cancelReason.trim() || actionLoading}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
-              >
-                {actionLoading ? "Cancelling..." : "Confirm Cancellation"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Payment Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-          <div
-            className="rounded-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-              Record Payment
-            </h3>
-            <div className="space-y-4 mb-4">
+            {paymentData.method !== PaymentMethod.CASH && (
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                  Payment Method
-                </label>
-                <select
-                  value={paymentData.method}
-                  onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value as PaymentMethod })}
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                >
-                  <option value={PaymentMethod.CASH}>Cash</option>
-                  <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
-                  <option value={PaymentMethod.SAFEPAY}>Safepay</option>
-                  <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
-                  <option value={PaymentMethod.RAAST}>Raast</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                  Amount
+                  Reference Number (optional)
                 </label>
                 <input
-                  type="number"
-                  value={paymentData.amount}
-                  onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
+                  type="text"
+                  value={paymentData.referenceNumber}
+                  onChange={(e) => setPaymentData({ ...paymentData, referenceNumber: e.target.value })}
+                  disabled={actionLoading}
                   className="w-full px-3 py-2 rounded text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
+                  placeholder="Enter reference number..."
                 />
               </div>
-              {paymentData.method !== PaymentMethod.CASH && (
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                    Reference Number (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={paymentData.referenceNumber}
-                    onChange={(e) => setPaymentData({ ...paymentData, referenceNumber: e.target.value })}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter reference number..."
-                  />
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRecordPayment}
-                disabled={paymentData.amount <= 0 || actionLoading}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.primary,
-                  color: theme.text.inverse,
-                }}
-              >
-                {actionLoading ? "Recording..." : "Record Payment"}
-              </button>
-            </div>
+            )}
           </div>
-        </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => setShowPaymentModal(false)}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleRecordPayment}
+              disabled={paymentData.amount <= 0 || actionLoading}
+              loading={actionLoading}
+              loadingLabel="Recording..."
+            >
+              Record Payment
+            </AsyncButton>
+          </div>
+        </ActionModal>
       )}
 
       {/* Reject Delivery Modal */}

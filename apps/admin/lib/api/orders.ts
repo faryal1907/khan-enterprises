@@ -10,6 +10,8 @@ export interface OrderFilters {
   page?: number;
   limit?: number;
   partId?: string;
+  orderType?: string;
+  pickupType?: string;
 }
 
 export async function getOrders(filters: OrderFilters = {}) {
@@ -22,6 +24,8 @@ export async function getOrders(filters: OrderFilters = {}) {
   if (filters.processedById) params.processedById = filters.processedById;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
+  if (filters.orderType) params.orderType = filters.orderType;
+  if (filters.pickupType) params.pickupType = filters.pickupType;
 
   const response = await api.get("/orders", { params });
   return response.data;
@@ -38,6 +42,8 @@ export async function getPartOrders(filters: OrderFilters = {}) {
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
   if (filters.partId) params.partId = filters.partId;
+  if (filters.orderType) params.orderType = filters.orderType;
+  if (filters.pickupType) params.pickupType = filters.pickupType;
 
   const response = await api.get("/part-orders", { params });
   return response.data;

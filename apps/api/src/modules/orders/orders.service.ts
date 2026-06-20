@@ -75,6 +75,14 @@ export class OrdersService {
       where.processedById = query.processedById;
     }
 
+    if (query.orderType) {
+      where.orderType = query.orderType;
+    }
+
+    if (query.pickupType) {
+      where.pickupType = query.pickupType;
+    }
+
     if (query.dateFrom || query.dateTo) {
       where.createdAt = {};
       if (query.dateFrom) {
@@ -604,9 +612,12 @@ export class OrdersService {
   /**
    * Customer-scoped order list by phone number (public endpoint)
    */
-  async getOrdersByCustomerPhone(phone: string) {
+  async getOrdersByCustomerPhone(phone: string, user?: any) {
+    const where: any = { customerPhone: phone };
+    this.applyBranchScope(where, user);
+
     const orders = await this.prisma.client.order.findMany({
-      where: { customerPhone: phone },
+      where,
       include: {
         bike: {
           include: {
@@ -627,7 +638,7 @@ export class OrdersService {
    * Handles both ONLINE and ONSITE order types
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
-    const result = await this.prisma.client.$transaction(async (tx) => {
+    const createdOrder = await this.prisma.client.$transaction(async (tx) => {
       // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
@@ -728,10 +739,6 @@ export class OrdersService {
 
       return order;
     });
-
-    await this.orderAlertsService.createAlertsForOrder(result.id, AlertType.NEW_ORDER);
-
-    return result;
   }
 
   /**

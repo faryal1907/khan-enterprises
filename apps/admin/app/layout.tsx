@@ -36,8 +36,9 @@ export default function RootLayout({
         style={{ backgroundColor: theme.backgrounds.tertiary }}
       >
         <AuthProvider>
-          <Navigation />
-          <main className="flex-1">{children}</main>
+          <Navigation>
+            <main className="flex-1">{children}</main>
+          </Navigation>
           <Toaster />
         </AuthProvider>
       </body>

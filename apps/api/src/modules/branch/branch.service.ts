@@ -1,14 +1,49 @@
-import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { AuditAction } from "@khan/prisma";
+import { AuditAction, UserRole } from "@khan/prisma";
 
 @Injectable()
 export class BranchService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private isAssignedBranchUser(user?: any) {
+    return user?.role !== UserRole.ADMIN && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
+  }
+
+  private applyBranchScope(where: any, user?: any) {
+    if (this.isAssignedBranchUser(user)) {
+      where.id = user.branchId;
+    }
+  }
+
+  private assertBranchAccess(id: string, user?: any) {
+    if (this.isAssignedBranchUser(user) && user.branchId !== id) {
+      throw new NotFoundException(`Branch with id "${id}" not found.`);
+    }
+  }
+
+  private async assertManager(managerId: string, tx: any = this.prisma.client) {
+    const manager = await tx.user.findUnique({
+      where: { id: managerId },
+      select: { id: true, role: true },
+    });
+
+    if (!manager) {
+      throw new NotFoundException("Selected manager not found.");
+    }
+
+    if (manager.role !== UserRole.MANAGER) {
+      throw new BadRequestException("Selected user must have MANAGER role.");
+    }
+  }
+
   /** Return all branches with their manager info and staff count. */
-  async getAllBranches() {
+  async getAllBranches(user?: any) {
+    const where: any = {};
+    this.applyBranchScope(where, user);
+
     return this.prisma.client.branch.findMany({
+      where,
       select: {
         id: true,
         name: true,
@@ -28,7 +63,9 @@ export class BranchService {
   }
 
   /** Return a single branch by ID with full detail. */
-  async getBranchById(id: string) {
+  async getBranchById(id: string, user?: any) {
+    this.assertBranchAccess(id, user);
+
     const branch = await this.prisma.client.branch.findUnique({
       where: { id },
       select: {
@@ -75,6 +112,10 @@ export class BranchService {
     adminId: string
   ) {
     return this.prisma.client.$transaction(async (tx) => {
+      if (dto.managerId) {
+        await this.assertManager(dto.managerId, tx);
+      }
+
       const branch = await tx.branch.create({
         data: {
           name: dto.name,
@@ -132,6 +173,10 @@ export class BranchService {
         throw new NotFoundException(`Branch with id "${id}" not found.`);
       }
 
+      if (dto.managerId) {
+        await this.assertManager(dto.managerId, tx);
+      }
+
       const branch = await tx.branch.update({
         where: { id },
         data: dto,
@@ -172,6 +217,32 @@ export class BranchService {
 
       if (!oldBranch) {
         throw new NotFoundException(`Branch with id "${id}" not found.`);
+      }
+
+      const counts = await tx.branch.findUnique({
+        where: { id },
+        select: {
+          _count: {
+            select: {
+              users: true,
+              bikeInventory: true,
+              partInventory: true,
+              orders: true,
+              partOrders: true,
+            },
+          },
+        },
+      });
+
+      if (
+        counts &&
+        (counts._count.users > 0 ||
+          counts._count.bikeInventory > 0 ||
+          counts._count.partInventory > 0 ||
+          counts._count.orders > 0 ||
+          counts._count.partOrders > 0)
+      ) {
+        throw new BadRequestException("Branch cannot be deleted while it has staff, inventory, or orders.");
       }
 
       await tx.branch.delete({ where: { id } });
@@ -273,9 +344,21 @@ export class BranchService {
     adminId: string
   ) {
     return this.prisma.client.$transaction(async (tx) => {
+    if (dto.fromBranchId === dto.toBranchId) {
+      throw new BadRequestException("Source and destination branches cannot be the same.");
+    }
+
+    const branches = await tx.branch.count({
+      where: { id: { in: [dto.fromBranchId, dto.toBranchId] } },
+    });
+
+    if (branches !== 2) {
+      throw new NotFoundException("Source or destination branch not found.");
+    }
+
     if (dto.type === "bike") {
       // Transfer a single bike unit
-      const bikeUnit = await this.prisma.client.bikeUnit.findUnique({
+      const bikeUnit = await tx.bikeUnit.findUnique({
         where: { id: dto.itemId },
       });
 
@@ -284,7 +367,7 @@ export class BranchService {
       }
 
       if (bikeUnit.branchId !== dto.fromBranchId) {
-        throw new Error("Bike unit is not in the source branch.");
+        throw new BadRequestException("Bike unit is not in the source branch.");
       }
 
       await tx.bikeUnit.update({
@@ -308,7 +391,7 @@ export class BranchService {
     } else {
       // Transfer parts (with quantity)
       if (!dto.quantity || dto.quantity <= 0) {
-        throw new Error("Quantity must be greater than 0 for part transfers.");
+        throw new BadRequestException("Quantity must be greater than 0 for part transfers.");
       }
 
       const fromInventory = await tx.partInventory.findUnique({
@@ -325,7 +408,7 @@ export class BranchService {
       }
 
       if (fromInventory.quantity < dto.quantity) {
-        throw new Error("Insufficient stock in source branch.");
+        throw new BadRequestException("Insufficient stock in source branch.");
       }
 
       // Update source inventory

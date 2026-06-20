@@ -62,7 +62,8 @@ exports.AuditAction = {
     LOGOUT: 'LOGOUT',
     APPROVE: 'APPROVE',
     REJECT: 'REJECT',
-    PAYMENT: 'PAYMENT'
+    PAYMENT: 'PAYMENT',
+    REFUND: 'REFUND'
 };
 exports.InventoryMovementType = {
     STOCK_IN: 'STOCK_IN',

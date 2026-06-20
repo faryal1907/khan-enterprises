@@ -1,190 +1,200 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { api } from "@/lib/api-client";
+import { ActionModal } from "@/components/action-modal";
+import { AsyncButton } from "@/components/async-button";
+import { SummaryCard } from "@/components/summary-card";
+import { getBranches } from "@/lib/api/inventory";
+import {
+  downloadReceipt,
+  getTransactions,
+  type TransactionRecord,
+} from "@/lib/api/transactions";
+import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
-import { UserRole } from "@/lib/types";
+import { Branch, PaymentMethod, PaymentStatus, UserRole } from "@/lib/types";
 
-type Transaction = {
-  id: string;
-  amount: number;
-  currency: string;
+type TransactionFilters = {
   status: string;
   method: string;
-  createdAt: string;
-  order?: {
-    id: string;
-    orderNumber: string;
-    customerName: string;
-    customerPhone: string;
-  };
+  branch: string;
+  dateFrom: string;
+  dateTo: string;
 };
 
+function getStatusColor(status: string) {
+  if (status === PaymentStatus.SUCCESS) return "#22c55e";
+  if (status === PaymentStatus.FAILED) return "#ef4444";
+  return theme.text.secondary;
+}
+
+function getOrderHref(transaction: TransactionRecord) {
+  if (!transaction.order?.id) return null;
+  return transaction.type === "PART"
+    ? `/part-orders/${transaction.order.id}`
+    : `/orders/${transaction.order.id}`;
+}
+
+function escapeCsv(value: unknown) {
+  const text = String(value ?? "");
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
 export default function TransactionsPage() {
-  const router = useRouter();
   const { user } = useAuthStore();
-  const [filters, setFilters] = useState({
+  const isAdmin = user?.role === UserRole.ADMIN;
+  const isBranchScoped = !isAdmin && Boolean(user?.branchId);
+
+  const [filters, setFilters] = useState<TransactionFilters>({
     status: "",
-    gateway: "",
+    method: "",
     branch: "",
     dateFrom: "",
     dateTo: "",
   });
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionRecord | null>(null);
+  const [receiptLoadingId, setReceiptLoadingId] = useState<string | null>(null);
 
-  // Modal state
-  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
-  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
-
-  // Fetch branches
   useEffect(() => {
-    import("@/lib/api/inventory").then(({ getBranches }) => {
-      getBranches().then((data: any) => setBranches(data.branches || []));
-    }).catch(console.error);
-  }, []);
+    if (!user) return;
 
-  // Role check: Admin only
+    getBranches()
+      .then((data) => setBranches(data.branches || []))
+      .catch(() => setBranches([]));
+  }, [user]);
+
   useEffect(() => {
-    if (user && user.role !== UserRole.ADMIN) {
-      router.push("/");
+    if (!user) return;
+    if (isBranchScoped) {
+      setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
-  }, [user, router]);
+  }, [isBranchScoped, user]);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
+  const requestFilters = useMemo(() => ({
+    status: filters.status || undefined,
+    method: filters.method || undefined,
+    branchId: filters.branch || undefined,
+    dateFrom: filters.dateFrom || undefined,
+    dateTo: filters.dateTo || undefined,
+  }), [filters]);
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        setLoading(true);
-        const params: any = {};
-        if (filters.status) params.status = filters.status;
-        if (filters.gateway) params.method = filters.gateway;
-        if (filters.branch) params.branchId = filters.branch;
-        if (filters.dateFrom) params.dateFrom = filters.dateFrom;
-        if (filters.dateTo) params.dateTo = filters.dateTo;
+  const fetchTransactions = useCallback(async () => {
+    if (!user) return;
 
-        const res = await api.get("/transactions", { params });
-        setTransactions(res.data.transactions || []);
-      } catch (err) {
-        setError("Failed to load transactions");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    setError("");
 
-    fetchTransactions();
-  }, [filters]);
-
-  const executeRefund = async () => {
-    if (!selectedTransactionId) return;
     try {
-      await api.post(`/transactions/${selectedTransactionId}/refund`);
-      toast.success("Refund initiated successfully");
-      setTransactions((prev) => prev.map((t) => t.id === selectedTransactionId ? { ...t, status: "REFUNDED" } : t));
-    } catch (err) {
-      console.error("Failed to initiate refund:", err);
-      toast.error("Failed to initiate refund");
+      const response = await getTransactions(requestFilters);
+      setTransactions(response.transactions || []);
+    } catch (fetchError: any) {
+      setError(fetchError.response?.data?.message || "Failed to load transactions");
+      setTransactions([]);
     } finally {
-      setIsRefundModalOpen(false);
-      setSelectedTransactionId(null);
+      setLoading(false);
     }
+  }, [requestFilters, user]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  const summary = useMemo(() => {
+    const successful = transactions.filter((transaction) => transaction.status === PaymentStatus.SUCCESS);
+    return {
+      revenue: successful.reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0),
+      successful: successful.length,
+      pending: transactions.filter((transaction) => transaction.status === PaymentStatus.PENDING).length,
+    };
+  }, [transactions]);
+
+  const handleFilterChange = (key: keyof TransactionFilters, value: string) => {
+    if (key === "branch" && isBranchScoped) return;
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleRefund = (transactionId: string) => {
-    setSelectedTransactionId(transactionId);
-    setIsRefundModalOpen(true);
-  };
-
-  const handleDownloadReceipt = async (transactionId: string) => {
+  const handleDownloadReceipt = async (transaction: TransactionRecord) => {
+    setReceiptLoadingId(transaction.id);
     try {
-      const res = await api.get(`/transactions/${transactionId}/receipt`, {
-        responseType: "blob",
-      });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `receipt-${transactionId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      await downloadReceipt(transaction.id);
       toast.success("Receipt downloaded successfully");
-    } catch (err) {
-      console.error("Failed to download receipt:", err);
-      toast.error("Failed to download receipt");
+    } catch (downloadError: any) {
+      toast.error(downloadError.response?.data?.message || "Failed to download receipt");
+    } finally {
+      setReceiptLoadingId(null);
     }
+  };
+
+
+
+  const handleExportCSV = () => {
+    const headers = ["Transaction ID", "Order", "Type", "Customer", "Branch", "Amount", "Method", "Status", "Date"];
+    const rows = transactions.map((transaction) => [
+      transaction.id,
+      transaction.order?.orderNumber || "",
+      transaction.type,
+      transaction.order?.customerName || "",
+      transaction.order?.branch?.name || "",
+      Number(transaction.amount || 0),
+      transaction.method,
+      transaction.status,
+      new Date(transaction.createdAt).toLocaleString(),
+    ]);
+
+    const csv = [
+      headers.map(escapeCsv).join(","),
+      ...rows.map((row) => row.map(escapeCsv).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `transactions_${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1
-              className="text-3xl font-bold"
-              style={{ color: theme.text.primary }}
-            >
+            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
               Transactions
             </h1>
-
-            <p
-              className="mt-1 text-sm"
-              style={{ color: theme.text.secondary }}
-            >
-              View and manage all payment transactions.
+            <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
+              View payment transactions across bike and part orders.
             </p>
           </div>
-
-        
+          <button
+            onClick={handleExportCSV}
+            disabled={transactions.length === 0}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: theme.backgrounds.tertiary,
+              color: theme.text.secondary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            Export CSV
+          </button>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {[
-            { label: "Total Revenue", value: `PKR ${transactions.filter(t => t.status === "SUCCESS").reduce((sum, t) => sum + Number(t.amount), 0).toLocaleString()}` },
-            { label: "Successful", value: transactions.filter((t) => t.status === "SUCCESS").length.toString() },
-            { label: "Pending", value: transactions.filter((t) => t.status === "PENDING").length.toString() },
-            { label: "Refunded", value: transactions.filter((t) => t.status === "REFUNDED").length.toString() },
-          ].map((card) => (
-            <div
-              key={card.label}
-              className="rounded-lg p-4"
-              style={{
-                backgroundColor: theme.backgrounds.primary,
-                border: `1px solid ${theme.borders.light}`,
-              }}
-            >
-              <p
-                className="text-sm"
-                style={{ color: theme.text.secondary }}
-              >
-                {card.label}
-              </p>
-
-              <p
-                className="text-2xl font-bold mt-2"
-                style={{ color: theme.text.primary }}
-              >
-                {card.value}
-              </p>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <SummaryCard label="Total Revenue" value={`PKR ${summary.revenue.toLocaleString()}`} />
+          <SummaryCard label="Successful" value={summary.successful} color="#22c55e" />
+          <SummaryCard label="Pending" value={summary.pending} color="#f59e0b" />
         </div>
 
-        {/* Filters */}
         <div
           className="rounded-lg p-4 mb-6"
           style={{
@@ -194,18 +204,12 @@ export default function TransactionsPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Status
               </label>
-
               <select
                 value={filters.status}
-                onChange={(e) =>
-                  handleFilterChange("status", e.target.value)
-                }
+                onChange={(event) => handleFilterChange("status", event.target.value)}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -214,26 +218,19 @@ export default function TransactionsPage() {
                 }}
               >
                 <option value="">All Statuses</option>
-                <option value="SUCCESS">Success</option>
-                <option value="PENDING">Pending</option>
-                <option value="FAILED">Failed</option>
-                <option value="REFUNDED">Refunded</option>
+                <option value={PaymentStatus.SUCCESS}>Success</option>
+                <option value={PaymentStatus.PENDING}>Pending</option>
+                <option value={PaymentStatus.FAILED}>Failed</option>
               </select>
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Gateway
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Method
               </label>
-
               <select
-                value={filters.gateway}
-                onChange={(e) =>
-                  handleFilterChange("gateway", e.target.value)
-                }
+                value={filters.method}
+                onChange={(event) => handleFilterChange("method", event.target.value)}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -241,29 +238,24 @@ export default function TransactionsPage() {
                   color: theme.text.primary,
                 }}
               >
-                <option value="">All Gateways</option>
-                <option value="SAFEPAY">Safepay (Visa/Mastercard)</option>
-                <option value="JAZZCASH">JazzCash (Mobile Wallet)</option>
-                <option value="RAAST">Raast (Instant Bank Transfer)</option>
-                <option value="BANK_TRANSFER">Bank Transfer</option>
-                <option value="CASH">Cash</option>
+                <option value="">All Methods</option>
+                <option value={PaymentMethod.SAFEPAY}>Safepay</option>
+                <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
+                <option value={PaymentMethod.RAAST}>Raast</option>
+                <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
+                <option value={PaymentMethod.CASH}>Cash</option>
               </select>
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Branch
               </label>
-
               <select
                 value={filters.branch}
-                onChange={(e) =>
-                  handleFilterChange("branch", e.target.value)
-                }
-                className="w-full px-3 py-2 rounded text-sm"
+                onChange={(event) => handleFilterChange("branch", event.target.value)}
+                disabled={isBranchScoped}
+                className="w-full px-3 py-2 rounded text-sm disabled:opacity-60"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
@@ -271,26 +263,25 @@ export default function TransactionsPage() {
                 }}
               >
                 <option value="">All Branches</option>
-                {branches.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
+                {branches.map((branch) => (
+                  <option key={branch.id} value={branch.id}>{branch.name}</option>
                 ))}
               </select>
+              {!isAdmin && (
+                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                  {isBranchScoped ? "Filtered to your assigned branch" : "No branch assigned, global transactions view"}
+                </p>
+              )}
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 From
               </label>
-
               <input
                 type="date"
                 value={filters.dateFrom}
-                onChange={(e) =>
-                  handleFilterChange("dateFrom", e.target.value)
-                }
+                onChange={(event) => handleFilterChange("dateFrom", event.target.value)}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -301,19 +292,13 @@ export default function TransactionsPage() {
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 To
               </label>
-
               <input
                 type="date"
                 value={filters.dateTo}
-                onChange={(e) =>
-                  handleFilterChange("dateTo", e.target.value)
-                }
+                onChange={(event) => handleFilterChange("dateTo", event.target.value)}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
@@ -325,9 +310,8 @@ export default function TransactionsPage() {
           </div>
         </div>
 
-        {/* Transactions Table */}
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{
             backgroundColor: theme.backgrounds.primary,
             border: `1px solid ${theme.borders.light}`,
@@ -335,94 +319,74 @@ export default function TransactionsPage() {
         >
           <table className="w-full">
             <thead>
-              <tr
-                style={{ backgroundColor: theme.backgrounds.secondary }}
-              >
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Transaction ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Order ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Gateway
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                  Actions
-                </th>
+              <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                {["Transaction ID", "Order", "Customer", "Branch", "Amount", "Method", "Status", "Date", "Actions"].map((header) => (
+                  <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
-
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                    Loading...
+                  <td colSpan={9} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                    Loading transactions...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                    {error}
+                  <td colSpan={9} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                    <div className="flex flex-col items-center gap-3">
+                      <span>{error}</span>
+                      <AsyncButton onClick={fetchTransactions}>Retry</AsyncButton>
+                    </div>
                   </td>
                 </tr>
               ) : transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
                     No transactions found
                   </td>
                 </tr>
-              ) : (
-                transactions.map((transaction) => (
-                  <tr
-                    key={transaction.id}
-                    style={{
-                      borderBottom: `1px solid ${theme.borders.light}`,
-                    }}
-                  >
+              ) : transactions.map((transaction) => {
+                const href = getOrderHref(transaction);
+                const statusColor = getStatusColor(transaction.status);
+
+                return (
+                  <tr key={`${transaction.type}-${transaction.id}`} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
                     <td className="px-6 py-4 text-sm font-medium" style={{ color: theme.text.primary }}>
                       {transaction.id}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {transaction.order?.orderNumber || "—"}
+                      {href ? (
+                        <Link href={href} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
+                          {transaction.order?.orderNumber}
+                        </Link>
+                      ) : "-"}
+                      <span className="ml-2 text-xs" style={{ color: theme.text.muted }}>
+                        {transaction.type}
+                      </span>
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {transaction.order?.customerName || "—"}
+                      {transaction.order?.customerName || "-"}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      PKR {transaction.amount.toLocaleString()}
+                      {transaction.order?.branch?.name || "-"}
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                      {transaction.method}
+                      PKR {Number(transaction.amount || 0).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                      {transaction.method.replace(/_/g, " ")}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span
                         className="px-2 py-1 text-xs font-medium rounded"
                         style={{
-                          backgroundColor:
-                            transaction.status === "SUCCESS"
-                              ? theme.accents.tertiary + "20"
-                              : transaction.status === "FAILED"
-                              ? theme.accents.secondary + "20"
-                              : theme.backgrounds.tertiary,
-                          color:
-                            transaction.status === "SUCCESS"
-                              ? theme.accents.tertiary
-                              : transaction.status === "FAILED"
-                              ? theme.accents.secondary
-                              : theme.text.secondary,
+                          backgroundColor: `${statusColor}20`,
+                          color: statusColor,
+                          border: `1px solid ${statusColor}`,
                         }}
                       >
                         {transaction.status}
@@ -432,81 +396,24 @@ export default function TransactionsPage() {
                       {new Date(transaction.createdAt).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleDownloadReceipt(transaction.id)}
-                          className="font-medium hover:opacity-70"
-                          style={{ color: theme.accents.primary }}
+                      <div className="flex gap-3 whitespace-nowrap">
+                        <AsyncButton
+                          onClick={() => handleDownloadReceipt(transaction)}
+                          loading={receiptLoadingId === transaction.id}
+                          loadingLabel="Downloading..."
+                          style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
                         >
-                          Download Receipt
-                        </button>
-                        {transaction.status === "SUCCESS" && (
-                          <button
-                            onClick={() => handleRefund(transaction.id)}
-                            className="font-medium hover:opacity-70 ml-4"
-                            style={{ color: theme.accents.secondary }}
-                          >
-                            Initiate Refund
-                          </button>
-                        )}
+                          Receipt
+                        </AsyncButton>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* Refund Confirmation Modal */}
-      {isRefundModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div
-            className="w-full max-w-md rounded-lg p-6 shadow-xl"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            <h3
-              className="text-lg font-bold mb-2"
-              style={{ color: theme.text.primary }}
-            >
-              Confirm Refund
-            </h3>
-            <p
-              className="text-sm mb-6"
-              style={{ color: theme.text.secondary }}
-            >
-              Are you sure you want to initiate a refund for this transaction? This action cannot be easily undone and will be permanently logged.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setIsRefundModalOpen(false);
-                  setSelectedTransactionId(null);
-                }}
-                className="px-4 py-2 rounded font-medium transition-opacity hover:opacity-80"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.primary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={executeRefund}
-                className="px-4 py-2 rounded font-medium text-white transition-opacity hover:opacity-80"
-                style={{ backgroundColor: theme.accents.secondary }}
-              >
-                Yes, Refund
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

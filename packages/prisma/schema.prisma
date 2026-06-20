@@ -89,6 +89,7 @@ enum AuditAction {
   APPROVE
   REJECT
   PAYMENT
+  REFUND
 }
 
 enum InventoryMovementType {

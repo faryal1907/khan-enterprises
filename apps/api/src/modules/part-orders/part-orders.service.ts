@@ -8,7 +8,7 @@ import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prism
 
 @Injectable()
 export class PartOrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -233,6 +233,14 @@ export class PartOrdersService {
       where.processedById = query.processedById;
     }
 
+    if (query.orderType) {
+      where.orderType = query.orderType;
+    }
+
+    if (query.pickupType) {
+      where.pickupType = query.pickupType;
+    }
+
     if (query.dateFrom || query.dateTo) {
       where.createdAt = {};
       if (query.dateFrom) {
@@ -354,6 +362,17 @@ export class PartOrdersService {
     }
 
     return this.prisma.client.$transaction(async (tx) => {
+      if (status === OrderStatus.CONFIRMED && currentStatus === OrderStatus.PAID) {
+        const reservedQuantity = order.partInventory.reservedQuantity;
+        if (order.partInventory.quantity < order.quantity || reservedQuantity < order.quantity) {
+          throw new BadRequestException("Insufficient reserved stock to confirm this order");
+        }
+      }
+
+      if (status === OrderStatus.CANCELLED) {
+        await this.restorePartOrderStock(tx, order);
+      }
+
       const updatedOrder = await tx.partOrder.update({
         where: { id },
         data: {
@@ -448,27 +467,8 @@ export class PartOrdersService {
         },
       });
 
-      // Restore reserved stock
-      await tx.partInventory.update({
-        where: { id: order.partInventoryId },
-        data: {
-          reservedQuantity: {
-            decrement: order.quantity,
-          },
-        },
-      });
+      await this.restorePartOrderStock(tx, order);
 
-      // If order was confirmed or ready for delivery (stock was already deducted), restore it
-      if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
-        await tx.partInventory.update({
-          where: { id: order.partInventoryId },
-          data: {
-            quantity: {
-              increment: order.quantity,
-            },
-          },
-        });
-      }
       await tx.auditLog.create({
         data: {
           userId: user.id,
@@ -881,5 +881,40 @@ export class PartOrdersService {
       averageOrderValue,
       revenueByBranch: Object.values(revenueByBranch),
     };
+  }
+
+  /**
+   * Helper method to restore part stock depending on the status of the cancelled order
+   */
+  private async restorePartOrderStock(tx: any, order: any) {
+    if (order.status === OrderStatus.PENDING_PAYMENT || order.status === OrderStatus.PAID) {
+      // Stock was only reserved, not fully deducted
+      await tx.partInventory.update({
+        where: { id: order.partInventoryId },
+        data: {
+          reservedQuantity: { decrement: order.quantity },
+        },
+      });
+    } else if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
+      // Stock was fully deducted and reservation was cleared.
+      // Increment quantity back.
+      await tx.partInventory.update({
+        where: { id: order.partInventoryId },
+        data: {
+          quantity: { increment: order.quantity },
+        },
+      });
+
+      // Create stock movement record for restoration
+      await tx.stockMovement.create({
+        data: {
+          inventoryId: order.partInventoryId,
+          movementType: "STOCK_IN",
+          quantity: order.quantity,
+          reason: `Part order cancelled: ${order.orderNumber}`,
+          performedById: order.processedById,
+        },
+      });
+    }
   }
 }

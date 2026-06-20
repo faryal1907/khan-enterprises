@@ -19,7 +19,6 @@ export interface DashboardStats {
     type: "GLOBAL" | "BRANCH";
     branch: Pick<Branch, "id" | "name" | "city"> | null;
   };
-  pendingOffers: number;
   availableBikes: number;
   availableParts: number;
   lowStockAlerts: number;
@@ -169,7 +168,17 @@ export enum PaymentStatus {
   PENDING = "PENDING",
   SUCCESS = "SUCCESS",
   FAILED = "FAILED",
-  REFUNDED = "REFUNDED",
+  VERIFICATION_PENDING = "VERIFICATION_PENDING",
+}
+
+export enum OrderType {
+  ONLINE = "ONLINE",
+  ONSITE = "ONSITE",
+}
+
+export enum PickupType {
+  DELIVERY = "DELIVERY",
+  ONSITE_PICKUP = "ONSITE_PICKUP",
 }
 
 export interface Order {
@@ -177,17 +186,21 @@ export interface Order {
   orderNumber: string;
   bikeId: string;
   bike: BikeUnit;
-  offerId: string | null;
-  offer: any;
   branchId: string;
   branch: Branch;
   customerName: string;
   customerPhone: string;
-  customerCNIC: string;
-  customerAddress: string;
+  customerCNIC: string | null;
+  customerAddress: string | null;
   negotiatedAmount: number;
+  isOnlineOrder: boolean;
+  appliedDiscount?: number | null;
   paymentMethod: PaymentMethod;
   status: OrderStatus;
+  paymentVerified: boolean;
+  orderType: OrderType;
+  reservationExpiry?: string | null;
+  pickupType: PickupType;
   processedById: string | null;
   processedBy: User | null;
   transactions: PaymentTransaction[];

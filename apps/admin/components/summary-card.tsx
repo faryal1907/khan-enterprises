@@ -1,8 +1,9 @@
 import { theme } from "@/lib/colors";
+import type { ReactNode } from "react";
 
 type SummaryCardProps = {
   label: string;
-  value: number;
+  value: ReactNode;
   color?: string;
 };
 

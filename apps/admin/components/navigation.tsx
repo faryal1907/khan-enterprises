@@ -36,7 +36,6 @@ const operationLinks = [
   { href: "/bikes", label: "Bikes", icon: Bike },
   { href: "/models", label: "Models", icon: Bike },
   { href: "/parts", label: "Parts", icon: Wrench },
-  { href: "/offers", label: "Offers", icon: BadgeDollarSign },
   { href: "/orders", label: "Orders", icon: ShoppingCart },
   { href: "/sales", label: "Sales", icon: DollarSign },
   { href: "/deliveries", label: "Delivery", icon: Truck },
@@ -49,13 +48,13 @@ const adminLinks = [
   { href: "/branches", label: "Branches", icon: Building2 },
 ];
 
-export function Navigation() {
+export function Navigation({ children }: { children?: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [collapsed, setCollapsed] = useState(false);
-  const [lowStockCount, setLowStockCount] = useState(0); // ← was missing
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [lowStockCount, setLowStockCount] = useState(0);
 
   useEffect(() => {
     const fetchLowStockCount = async () => {
@@ -72,10 +71,10 @@ export function Navigation() {
     fetchLowStockCount();
   }, [user?.branchId, user?.role]);
 
-  if (!user) return null;
+  if (!user) return <>{children}</>;
 
   if (!["ADMIN", "MANAGER", "SALES_STAFF"].includes(user.role)) {
-    return null;
+    return <>{children}</>;
   }
 
   const isAdmin = user.role === UserRole.ADMIN;
@@ -99,7 +98,7 @@ export function Navigation() {
     <>
       {/* Mobile toggle */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg shadow-lg"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg shadow-lg"
         style={{
           backgroundColor: theme.backgrounds.secondary,
           color: theme.text.primary,
@@ -113,7 +112,7 @@ export function Navigation() {
       <aside
         className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        } md:translate-x-0`}
         style={{
           width: collapsed ? "80px" : "260px",
           backgroundColor: theme.backgrounds.secondary,
@@ -144,7 +143,7 @@ export function Navigation() {
             )}
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg"
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg"
               style={{
                 backgroundColor: theme.backgrounds.primary,
                 color: theme.text.secondary,
@@ -327,10 +326,20 @@ export function Navigation() {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Main Content Wrapper */}
+      <div 
+        className={`transition-all duration-300 ease-in-out flex-1 flex flex-col ${
+          sidebarOpen ? (collapsed ? "ml-[80px]" : "ml-[260px]") : "ml-0"
+        } ${collapsed ? 'md:ml-[80px]' : 'md:ml-[260px]'}`}
+      >
+        <div className="md:hidden" style={{ height: "64px" }} /> {/* Spacer for mobile menu button */}
+        {children}
+      </div>
     </>
   );
 }
