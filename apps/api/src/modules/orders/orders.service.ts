@@ -377,6 +377,7 @@ export class OrdersService {
 
   /**
    * Advance order through valid state transitions only
+   * Applies inventory side effects: DELIVERED → bike SOLD, CANCELLED → bike AVAILABLE
    */
   async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, user: any) {
     const order = await this.getOrderById(id, user);
@@ -399,28 +400,55 @@ export class OrdersService {
       );
     }
 
-    return this.prisma.client.order.update({
-      where: { id },
-      data: {
-        status: newStatus,
-        processedById: user.id,
-      },
-      include: {
-        bike: {
-          include: {
-            model: true,
-            branch: true,
+    return this.prisma.client.$transaction(async (tx) => {
+      const updatedOrder = await tx.order.update({
+        where: { id },
+        data: {
+          status: newStatus,
+          processedById: user.id,
+        },
+        include: {
+          bike: {
+            include: {
+              model: true,
+              branch: true,
+            },
+          },
+          branch: true,
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
           },
         },
-        branch: true,
-        processedBy: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
+      });
+
+      // Side effects: keep bike status in sync with order lifecycle
+      if (newStatus === OrderStatus.DELIVERED && order.bike.status !== BikeStatus.SOLD) {
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
           },
-        },
-      },
+        });
+      }
+
+      if (newStatus === OrderStatus.CANCELLED) {
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.AVAILABLE,
+            reservedUntil: null,
+            soldAt: null,
+          },
+        });
+      }
+
+      return updatedOrder;
     });
   }
 
@@ -549,18 +577,14 @@ export class OrdersService {
         },
       });
 
-      // 5. For CASH payments: set order → PAID, offer → PAID, bike → SOLD, set reservationExpiry to 2 days
+      // 5. For CASH payments: set order → PAID, bike → SOLD (sale is finalized immediately)
       // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
       if (dto.method === "CASH") {
-        // Set reservation expiry to 2 days from now
-        const reservationExpiry = new Date();
-        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
-
         await tx.order.update({
           where: { id: orderId },
           data: {
             status: OrderStatus.PAID,
-            reservationExpiry,
+            reservationExpiry: null,
             processedById: user.id,
           },
         });
@@ -742,7 +766,7 @@ export class OrdersService {
           isOnlineOrder,
           orderType,
           pickupType: orderType === "ONLINE" ? "DELIVERY" : "ONSITE_PICKUP",
-          customerId: dto.customerId ?? user.id,
+          customerId: dto.customerId ?? null,
         },
       });
 

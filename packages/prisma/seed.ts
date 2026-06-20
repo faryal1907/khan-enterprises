@@ -24,7 +24,6 @@ async function main() {
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "DeliveryRequest" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "PaymentTransaction" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Order" CASCADE;');
-  await prisma.$executeRawUnsafe('TRUNCATE TABLE "Offer" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "StockMovement" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartInventory" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Part" CASCADE;');
