@@ -739,6 +739,11 @@ export class OrdersService {
 
       return order;
     });
+
+    // Create alerts for users based on their role AFTER transaction commits
+    await this.orderAlertsService.createAlertsForOrder(createdOrder.id, AlertType.NEW_ORDER);
+
+    return createdOrder;
   }
 
   /**
