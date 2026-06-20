@@ -22,7 +22,10 @@ async function main() {
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "AuditLog" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Document" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "DeliveryRequest" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartPaymentTransaction" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "PaymentTransaction" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "OrderAlert" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartOrder" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Order" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "StockMovement" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartInventory" CASCADE;');
@@ -552,18 +555,22 @@ async function main() {
   // ============================================================================
   console.log("💳 Seeding sample order and transaction...");
 
+  const soldBike = await prisma.bikeUnit.findFirst({ where: { status: "SOLD" } });
+
   const sampleOrder = await prisma.order.create({
     data: {
       orderNumber: "ORD-2025-001",
-      bikeId: (await prisma.bikeUnit.findFirst({ where: { status: "SOLD" } }))!.id,
+      bikeId: soldBike!.id,
       branchId: branchHQ.id,
       customerName: "Ahmed Khan",
       customerPhone: "+923001234567",
       customerCNIC: "12345-6789012-3",
       customerAddress: "House 123, Street 5, F-8 Islamabad",
-      negotiatedAmount: 175000,
-      paymentMethod: "BANK_TRANSFER",
+      paymentMethod: "ONLINE_TRANSFER",
       status: "PAID",
+      paymentVerified: true,
+      orderType: "ONSITE",
+      pickupType: "ONSITE_PICKUP",
     },
   });
 
@@ -572,7 +579,7 @@ async function main() {
       orderId: sampleOrder.id,
       gatewayReference: "TXN-2025-001",
       amount: 175000,
-      method: "BANK_TRANSFER",
+      method: "ONLINE_TRANSFER",
       status: "SUCCESS",
       gatewayResponse: { status: "success", message: "Payment completed" },
       webhookReceivedAt: new Date(),
