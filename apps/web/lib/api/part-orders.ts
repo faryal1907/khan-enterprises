@@ -8,6 +8,7 @@ export async function createPartOrder(data: {
   customerAddress: string;
   quantity: number;
   paymentMethod: string;
+  paymentProofUrl?: string;
 }) {
   const response = await api.post("/part-orders", data);
   return response.data;

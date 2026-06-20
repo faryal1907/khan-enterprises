@@ -102,6 +102,7 @@ export default function NewPartOrderPage() {
         customerAddress,
         quantity,
         paymentMethod,
+        paymentProofUrl: paymentMethod === "ONLINE_TRANSFER" ? paymentProofUrl || undefined : undefined,
       });
 
       setCreatedOrder(response.order);

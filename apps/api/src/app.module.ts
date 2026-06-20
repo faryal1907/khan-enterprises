@@ -39,8 +39,8 @@ import { OrderAlertsModule } from "./modules/order-alerts/order-alerts.module";
     OrderAlertsModule,
     ThrottlerModule.forRoot([
       {
-        ttl: 60000, // 1 minute
-        limit: 3, // 3 attempts per minute for login
+        ttl: 60000,  // 1 minute
+        limit: 100,  // generous global limit; login endpoint overrides with @Throttle
       },
     ]),
   ],
