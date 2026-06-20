@@ -117,8 +117,8 @@ export default function CustomerOrdersPage() {
       setLoading(true);
       console.log('fetchOrders called with activeTab:', activeTab, 'fetching all orders (no isCompleted filter)');
       const [bikesRes, partsRes] = await Promise.all([
-        getOrders({}).catch(err => ({ orders: [] })),
-        getPartOrders({}).catch(err => ({ orders: [] }))
+        getOrders({ isCustomerView: true }).catch(err => ({ orders: [] })),
+        getPartOrders({ isCustomerView: true }).catch(err => ({ orders: [] }))
       ]);
 
       const bikes: UnifiedOrder[] = (bikesRes.orders || []).map((o: any) => ({

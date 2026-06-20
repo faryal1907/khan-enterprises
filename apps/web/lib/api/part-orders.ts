@@ -24,6 +24,7 @@ export async function getPartOrders(filters: any = {}) {
   if (filters.isCompleted !== undefined) params.isCompleted = filters.isCompleted;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
+  if (filters.isCustomerView) params.isCustomerView = filters.isCustomerView;
 
   const response = await api.get("/part-orders", { params });
   return response.data;

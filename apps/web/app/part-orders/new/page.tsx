@@ -200,7 +200,7 @@ export default function NewPartOrderPage() {
       <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
         <div className="max-w-2xl mx-auto px-6 py-12">
           <div className="rounded-xl p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-            <div className="text-5xl mb-4">{isCash ? "✅" : ""}</div>
+            <div className="text-5xl mb-4">{isCash ? "" : ""}</div>
             <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>
               {isCash ? "Order Confirmed!" : "Order Created!"}
             </h1>

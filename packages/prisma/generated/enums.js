@@ -21,9 +21,9 @@ exports.BikeStatus = {
 exports.OrderStatus = {
     PENDING_PAYMENT: 'PENDING_PAYMENT',
     PAID: 'PAID',
+    CONFIRMED: 'CONFIRMED',
     READY_FOR_DELIVERY: 'READY_FOR_DELIVERY',
     DELIVERED: 'DELIVERED',
-    PICKED_UP: 'PICKED_UP',
     CANCELLED: 'CANCELLED'
 };
 exports.DeliveryStatus = {

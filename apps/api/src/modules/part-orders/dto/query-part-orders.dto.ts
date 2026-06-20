@@ -28,6 +28,11 @@ export class QueryPartOrdersDto {
   @Type(() => Boolean)
   isCompleted?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  isCustomerView?: boolean;
+
   @IsString()
   @IsOptional()
   search?: string;

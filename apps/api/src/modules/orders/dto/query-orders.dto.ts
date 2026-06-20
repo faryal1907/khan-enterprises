@@ -32,6 +32,11 @@ export class QueryOrdersDto {
   @Type(() => Boolean)
   isCompleted?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  isCustomerView?: boolean;
+
   @IsInt()
   @Min(1)
   @IsOptional()

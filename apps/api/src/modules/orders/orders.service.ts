@@ -102,10 +102,22 @@ export class OrdersService {
       ];
     }
 
-    // Filter by customer for CUSTOMER role
-    if (user?.role === "CUSTOMER") {
-      where.customerPhone = user.phoneNumber;
+    // Filter by customer for CUSTOMER role or if requested by frontend customer view
+    if (user?.role === "CUSTOMER" || query.isCustomerView) {
+      if (user?.phoneNumber) {
+        if (!where.AND) where.AND = [];
+        where.AND.push({
+          OR: [
+            { customerPhone: user.phoneNumber },
+            { processedById: user.id }
+          ]
+        });
+      } else {
+        // If the user has no phone number, only show orders they processed themselves (e.g. online orders)
+        where.processedById = user.id;
+      }
     }
+
 
     const page = query.page || 1;
     const limit = query.limit || 20;

@@ -21,9 +21,9 @@ export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus];
 export declare const OrderStatus: {
     readonly PENDING_PAYMENT: "PENDING_PAYMENT";
     readonly PAID: "PAID";
+    readonly CONFIRMED: "CONFIRMED";
     readonly READY_FOR_DELIVERY: "READY_FOR_DELIVERY";
     readonly DELIVERED: "DELIVERED";
-    readonly PICKED_UP: "PICKED_UP";
     readonly CANCELLED: "CANCELLED";
 };
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
