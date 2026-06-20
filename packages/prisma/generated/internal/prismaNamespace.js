@@ -60,9 +60,9 @@ exports.UserScalarFieldEnum = {
     role: 'role',
     status: 'status',
     branchId: 'branchId',
-    vendorId: 'vendorId',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    vendorId: 'vendorId'
 };
 exports.RefreshTokenScalarFieldEnum = {
     id: 'id',
@@ -112,16 +112,16 @@ exports.BikeUnitScalarFieldEnum = {
     engineNumber: 'engineNumber',
     serialNumber: 'serialNumber',
     status: 'status',
-    price: 'price',
-    color: 'color',
-    media: 'media',
     negotiatedPrice: 'negotiatedPrice',
-    onlineDiscountPercent: 'onlineDiscountPercent',
-    actualSalePrice: 'actualSalePrice',
     reservedUntil: 'reservedUntil',
     soldAt: 'soldAt',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    color: 'color',
+    media: 'media',
+    price: 'price',
+    onlineDiscountPercent: 'onlineDiscountPercent',
+    actualSalePrice: 'actualSalePrice'
 };
 exports.PartScalarFieldEnum = {
     id: 'id',
@@ -156,23 +156,24 @@ exports.OrderScalarFieldEnum = {
     orderNumber: 'orderNumber',
     bikeId: 'bikeId',
     branchId: 'branchId',
+    customerId: 'customerId',
     customerName: 'customerName',
     customerPhone: 'customerPhone',
     customerCNIC: 'customerCNIC',
     customerAddress: 'customerAddress',
     negotiatedAmount: 'negotiatedAmount',
-    isOnlineOrder: 'isOnlineOrder',
-    appliedDiscount: 'appliedDiscount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    processedById: 'processedById',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    expiresAt: 'expiresAt',
+    appliedDiscount: 'appliedDiscount',
     paymentVerified: 'paymentVerified',
     orderType: 'orderType',
     reservationExpiry: 'reservationExpiry',
     pickupType: 'pickupType',
-    expiresAt: 'expiresAt',
-    processedById: 'processedById',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    isOnlineOrder: 'isOnlineOrder'
 };
 exports.OrderAlertScalarFieldEnum = {
     id: 'id',
@@ -188,6 +189,7 @@ exports.PartOrderScalarFieldEnum = {
     partId: 'partId',
     partInventoryId: 'partInventoryId',
     branchId: 'branchId',
+    customerId: 'customerId',
     customerName: 'customerName',
     customerPhone: 'customerPhone',
     customerAddress: 'customerAddress',
@@ -195,14 +197,14 @@ exports.PartOrderScalarFieldEnum = {
     amount: 'amount',
     paymentMethod: 'paymentMethod',
     status: 'status',
+    processedById: 'processedById',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    expiresAt: 'expiresAt',
     paymentVerified: 'paymentVerified',
     orderType: 'orderType',
     reservationExpiry: 'reservationExpiry',
-    pickupType: 'pickupType',
-    expiresAt: 'expiresAt',
-    processedById: 'processedById',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    pickupType: 'pickupType'
 };
 exports.PaymentTransactionScalarFieldEnum = {
     id: 'id',
@@ -214,12 +216,12 @@ exports.PaymentTransactionScalarFieldEnum = {
     status: 'status',
     gatewayResponse: 'gatewayResponse',
     failureReason: 'failureReason',
-    paymentProofUrl: 'paymentProofUrl',
-    verifiedAt: 'verifiedAt',
-    verifiedById: 'verifiedById',
     webhookReceivedAt: 'webhookReceivedAt',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    paymentProofUrl: 'paymentProofUrl',
+    verifiedAt: 'verifiedAt',
+    verifiedById: 'verifiedById'
 };
 exports.PartPaymentTransactionScalarFieldEnum = {
     id: 'id',
@@ -231,26 +233,26 @@ exports.PartPaymentTransactionScalarFieldEnum = {
     status: 'status',
     gatewayResponse: 'gatewayResponse',
     failureReason: 'failureReason',
-    paymentProofUrl: 'paymentProofUrl',
-    verifiedAt: 'verifiedAt',
-    verifiedById: 'verifiedById',
     webhookReceivedAt: 'webhookReceivedAt',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    paymentProofUrl: 'paymentProofUrl',
+    verifiedAt: 'verifiedAt',
+    verifiedById: 'verifiedById'
 };
 exports.DeliveryRequestScalarFieldEnum = {
     id: 'id',
     orderId: 'orderId',
-    partOrderId: 'partOrderId',
     deliveryAddress: 'deliveryAddress',
     preferredTimeWindow: 'preferredTimeWindow',
     contactNumber: 'contactNumber',
     status: 'status',
     approvedAt: 'approvedAt',
     deliveredAt: 'deliveredAt',
-    notes: 'notes',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    notes: 'notes',
+    partOrderId: 'partOrderId'
 };
 exports.DocumentScalarFieldEnum = {
     id: 'id',

@@ -414,32 +414,7 @@ export default function OrderStatusPage() {
                     <p className="text-sm" style={{ color: "#92400E" }}>
                       Please complete your payment and upload the proof below for verification.
                     </p>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                        className="text-sm"
-                        style={{ color: theme.text.primary }}
-                      />
-                      <button
-                        onClick={handleUploadPaymentProof}
-                        disabled={!selectedFile || uploadingProof}
-                        className="px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                        style={{
-                          backgroundColor: theme.accents.primary,
-                          color: theme.text.inverse,
-                        }}
-                      >
-                        {uploadingProof ? "Uploading..." : "Upload Payment Proof"}
-                      </button>
-                    </div>
-                    {proofUploadError && (
-                      <p className="text-xs" style={{ color: "#EF4444" }}>{proofUploadError}</p>
-                    )}
-                    {proofUploaded && (
-                      <p className="text-sm font-semibold" style={{ color: "#10B981" }}>Payment proof uploaded successfully!</p>
-                    )}
+                    
                   </div>
                 )}
               </div>

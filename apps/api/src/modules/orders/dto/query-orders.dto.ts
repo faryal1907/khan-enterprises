@@ -1,6 +1,16 @@
 import { IsEnum, IsUUID, IsOptional, IsInt, Min, IsDateString, IsBoolean, IsString } from "class-validator";
-import { Type } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import { OrderStatus, OrderType, PickupType } from "@khan/prisma";
+
+// class-transformer's @Type(() => Boolean) converts the string "false" to true
+// because new Boolean("false") is truthy. Use an explicit Transform instead.
+function toBoolean({ value }: { value: any }): boolean | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === "boolean") return value;
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return undefined;
+}
 
 export class QueryOrdersDto {
   @IsEnum(OrderStatus)
@@ -29,12 +39,12 @@ export class QueryOrdersDto {
 
   @IsBoolean()
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
   isCompleted?: boolean;
 
   @IsBoolean()
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
   isCustomerView?: boolean;
 
   @IsInt()

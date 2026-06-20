@@ -10,31 +10,37 @@ export enum OrderType {
 export class CreateManualOrderDto {
   @IsString()
   @IsNotEmpty()
-  chassisNumber: string;
+  chassisNumber!: string;
 
   @IsString()
   @IsNotEmpty()
-  customerName: string;
+  customerName!: string;
 
   @IsString()
   @IsNotEmpty()
-  customerCNIC: string;
+  customerCNIC!: string;
 
   @IsString()
   @IsNotEmpty()
-  customerPhone: string;
+  customerPhone!: string;
 
   @IsString()
   @IsNotEmpty()
-  customerAddress: string;
+  customerAddress!: string;
+
+  // If created by staff we still store the customer ownership.
+  // Use `user.id` when not provided.
+  @IsString()
+  @IsOptional()
+  customerId?: string;
 
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  salePrice: number;
+  salePrice!: number;
 
   @IsEnum(PaymentMethod)
-  paymentMethod: PaymentMethod;
+  paymentMethod!: PaymentMethod;
 
   @IsEnum(OrderType)
   @IsOptional()
@@ -45,3 +51,4 @@ export class CreateManualOrderDto {
   @IsOptional()
   actualSalePrice?: number;
 }
+

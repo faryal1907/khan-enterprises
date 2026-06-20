@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { theme, colors } from "@/lib/colors";
@@ -100,25 +100,13 @@ export default function CustomerOrdersPage() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"current" | "history">("current");
 
-  useEffect(() => {
-    console.log('activeTab changed to:', activeTab);
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    fetchOrders();
-  }, [user, router, activeTab]);
-
-  // Log initial state
-  console.log('Initial activeTab:', activeTab);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('fetchOrders called with activeTab:', activeTab, 'fetching all orders (no isCompleted filter)');
+      setOrders([]);  // clear stale data immediately so a previous session's orders never show
       const [bikesRes, partsRes] = await Promise.all([
-        getOrders({ isCustomerView: true }).catch(err => ({ orders: [] })),
-        getPartOrders({ isCustomerView: true }).catch(err => ({ orders: [] }))
+        getOrders({ isCustomerView: true, isCompleted: activeTab === "history" }).catch(() => ({ orders: [] })),
+        getPartOrders({ isCustomerView: true, isCompleted: activeTab === "history" }).catch(() => ({ orders: [] }))
       ]);
 
       const bikes: UnifiedOrder[] = (bikesRes.orders || []).map((o: any) => ({
@@ -135,9 +123,6 @@ export default function CustomerOrdersPage() {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
-      console.log('API response - bikes:', bikes.length, 'parts:', parts.length, 'merged:', merged.length);
-      console.log('All orders with statuses:', merged.map(o => ({ orderNumber: o.orderNumber, status: o.status, type: o.type })));
-
       setOrders(merged);
     } catch (err: any) {
       console.error("Failed to fetch orders:", err);
@@ -145,7 +130,15 @@ export default function CustomerOrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, activeTab]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    fetchOrders();
+  }, [user, router, activeTab, fetchOrders]);
 
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
@@ -218,14 +211,13 @@ export default function CustomerOrdersPage() {
     return status.replace(/_/g, " ");
   };
 
-  // Filter orders based on activeTab
+  // Filter orders based on activeTab (history vs current)
+  // NOTE: backend subset already uses `isCompleted`, but we keep this for UI safety.
+  // Treat both delivered and cancelled as history, everything else as current.
   const filteredOrders = orders.filter((order) => {
-    const isOrderCompleted =
-      order.status === "DELIVERED" || order.status === "CANCELLED";
+    const isOrderCompleted = order.status === "DELIVERED" || order.status === "CANCELLED";
     return activeTab === "history" ? isOrderCompleted : !isOrderCompleted;
   });
-
-  console.log('Filtered orders for display:', filteredOrders.map(o => ({ orderNumber: o.orderNumber, status: o.status, type: o.type })));
 
   if (loading) {
     return (
@@ -253,7 +245,6 @@ export default function CustomerOrdersPage() {
           <div className="flex gap-2">
             <button
               onClick={() => {
-                console.log('Switching to current tab');
                 setActiveTab("current");
               }}
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
@@ -266,7 +257,6 @@ export default function CustomerOrdersPage() {
             </button>
             <button
               onClick={() => {
-                console.log('Switching to history tab');
                 setActiveTab("history");
               }}
               className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
@@ -336,9 +326,10 @@ export default function CustomerOrdersPage() {
                       >
                         {getStatusLabel(getDisplayStatus(order))}
                       </span>
-                      {activeTab === "current" && getDisplayStatus(order) === "PENDING_PAYMENT" && order.expiresAt && (
-                        <CountdownTimer expiresAt={order.expiresAt} />
+                      {activeTab === "current" && getDisplayStatus(order) === "PENDING_PAYMENT" && (order.expiresAt || order.createdAt) && (
+                        <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />
                       )}
+
                       <span className="text-xs" style={{ color: theme.text.muted }}>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </span>

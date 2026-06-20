@@ -20,9 +20,19 @@ export class PartOrdersService {
     }
   }
 
-  private assertPartOrderAccess(order: { branchId: string; customerPhone?: string }, user?: any) {
-    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
-      throw new NotFoundException("Part order not found");
+  private assertPartOrderAccess(
+    order: { branchId: string; customerId?: string | null; customerPhone?: string },
+    user?: any,
+  ) {
+    if (user?.role === "CUSTOMER") {
+      // Primary check: customerId is set and matches — grant access immediately.
+      if (order.customerId === user.id) {
+        // ownership confirmed, skip phone check
+      } else if (order.customerId === null && user.phoneNumber && order.customerPhone === user.phoneNumber) {
+        // Legacy fallback: row pre-dates the customerId migration, match by phone instead.
+      } else {
+        throw new NotFoundException("Part order not found");
+      }
     }
 
     if (this.isAssignedBranchUser(user) && order.branchId !== user.branchId) {
@@ -30,11 +40,36 @@ export class PartOrdersService {
     }
   }
 
+
+  private applyCustomerScope(where: any, user?: any, isCustomerView?: boolean) {
+    // Only scope to a specific customer when the caller is actually a CUSTOMER.
+    // isCustomerView is a hint from the frontend but must never override the role check —
+    // a non-CUSTOMER user (admin, staff) passing isCustomerView:true must still see all orders.
+    if (user?.role !== "CUSTOMER" || !user.id) {
+      return;
+    }
+
+    // Match orders explicitly linked to this user OR legacy orders (customerId not yet set)
+    // that were placed with the customer's phone number.
+    // Written into AND so it composes safely with any existing OR (e.g. search).
+    const ownershipClause = {
+      OR: [
+        { customerId: user.id },
+        ...(user.phoneNumber
+          ? [{ customerId: null, customerPhone: user.phoneNumber }]
+          : []),
+      ],
+    };
+    where.AND = [...(where.AND ?? []), ownershipClause];
+  }
+
+
   /**
    * Create a new part order
    */
-  async createPartOrder(dto: CreatePartOrderDto) {
+  async createPartOrder(dto: CreatePartOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
+
       // 1. Verify part exists
       const part = await tx.part.findUnique({
         where: { id: dto.partId },
@@ -92,6 +127,8 @@ export class PartOrdersService {
           reservationExpiry,
           orderType,
           pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
+          customerId: user.id,
+
         },
         include: {
           part: true,
@@ -203,25 +240,19 @@ export class PartOrdersService {
 
   /**
    * Paginated, filtered by status/branchId/date range. Include part, inventory, branch, processedBy
-   * For CUSTOMER role: filters by customer phone/CNIC from user profile
+   * For CUSTOMER role or customer view: filters by the logged-in user id
    * Supports isCompleted filter: true=DELIVERED/CANCELLED, false=active orders
    */
   async getPartOrders(query: QueryPartOrdersDto, user?: any) {
-    console.log('getPartOrders called with query:', query);
-    console.log('isCompleted value:', query.isCompleted, 'type:', typeof query.isCompleted, 'is undefined:', query.isCompleted === undefined);
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
     } else if (query.isCompleted !== undefined) {
-      console.log('Filtering by isCompleted:', query.isCompleted);
-      // Filter by completion status
       if (query.isCompleted) {
         where.status = { in: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] };
-        console.log('Setting where.status for completed orders:', where.status);
       } else {
         where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] };
-        console.log('Setting where.status for current orders:', where.status);
       }
     }
 
@@ -264,21 +295,7 @@ export class PartOrdersService {
       ];
     }
 
-    // Filter by customer for CUSTOMER role or if requested by frontend customer view
-    if (user?.role === "CUSTOMER" || query.isCustomerView) {
-      if (user?.phoneNumber) {
-        if (!where.AND) where.AND = [];
-        where.AND.push({
-          OR: [
-            { customerPhone: user.phoneNumber },
-            { processedById: user.id }
-          ]
-        });
-      } else {
-        // If the user has no phone number, only show orders they processed themselves
-        where.processedById = user.id;
-      }
-    }
+    this.applyCustomerScope(where, user, query.isCustomerView);
 
     const page = query.page ? Number(query.page) : 1;
     const limit = query.limit ? Number(query.limit) : 20;
@@ -560,6 +577,10 @@ export class PartOrdersService {
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.DELIVERED, // Manual sale assumes immediate delivery
           processedById: user.id,
+          // Only link to a customer account if one was explicitly provided.
+          // Walk-in sales with no registered customer stay null so the order
+          // remains matchable by phone if the customer registers later.
+          customerId: dto.customerId ?? null,
         },
       });
 

@@ -35,4 +35,10 @@ export class CreateManualPartOrderDto {
 
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
+
+  // Optional: link the order to a registered customer account.
+  // Leave null for walk-in customers who have no account yet.
+  @IsString()
+  @IsOptional()
+  customerId?: string;
 }

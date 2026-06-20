@@ -31,37 +31,62 @@ export class OrdersService {
     }
   }
 
-  private assertOrderAccess(order: { branchId: string; customerPhone?: string }, user?: any) {
-    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
-      throw new NotFoundException("Order not found");
+  private assertOrderAccess(order: { branchId: string; customerId?: string | null; customerPhone?: string | null }, user?: any) {
+    if (user?.role === "CUSTOMER") {
+      // Primary check: customerId is set and matches — grant access immediately.
+      if (order.customerId === user.id) {
+        // ownership confirmed, skip phone check
+      } else if (order.customerId === null && user.phoneNumber && order.customerPhone === user.phoneNumber) {
+        // Legacy fallback: row pre-dates the customerId migration, match by phone instead.
+      } else {
+        throw new NotFoundException("Order not found");
+      }
     }
 
     if (this.isAssignedBranchUser(user) && order.branchId !== user.branchId) {
+
       throw new NotFoundException("Order not found");
     }
   }
 
+  private applyCustomerScope(where: any, user?: any, isCustomerView?: boolean) {
+    // Only scope to a specific customer when the caller is actually a CUSTOMER.
+    // isCustomerView is a hint from the frontend but must never override the role check —
+    // a non-CUSTOMER user (admin, staff) passing isCustomerView:true must still see all orders.
+    if (user?.role !== "CUSTOMER" || !user.id) {
+      return;
+    }
+
+    // Match orders explicitly linked to this user OR legacy orders (customerId not yet set)
+    // that were placed with the customer's phone number.
+    // Written into AND so it composes safely with any existing OR (e.g. search).
+    const ownershipClause = {
+      OR: [
+        { customerId: user.id },
+        ...(user.phoneNumber
+          ? [{ customerId: null, customerPhone: user.phoneNumber }]
+          : []),
+      ],
+    };
+    where.AND = [...(where.AND ?? []), ownershipClause];
+  }
+
+
   /**
    * Paginated, filtered by status/branchId/date range. Include bike, offer, branch, processedBy
-   * For CUSTOMER role: filters by customer phone/CNIC from user profile
+   * For CUSTOMER role or customer view: filters by the logged-in user id
    * Supports isCompleted filter: true=DELIVERED/CANCELLED, false=active orders
    */
   async getOrders(query: QueryOrdersDto, user?: any) {
-    console.log('getOrders called with query:', query);
-    console.log('isCompleted value:', query.isCompleted, 'type:', typeof query.isCompleted, 'is undefined:', query.isCompleted === undefined);
     const where: any = {};
 
     if (query.status) {
       where.status = query.status;
     } else if (query.isCompleted !== undefined) {
-      console.log('Filtering by isCompleted:', query.isCompleted);
-      // Filter by completion status
       if (query.isCompleted) {
         where.status = { in: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] };
-        console.log('Setting where.status for completed orders:', where.status);
       } else {
         where.status = { in: [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY] };
-        console.log('Setting where.status for current orders:', where.status);
       }
     }
 
@@ -71,9 +96,7 @@ export class OrdersService {
 
     this.applyBranchScope(where, user);
 
-    if (query.processedById) {
-      where.processedById = query.processedById;
-    }
+
 
     if (query.orderType) {
       where.orderType = query.orderType;
@@ -102,22 +125,7 @@ export class OrdersService {
       ];
     }
 
-    // Filter by customer for CUSTOMER role or if requested by frontend customer view
-    if (user?.role === "CUSTOMER" || query.isCustomerView) {
-      if (user?.phoneNumber) {
-        if (!where.AND) where.AND = [];
-        where.AND.push({
-          OR: [
-            { customerPhone: user.phoneNumber },
-            { processedById: user.id }
-          ]
-        });
-      } else {
-        // If the user has no phone number, only show orders they processed themselves (e.g. online orders)
-        where.processedById = user.id;
-      }
-    }
-
+    this.applyCustomerScope(where, user, query.isCustomerView);
 
     const page = query.page || 1;
     const limit = query.limit || 20;
@@ -234,11 +242,11 @@ export class OrdersService {
           status: OrderStatus.PENDING_PAYMENT,
           expiresAt,
           reservationExpiry,
-          processedById: user.id,
           isOnlineOrder: !isCash,
           appliedDiscount: discountAmount,
           orderType: isCash ? "ONSITE" : "ONLINE",
           pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
+          customerId: user.id,
         },
       });
 
@@ -314,11 +322,8 @@ export class OrdersService {
       throw new NotFoundException(`Order with number ${orderNumber} not found`);
     }
 
-    // For CUSTOMER role, verify order belongs to them
-    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
-      throw new NotFoundException(`Order with number ${orderNumber} not found`);
-    }
-
+    // assertOrderAccess handles both the customerId match and the legacy phone
+    // fallback (customerId IS NULL) in one place — no need to duplicate here.
     this.assertOrderAccess(order, user);
 
     return order;
@@ -330,16 +335,17 @@ export class OrdersService {
   async completeOrderDetails(id: string, dto: CompleteOrderDetailsDto, user: any) {
     const order = await this.getOrderById(id, user);
 
+
     if (order.status !== OrderStatus.PENDING_PAYMENT) {
       throw new BadRequestException(
         `Cannot complete details for order in ${order.status} status`
       );
     }
 
-    // For CUSTOMER role, verify order belongs to them
-    if (user?.role === "CUSTOMER" && order.customerPhone !== user.phoneNumber) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
-    }
+    // Ownership was already verified by getOrderById → assertOrderAccess above.
+    // No need to re-check here.
+
+
 
     return this.prisma.client.order.update({
       where: { id },
@@ -624,11 +630,32 @@ export class OrdersService {
   }
 
   /**
-   * Customer-scoped order list by phone number (public endpoint)
+   * Customer-scoped order list by phone number.
+   * Returns orders matched by customerPhone OR by the customerId of a registered
+   * user account whose phoneNumber matches — so online orders (which carry
+   * customerId but may have a different stored phone) are included too.
    */
   async getOrdersByCustomerPhone(phone: string, user?: any) {
-    const where: any = { customerPhone: phone };
-    this.applyBranchScope(where, user);
+    // Look up a registered user account with this phone so we can also match
+    // orders that are linked via customerId rather than customerPhone.
+    const matchedUser = await this.prisma.client.user.findFirst({
+      where: { phoneNumber: phone },
+      select: { id: true },
+    });
+
+    const where: any = {
+      OR: [
+        { customerPhone: phone },
+        ...(matchedUser ? [{ customerId: matchedUser.id }] : []),
+      ],
+    };
+
+    // Branch scope must be applied as an AND alongside the OR so it doesn't
+    // clobber the OR clause. applyBranchScope writes a flat branchId key, so
+    // we handle it manually here.
+    if (this.isAssignedBranchUser(user)) {
+      where.AND = [{ branchId: user.branchId }];
+    }
 
     const orders = await this.prisma.client.order.findMany({
       where,
@@ -715,6 +742,7 @@ export class OrdersService {
           isOnlineOrder,
           orderType,
           pickupType: orderType === "ONLINE" ? "DELIVERY" : "ONSITE_PICKUP",
+          customerId: dto.customerId ?? user.id,
         },
       });
 

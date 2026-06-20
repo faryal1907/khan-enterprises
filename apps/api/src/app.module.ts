@@ -10,7 +10,6 @@ import { UploadModule } from "./modules/upload/upload.module";
 import { VendorModule } from "./modules/vendor/vendor.module";
 import { BikeModelsModule } from "./modules/bike-models/bike-models.module";
 import { CatalogModule } from "./modules/catalog/catalog.module";
-import { OffersModule } from "./modules/offers/offers.module";
 import { OrdersModule } from "./modules/orders/orders.module";
 import { PartOrdersModule } from "./modules/part-orders/part-orders.module";
 import { DeliveriesModule } from "./modules/deliveries/deliveries.module";
@@ -31,7 +30,6 @@ import { OrderAlertsModule } from "./modules/order-alerts/order-alerts.module";
     VendorModule,
     BikeModelsModule,
     CatalogModule,
-    OffersModule,
     OrdersModule,
     PartOrdersModule,
     DeliveriesModule,

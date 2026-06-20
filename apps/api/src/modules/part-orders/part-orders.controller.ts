@@ -23,12 +23,15 @@ export class PartOrdersController {
 
   /**
    * POST /api/part-orders
-   * Create a new part order (public endpoint)
+   * Create a new part order (customer-authenticated)
    */
   @Post()
-  async createPartOrder(@Body() dto: CreatePartOrderDto) {
-    return this.partOrdersService.createPartOrder(dto);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("CUSTOMER")
+  async createPartOrder(@Body() dto: CreatePartOrderDto, @CurrentUser() user: any) {
+    return this.partOrdersService.createPartOrder(dto, user);
   }
+
 
   /**
    * GET /api/part-orders/id/:id
@@ -55,7 +58,8 @@ export class PartOrdersController {
    * Get part orders (paginated, filtered)
    */
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
   async getPartOrders(@Query() query: QueryPartOrdersDto, @CurrentUser() user: any) {
     return this.partOrdersService.getPartOrders(query, user);
   }

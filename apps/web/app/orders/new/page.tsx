@@ -127,7 +127,11 @@ export default function NewOrderPage() {
         customerCNIC: customerCNIC || undefined,
         customerAddress: customerAddress || undefined,
         paymentMethod,
-        paymentProofUrl: paymentMethod === "BANK_TRANSFER" ? paymentProofUrl : undefined,
+        // For CASH orders we must not send empty/invalid paymentProofUrl
+        paymentProofUrl:
+          paymentMethod === "BANK_TRANSFER"
+            ? paymentProofUrl || undefined
+            : undefined,
       };
 
       const order = await createCustomerOrder(payload);

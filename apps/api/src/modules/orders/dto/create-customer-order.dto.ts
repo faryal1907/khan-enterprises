@@ -31,6 +31,6 @@ export class CreateCustomerOrderDto {
   paymentMethod!: PaymentMethod;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   paymentProofUrl?: string;
 }
