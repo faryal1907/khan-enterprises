@@ -203,7 +203,7 @@ export type PartOrderGroupByOutputType = {
     paymentVerified: boolean;
     orderType: $Enums.OrderType;
     reservationExpiry: Date | null;
-    pickupType: $Enums.PickupType;
+    pickupType: $Enums.PickupType | null;
     expiresAt: Date | null;
     processedById: string | null;
     createdAt: Date;
@@ -236,7 +236,7 @@ export type PartOrderWhereInput = {
     paymentVerified?: Prisma.BoolFilter<"PartOrder"> | boolean;
     orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType;
+    pickupType?: Prisma.EnumPickupTypeNullableFilter<"PartOrder"> | $Enums.PickupType | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
@@ -264,7 +264,7 @@ export type PartOrderOrderByWithRelationInput = {
     paymentVerified?: Prisma.SortOrder;
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder;
-    pickupType?: Prisma.SortOrder;
+    pickupType?: Prisma.SortOrderInput | Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
@@ -295,7 +295,7 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
     paymentVerified?: Prisma.BoolFilter<"PartOrder"> | boolean;
     orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType;
+    pickupType?: Prisma.EnumPickupTypeNullableFilter<"PartOrder"> | $Enums.PickupType | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
@@ -323,7 +323,7 @@ export type PartOrderOrderByWithAggregationInput = {
     paymentVerified?: Prisma.SortOrder;
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder;
-    pickupType?: Prisma.SortOrder;
+    pickupType?: Prisma.SortOrderInput | Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
@@ -353,7 +353,7 @@ export type PartOrderScalarWhereWithAggregatesInput = {
     paymentVerified?: Prisma.BoolWithAggregatesFilter<"PartOrder"> | boolean;
     orderType?: Prisma.EnumOrderTypeWithAggregatesFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeWithAggregatesFilter<"PartOrder"> | $Enums.PickupType;
+    pickupType?: Prisma.EnumPickupTypeNullableWithAggregatesFilter<"PartOrder"> | $Enums.PickupType | null;
     expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartOrder"> | Date | string;
@@ -372,7 +372,7 @@ export type PartOrderCreateInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -399,7 +399,7 @@ export type PartOrderUncheckedCreateInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -420,7 +420,7 @@ export type PartOrderUpdateInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -447,7 +447,7 @@ export type PartOrderUncheckedUpdateInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -471,7 +471,7 @@ export type PartOrderCreateManyInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -490,7 +490,7 @@ export type PartOrderUpdateManyMutationInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -511,7 +511,7 @@ export type PartOrderUncheckedUpdateManyInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -798,7 +798,7 @@ export type PartOrderCreateWithoutProcessedByInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -824,7 +824,7 @@ export type PartOrderUncheckedCreateWithoutProcessedByInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -871,7 +871,7 @@ export type PartOrderScalarWhereInput = {
     paymentVerified?: Prisma.BoolFilter<"PartOrder"> | boolean;
     orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType;
+    pickupType?: Prisma.EnumPickupTypeNullableFilter<"PartOrder"> | $Enums.PickupType | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
@@ -890,7 +890,7 @@ export type PartOrderCreateWithoutBranchInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -915,7 +915,7 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -957,7 +957,7 @@ export type PartOrderCreateWithoutPartInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -982,7 +982,7 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1024,7 +1024,7 @@ export type PartOrderCreateWithoutPartInventoryInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1049,7 +1049,7 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1091,7 +1091,7 @@ export type PartOrderCreateWithoutTransactionsInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1117,7 +1117,7 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1150,7 +1150,7 @@ export type PartOrderUpdateWithoutTransactionsInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1176,7 +1176,7 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1196,7 +1196,7 @@ export type PartOrderCreateWithoutDeliveryInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1222,7 +1222,7 @@ export type PartOrderUncheckedCreateWithoutDeliveryInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1255,7 +1255,7 @@ export type PartOrderUpdateWithoutDeliveryInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1281,7 +1281,7 @@ export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1304,7 +1304,7 @@ export type PartOrderCreateManyProcessedByInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -1322,7 +1322,7 @@ export type PartOrderUpdateWithoutProcessedByInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1348,7 +1348,7 @@ export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1371,7 +1371,7 @@ export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1391,7 +1391,7 @@ export type PartOrderCreateManyBranchInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1410,7 +1410,7 @@ export type PartOrderUpdateWithoutBranchInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1435,7 +1435,7 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1458,7 +1458,7 @@ export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1479,7 +1479,7 @@ export type PartOrderCreateManyPartInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1498,7 +1498,7 @@ export type PartOrderUpdateWithoutPartInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1523,7 +1523,7 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1546,7 +1546,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1567,7 +1567,7 @@ export type PartOrderCreateManyPartInventoryInput = {
     paymentVerified?: boolean;
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
+    pickupType?: $Enums.PickupType | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     createdAt?: Date | string;
@@ -1586,7 +1586,7 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1611,7 +1611,7 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1634,7 +1634,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
     paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    pickupType?: Prisma.NullableEnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -1803,7 +1803,7 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
         paymentVerified: boolean;
         orderType: $Enums.OrderType;
         reservationExpiry: Date | null;
-        pickupType: $Enums.PickupType;
+        pickupType: $Enums.PickupType | null;
         expiresAt: Date | null;
         processedById: string | null;
         createdAt: Date;

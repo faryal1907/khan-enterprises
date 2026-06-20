@@ -232,7 +232,6 @@ export const OrderScalarFieldEnum = {
   customerCNIC: 'customerCNIC',
   customerAddress: 'customerAddress',
   negotiatedAmount: 'negotiatedAmount',
-  isOnlineOrder: 'isOnlineOrder',
   appliedDiscount: 'appliedDiscount',
   paymentMethod: 'paymentMethod',
   status: 'status',

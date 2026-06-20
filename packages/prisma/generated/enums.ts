@@ -41,9 +41,9 @@ export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus]
 export const OrderStatus = {
   PENDING_PAYMENT: 'PENDING_PAYMENT',
   PAID: 'PAID',
-  CONFIRMED: 'CONFIRMED',
   READY_FOR_DELIVERY: 'READY_FOR_DELIVERY',
   DELIVERED: 'DELIVERED',
+  PICKED_UP: 'PICKED_UP',
   CANCELLED: 'CANCELLED'
 } as const
 
