@@ -6,6 +6,7 @@ import { CancelOrderDto } from "./dto/cancel-order.dto";
 import { CompleteOrderDetailsDto } from "./dto/complete-order-details.dto";
 import { RecordPaymentDto } from "./dto/record-payment.dto";
 import { CreateManualOrderDto, OrderType } from "./dto/create-manual-order.dto";
+import { CreateCustomerOrderDto } from "./dto/create-customer-order.dto";
 import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
 import { RevenueQueryDto, RevenueDuration } from "./dto/revenue-query.dto";
@@ -172,6 +173,91 @@ export class OrdersService {
     this.assertOrderAccess(order, user);
 
     return order;
+  }
+
+  /**
+   * Create an online order directly by a customer (no negotiation)
+   * Auto-applies 2% discount for online orders
+   */
+  async createCustomerOrder(dto: CreateCustomerOrderDto, user: any) {
+    const isCash = dto.paymentMethod === "CASH";
+    const result = await this.prisma.client.$transaction(async (tx) => {
+      const bike = await tx.bikeUnit.findUnique({
+        where: { id: dto.bikeId },
+        include: { model: true, branch: true },
+      });
+
+      if (!bike) throw new NotFoundException(`Bike not found`);
+      if (bike.status !== BikeStatus.AVAILABLE) throw new BadRequestException(`Bike is not available for sale`);
+
+      const basePrice = Number(bike.model.basePrice);
+      const salePrice = basePrice * 0.98;
+      const discountAmount = basePrice - salePrice;
+      const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 48);
+
+      const order = await tx.order.create({
+        data: {
+          orderNumber,
+          bikeId: bike.id,
+          branchId: bike.branchId,
+          customerName: dto.customerName,
+          customerPhone: dto.customerPhone,
+          customerCNIC: dto.customerCNIC || null,
+          customerAddress: dto.customerAddress || null,
+          negotiatedAmount: salePrice,
+          paymentMethod: dto.paymentMethod,
+          status: isCash ? OrderStatus.CONFIRMED : OrderStatus.PENDING_PAYMENT,
+          expiresAt,
+          reservationExpiry: isCash ? expiresAt : null,
+          processedById: user.id,
+          isOnlineOrder: !isCash,
+          appliedDiscount: discountAmount,
+          orderType: isCash ? "ONSITE" : "ONLINE",
+          pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
+        },
+      });
+
+      await tx.bikeUnit.update({
+        where: { id: bike.id },
+        data: {
+          status: BikeStatus.RESERVED,
+          soldAt: null,
+          reservedUntil: expiresAt,
+          ...(isCash ? {} : { onlineDiscountPercent: 2 }),
+        },
+      });
+
+      const txStatus = isCash ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING;
+      const transaction = await tx.paymentTransaction.create({
+        data: {
+          orderId: order.id,
+          amount: salePrice,
+          method: dto.paymentMethod,
+          status: txStatus,
+          paymentProofUrl: dto.paymentProofUrl || null,
+          verifiedAt: isCash ? new Date() : null,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id, userRole: user.role, action: AuditAction.CREATE,
+          entityType: "ORDER", entityId: order.id,
+          newValue: JSON.stringify({ ...dto, finalSalePrice: salePrice, discountApplied: discountAmount }),
+        },
+      });
+
+      return tx.order.findUnique({
+        where: { id: order.id },
+        include: { bike: { include: { model: true, branch: true } }, branch: true, transactions: true },
+      });
+    });
+
+    await this.orderAlertsService.createAlertsForOrder(result!.id, isCash ? AlertType.NEW_ORDER : AlertType.PAYMENT_PENDING);
+
+    return result;
   }
 
   /**
@@ -541,7 +627,7 @@ export class OrdersService {
    * Handles both ONLINE and ONSITE order types
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
-    return this.prisma.client.$transaction(async (tx) => {
+    const result = await this.prisma.client.$transaction(async (tx) => {
       // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
@@ -640,11 +726,12 @@ export class OrdersService {
         },
       });
 
-      // Create alerts for users based on their role
-      await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.NEW_ORDER);
-
       return order;
     });
+
+    await this.orderAlertsService.createAlertsForOrder(result.id, AlertType.NEW_ORDER);
+
+    return result;
   }
 
   /**

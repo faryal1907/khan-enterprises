@@ -72,7 +72,9 @@ export default function PartsPage() {
             Parts & Accessories
           </h1>
           <p style={{ color: theme.text.secondary }}>
-            Genuine spare parts, accessories, and consumables for all motorcycle models
+            Browse parts, their specs, and order from your nearest branch!
+          </p><p style={{ color: theme.text.secondary }}>
+            For onsite pickup, browse branch-wise inventory and visit our showroom!
           </p>
         </div>
 

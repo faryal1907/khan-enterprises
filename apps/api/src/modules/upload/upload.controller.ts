@@ -17,7 +17,7 @@ export class UploadController {
    * Uploads to Cloudinary and returns file metadata.
    */
   @Post()
-  @Roles("ADMIN", "MANAGER")
+  @Roles("ADMIN", "MANAGER", "CUSTOMER")
   @UseInterceptors(FileInterceptor("file"))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     if (!file) {

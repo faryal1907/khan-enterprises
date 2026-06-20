@@ -73,10 +73,12 @@ export default function BikesPage() {
             className="text-5xl font-bold mb-4"
             style={{ color: theme.text.primary }}
           >
-            Motorcycle Inventory
+            Bikes Inventory
           </h1>
           <p style={{ color: theme.text.secondary }}>
-            Browse bikes, their specs and start negotitation process!
+            Browse bikes, their specs, and order from your nearest branch!
+          </p><p style={{ color: theme.text.secondary }}>
+            For onsite pickup, browse branch-wise inventory and visit our showroom!
           </p>
         </div>
 
