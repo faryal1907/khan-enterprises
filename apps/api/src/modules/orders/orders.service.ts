@@ -202,8 +202,11 @@ export class OrdersService {
       const salePrice = basePrice * 0.98;
       const discountAmount = basePrice - salePrice;
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      
+      // Set expiry: 2 days for cash (onsite pickup), 7 days for online
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 48);
+      expiresAt.setDate(expiresAt.getDate() + (isCash ? 2 : 7));
+      const reservationExpiry = isCash ? expiresAt : null;
 
       const order = await tx.order.create({
         data: {
@@ -216,9 +219,9 @@ export class OrdersService {
           customerAddress: dto.customerAddress || null,
           negotiatedAmount: salePrice,
           paymentMethod: dto.paymentMethod,
-          status: isCash ? OrderStatus.CONFIRMED : OrderStatus.PENDING_PAYMENT,
+          status: OrderStatus.PENDING_PAYMENT,
           expiresAt,
-          reservationExpiry: isCash ? expiresAt : null,
+          reservationExpiry,
           processedById: user.id,
           isOnlineOrder: !isCash,
           appliedDiscount: discountAmount,

@@ -155,6 +155,12 @@ export default function CustomerOrdersPage() {
           color: "#92400E",
           border: "1px solid #F59E0B",
         };
+      case "VERIFICATION_PENDING":
+        return {
+          backgroundColor: "#FEF3C7",
+          color: "#92400E",
+          border: "1px solid #D97706",
+        };
       case "PAID":
         return {
           backgroundColor: "#DBEAFE",
@@ -192,6 +198,20 @@ export default function CustomerOrdersPage() {
           border: `1px solid ${theme.borders.medium}`,
         };
     }
+  };
+
+  const getDisplayStatus = (order: UnifiedOrder) => {
+    // 1. Terminal/Completed statuses always take precedence
+    if (["DELIVERED", "CANCELLED", "PAID", "CONFIRMED", "READY_FOR_DELIVERY"].includes(order.status)) {
+      return order.status;
+    }
+    
+    // 2. Check for verification pending on online payments
+    const hasVerificationPending = (order as any).transactions?.some((tx: any) => tx.status === "VERIFICATION_PENDING");
+    if (hasVerificationPending) return "VERIFICATION_PENDING";
+    
+    // 3. Default fallback
+    return order.status;
   };
 
   const getStatusLabel = (status: string) => {
@@ -312,11 +332,11 @@ export default function CustomerOrdersPage() {
                       </span>
                       <span
                         className="inline-block px-3 py-1 text-xs font-medium rounded-full"
-                        style={getStatusBadgeStyle(order.status)}
+                        style={getStatusBadgeStyle(getDisplayStatus(order))}
                       >
-                        {getStatusLabel(order.status)}
+                        {getStatusLabel(getDisplayStatus(order))}
                       </span>
-                      {activeTab === "current" && order.status === "PENDING_PAYMENT" && order.expiresAt && (
+                      {activeTab === "current" && getDisplayStatus(order) === "PENDING_PAYMENT" && order.expiresAt && (
                         <CountdownTimer expiresAt={order.expiresAt} />
                       )}
                       <span className="text-xs" style={{ color: theme.text.muted }}>

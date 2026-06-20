@@ -229,7 +229,7 @@ export default function NewOrderPage() {
           <div className="rounded-xl p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
             <div className="text-5xl mb-4">{isCash ? <CheckIcon /> : ""}</div>
             <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>
-              {isCash ? "Order Confirmed!" : "Order Created!"}
+              {isCash ? "Order Placed!" : "Order Created!"}
             </h1>
             <p className="mb-2" style={{ color: theme.text.secondary }}>
               Order Number: <span className="font-mono font-bold" style={{ color: theme.accents.primary }}>{createdOrder.orderNumber}</span>

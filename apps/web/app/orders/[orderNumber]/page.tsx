@@ -7,6 +7,7 @@ import { getOrderByNumber } from "@/lib/api/orders";
 import { getPartOrderByNumber } from "@/lib/api/part-orders";
 import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
 import { markAsPickedByCustomer } from "@/lib/api/orders";
+import { api } from "@/lib/api-client";
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -150,6 +151,12 @@ export default function OrderStatusPage() {
   const [pickingUp, setPickingUp] = useState(false);
   const [pickupError, setPickupError] = useState("");
 
+  // Payment proof upload state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [proofUploaded, setProofUploaded] = useState(false);
+  const [proofUploadError, setProofUploadError] = useState("");
+
   useEffect(() => {
     fetchOrder();
   }, [orderNumber]);
@@ -209,6 +216,33 @@ export default function OrderStatusPage() {
     }
   };
 
+  const handleUploadPaymentProof = async () => {
+    if (!selectedFile || !order) return;
+    try {
+      setUploadingProof(true);
+      setProofUploadError("");
+
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      const uploadResponse = await api.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const paymentProofUrl = uploadResponse.data.fileUrl;
+
+      // Now submit the proof URL to the order
+      await api.post(`/orders/${order.id}/upload-payment-proof`, {
+        paymentProofUrl,
+      });
+
+      setProofUploaded(true);
+      await fetchOrder();
+    } catch (err: any) {
+      setProofUploadError(err.response?.data?.message || "Failed to upload payment proof");
+    } finally {
+      setUploadingProof(false);
+    }
+  };
+
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
       case "PENDING_PAYMENT":
@@ -216,6 +250,12 @@ export default function OrderStatusPage() {
           backgroundColor: "#FEF3C7",
           color: "#92400E",
           border: "1px solid #F59E0B",
+        };
+      case "VERIFICATION_PENDING":
+        return {
+          backgroundColor: "#FEF3C7",
+          color: "#92400E",
+          border: "1px solid #D97706",
         };
       case "PAID":
         return {
@@ -260,6 +300,21 @@ export default function OrderStatusPage() {
     return status.replace(/_/g, " ");
   };
 
+  // Same getDisplayStatus logic as the list page
+  const getDisplayStatus = (order: Order) => {
+    // 1. Terminal/Completed statuses always take precedence
+    if (["DELIVERED", "CANCELLED", "PAID", "CONFIRMED", "READY_FOR_DELIVERY"].includes(order.status)) {
+      return order.status;
+    }
+    
+    // 2. Check for verification pending on online payments
+    const hasVerificationPending = order.transactions?.some((tx) => tx.status === "VERIFICATION_PENDING");
+    if (hasVerificationPending) return "VERIFICATION_PENDING";
+    
+    // 3. Default fallback
+    return order.status;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -281,18 +336,20 @@ export default function OrderStatusPage() {
     );
   }
 
+  const displayStatus = getDisplayStatus(order);
   const isPendingPayment = order.status === "PENDING_PAYMENT";
   const hasVerificationPending = order.transactions?.some((tx) => tx.status === "VERIFICATION_PENDING");
   const isConfirmed = order.status === "CONFIRMED" || order.status === "PAID";
+  const isCash = order.paymentMethod === "CASH";
   
-  // For orders with ONSITE_PICKUP, customer chose to pay and pick up at store - no delivery selection needed
-  const isOnsitePickup = order.pickupType === "ONSITE_PICKUP" 
-    || order.orderType === "ONSITE"
-    || (order.paymentMethod === "CASH" && (order.status === "CONFIRMED" || order.status === "PAID"));
+  // Order is paid online (has a SUCCESS transaction) - show Payment Received in timeline
+  const hasSuccessTransaction = order.transactions?.some((tx) => tx.status === "SUCCESS");
   
-  // Only show "Payment Received" for non-onsite orders with a successful transaction
-  const hasSuccessTransaction = order.transactions?.some((tx) => tx.status === "SUCCESS") && !isOnsitePickup;
-  const canRequestDelivery = isConfirmed && !order.delivery && !isOnsitePickup;
+  // Can request delivery: order is CONFIRMED/PAID, no delivery yet, and not cash (cash = onsite pickup)
+  const canRequestDelivery = isConfirmed && !order.delivery && !isCash;
+  
+  // Show order reserved for cash orders that are still in pending payment
+  const showReservedNotice = order.status === "PENDING_PAYMENT" && isCash && order.reservationExpiry;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -307,21 +364,14 @@ export default function OrderStatusPage() {
           </p>
         </div>
 
-        {/* Status Badge - For onsite pickup cash orders, show PENDING PAYMENT instead of CONFIRMED */}
+        {/* Status Badge - uses same getDisplayStatus as list page */}
         <div className="mb-6">
-          {(() => {
-            const displayStatus = (order.pickupType === "ONSITE_PICKUP" || order.orderType === "ONSITE" || (order.paymentMethod === "CASH" && (order.status === "CONFIRMED" || order.status === "PAID"))) 
-              ? "PENDING_PAYMENT" 
-              : order.status;
-            return (
-              <span
-                className="inline-block px-4 py-2 text-sm font-medium rounded-full"
-                style={getStatusBadgeStyle(displayStatus)}
-              >
-                {getStatusLabel(displayStatus)}
-              </span>
-            );
-          })()}
+          <span
+            className="inline-block px-4 py-2 text-sm font-medium rounded-full"
+            style={getStatusBadgeStyle(displayStatus)}
+          >
+            {getStatusLabel(displayStatus)}
+          </span>
         </div>
 
         {/* Pending Payment Notice */}
@@ -341,27 +391,63 @@ export default function OrderStatusPage() {
                   <h2 className="text-lg font-semibold" style={{ color: "#92400E" }}>
                     {hasVerificationPending ? "Awaiting Admin Verification" : "Payment Pending"}
                   </h2>
-                  {!hasVerificationPending && <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />}
+                  {displayStatus === "PENDING_PAYMENT" && isCash && <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />}
                 </div>
-                {hasVerificationPending ? (
-                  <>
-                    <p className="text-sm mb-3" style={{ color: "#92400E" }}>
-                      Your payment proof has been submitted. Our team will verify it shortly.
-                    </p>
-                    
-                    
-                  </>
-                ) : (
+
+                {/* Cash order - show visit branch message */}
+                {isCash && !hasVerificationPending && (
                   <p className="text-sm mb-3" style={{ color: "#92400E" }}>
                     Please visit your nearest branch to complete payment and confirm your order.
                   </p>
+                )}
+
+                {/* Online order with verification pending */}
+                {hasVerificationPending && (
+                  <p className="text-sm mb-3" style={{ color: "#92400E" }}>
+                    Your payment proof has been submitted. Our team will verify it shortly.
+                  </p>
+                )}
+
+                {/* Online order without verification pending - show upload button */}
+                {!isCash && !hasVerificationPending && (
+                  <div className="space-y-3">
+                    <p className="text-sm" style={{ color: "#92400E" }}>
+                      Please complete your payment and upload the proof below for verification.
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                        className="text-sm"
+                        style={{ color: theme.text.primary }}
+                      />
+                      <button
+                        onClick={handleUploadPaymentProof}
+                        disabled={!selectedFile || uploadingProof}
+                        className="px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                        style={{
+                          backgroundColor: theme.accents.primary,
+                          color: theme.text.inverse,
+                        }}
+                      >
+                        {uploadingProof ? "Uploading..." : "Upload Payment Proof"}
+                      </button>
+                    </div>
+                    {proofUploadError && (
+                      <p className="text-xs" style={{ color: "#EF4444" }}>{proofUploadError}</p>
+                    )}
+                    {proofUploaded && (
+                      <p className="text-sm font-semibold" style={{ color: "#10B981" }}>Payment proof uploaded successfully!</p>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Delivery/Pickup Selection Section */}
+        {/* Delivery/Pickup Selection Section - for online orders after payment is confirmed */}
         {canRequestDelivery && !showDeliveryForm && (
           <div
             className="rounded-xl p-6 mb-6"
@@ -375,10 +461,10 @@ export default function OrderStatusPage() {
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#3730A3" }}>
-                  How would you like to receive your bike?
+                  How would you like to receive your {order.type === "BIKE" ? "bike" : "order"}?
                 </h2>
                 <p className="text-sm mb-4" style={{ color: "#3730A3" }}>
-                  Your order is confirmed! Please choose how you'd like to receive your bike.
+                  Your order is confirmed! Please choose how you'd like to receive it.
                 </p>
               </div>
             </div>
@@ -407,7 +493,7 @@ export default function OrderStatusPage() {
                   </h3>
                 </div>
                 <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                  Get your bike delivered to your doorstep. Our team will coordinate with you for timing.
+                  Get your {order.type === "BIKE" ? "bike" : "order"} delivered to your doorstep. Our team will coordinate with you for timing.
                 </p>
                 <button
                   onClick={() => setShowDeliveryForm(true)}
@@ -435,7 +521,7 @@ export default function OrderStatusPage() {
                   </h3>
                 </div>
                 <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                  Collect your bike directly from our branch. Visit us at your convenience during business hours.
+                  Collect your {order.type === "BIKE" ? "bike" : "order"} directly from our branch. Visit us at your convenience during business hours.
                 </p>
                 <button
                   onClick={handlePickupFromStore}
@@ -599,8 +685,8 @@ export default function OrderStatusPage() {
               </div>
             </div>
 
-            {/* Payment Status - Only show for SUCCESS transactions (never show for ONSITE_PICKUP since payment is pending) */}
-            {hasSuccessTransaction && order.transactions && order.transactions.length > 0 && !isOnsitePickup && (
+            {/* Payment Received - only when a SUCCESS transaction exists, no isOnsitePickup restriction */}
+            {hasSuccessTransaction && order.transactions && order.transactions.length > 0 && (
               <div className="flex gap-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -624,8 +710,8 @@ export default function OrderStatusPage() {
               </div>
             )}
 
-            {/* Reservation Notice for ONSITE_PICKUP orders */}
-            {isOnsitePickup && order.status === "CONFIRMED" && (
+            {/* Reservation Notice - only for cash orders still pending payment */}
+            {showReservedNotice && (
               <div className="flex gap-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -809,8 +895,8 @@ export default function OrderStatusPage() {
           </div>
         </div>
 
-        {/* Payment Transactions - Hide for ONSITE_PICKUP since payment is pending at store */}
-        {order.transactions && order.transactions.length > 0 && !isOnsitePickup && (
+        {/* Payment Transactions */}
+        {order.transactions && order.transactions.length > 0 && (
           <div
             className="rounded-xl p-6 mb-6"
             style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}

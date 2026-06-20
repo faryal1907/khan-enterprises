@@ -15,18 +15,22 @@ export class CreateCustomerOrderDto {
   customerPhone!: string;
 
   @IsString()
+  @IsNotEmpty()
   customerEmail?: string;
 
   @IsString()
+  @IsNotEmpty()
   customerCNIC?: string;
 
   @IsString()
+  @IsNotEmpty()
   customerAddress?: string;
 
   @IsEnum(PaymentMethod)
+  @IsNotEmpty()
   paymentMethod!: PaymentMethod;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   paymentProofUrl?: string;
 }
