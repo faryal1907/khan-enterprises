@@ -35,7 +35,7 @@ export class PdfService {
     doc.moveDown();
 
     doc.fontSize(14).text('Payment Details', { underline: true });
-    const amount = order.negotiatedAmount || order.amount || 0;
+    const amount = order.bike?.actualSalePrice || order.amount || 0;
     doc.fontSize(12).text(`Total Amount: Rs. ${Number(amount).toLocaleString()}`);
     doc.text(`Payment Method: ${order.paymentMethod}`);
     

@@ -289,17 +289,16 @@ export class BranchService {
       throw new NotFoundException(`Branch with id "${id}" not found.`);
     }
 
-    // Calculate additional metrics
     const orders = await this.prisma.client.order.findMany({
       where: { branchId: id },
       select: {
-        negotiatedAmount: true,
+        bike: { select: { actualSalePrice: true } },
         status: true,
         createdAt: true,
       },
     });
 
-    const totalRevenue = orders.reduce((sum, order) => sum + Number(order.negotiatedAmount), 0);
+    const totalRevenue = orders.reduce((sum, order) => sum + Number(order.bike?.actualSalePrice || 0), 0);
     const completedOrders = orders.filter((o) => o.status === "PAID" || o.status === "CONFIRMED").length;
     const pendingOrders = orders.filter((o) => o.status === "PENDING_PAYMENT").length;
 

@@ -1,7 +1,13 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
-import type { User } from "@khan/types";
-
+export interface User {
+  id: string;
+  email: string;
+  role: string;
+  branchId: string | null;
+  vendorId: string | null;
+  status: string;
+}
 interface AuthState {
   user: User | null;
   accessToken: string | null;

@@ -1726,9 +1726,9 @@ export const UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   branchId: 'branchId',
+  vendorId: 'vendorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  vendorId: 'vendorId'
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1798,16 +1798,15 @@ export const BikeUnitScalarFieldEnum = {
   engineNumber: 'engineNumber',
   serialNumber: 'serialNumber',
   status: 'status',
-  negotiatedPrice: 'negotiatedPrice',
+  price: 'price',
+  color: 'color',
+  media: 'media',
+  onlineDiscountPercent: 'onlineDiscountPercent',
+  actualSalePrice: 'actualSalePrice',
   reservedUntil: 'reservedUntil',
   soldAt: 'soldAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  color: 'color',
-  media: 'media',
-  price: 'price',
-  onlineDiscountPercent: 'onlineDiscountPercent',
-  actualSalePrice: 'actualSalePrice'
+  updatedAt: 'updatedAt'
 } as const
 
 export type BikeUnitScalarFieldEnum = (typeof BikeUnitScalarFieldEnum)[keyof typeof BikeUnitScalarFieldEnum]
@@ -1858,24 +1857,23 @@ export const OrderScalarFieldEnum = {
   orderNumber: 'orderNumber',
   bikeId: 'bikeId',
   branchId: 'branchId',
-  customerId: 'customerId',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   customerCNIC: 'customerCNIC',
   customerAddress: 'customerAddress',
-  negotiatedAmount: 'negotiatedAmount',
+  isOnlineOrder: 'isOnlineOrder',
+  appliedDiscount: 'appliedDiscount',
   paymentMethod: 'paymentMethod',
   status: 'status',
-  processedById: 'processedById',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  expiresAt: 'expiresAt',
-  appliedDiscount: 'appliedDiscount',
   paymentVerified: 'paymentVerified',
   orderType: 'orderType',
   reservationExpiry: 'reservationExpiry',
   pickupType: 'pickupType',
-  isOnlineOrder: 'isOnlineOrder'
+  expiresAt: 'expiresAt',
+  processedById: 'processedById',
+  customerId: 'customerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -1899,7 +1897,6 @@ export const PartOrderScalarFieldEnum = {
   partId: 'partId',
   partInventoryId: 'partInventoryId',
   branchId: 'branchId',
-  customerId: 'customerId',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   customerAddress: 'customerAddress',
@@ -1907,14 +1904,15 @@ export const PartOrderScalarFieldEnum = {
   amount: 'amount',
   paymentMethod: 'paymentMethod',
   status: 'status',
-  processedById: 'processedById',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  expiresAt: 'expiresAt',
   paymentVerified: 'paymentVerified',
   orderType: 'orderType',
   reservationExpiry: 'reservationExpiry',
-  pickupType: 'pickupType'
+  pickupType: 'pickupType',
+  expiresAt: 'expiresAt',
+  processedById: 'processedById',
+  customerId: 'customerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type PartOrderScalarFieldEnum = (typeof PartOrderScalarFieldEnum)[keyof typeof PartOrderScalarFieldEnum]
@@ -1930,12 +1928,12 @@ export const PaymentTransactionScalarFieldEnum = {
   status: 'status',
   gatewayResponse: 'gatewayResponse',
   failureReason: 'failureReason',
-  webhookReceivedAt: 'webhookReceivedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
   paymentProofUrl: 'paymentProofUrl',
   verifiedAt: 'verifiedAt',
-  verifiedById: 'verifiedById'
+  verifiedById: 'verifiedById',
+  webhookReceivedAt: 'webhookReceivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum]
@@ -1951,12 +1949,12 @@ export const PartPaymentTransactionScalarFieldEnum = {
   status: 'status',
   gatewayResponse: 'gatewayResponse',
   failureReason: 'failureReason',
-  webhookReceivedAt: 'webhookReceivedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
   paymentProofUrl: 'paymentProofUrl',
   verifiedAt: 'verifiedAt',
-  verifiedById: 'verifiedById'
+  verifiedById: 'verifiedById',
+  webhookReceivedAt: 'webhookReceivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
@@ -1965,16 +1963,16 @@ export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransacti
 export const DeliveryRequestScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
+  partOrderId: 'partOrderId',
   deliveryAddress: 'deliveryAddress',
   preferredTimeWindow: 'preferredTimeWindow',
   contactNumber: 'contactNumber',
   status: 'status',
   approvedAt: 'approvedAt',
   deliveredAt: 'deliveredAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
   notes: 'notes',
-  partOrderId: 'partOrderId'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type DeliveryRequestScalarFieldEnum = (typeof DeliveryRequestScalarFieldEnum)[keyof typeof DeliveryRequestScalarFieldEnum]
@@ -2172,6 +2170,13 @@ export type ListEnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefI
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'PaymentMethod'
  */
 export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
@@ -2196,13 +2201,6 @@ export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'OrderStatus[]'
  */
 export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

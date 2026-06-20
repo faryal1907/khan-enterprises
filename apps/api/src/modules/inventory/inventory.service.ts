@@ -87,7 +87,7 @@ export class InventoryService {
           engineNumber: true,
           serialNumber: true,
           status: true,
-          negotiatedPrice: true,
+          actualSalePrice: true,
           reservedUntil: true,
           soldAt: true,
           createdAt: true,
@@ -308,7 +308,7 @@ export class InventoryService {
         data: {
           status: BikeStatus.AVAILABLE,
           reservedUntil: null,
-          negotiatedPrice: null,
+          actualSalePrice: null,
         },
         include: {
           model: true,

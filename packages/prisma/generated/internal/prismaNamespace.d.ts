@@ -1488,9 +1488,9 @@ export declare const UserScalarFieldEnum: {
     readonly role: "role";
     readonly status: "status";
     readonly branchId: "branchId";
+    readonly vendorId: "vendorId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
-    readonly vendorId: "vendorId";
 };
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
 export declare const RefreshTokenScalarFieldEnum: {
@@ -1545,16 +1545,15 @@ export declare const BikeUnitScalarFieldEnum: {
     readonly engineNumber: "engineNumber";
     readonly serialNumber: "serialNumber";
     readonly status: "status";
-    readonly negotiatedPrice: "negotiatedPrice";
+    readonly price: "price";
+    readonly color: "color";
+    readonly media: "media";
+    readonly onlineDiscountPercent: "onlineDiscountPercent";
+    readonly actualSalePrice: "actualSalePrice";
     readonly reservedUntil: "reservedUntil";
     readonly soldAt: "soldAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
-    readonly color: "color";
-    readonly media: "media";
-    readonly price: "price";
-    readonly onlineDiscountPercent: "onlineDiscountPercent";
-    readonly actualSalePrice: "actualSalePrice";
 };
 export type BikeUnitScalarFieldEnum = (typeof BikeUnitScalarFieldEnum)[keyof typeof BikeUnitScalarFieldEnum];
 export declare const PartScalarFieldEnum: {
@@ -1593,24 +1592,23 @@ export declare const OrderScalarFieldEnum: {
     readonly orderNumber: "orderNumber";
     readonly bikeId: "bikeId";
     readonly branchId: "branchId";
-    readonly customerId: "customerId";
     readonly customerName: "customerName";
     readonly customerPhone: "customerPhone";
     readonly customerCNIC: "customerCNIC";
     readonly customerAddress: "customerAddress";
-    readonly negotiatedAmount: "negotiatedAmount";
+    readonly isOnlineOrder: "isOnlineOrder";
+    readonly appliedDiscount: "appliedDiscount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
-    readonly processedById: "processedById";
-    readonly createdAt: "createdAt";
-    readonly updatedAt: "updatedAt";
-    readonly expiresAt: "expiresAt";
-    readonly appliedDiscount: "appliedDiscount";
     readonly paymentVerified: "paymentVerified";
     readonly orderType: "orderType";
     readonly reservationExpiry: "reservationExpiry";
     readonly pickupType: "pickupType";
-    readonly isOnlineOrder: "isOnlineOrder";
+    readonly expiresAt: "expiresAt";
+    readonly processedById: "processedById";
+    readonly customerId: "customerId";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
 };
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum];
 export declare const OrderAlertScalarFieldEnum: {
@@ -1628,7 +1626,6 @@ export declare const PartOrderScalarFieldEnum: {
     readonly partId: "partId";
     readonly partInventoryId: "partInventoryId";
     readonly branchId: "branchId";
-    readonly customerId: "customerId";
     readonly customerName: "customerName";
     readonly customerPhone: "customerPhone";
     readonly customerAddress: "customerAddress";
@@ -1636,14 +1633,15 @@ export declare const PartOrderScalarFieldEnum: {
     readonly amount: "amount";
     readonly paymentMethod: "paymentMethod";
     readonly status: "status";
-    readonly processedById: "processedById";
-    readonly createdAt: "createdAt";
-    readonly updatedAt: "updatedAt";
-    readonly expiresAt: "expiresAt";
     readonly paymentVerified: "paymentVerified";
     readonly orderType: "orderType";
     readonly reservationExpiry: "reservationExpiry";
     readonly pickupType: "pickupType";
+    readonly expiresAt: "expiresAt";
+    readonly processedById: "processedById";
+    readonly customerId: "customerId";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
 };
 export type PartOrderScalarFieldEnum = (typeof PartOrderScalarFieldEnum)[keyof typeof PartOrderScalarFieldEnum];
 export declare const PaymentTransactionScalarFieldEnum: {
@@ -1656,12 +1654,12 @@ export declare const PaymentTransactionScalarFieldEnum: {
     readonly status: "status";
     readonly gatewayResponse: "gatewayResponse";
     readonly failureReason: "failureReason";
-    readonly webhookReceivedAt: "webhookReceivedAt";
-    readonly createdAt: "createdAt";
-    readonly updatedAt: "updatedAt";
     readonly paymentProofUrl: "paymentProofUrl";
     readonly verifiedAt: "verifiedAt";
     readonly verifiedById: "verifiedById";
+    readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
 };
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum];
 export declare const PartPaymentTransactionScalarFieldEnum: {
@@ -1674,27 +1672,27 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly status: "status";
     readonly gatewayResponse: "gatewayResponse";
     readonly failureReason: "failureReason";
-    readonly webhookReceivedAt: "webhookReceivedAt";
-    readonly createdAt: "createdAt";
-    readonly updatedAt: "updatedAt";
     readonly paymentProofUrl: "paymentProofUrl";
     readonly verifiedAt: "verifiedAt";
     readonly verifiedById: "verifiedById";
+    readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
 };
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum];
 export declare const DeliveryRequestScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
+    readonly partOrderId: "partOrderId";
     readonly deliveryAddress: "deliveryAddress";
     readonly preferredTimeWindow: "preferredTimeWindow";
     readonly contactNumber: "contactNumber";
     readonly status: "status";
     readonly approvedAt: "approvedAt";
     readonly deliveredAt: "deliveredAt";
+    readonly notes: "notes";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
-    readonly notes: "notes";
-    readonly partOrderId: "partOrderId";
 };
 export type DeliveryRequestScalarFieldEnum = (typeof DeliveryRequestScalarFieldEnum)[keyof typeof DeliveryRequestScalarFieldEnum];
 export declare const DocumentScalarFieldEnum: {
@@ -1765,11 +1763,11 @@ export type EnumBikeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 export type ListEnumBikeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BikeStatus[]'>;
 export type EnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryMovementType'>;
 export type ListEnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryMovementType[]'>;
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>;
 export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>;
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>;
 export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>;
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type EnumOrderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderType'>;
 export type ListEnumOrderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderType[]'>;
 export type EnumPickupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PickupType'>;

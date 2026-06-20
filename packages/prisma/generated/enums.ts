@@ -73,10 +73,7 @@ export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
 
 export const PaymentMethod = {
   CASH: 'CASH',
-  BANK_TRANSFER: 'BANK_TRANSFER',
-  SAFEPAY: 'SAFEPAY',
-  JAZZCASH: 'JAZZCASH',
-  RAAST: 'RAAST'
+  ONLINE_TRANSFER: 'ONLINE_TRANSFER'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
@@ -106,8 +103,7 @@ export const AuditAction = {
   LOGOUT: 'LOGOUT',
   APPROVE: 'APPROVE',
   REJECT: 'REJECT',
-  PAYMENT: 'PAYMENT',
-  REFUND: 'REFUND'
+  PAYMENT: 'PAYMENT'
 } as const
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

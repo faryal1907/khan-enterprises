@@ -29,10 +29,10 @@ export interface DeliveryRequest {
     customerName: string;
     customerPhone: string;
     customerAddress: string;
-    negotiatedAmount: number;
     paymentMethod: string;
     bike: {
       id: string;
+      actualSalePrice?: number;
       chassisNumber: string;
       model: {
         brand: string;

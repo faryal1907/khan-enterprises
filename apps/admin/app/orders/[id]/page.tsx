@@ -37,7 +37,7 @@ export default function OrderDetailPage() {
       try {
         const data = await getOrderById(orderId);
         setOrder(data);
-        setPaymentData((prev) => ({ ...prev, amount: data.negotiatedAmount }));
+        setPaymentData((prev) => ({ ...prev, amount: data.bike?.actualSalePrice || 0 }));
       } catch (error: any) {
         console.warn("Failed to fetch order:", error?.message || error);
         toast.error("Failed to fetch order");
@@ -396,10 +396,10 @@ export default function OrderDetailPage() {
               </div>
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
-                  Negotiated Amount
+                  Sale Price
                 </label>
                 <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                  Rs. {order.negotiatedAmount?.toLocaleString()}
+                  Rs. {order.bike?.actualSalePrice?.toLocaleString() || "0"}
                 </p>
               </div>
             </div>
@@ -696,10 +696,7 @@ export default function OrderDetailPage() {
                 }}
               >
                 <option value={PaymentMethod.CASH}>Cash</option>
-                <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
-                <option value={PaymentMethod.SAFEPAY}>Safepay</option>
-                <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
-                <option value={PaymentMethod.RAAST}>Raast</option>
+                <option value={PaymentMethod.ONLINE_TRANSFER}>Online Transfer</option>
               </select>
             </div>
             <div>

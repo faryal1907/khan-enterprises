@@ -86,7 +86,7 @@ export class TransactionsService {
         customerName: orderData.customerName,
         customerPhone: orderData.customerPhone,
         customerAddress: orderData.customerAddress,
-        negotiatedAmount: isPart ? orderData.amount : orderData.negotiatedAmount,
+        negotiatedAmount: isPart ? orderData.amount : (orderData as any).bike?.actualSalePrice || 0,
         paymentMethod: orderData.paymentMethod,
         status: orderData.status,
         branch: orderData.branch,

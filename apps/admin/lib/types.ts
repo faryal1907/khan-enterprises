@@ -54,7 +54,7 @@ export interface BikeUnit {
   serialNumber: string;
   status: BikeStatus;
   price?: number | null;
-  negotiatedPrice?: number | null;
+  actualSalePrice?: number | null;
   reservedUntil?: string | null;
   soldAt?: string | null;
   model: BikeModel;
@@ -158,10 +158,7 @@ export enum OrderStatus {
 
 export enum PaymentMethod {
   CASH = "CASH",
-  BANK_TRANSFER = "BANK_TRANSFER",
-  SAFEPAY = "SAFEPAY",
-  JAZZCASH = "JAZZCASH",
-  RAAST = "RAAST",
+  ONLINE_TRANSFER = "ONLINE_TRANSFER",
 }
 
 export enum PaymentStatus {
@@ -192,7 +189,6 @@ export interface Order {
   customerPhone: string;
   customerCNIC: string | null;
   customerAddress: string | null;
-  negotiatedAmount: number;
   isOnlineOrder: boolean;
   appliedDiscount?: number | null;
   paymentMethod: PaymentMethod;

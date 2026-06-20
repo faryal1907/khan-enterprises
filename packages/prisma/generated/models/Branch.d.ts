@@ -120,12 +120,12 @@ export type BranchWhereInput = {
     managerId?: Prisma.StringNullableFilter<"Branch"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
-    bikeInventory?: Prisma.BikeUnitListRelationFilter;
     manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    orders?: Prisma.OrderListRelationFilter;
-    partInventory?: Prisma.PartInventoryListRelationFilter;
-    partOrders?: Prisma.PartOrderListRelationFilter;
     users?: Prisma.UserListRelationFilter;
+    bikeInventory?: Prisma.BikeUnitListRelationFilter;
+    partInventory?: Prisma.PartInventoryListRelationFilter;
+    orders?: Prisma.OrderListRelationFilter;
+    partOrders?: Prisma.PartOrderListRelationFilter;
 };
 export type BranchOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -136,12 +136,12 @@ export type BranchOrderByWithRelationInput = {
     managerId?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
-    bikeInventory?: Prisma.BikeUnitOrderByRelationAggregateInput;
     manager?: Prisma.UserOrderByWithRelationInput;
-    orders?: Prisma.OrderOrderByRelationAggregateInput;
-    partInventory?: Prisma.PartInventoryOrderByRelationAggregateInput;
-    partOrders?: Prisma.PartOrderOrderByRelationAggregateInput;
     users?: Prisma.UserOrderByRelationAggregateInput;
+    bikeInventory?: Prisma.BikeUnitOrderByRelationAggregateInput;
+    partInventory?: Prisma.PartInventoryOrderByRelationAggregateInput;
+    orders?: Prisma.OrderOrderByRelationAggregateInput;
+    partOrders?: Prisma.PartOrderOrderByRelationAggregateInput;
 };
 export type BranchWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -156,12 +156,12 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
     managerId?: Prisma.StringNullableFilter<"Branch"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
-    bikeInventory?: Prisma.BikeUnitListRelationFilter;
     manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    orders?: Prisma.OrderListRelationFilter;
-    partInventory?: Prisma.PartInventoryListRelationFilter;
-    partOrders?: Prisma.PartOrderListRelationFilter;
     users?: Prisma.UserListRelationFilter;
+    bikeInventory?: Prisma.BikeUnitListRelationFilter;
+    partInventory?: Prisma.PartInventoryListRelationFilter;
+    orders?: Prisma.OrderListRelationFilter;
+    partOrders?: Prisma.PartOrderListRelationFilter;
 }, "id" | "name_city">;
 export type BranchOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -197,12 +197,12 @@ export type BranchCreateInput = {
     phoneNumber?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
-    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
-    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
     users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateInput = {
     id?: string;
@@ -213,11 +213,11 @@ export type BranchUncheckedCreateInput = {
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
-    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
-    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
     users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -227,12 +227,12 @@ export type BranchUpdateInput = {
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
-    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -243,11 +243,11 @@ export type BranchUncheckedUpdateInput = {
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
-    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateManyInput = {
     id?: string;
@@ -278,14 +278,14 @@ export type BranchUncheckedUpdateManyInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
+export type BranchNullableScalarRelationFilter = {
+    is?: Prisma.BranchWhereInput | null;
+    isNot?: Prisma.BranchWhereInput | null;
+};
 export type BranchListRelationFilter = {
     every?: Prisma.BranchWhereInput;
     some?: Prisma.BranchWhereInput;
     none?: Prisma.BranchWhereInput;
-};
-export type BranchNullableScalarRelationFilter = {
-    is?: Prisma.BranchWhereInput | null;
-    isNot?: Prisma.BranchWhereInput | null;
 };
 export type BranchOrderByRelationAggregateInput = {
     _count?: Prisma.SortOrder;
@@ -328,22 +328,31 @@ export type BranchScalarRelationFilter = {
     is?: Prisma.BranchWhereInput;
     isNot?: Prisma.BranchWhereInput;
 };
+export type BranchCreateNestedOneWithoutUsersInput = {
+    create?: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
+    connectOrCreate?: Prisma.BranchCreateOrConnectWithoutUsersInput;
+    connect?: Prisma.BranchWhereUniqueInput;
+};
 export type BranchCreateNestedManyWithoutManagerInput = {
     create?: Prisma.XOR<Prisma.BranchCreateWithoutManagerInput, Prisma.BranchUncheckedCreateWithoutManagerInput> | Prisma.BranchCreateWithoutManagerInput[] | Prisma.BranchUncheckedCreateWithoutManagerInput[];
     connectOrCreate?: Prisma.BranchCreateOrConnectWithoutManagerInput | Prisma.BranchCreateOrConnectWithoutManagerInput[];
     createMany?: Prisma.BranchCreateManyManagerInputEnvelope;
     connect?: Prisma.BranchWhereUniqueInput | Prisma.BranchWhereUniqueInput[];
 };
-export type BranchCreateNestedOneWithoutUsersInput = {
-    create?: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
-    connectOrCreate?: Prisma.BranchCreateOrConnectWithoutUsersInput;
-    connect?: Prisma.BranchWhereUniqueInput;
-};
 export type BranchUncheckedCreateNestedManyWithoutManagerInput = {
     create?: Prisma.XOR<Prisma.BranchCreateWithoutManagerInput, Prisma.BranchUncheckedCreateWithoutManagerInput> | Prisma.BranchCreateWithoutManagerInput[] | Prisma.BranchUncheckedCreateWithoutManagerInput[];
     connectOrCreate?: Prisma.BranchCreateOrConnectWithoutManagerInput | Prisma.BranchCreateOrConnectWithoutManagerInput[];
     createMany?: Prisma.BranchCreateManyManagerInputEnvelope;
     connect?: Prisma.BranchWhereUniqueInput | Prisma.BranchWhereUniqueInput[];
+};
+export type BranchUpdateOneWithoutUsersNestedInput = {
+    create?: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
+    connectOrCreate?: Prisma.BranchCreateOrConnectWithoutUsersInput;
+    upsert?: Prisma.BranchUpsertWithoutUsersInput;
+    disconnect?: Prisma.BranchWhereInput | boolean;
+    delete?: Prisma.BranchWhereInput | boolean;
+    connect?: Prisma.BranchWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutUsersInput, Prisma.BranchUpdateWithoutUsersInput>, Prisma.BranchUncheckedUpdateWithoutUsersInput>;
 };
 export type BranchUpdateManyWithoutManagerNestedInput = {
     create?: Prisma.XOR<Prisma.BranchCreateWithoutManagerInput, Prisma.BranchUncheckedCreateWithoutManagerInput> | Prisma.BranchCreateWithoutManagerInput[] | Prisma.BranchUncheckedCreateWithoutManagerInput[];
@@ -357,15 +366,6 @@ export type BranchUpdateManyWithoutManagerNestedInput = {
     update?: Prisma.BranchUpdateWithWhereUniqueWithoutManagerInput | Prisma.BranchUpdateWithWhereUniqueWithoutManagerInput[];
     updateMany?: Prisma.BranchUpdateManyWithWhereWithoutManagerInput | Prisma.BranchUpdateManyWithWhereWithoutManagerInput[];
     deleteMany?: Prisma.BranchScalarWhereInput | Prisma.BranchScalarWhereInput[];
-};
-export type BranchUpdateOneWithoutUsersNestedInput = {
-    create?: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
-    connectOrCreate?: Prisma.BranchCreateOrConnectWithoutUsersInput;
-    upsert?: Prisma.BranchUpsertWithoutUsersInput;
-    disconnect?: Prisma.BranchWhereInput | boolean;
-    delete?: Prisma.BranchWhereInput | boolean;
-    connect?: Prisma.BranchWhereUniqueInput;
-    update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutUsersInput, Prisma.BranchUpdateWithoutUsersInput>, Prisma.BranchUncheckedUpdateWithoutUsersInput>;
 };
 export type BranchUncheckedUpdateManyWithoutManagerNestedInput = {
     create?: Prisma.XOR<Prisma.BranchCreateWithoutManagerInput, Prisma.BranchUncheckedCreateWithoutManagerInput> | Prisma.BranchCreateWithoutManagerInput[] | Prisma.BranchUncheckedCreateWithoutManagerInput[];
@@ -428,42 +428,6 @@ export type BranchUpdateOneRequiredWithoutPartOrdersNestedInput = {
     connect?: Prisma.BranchWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutPartOrdersInput, Prisma.BranchUpdateWithoutPartOrdersInput>, Prisma.BranchUncheckedUpdateWithoutPartOrdersInput>;
 };
-export type BranchCreateWithoutManagerInput = {
-    id?: string;
-    name: string;
-    city: string;
-    address: string;
-    phoneNumber?: string | null;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
-    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
-    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
-    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
-};
-export type BranchUncheckedCreateWithoutManagerInput = {
-    id?: string;
-    name: string;
-    city: string;
-    address: string;
-    phoneNumber?: string | null;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
-    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
-    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
-    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
-};
-export type BranchCreateOrConnectWithoutManagerInput = {
-    where: Prisma.BranchWhereUniqueInput;
-    create: Prisma.XOR<Prisma.BranchCreateWithoutManagerInput, Prisma.BranchUncheckedCreateWithoutManagerInput>;
-};
-export type BranchCreateManyManagerInputEnvelope = {
-    data: Prisma.BranchCreateManyManagerInput | Prisma.BranchCreateManyManagerInput[];
-    skipDuplicates?: boolean;
-};
 export type BranchCreateWithoutUsersInput = {
     id?: string;
     name: string;
@@ -472,10 +436,10 @@ export type BranchCreateWithoutUsersInput = {
     phoneNumber?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
-    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutUsersInput = {
@@ -488,13 +452,86 @@ export type BranchUncheckedCreateWithoutUsersInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
-    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutUsersInput = {
     where: Prisma.BranchWhereUniqueInput;
     create: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
+};
+export type BranchCreateWithoutManagerInput = {
+    id?: string;
+    name: string;
+    city: string;
+    address: string;
+    phoneNumber?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+};
+export type BranchUncheckedCreateWithoutManagerInput = {
+    id?: string;
+    name: string;
+    city: string;
+    address: string;
+    phoneNumber?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+};
+export type BranchCreateOrConnectWithoutManagerInput = {
+    where: Prisma.BranchWhereUniqueInput;
+    create: Prisma.XOR<Prisma.BranchCreateWithoutManagerInput, Prisma.BranchUncheckedCreateWithoutManagerInput>;
+};
+export type BranchCreateManyManagerInputEnvelope = {
+    data: Prisma.BranchCreateManyManagerInput | Prisma.BranchCreateManyManagerInput[];
+    skipDuplicates?: boolean;
+};
+export type BranchUpsertWithoutUsersInput = {
+    update: Prisma.XOR<Prisma.BranchUpdateWithoutUsersInput, Prisma.BranchUncheckedUpdateWithoutUsersInput>;
+    create: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
+    where?: Prisma.BranchWhereInput;
+};
+export type BranchUpdateToOneWithWhereWithoutUsersInput = {
+    where?: Prisma.BranchWhereInput;
+    data: Prisma.XOR<Prisma.BranchUpdateWithoutUsersInput, Prisma.BranchUncheckedUpdateWithoutUsersInput>;
+};
+export type BranchUpdateWithoutUsersInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    city?: Prisma.StringFieldUpdateOperationsInput | string;
+    address?: Prisma.StringFieldUpdateOperationsInput | string;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+};
+export type BranchUncheckedUpdateWithoutUsersInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    city?: Prisma.StringFieldUpdateOperationsInput | string;
+    address?: Prisma.StringFieldUpdateOperationsInput | string;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUpsertWithWhereUniqueWithoutManagerInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -522,43 +559,6 @@ export type BranchScalarWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
 };
-export type BranchUpsertWithoutUsersInput = {
-    update: Prisma.XOR<Prisma.BranchUpdateWithoutUsersInput, Prisma.BranchUncheckedUpdateWithoutUsersInput>;
-    create: Prisma.XOR<Prisma.BranchCreateWithoutUsersInput, Prisma.BranchUncheckedCreateWithoutUsersInput>;
-    where?: Prisma.BranchWhereInput;
-};
-export type BranchUpdateToOneWithWhereWithoutUsersInput = {
-    where?: Prisma.BranchWhereInput;
-    data: Prisma.XOR<Prisma.BranchUpdateWithoutUsersInput, Prisma.BranchUncheckedUpdateWithoutUsersInput>;
-};
-export type BranchUpdateWithoutUsersInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    name?: Prisma.StringFieldUpdateOperationsInput | string;
-    city?: Prisma.StringFieldUpdateOperationsInput | string;
-    address?: Prisma.StringFieldUpdateOperationsInput | string;
-    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
-    manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
-    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
-};
-export type BranchUncheckedUpdateWithoutUsersInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    name?: Prisma.StringFieldUpdateOperationsInput | string;
-    city?: Prisma.StringFieldUpdateOperationsInput | string;
-    address?: Prisma.StringFieldUpdateOperationsInput | string;
-    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
-    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
-};
 export type BranchCreateWithoutBikeInventoryInput = {
     id?: string;
     name: string;
@@ -568,10 +568,10 @@ export type BranchCreateWithoutBikeInventoryInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
-    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
-    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
     users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutBikeInventoryInput = {
     id?: string;
@@ -582,10 +582,10 @@ export type BranchUncheckedCreateWithoutBikeInventoryInput = {
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
-    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
     users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutBikeInventoryInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -609,10 +609,10 @@ export type BranchUpdateWithoutBikeInventoryInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
-    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -623,10 +623,10 @@ export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateWithoutPartInventoryInput = {
     id?: string;
@@ -636,11 +636,11 @@ export type BranchCreateWithoutPartInventoryInput = {
     phoneNumber?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
+    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
-    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutPartInventoryInput = {
     id?: string;
@@ -651,10 +651,10 @@ export type BranchUncheckedCreateWithoutPartInventoryInput = {
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
     bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
-    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutPartInventoryInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -677,11 +677,11 @@ export type BranchUpdateWithoutPartInventoryInput = {
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
+    users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
-    users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutPartInventoryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -692,10 +692,10 @@ export type BranchUncheckedUpdateWithoutPartInventoryInput = {
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
     bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
-    users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateWithoutOrdersInput = {
     id?: string;
@@ -705,11 +705,11 @@ export type BranchCreateWithoutOrdersInput = {
     phoneNumber?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
+    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
-    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutOrdersInput = {
     id?: string;
@@ -720,10 +720,10 @@ export type BranchUncheckedCreateWithoutOrdersInput = {
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
     bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
-    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutOrdersInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -746,11 +746,11 @@ export type BranchUpdateWithoutOrdersInput = {
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
+    users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
-    users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutOrdersInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -761,10 +761,10 @@ export type BranchUncheckedUpdateWithoutOrdersInput = {
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
     bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
-    users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateWithoutPartOrdersInput = {
     id?: string;
@@ -774,11 +774,11 @@ export type BranchCreateWithoutPartOrdersInput = {
     phoneNumber?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
-    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutPartOrdersInput = {
     id?: string;
@@ -789,10 +789,10 @@ export type BranchUncheckedCreateWithoutPartOrdersInput = {
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
-    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
-    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutPartOrdersInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -815,11 +815,11 @@ export type BranchUpdateWithoutPartOrdersInput = {
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
-    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutPartOrdersInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -830,10 +830,10 @@ export type BranchUncheckedUpdateWithoutPartOrdersInput = {
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
-    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateManyManagerInput = {
     id?: string;
@@ -852,11 +852,11 @@ export type BranchUpdateWithoutManagerInput = {
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
-    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutManagerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -866,11 +866,11 @@ export type BranchUncheckedUpdateWithoutManagerInput = {
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
-    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
-    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
-    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
     users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateManyWithoutManagerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -882,36 +882,36 @@ export type BranchUncheckedUpdateManyWithoutManagerInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type BranchCountOutputType = {
-    bikeInventory: number;
-    orders: number;
-    partInventory: number;
-    partOrders: number;
     users: number;
+    bikeInventory: number;
+    partInventory: number;
+    orders: number;
+    partOrders: number;
 };
 export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    bikeInventory?: boolean | BranchCountOutputTypeCountBikeInventoryArgs;
-    orders?: boolean | BranchCountOutputTypeCountOrdersArgs;
-    partInventory?: boolean | BranchCountOutputTypeCountPartInventoryArgs;
-    partOrders?: boolean | BranchCountOutputTypeCountPartOrdersArgs;
     users?: boolean | BranchCountOutputTypeCountUsersArgs;
+    bikeInventory?: boolean | BranchCountOutputTypeCountBikeInventoryArgs;
+    partInventory?: boolean | BranchCountOutputTypeCountPartInventoryArgs;
+    orders?: boolean | BranchCountOutputTypeCountOrdersArgs;
+    partOrders?: boolean | BranchCountOutputTypeCountPartOrdersArgs;
 };
 export type BranchCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.BranchCountOutputTypeSelect<ExtArgs> | null;
 };
+export type BranchCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.UserWhereInput;
+};
 export type BranchCountOutputTypeCountBikeInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.BikeUnitWhereInput;
-};
-export type BranchCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    where?: Prisma.OrderWhereInput;
 };
 export type BranchCountOutputTypeCountPartInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.PartInventoryWhereInput;
 };
+export type BranchCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.OrderWhereInput;
+};
 export type BranchCountOutputTypeCountPartOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.PartOrderWhereInput;
-};
-export type BranchCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    where?: Prisma.UserWhereInput;
 };
 export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -922,12 +922,12 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     managerId?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    bikeInventory?: boolean | Prisma.Branch$bikeInventoryArgs<ExtArgs>;
     manager?: boolean | Prisma.Branch$managerArgs<ExtArgs>;
-    orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>;
-    partInventory?: boolean | Prisma.Branch$partInventoryArgs<ExtArgs>;
-    partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>;
     users?: boolean | Prisma.Branch$usersArgs<ExtArgs>;
+    bikeInventory?: boolean | Prisma.Branch$bikeInventoryArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.Branch$partInventoryArgs<ExtArgs>;
+    orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>;
+    partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>;
     _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["branch"]>;
 export type BranchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -964,12 +964,12 @@ export type BranchSelectScalar = {
 };
 export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "city" | "address" | "phoneNumber" | "managerId" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>;
 export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    bikeInventory?: boolean | Prisma.Branch$bikeInventoryArgs<ExtArgs>;
     manager?: boolean | Prisma.Branch$managerArgs<ExtArgs>;
-    orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>;
-    partInventory?: boolean | Prisma.Branch$partInventoryArgs<ExtArgs>;
-    partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>;
     users?: boolean | Prisma.Branch$usersArgs<ExtArgs>;
+    bikeInventory?: boolean | Prisma.Branch$bikeInventoryArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.Branch$partInventoryArgs<ExtArgs>;
+    orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>;
+    partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>;
     _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type BranchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -981,12 +981,12 @@ export type BranchIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "Branch";
     objects: {
-        bikeInventory: Prisma.$BikeUnitPayload<ExtArgs>[];
         manager: Prisma.$UserPayload<ExtArgs> | null;
-        orders: Prisma.$OrderPayload<ExtArgs>[];
-        partInventory: Prisma.$PartInventoryPayload<ExtArgs>[];
-        partOrders: Prisma.$PartOrderPayload<ExtArgs>[];
         users: Prisma.$UserPayload<ExtArgs>[];
+        bikeInventory: Prisma.$BikeUnitPayload<ExtArgs>[];
+        partInventory: Prisma.$PartInventoryPayload<ExtArgs>[];
+        orders: Prisma.$OrderPayload<ExtArgs>[];
+        partOrders: Prisma.$PartOrderPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -1049,12 +1049,12 @@ export interface BranchDelegate<ExtArgs extends runtime.Types.Extensions.Interna
 }
 export interface Prisma__BranchClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    bikeInventory<T extends Prisma.Branch$bikeInventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$bikeInventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     manager<T extends Prisma.Branch$managerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$managerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    orders<T extends Prisma.Branch$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
-    partInventory<T extends Prisma.Branch$partInventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partInventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
-    partOrders<T extends Prisma.Branch$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     users<T extends Prisma.Branch$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    bikeInventory<T extends Prisma.Branch$bikeInventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$bikeInventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    partInventory<T extends Prisma.Branch$partInventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partInventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    orders<T extends Prisma.Branch$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    partOrders<T extends Prisma.Branch$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -1169,6 +1169,23 @@ export type BranchDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
     where?: Prisma.BranchWhereInput;
     limit?: number;
 };
+export type Branch$managerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+};
+export type Branch$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[];
+    cursor?: Prisma.UserWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[];
+};
 export type Branch$bikeInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.BikeUnitSelect<ExtArgs> | null;
     omit?: Prisma.BikeUnitOmit<ExtArgs> | null;
@@ -1179,23 +1196,6 @@ export type Branch$bikeInventoryArgs<ExtArgs extends runtime.Types.Extensions.In
     take?: number;
     skip?: number;
     distinct?: Prisma.BikeUnitScalarFieldEnum | Prisma.BikeUnitScalarFieldEnum[];
-};
-export type Branch$managerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.UserSelect<ExtArgs> | null;
-    omit?: Prisma.UserOmit<ExtArgs> | null;
-    include?: Prisma.UserInclude<ExtArgs> | null;
-    where?: Prisma.UserWhereInput;
-};
-export type Branch$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.OrderSelect<ExtArgs> | null;
-    omit?: Prisma.OrderOmit<ExtArgs> | null;
-    include?: Prisma.OrderInclude<ExtArgs> | null;
-    where?: Prisma.OrderWhereInput;
-    orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[];
-    cursor?: Prisma.OrderWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[];
 };
 export type Branch$partInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PartInventorySelect<ExtArgs> | null;
@@ -1208,6 +1208,17 @@ export type Branch$partInventoryArgs<ExtArgs extends runtime.Types.Extensions.In
     skip?: number;
     distinct?: Prisma.PartInventoryScalarFieldEnum | Prisma.PartInventoryScalarFieldEnum[];
 };
+export type Branch$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.OrderSelect<ExtArgs> | null;
+    omit?: Prisma.OrderOmit<ExtArgs> | null;
+    include?: Prisma.OrderInclude<ExtArgs> | null;
+    where?: Prisma.OrderWhereInput;
+    orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[];
+    cursor?: Prisma.OrderWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[];
+};
 export type Branch$partOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PartOrderSelect<ExtArgs> | null;
     omit?: Prisma.PartOrderOmit<ExtArgs> | null;
@@ -1218,17 +1229,6 @@ export type Branch$partOrdersArgs<ExtArgs extends runtime.Types.Extensions.Inter
     take?: number;
     skip?: number;
     distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[];
-};
-export type Branch$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.UserSelect<ExtArgs> | null;
-    omit?: Prisma.UserOmit<ExtArgs> | null;
-    include?: Prisma.UserInclude<ExtArgs> | null;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[];
-    cursor?: Prisma.UserWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[];
 };
 export type BranchDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.BranchSelect<ExtArgs> | null;

@@ -7,7 +7,7 @@ export interface CreateOrderPayload {
   customerEmail?: string;
   customerCNIC?: string;
   customerAddress?: string;
-  paymentMethod: "CASH" | "BANK_TRANSFER";
+  paymentMethod: "CASH" | "ONLINE_TRANSFER";
   paymentProofUrl?: string;
 }
 

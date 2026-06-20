@@ -237,7 +237,6 @@ export class OrdersService {
           customerPhone: dto.customerPhone,
           customerCNIC: dto.customerCNIC || null,
           customerAddress: dto.customerAddress || null,
-          negotiatedAmount: salePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.PENDING_PAYMENT,
           expiresAt,
@@ -256,6 +255,7 @@ export class OrdersService {
           status: BikeStatus.RESERVED,
           soldAt: null,
           reservedUntil: expiresAt,
+          actualSalePrice: salePrice,
           ...(isCash ? {} : { onlineDiscountPercent: 2 }),
         },
       });
@@ -758,7 +758,6 @@ export class OrdersService {
           customerPhone: dto.customerPhone,
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
-          negotiatedAmount: finalSalePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.CONFIRMED,
           expiresAt,

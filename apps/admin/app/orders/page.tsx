@@ -28,7 +28,7 @@ function getOrderItemLabel(order: OrderRow) {
 }
 
 function getOrderAmount(order: OrderRow) {
-  return Number(order.type === "BIKE" ? order.negotiatedAmount : order.amount || 0);
+  return Number(order.type === "BIKE" ? order.bike?.actualSalePrice : order.amount || 0);
 }
 
 function escapeCsv(value: unknown) {

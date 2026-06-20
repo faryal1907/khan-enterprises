@@ -21,14 +21,13 @@ type SaleRecord = {
   id: string;
   orderNumber: string;
   customerName: string;
-  negotiatedAmount?: number;
-  totalAmount?: number;
   amount?: number;
   quantity?: number;
   status: OrderStatus;
   type: "BIKE" | "PART";
   createdAt: string;
   bike?: {
+    actualSalePrice?: number | null;
     model?: {
       brand?: string;
       modelName?: string;
@@ -74,7 +73,7 @@ function getDateRange(range: string) {
 }
 
 function getSaleAmount(sale: SaleRecord) {
-  return Number(sale.negotiatedAmount || sale.totalAmount || sale.amount || 0);
+  return Number(sale.bike?.actualSalePrice || sale.amount || 0);
 }
 
 function getSaleItemLabel(sale: SaleRecord) {

@@ -1,18 +1,4 @@
-[96msrc/modules/orders/orders.service.ts[0m:[93m708[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType '{ orderNumber: string; bikeId: string; branchId: string; customerName: string; customerPhone: string; customerCNIC: string; customerAddress: string; negotiatedAmount: number; paymentMethod: PaymentMethod; ... 5 more ...; pickupType: "DELIVERY" | "ONSITE_PICKUP"; }' is not assignable to type '(Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput)'.
-Found 1 error(s).
 
-  Type '{ orderNumber: string; bikeId: string; branchId: string; customerName: string; customerPhone: string; customerCNIC: string; customerAddress: string; negotiatedAmount: number; paymentMethod: PaymentMethod; ... 5 more ...; pickupType: "DELIVERY" | "ONSITE_PICKUP"; }' is not assignable to type 'Without<OrderCreateInput, OrderUncheckedCreateInput> & OrderUncheckedCreateInput'.
-    Property 'customerId' is missing in type '{ orderNumber: string; bikeId: string; branchId: string; customerName: string; customerPhone: string; customerCNIC: string; customerAddress: string; negotiatedAmount: number; paymentMethod: PaymentMethod; ... 5 more ...; pickupType: "DELIVERY" | "ONSITE_PICKUP"; }' but required in type 'OrderUncheckedCreateInput'.
-
-[7m708[0m         data: {
-[7m   [0m [91m        ~~~~[0m
-
-  [96m../../packages/prisma/generated/models/Order.ts[0m:[93m544[0m:[93m3[0m
-    [7m544[0m   customerId: string
-    [7m   [0m [96m  ~~~~~~~~~~[0m
-    'customerId' is declared here.
-  [96m../../packages/prisma/generated/models/Order.ts[0m:[93m3222[0m:[93m3[0m
-    [7m3222[0m   data: Prisma.XOR<Prisma.OrderCreateInput, Prisma.OrderUncheckedCreateInput>
-    [7m    [0m [96m  ~~~~[0m
-    The expected type comes from property 'data' which is declared here on type '{ select?: OrderSelect<DefaultArgs> | null | undefined; omit?: OrderOmit<DefaultArgs> | null | undefined; include?: OrderInclude<DefaultArgs> | null | undefined; data: (Without<...> & OrderUncheckedCreateInput) | (Without<...> & OrderCreateInput); }'
+> api@1.0.0 build
+> nest build
 

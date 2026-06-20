@@ -693,10 +693,7 @@ export default function ManualOrderPage() {
               >
                 <option value="">Select payment method</option>
                 <option value="CASH">Cash</option>
-                <option value="BANK_TRANSFER">Bank Transfer</option>
-                <option value="SAFEPAY">Safepay (Visa/Mastercard)</option>
-                <option value="JAZZCASH">JazzCash (Mobile Wallet)</option>
-                <option value="RAAST">Raast (Instant Bank Transfer)</option>
+                <option value="ONLINE_TRANSFER">Online Transfer</option>
               </select>
             </div>
           </div>

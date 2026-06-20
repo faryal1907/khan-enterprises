@@ -44,10 +44,7 @@ export declare const PaymentStatus: {
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 export declare const PaymentMethod: {
     readonly CASH: "CASH";
-    readonly BANK_TRANSFER: "BANK_TRANSFER";
-    readonly SAFEPAY: "SAFEPAY";
-    readonly JAZZCASH: "JAZZCASH";
-    readonly RAAST: "RAAST";
+    readonly ONLINE_TRANSFER: "ONLINE_TRANSFER";
 };
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 export declare const OrderType: {
@@ -69,7 +66,6 @@ export declare const AuditAction: {
     readonly APPROVE: "APPROVE";
     readonly REJECT: "REJECT";
     readonly PAYMENT: "PAYMENT";
-    readonly REFUND: "REFUND";
 };
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export declare const InventoryMovementType: {
