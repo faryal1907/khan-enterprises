@@ -5,7 +5,7 @@ import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
-import { createCustomerOrder, CreateOrderPayload } from "@/lib/api/create-order";
+import { createPartOrder } from "@/lib/api/part-orders";
 
 const CameraIcon = () => (
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto", display: "block" }}>
@@ -14,20 +14,16 @@ const CameraIcon = () => (
   </svg>
 );
 
-const CheckIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto", display: "block" }}>
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-export default function NewOrderPage() {
+export default function NewPartOrderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuthStore();
-  const bikeId = searchParams.get("bikeId");
+  const partId = searchParams.get("partId");
+  const inventoryId = searchParams.get("inventoryId");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [bike, setBike] = useState<any>(null);
+  const [part, setPart] = useState<any>(null);
+  const [inventory, setInventory] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -35,10 +31,9 @@ export default function NewOrderPage() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
-  const [customerCNIC, setCustomerCNIC] = useState("");
-  const [customerCNICError, setCustomerCNICError] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"CASH" | "BANK_TRANSFER" | "">("");
+  const [quantity, setQuantity] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState<"CASH" | "BANK_TRANSFER" | "SAFEPAY" | "JAZZCASH" | "">("");
 
   const [createdOrder, setCreatedOrder] = useState<any>(null);
   const [paymentProofUrl, setPaymentProofUrl] = useState("");
@@ -48,22 +43,21 @@ export default function NewOrderPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const basePrice = bike ? (bike.price || bike.model?.basePrice) : 0;
-  const onlinePrice = basePrice * 0.98;
-  const discountAmount = basePrice - onlinePrice;
+  const unitPrice = part ? part.sellingPrice : 0;
+  const totalPrice = unitPrice * quantity;
 
   useEffect(() => {
     if (!user) {
       router.push("/login");
       return;
     }
-    if (!bikeId) {
-      setError("No bike selected");
+    if (!partId || !inventoryId) {
+      setError("No part or inventory selected");
       setLoading(false);
       return;
     }
-    fetchBike();
-  }, [user, bikeId]);
+    fetchPartAndInventory();
+  }, [user, partId, inventoryId]);
 
   useEffect(() => {
     if (user) {
@@ -73,45 +67,26 @@ export default function NewOrderPage() {
     }
   }, [user]);
 
-  const fetchBike = async () => {
+  const fetchPartAndInventory = async () => {
     try {
-      const response = await api.get(`/catalog/bikes/${bikeId}`);
-      setBike(response.data);
+      const partRes = await api.get(`/catalog/parts/${partId}`);
+      setPart(partRes.data);
+      // Find the specific inventory from part's inventories list
+      const foundInventory = partRes.data.inventories?.find((inv: any) => inv.id === inventoryId);
+      setInventory(foundInventory);
+      setQuantity(1);
     } catch (err) {
-      setError("Failed to load bike details");
+      setError("Failed to load part details");
     } finally {
       setLoading(false);
     }
   };
 
-  const validateCNIC = (value: string): boolean => {
-    const digits = value.replace(/\D/g, "");
-    if (digits.length !== 13) {
-      setCustomerCNICError("CNIC must be exactly 13 digits");
-      return false;
-    }
-    setCustomerCNICError("");
-    return true;
-  };
-
-  const handleCNICChange = (value: string) => {
-    const formatted = value
-      .replace(/[^0-9]/g, "")
-      .replace(/(\d{5})(\d{7})(\d)/, "$1-$2-$3")
-      .slice(0, 15);
-    setCustomerCNIC(formatted);
-  };
-
   const handleCreateOrder = async () => {
-    if (!bikeId || !user || !paymentMethod) return;
+    if (!partId || !inventoryId || !user || !paymentMethod) return;
 
-    if (!customerName || !customerPhone) {
-      setError("Please fill in your name and phone number");
-      return;
-    }
-
-    if (customerCNIC && !validateCNIC(customerCNIC)) {
-      setError("Please enter a valid CNIC");
+    if (!customerName || !customerPhone || !customerAddress) {
+      setError("Please fill in all required fields");
       return;
     }
 
@@ -119,19 +94,17 @@ export default function NewOrderPage() {
       setSubmitting(true);
       setError("");
 
-      const payload: CreateOrderPayload = {
-        bikeId,
+      const response = await createPartOrder({
+        partId,
+        partInventoryId: inventoryId,
         customerName,
         customerPhone,
-        customerEmail: customerEmail || undefined,
-        customerCNIC: customerCNIC || undefined,
-        customerAddress: customerAddress || undefined,
+        customerAddress,
+        quantity,
         paymentMethod,
-        paymentProofUrl: paymentMethod === "BANK_TRANSFER" ? paymentProofUrl : undefined,
-      };
+      });
 
-      const order = await createCustomerOrder(payload);
-      setCreatedOrder(order);
+      setCreatedOrder(response.order);
     } catch (err: any) {
       const data = err.response?.data;
       setError(data?.message || "Failed to create order. Please try again.");
@@ -208,13 +181,13 @@ export default function NewOrderPage() {
     );
   }
 
-  if (!bike && !error) {
+  if (!part || !inventory) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
         <div className="rounded-xl p-12 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-          <p style={{ color: theme.text.secondary }}>Bike not found</p>
-          <Link href="/bikes" className="mt-4 inline-block px-6 py-3 rounded-lg font-semibold" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
-            Back to Inventory
+          <p style={{ color: theme.text.secondary }}>Part not found</p>
+          <Link href="/parts" className="mt-4 inline-block px-6 py-3 rounded-lg font-semibold" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
+            Back to Parts
           </Link>
         </div>
       </div>
@@ -227,7 +200,7 @@ export default function NewOrderPage() {
       <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
         <div className="max-w-2xl mx-auto px-6 py-12">
           <div className="rounded-xl p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-            <div className="text-5xl mb-4">{isCash ? <CheckIcon /> : ""}</div>
+            <div className="text-5xl mb-4">{isCash ? "✅" : ""}</div>
             <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>
               {isCash ? "Order Confirmed!" : "Order Created!"}
             </h1>
@@ -239,13 +212,13 @@ export default function NewOrderPage() {
               <div className="rounded-xl p-6 text-left mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
                 <p className="font-semibold" style={{ color: "#065F46" }}>Cash on Delivery — Onsite Pickup</p>
                 <p className="text-sm mt-2" style={{ color: "#065F46" }}>
-                  Your bike has been reserved for <strong>48 hours</strong>. Please visit the store within this time to pick it up.
+                  Your parts have been reserved for <strong>48 hours</strong>. Please visit the store within this time to pick them up.
                 </p>
                 <p className="text-xs mt-1" style={{ color: "#065F46" }}>
                   If not picked up within 48 hours, your order will be automatically cancelled.
                 </p>
                 <p className="text-sm mt-2" style={{ color: "#065F46" }}>
-                  Total Amount: <strong>PKR {Number(createdOrder.negotiatedAmount).toLocaleString()}</strong>
+                  Total Amount: <strong>PKR {Number(createdOrder.amount).toLocaleString()}</strong>
                 </p>
               </div>
             ) : (
@@ -264,7 +237,6 @@ export default function NewOrderPage() {
 
                 <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.primary }}>
                   <p className="text-sm font-medium mb-3" style={{ color: theme.text.primary }}>Once verified, you may choose between delivery and onsite-pickup!</p>
-                  
                 </div>
               </div>
             )}
@@ -284,26 +256,26 @@ export default function NewOrderPage() {
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
       <div className="max-w-2xl mx-auto px-6 py-12">
         <div className="mb-8">
-          <Link href="/bikes" className="text-sm hover:opacity-70" style={{ color: theme.text.secondary }}>← Back to Inventory</Link>
+          <Link href={`/parts/${partId}`} className="text-sm hover:opacity-70" style={{ color: theme.text.secondary }}>← Back to Part</Link>
         </div>
 
         <div className="rounded-xl p-8" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
           <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>Complete Your Order</h1>
 
-          {bike && (
+          {part && (
             <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.tertiary }}>
               <p className="font-semibold" style={{ color: theme.text.primary }}>
-                {bike.model?.brand} {bike.model?.modelName} ({bike.model?.year})
+                {part.name}
               </p>
-              <p className="text-sm mt-1" style={{ color: theme.text.muted }}>{bike.branch?.name}</p>
+              <p className="text-sm mt-1" style={{ color: theme.text.muted }}>{inventory.branch?.name}</p>
               <div className="mt-2 pt-2 border-t" style={{ borderColor: theme.borders.light }}>
                 <p className="text-sm" style={{ color: theme.text.secondary }}>
-                  Store Price: <span className="line-through">PKR {basePrice.toLocaleString()}</span>
+                  Store Price: <span className="line-through">PKR {unitPrice.toLocaleString()}</span>
                 </p>
                 <p className="text-lg font-bold" style={{ color: theme.accents.primary }}>
-                  Online Price: PKR {onlinePrice.toLocaleString()}
+                  Total: PKR {totalPrice.toLocaleString()}
                 </p>
-                <p className="text-xs" style={{ color: theme.text.muted }}>You save PKR {discountAmount.toLocaleString()}</p>
+                <p className="text-xs" style={{ color: theme.text.muted }}>Qty: {quantity} × PKR {unitPrice.toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -327,26 +299,13 @@ export default function NewOrderPage() {
               <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>CNIC</label>
-              <input
-                type="text"
-                value={customerCNIC}
-                onChange={(e) => handleCNICChange(e.target.value)}
-                placeholder="12345-1234567-1"
-                className="w-full px-4 py-3 rounded-lg focus:outline-none"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${customerCNICError ? "#EF4444" : theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-              />
-              {customerCNICError && (
-                <p className="text-xs mt-1" style={{ color: "#EF4444" }}>{customerCNICError}</p>
-              )}
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Delivery Address</label>
+              <textarea value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} rows={2} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Address</label>
-              <textarea value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} rows={2} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Quantity</label>
+              <input type="number" min="1" max={inventory.quantity - inventory.reservedQuantity} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <p className="text-xs mt-1" style={{ color: theme.text.muted }}>Available: {inventory.quantity - inventory.reservedQuantity}</p>
             </div>
           </div>
 
@@ -366,7 +325,7 @@ export default function NewOrderPage() {
               >
                 <p className="font-semibold">Cash on Delivery</p>
                 <p className="text-xs mt-1 opacity-80">Pay at store, pickup in person</p>
-                <p className="text-sm font-bold mt-2">PKR {onlinePrice.toLocaleString()}</p>
+                <p className="text-sm font-bold mt-2">PKR {totalPrice.toLocaleString()}</p>
               </button>
               <button
                 type="button"
@@ -380,7 +339,7 @@ export default function NewOrderPage() {
               >
                 <p className="font-semibold">Bank Transfer</p>
                 <p className="text-xs mt-1 opacity-80">2% discount, delivery available</p>
-                <p className="text-sm font-bold mt-2">PKR {onlinePrice.toLocaleString()}</p>
+                <p className="text-sm font-bold mt-2">PKR {totalPrice.toLocaleString()}</p>
               </button>
             </div>
           </div>
@@ -390,7 +349,7 @@ export default function NewOrderPage() {
             <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
               <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
               <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                Transfer PKR {onlinePrice.toLocaleString()} to our bank account and upload the payment screenshot below.
+                Transfer PKR {totalPrice.toLocaleString()} to our bank account and upload the payment screenshot below.
               </p>
 
               <div
@@ -441,7 +400,7 @@ export default function NewOrderPage() {
           {paymentMethod === "CASH" && (
             <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
               <p className="text-sm" style={{ color: "#92400E" }}>
-                <strong>Note:</strong> Your bike will be reserved for <strong>48 hours</strong>. Please visit the store to complete your purchase. If not picked up within 48 hours, the reservation will be cancelled.
+                <strong>Note:</strong> Your parts will be reserved for <strong>48 hours</strong>. Please visit the store to complete your purchase. If not picked up within 48 hours, the reservation will be cancelled.
               </p>
             </div>
           )}

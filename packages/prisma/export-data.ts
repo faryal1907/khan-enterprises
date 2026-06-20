@@ -110,7 +110,7 @@ async function main() {
   const outputPath = path.resolve(process.cwd(), "data-export.json");
   fs.writeFileSync(outputPath, JSON.stringify(exportData, null, 2));
   
-  console.log(`\n🎉 Data export complete! Saved to: ${outputPath}`);
+  console.log(`\n Data export complete! Saved to: ${outputPath}`);
 }
 
 main()

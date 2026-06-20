@@ -1,30 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
-import { createPartOrder } from "@/lib/api/part-orders";
 import { useAuthStore } from "@/lib/auth-store";
 
 export default function PartDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { user } = useAuthStore();
   const [part, setPart] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showOrderForm, setShowOrderForm] = useState(false);
-  const [selectedInventory, setSelectedInventory] = useState<any>(null);
-  const [orderForm, setOrderForm] = useState({
-    customerName: "",
-    customerPhone: "",
-    customerAddress: "",
-    quantity: 1,
-    paymentMethod: "CASH",
-  });
-  const [submittingOrder, setSubmittingOrder] = useState(false);
-  const [orderError, setOrderError] = useState("");
-  const [orderSuccess, setOrderSuccess] = useState(false);
-  const [createdOrder, setCreatedOrder] = useState<any>(null);
 
   useEffect(() => {
     const fetchPart = async () => {
@@ -40,61 +27,12 @@ export default function PartDetailPage() {
     fetchPart();
   }, [id]);
 
-  useEffect(() => {
-    if (user) {
-      setOrderForm((prev) => ({
-        ...prev,
-        customerName: user.fullName || "",
-        customerPhone: user.phoneNumber || "",
-      }));
-    }
-  }, [user]);
-
   const handleOrderClick = (inventory: any) => {
     if (!user) {
       window.location.href = "/login";
       return;
     }
-    setSelectedInventory(inventory);
-    setShowOrderForm(true);
-    setOrderError("");
-    setOrderSuccess(false);
-  };
-
-  const handleOrderSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedInventory || !part) return;
-
-    try {
-      setSubmittingOrder(true);
-      setOrderError("");
-      
-      const response = await createPartOrder({
-        partId: part.id,
-        partInventoryId: selectedInventory.id,
-        customerName: orderForm.customerName,
-        customerPhone: orderForm.customerPhone,
-        customerAddress: orderForm.customerAddress,
-        quantity: orderForm.quantity,
-        paymentMethod: orderForm.paymentMethod,
-      });
-
-      setCreatedOrder(response.order);
-      setOrderSuccess(true);
-      setShowOrderForm(false);
-      setOrderForm({
-        customerName: user?.fullName || "",
-        customerPhone: user?.phoneNumber || "",
-        customerAddress: "",
-        quantity: 1,
-        paymentMethod: "CASH",
-      });
-    } catch (err: any) {
-      console.error("Failed to create part order:", err);
-      setOrderError(err.response?.data?.message || "Failed to create order");
-    } finally {
-      setSubmittingOrder(false);
-    }
+    router.push(`/part-orders/new?partId=${id}&inventoryId=${inventory.id}`);
   };
 
   if (loading) {
@@ -124,45 +62,6 @@ export default function PartDetailPage() {
             ← Back to Parts
           </Link>
         </div>
-
-        {/* Order Success Message */}
-        {orderSuccess && createdOrder && (
-          <div
-            className="rounded-xl p-6 mb-6"
-            style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}
-          >
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <svg className="w-6 h-6" style={{ color: "#065F46" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-2" style={{ color: "#065F46" }}>
-                  Order Created Successfully!
-                </h3>
-                <p className="text-sm mb-2" style={{ color: "#065F46" }}>
-                  Order Number: {createdOrder.orderNumber}
-                </p>
-                <p className="text-sm" style={{ color: "#065F46" }}>
-                  Status: {createdOrder.status.replace(/_/g, " ")}
-                </p>
-                {createdOrder.status === "PENDING_PAYMENT" && (
-                  <p className="text-sm mt-2" style={{ color: "#065F46" }}>
-                    Please visit your nearest branch to complete payment.
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => setOrderSuccess(false)}
-                className="text-sm hover:opacity-70"
-                style={{ color: "#065F46" }}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Part Information */}
@@ -267,166 +166,6 @@ export default function PartDetailPage() {
             </div>
           </div>
         </div>
-
-        {/* Order Form Modal */}
-        {showOrderForm && selectedInventory && (
-          <div className="fixed inset-0 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-            <div
-              className="rounded-xl p-6 max-w-md w-full"
-              style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>
-                  Order Part
-                </h2>
-                <button
-                  onClick={() => setShowOrderForm(false)}
-                  className="text-sm hover:opacity-70"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {orderError && (
-                <div
-                  className="rounded-lg p-4 mb-4"
-                  style={{ backgroundColor: "#FEE2E2", border: "1px solid #EF4444" }}
-                >
-                  <p className="text-sm" style={{ color: "#991B1B" }}>{orderError}</p>
-                </div>
-              )}
-
-              <form onSubmit={handleOrderSubmit} className="space-y-4">
-                <div>
-                  <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
-                    <span className="font-medium" style={{ color: theme.text.primary }}>Part:</span> {part.name}
-                  </p>
-                  <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
-                    <span className="font-medium" style={{ color: theme.text.primary }}>Branch:</span> {selectedInventory.branch?.name}
-                  </p>
-                  <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
-                    <span className="font-medium" style={{ color: theme.text.primary }}>Price:</span> PKR {part.sellingPrice?.toLocaleString()} each
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
-                    Quantity *
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max={selectedInventory.quantity - selectedInventory.reservedQuantity}
-                    required
-                    value={orderForm.quantity}
-                    onChange={(e) => setOrderForm({ ...orderForm, quantity: parseInt(e.target.value) })}
-                    className="w-full px-4 py-3 rounded-lg text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  />
-                  <p className="text-xs mt-1" style={{ color: theme.text.muted }}>
-                    Available: {selectedInventory.quantity - selectedInventory.reservedQuantity}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
-                    Customer Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={orderForm.customerName}
-                    onChange={(e) => setOrderForm({ ...orderForm, customerName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={orderForm.customerPhone}
-                    onChange={(e) => setOrderForm({ ...orderForm, customerPhone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
-                    Delivery Address *
-                  </label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={orderForm.customerAddress}
-                    onChange={(e) => setOrderForm({ ...orderForm, customerAddress: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter your complete address"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
-                    Payment Method *
-                  </label>
-                  <select
-                    required
-                    value={orderForm.paymentMethod}
-                    onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  >
-                    <option value="CASH">Cash (Pay at Branch)</option>
-                    <option value="BANK_TRANSFER">Bank Transfer</option>
-                    <option value="SAFEPAY">Safepay (Card)</option>
-                    <option value="JAZZCASH">JazzCash</option>
-                  </select>
-                </div>
-
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    disabled={submittingOrder}
-                    className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    {submittingOrder ? "Creating Order..." : "Confirm Order"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

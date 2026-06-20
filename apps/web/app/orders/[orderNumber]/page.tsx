@@ -6,6 +6,7 @@ import { theme } from "@/lib/colors";
 import { getOrderByNumber } from "@/lib/api/orders";
 import { getPartOrderByNumber } from "@/lib/api/part-orders";
 import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
+import { markAsPickedByCustomer } from "@/lib/api/orders";
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -71,7 +72,10 @@ interface Order {
   createdAt: string;
   updatedAt: string;
   expiresAt?: string;
+  reservationExpiry?: string;
   type: "BIKE" | "PART";
+  orderType?: string;
+  pickupType?: string;
   
   // Bike order fields
   bike?: {
@@ -143,6 +147,8 @@ export default function OrderStatusPage() {
   });
   const [submittingDelivery, setSubmittingDelivery] = useState(false);
   const [deliveryError, setDeliveryError] = useState("");
+  const [pickingUp, setPickingUp] = useState(false);
+  const [pickupError, setPickupError] = useState("");
 
   useEffect(() => {
     fetchOrder();
@@ -166,6 +172,21 @@ export default function OrderStatusPage() {
       setError(err.response?.data?.message || "Failed to load order details");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePickupFromStore = async () => {
+    if (!order) return;
+    try {
+      setPickingUp(true);
+      setPickupError("");
+      await markAsPickedByCustomer(order.id);
+      await fetchOrder();
+    } catch (err: any) {
+      console.error("Failed to mark as picked up:", err);
+      setPickupError(err.response?.data?.message || "Failed to process pickup");
+    } finally {
+      setPickingUp(false);
     }
   };
 
@@ -261,8 +282,17 @@ export default function OrderStatusPage() {
   }
 
   const isPendingPayment = order.status === "PENDING_PAYMENT";
+  const hasVerificationPending = order.transactions?.some((tx) => tx.status === "VERIFICATION_PENDING");
   const isConfirmed = order.status === "CONFIRMED" || order.status === "PAID";
-  const canRequestDelivery = isConfirmed && !order.delivery;
+  
+  // For orders with ONSITE_PICKUP, customer chose to pay and pick up at store - no delivery selection needed
+  const isOnsitePickup = order.pickupType === "ONSITE_PICKUP" 
+    || order.orderType === "ONSITE"
+    || (order.paymentMethod === "CASH" && (order.status === "CONFIRMED" || order.status === "PAID"));
+  
+  // Only show "Payment Received" for non-onsite orders with a successful transaction
+  const hasSuccessTransaction = order.transactions?.some((tx) => tx.status === "SUCCESS") && !isOnsitePickup;
+  const canRequestDelivery = isConfirmed && !order.delivery && !isOnsitePickup;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -277,14 +307,21 @@ export default function OrderStatusPage() {
           </p>
         </div>
 
-        {/* Status Badge */}
+        {/* Status Badge - For onsite pickup cash orders, show PENDING PAYMENT instead of CONFIRMED */}
         <div className="mb-6">
-          <span
-            className="inline-block px-4 py-2 text-sm font-medium rounded-full"
-            style={getStatusBadgeStyle(order.status)}
-          >
-            {getStatusLabel(order.status)}
-          </span>
+          {(() => {
+            const displayStatus = (order.pickupType === "ONSITE_PICKUP" || order.orderType === "ONSITE" || (order.paymentMethod === "CASH" && (order.status === "CONFIRMED" || order.status === "PAID"))) 
+              ? "PENDING_PAYMENT" 
+              : order.status;
+            return (
+              <span
+                className="inline-block px-4 py-2 text-sm font-medium rounded-full"
+                style={getStatusBadgeStyle(displayStatus)}
+              >
+                {getStatusLabel(displayStatus)}
+              </span>
+            );
+          })()}
         </div>
 
         {/* Pending Payment Notice */}
@@ -302,46 +339,114 @@ export default function OrderStatusPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-lg font-semibold" style={{ color: "#92400E" }}>
-                    Payment Pending
+                    {hasVerificationPending ? "Awaiting Admin Verification" : "Payment Pending"}
                   </h2>
-                  <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />
+                  {!hasVerificationPending && <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />}
                 </div>
-                <p className="text-sm" style={{ color: "#92400E" }}>
-                  Please visit your nearest branch to complete payment and confirm your order.
-                </p>
+                {hasVerificationPending ? (
+                  <>
+                    <p className="text-sm mb-3" style={{ color: "#92400E" }}>
+                      Your payment proof has been submitted. Our team will verify it shortly.
+                    </p>
+                    
+                    
+                  </>
+                ) : (
+                  <p className="text-sm mb-3" style={{ color: "#92400E" }}>
+                    Please visit your nearest branch to complete payment and confirm your order.
+                  </p>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Delivery Request Section */}
+        {/* Delivery/Pickup Selection Section */}
         {canRequestDelivery && !showDeliveryForm && (
           <div
             className="rounded-xl p-6 mb-6"
             style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 mb-6">
               <div className="flex-shrink-0">
                 <svg className="w-6 h-6" style={{ color: "#3730A3" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#3730A3" }}>
-                  Request Delivery
+                  How would you like to receive your bike?
                 </h2>
                 <p className="text-sm mb-4" style={{ color: "#3730A3" }}>
-                  Your order is confirmed! Request delivery to have your bike delivered to your location.
+                  Your order is confirmed! Please choose how you'd like to receive your bike.
+                </p>
+              </div>
+            </div>
+
+            {pickupError && (
+              <div
+                className="rounded-lg p-4 mb-4"
+                style={{ backgroundColor: "#FEE2E2", border: "1px solid #EF4444" }}
+              >
+                <p className="text-sm" style={{ color: "#991B1B" }}>{pickupError}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Delivery Option */}
+              <div
+                className="rounded-lg p-6"
+                style={{ backgroundColor: theme.backgrounds.secondary, border: `2px solid ${theme.borders.light}` }}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <svg className="w-6 h-6" style={{ color: theme.accents.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  <h3 className="text-base font-semibold" style={{ color: theme.text.primary }}>
+                    Request Delivery
+                  </h3>
+                </div>
+                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                  Get your bike delivered to your doorstep. Our team will coordinate with you for timing.
                 </p>
                 <button
                   onClick={() => setShowDeliveryForm(true)}
-                  className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                  className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                   style={{
                     backgroundColor: "#6366F1",
                     color: "white",
                   }}
                 >
                   Request Delivery
+                </button>
+              </div>
+
+              {/* Pickup Option */}
+              <div
+                className="rounded-lg p-6"
+                style={{ backgroundColor: theme.backgrounds.secondary, border: `2px solid ${theme.borders.light}` }}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <svg className="w-6 h-6" style={{ color: "#10B981" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <h3 className="text-base font-semibold" style={{ color: theme.text.primary }}>
+                    Pick Up from Store
+                  </h3>
+                </div>
+                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                  Collect your bike directly from our branch. Visit us at your convenience during business hours.
+                </p>
+                <button
+                  onClick={handlePickupFromStore}
+                  disabled={pickingUp}
+                  className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  style={{
+                    backgroundColor: "#10B981",
+                    color: "white",
+                  }}
+                >
+                  {pickingUp ? "Processing..." : "Pick Up from Store"}
                 </button>
               </div>
             </div>
@@ -494,15 +599,15 @@ export default function OrderStatusPage() {
               </div>
             </div>
 
-            {/* Payment Status */}
-            {order.transactions && order.transactions.length > 0 && order.status !== "PENDING_PAYMENT" && (
+            {/* Payment Status - Only show for SUCCESS transactions (never show for ONSITE_PICKUP since payment is pending) */}
+            {hasSuccessTransaction && order.transactions && order.transactions.length > 0 && !isOnsitePickup && (
               <div className="flex gap-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: "#10B981", color: "white" }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6m7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <div className="flex-1">
@@ -514,6 +619,29 @@ export default function OrderStatusPage() {
                   </div>
                   <p className="text-sm" style={{ color: theme.text.secondary }}>
                     Payment of PKR {Number(order.transactions[0].amount).toLocaleString()} received via {order.transactions[0].method}.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Reservation Notice for ONSITE_PICKUP orders */}
+            {isOnsitePickup && order.status === "CONFIRMED" && (
+              <div className="flex gap-4">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: "#F59E0B", color: "white" }}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-semibold" style={{ color: theme.text.primary }}>Order Reserved</h3>
+                    {order.reservationExpiry && <CountdownTimer expiresAt={order.reservationExpiry} />}
+                  </div>
+                  <p className="text-sm" style={{ color: theme.text.secondary }}>
+                    Your order is reserved for <strong>48 hours</strong>. Please visit the store to complete payment and pick up your order.
                   </p>
                 </div>
               </div>
@@ -658,7 +786,7 @@ export default function OrderStatusPage() {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: theme.text.secondary }}>
-                {order.type === "BIKE" ? "Negotiated Amount" : "Amount"}
+                {order.type === "BIKE" ? "Amount" : "Amount"}
               </span>
               <span className="font-semibold" style={{ color: theme.text.primary }}>
                 PKR {Number(order.type === "BIKE" ? order.negotiatedAmount : order.amount).toLocaleString()}
@@ -681,8 +809,8 @@ export default function OrderStatusPage() {
           </div>
         </div>
 
-        {/* Payment Transactions */}
-        {order.transactions && order.transactions.length > 0 && (
+        {/* Payment Transactions - Hide for ONSITE_PICKUP since payment is pending at store */}
+        {order.transactions && order.transactions.length > 0 && !isOnsitePickup && (
           <div
             className="rounded-xl p-6 mb-6"
             style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
@@ -708,8 +836,10 @@ export default function OrderStatusPage() {
                   <span
                     className="px-2 py-1 text-xs font-medium rounded"
                     style={{
-                      backgroundColor: transaction.status === "SUCCESS" ? "#D1FAE5" : "#FEE2E2",
-                      color: transaction.status === "SUCCESS" ? "#065F46" : "#991B1B",
+                      backgroundColor: transaction.status === "SUCCESS" ? "#D1FAE5" : 
+                        transaction.status === "PENDING" ? "#FEF3C7" : "#FEE2E2",
+                      color: transaction.status === "SUCCESS" ? "#065F46" : 
+                        transaction.status === "PENDING" ? "#92400E" : "#991B1B",
                     }}
                   >
                     {transaction.status}

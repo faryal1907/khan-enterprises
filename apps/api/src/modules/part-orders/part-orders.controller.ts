@@ -8,9 +8,11 @@ import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
 import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
 import { RevenueQueryDto } from "../orders/dto/revenue-query.dto";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
-import { OrderStatus } from "@khan/prisma";
+import { OrderStatus, PaymentMethod } from "@khan/prisma";
 import { PdfService } from "../pdf/pdf.service";
 import { Response } from "express";
+import { UploadPaymentProofDto } from "../orders/dto/upload-payment-proof.dto";
+import { VerifyPartOrderPaymentDto } from "./dto/verify-part-order-payment.dto";
 
 @Controller("part-orders")
 export class PartOrdersController {
@@ -126,6 +128,53 @@ export class PartOrdersController {
     @CurrentUser() user: any
   ) {
     return this.partOrdersService.markAsPickedByCustomer(id, user);
+  }
+
+  /**
+   * POST /api/part-orders/:id/upload-payment-proof
+   * @Roles(ADMIN, MANAGER, SALES_STAFF, CUSTOMER)
+   * Upload payment proof image
+   */
+  @Post(":id/upload-payment-proof")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async uploadPaymentProof(
+    @Param("id") id: string,
+    @Body() dto: UploadPaymentProofDto,
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.uploadPartOrderPaymentProof(id, dto.paymentProofUrl, user);
+  }
+
+  /**
+   * POST /api/part-orders/:id/verify-payment
+   * @Roles(ADMIN, MANAGER)
+   * Admin verifies payment
+   */
+  @Post(":id/verify-payment")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER")
+  async verifyPayment(
+    @Param("id") id: string,
+    @Body() dto: VerifyPartOrderPaymentDto,
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.verifyPartOrderPayment(id, dto.verified, user);
+  }
+
+  /**
+   * POST /api/part-orders/:id/payment
+   * @Roles(ADMIN, MANAGER, SALES_STAFF)
+   */
+  @Post(":id/payment")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF")
+  async recordPayment(
+    @Param("id") id: string,
+    @Body() dto: { amount: number; method: PaymentMethod; referenceNumber?: string },
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.recordPartOrderPayment(id, dto, user);
   }
 
   /**

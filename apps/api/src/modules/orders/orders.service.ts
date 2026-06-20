@@ -237,15 +237,14 @@ export class OrdersService {
         },
       });
 
-      const txStatus = isCash ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING;
+      // Cash payment stays PENDING until customer picks up at store
       const transaction = await tx.paymentTransaction.create({
         data: {
           orderId: order.id,
           amount: salePrice,
           method: dto.paymentMethod,
-          status: txStatus,
+          status: PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
-          verifiedAt: isCash ? new Date() : null,
         },
       });
 
@@ -525,7 +524,7 @@ export class OrdersService {
           amount: dto.amount,
           method: dto.method,
           gatewayReference: dto.referenceNumber || null,
-          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
+          status: PaymentStatus.PENDING,
         },
       });
 

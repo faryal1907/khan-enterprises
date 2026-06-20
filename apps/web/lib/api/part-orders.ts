@@ -28,3 +28,26 @@ export async function getPartOrders(filters: any = {}) {
   const response = await api.get("/part-orders", { params });
   return response.data;
 }
+
+export async function uploadPartOrderPaymentProof(orderId: string, paymentProofUrl: string) {
+  const response = await api.post(`/part-orders/${orderId}/upload-payment-proof`, {
+    paymentProofUrl,
+  });
+  return response.data;
+}
+
+export async function verifyPartOrderPayment(orderId: string, verified: boolean) {
+  const response = await api.post(`/part-orders/${orderId}/verify-payment`, {
+    verified,
+  });
+  return response.data;
+}
+
+export async function recordPartOrderPayment(orderId: string, data: {
+  amount: number;
+  method: string;
+  referenceNumber?: string;
+}) {
+  const response = await api.post(`/part-orders/${orderId}/payment`, data);
+  return response.data;
+}

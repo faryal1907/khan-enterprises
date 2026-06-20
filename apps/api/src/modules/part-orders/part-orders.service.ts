@@ -4,7 +4,7 @@ import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
 import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
 import { RevenueQueryDto, RevenueDuration } from "../orders/dto/revenue-query.dto";
-import { OrderStatus, PaymentStatus, BikeStatus, AuditAction } from "@khan/prisma";
+import { OrderStatus, PaymentStatus, PaymentMethod, BikeStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class PartOrdersService {
@@ -64,14 +64,17 @@ export class PartOrdersService {
       // 3. Generate unique order number
       const orderNumber = this.generateOrderNumber();
 
-      // 4. Calculate total amount
-      const amount = part.sellingPrice.mul(dto.quantity);
+      // 4. Calculate total amount (convert Decimal to number for JSON serialization)
+      const amount = Number(part.sellingPrice) * dto.quantity;
 
-      // 5. Set expiresAt to 1 week from now
+      // 5. Determine order type and set expiry
+      const isCash = dto.paymentMethod === "CASH";
+      const orderType = isCash ? "ONSITE" : "ONLINE";
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
+      expiresAt.setDate(expiresAt.getDate() + (isCash ? 2 : 7));
+      const reservationExpiry = isCash ? expiresAt : null;
 
-      // 6. Create part order
+      // 6. Create part order - cash orders are PENDING_PAYMENT (reserved) until actually paid at store
       const partOrder = await tx.partOrder.create({
         data: {
           orderNumber,
@@ -86,6 +89,9 @@ export class PartOrdersService {
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.PENDING_PAYMENT,
           expiresAt,
+          reservationExpiry,
+          orderType,
+          pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
         },
         include: {
           part: true,
@@ -108,13 +114,13 @@ export class PartOrdersService {
         },
       });
 
-      // 7. Create payment transaction
+      // 7. Create payment transaction (cash stays PENDING until picked up at store)
       const transaction = await tx.partPaymentTransaction.create({
         data: {
           partOrderId: partOrder.id,
           amount,
           method: dto.paymentMethod,
-          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          status: PaymentStatus.PENDING,
         },
       });
 
@@ -773,6 +779,196 @@ export class PartOrdersService {
       });
 
       return updatedOrder;
+    });
+  }
+
+  /**
+   * Upload payment proof for a part order
+   */
+  async uploadPartOrderPaymentProof(partOrderId: string, paymentProofUrl: string, user: any) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id: partOrderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Part order with ID ${partOrderId} not found`);
+    }
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Cannot upload payment proof for part order in ${order.status} status`
+      );
+    }
+
+    // Find the pending transaction
+    const transaction = await this.prisma.client.partPaymentTransaction.findFirst({
+      where: {
+        partOrderId,
+        status: PaymentStatus.VERIFICATION_PENDING,
+      },
+    });
+
+    if (!transaction) {
+      throw new BadRequestException(
+        "No pending verification transaction found for this part order"
+      );
+    }
+
+    // Update transaction with payment proof URL
+    const updatedTransaction = await this.prisma.client.partPaymentTransaction.update({
+      where: { id: transaction.id },
+      data: {
+        paymentProofUrl,
+      },
+    });
+
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: AuditAction.UPDATE,
+        entityType: "PART_PAYMENT_TRANSACTION",
+        entityId: transaction.id,
+        newValue: JSON.stringify({ paymentProofUrl }),
+      },
+    });
+
+    return updatedTransaction;
+  }
+
+  /**
+   * Verify payment for a part order (admin only)
+   */
+  async verifyPartOrderPayment(partOrderId: string, verified: boolean, user: any) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id: partOrderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Part order with ID ${partOrderId} not found`);
+    }
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Part order is not in PENDING_PAYMENT status. Current status: ${order.status}`
+      );
+    }
+
+    const newStatus = verified ? PaymentStatus.SUCCESS : PaymentStatus.FAILED;
+    const orderStatus = verified ? OrderStatus.PAID : OrderStatus.PENDING_PAYMENT;
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // Find pending transaction first
+      const pendingTransaction = await tx.partPaymentTransaction.findFirst({
+        where: {
+          partOrderId,
+          status: PaymentStatus.VERIFICATION_PENDING,
+        },
+      });
+
+      if (!pendingTransaction) {
+        throw new BadRequestException(
+          "No pending verification transaction found for this part order"
+        );
+      }
+
+      // Update transaction status
+      const transaction = await tx.partPaymentTransaction.update({
+        where: { id: pendingTransaction.id },
+        data: {
+          status: newStatus,
+          verifiedAt: new Date(),
+        },
+      });
+
+      // If verified, update order status to PAID
+      if (verified) {
+        await tx.partOrder.update({
+          where: { id: partOrderId },
+          data: {
+            status: OrderStatus.PAID,
+            processedById: user.id,
+          },
+        });
+      }
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "PART_PAYMENT_TRANSACTION",
+          entityId: transaction.id,
+          oldValue: JSON.stringify({ status: PaymentStatus.VERIFICATION_PENDING }),
+          newValue: JSON.stringify({ status: newStatus, verified }),
+        },
+      });
+
+      return { transaction, orderStatus };
+    });
+  }
+
+  /**
+   * Record payment for a part order
+   */
+  async recordPartOrderPayment(partOrderId: string, dto: { amount: number; method: PaymentMethod; referenceNumber?: string }, user: any) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id: partOrderId },
+      include: {
+        partInventory: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Part order with ID ${partOrderId} not found`);
+    }
+
+    this.assertPartOrderAccess(order, user);
+
+    if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      throw new BadRequestException(
+        `Part order is not in PENDING_PAYMENT status. Current status: ${order.status}`
+      );
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // Create payment transaction
+      const transaction = await tx.partPaymentTransaction.create({
+        data: {
+          partOrderId,
+          amount: dto.amount,
+          method: dto.method,
+          gatewayReference: dto.referenceNumber || null,
+          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
+        },
+      });
+
+      // For cash payments, update order status to PAID
+      if (dto.method === "CASH") {
+        await tx.partOrder.update({
+          where: { id: partOrderId },
+          data: {
+            status: OrderStatus.PAID,
+            processedById: user.id,
+          },
+        });
+      }
+
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.PAYMENT,
+          entityType: "PART_ORDER",
+          entityId: partOrderId,
+          newValue: JSON.stringify(dto),
+        },
+      });
+
+      return {
+        transaction,
+        orderStatus: dto.method === "CASH" ? OrderStatus.PAID : OrderStatus.PENDING_PAYMENT,
+      };
     });
   }
 

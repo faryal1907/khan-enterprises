@@ -1,5 +1,10 @@
 import { api } from "../api-client";
 
+export async function markAsPickedByCustomer(orderId: string) {
+  const response = await api.patch(`/orders/${orderId}/picked-up`);
+  return response.data;
+}
+
 export async function getOrders(filters: any = {}) {
   const params: any = {};
   if (filters.status) params.status = filters.status;

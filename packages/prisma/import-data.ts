@@ -567,7 +567,7 @@ async function main() {
   }
   console.log(`✅ Imported ${exportData.auditLogs?.length || 0} audit logs`);
 
-  console.log("\n🎉 Data import complete! All local data is now in Supabase.");
+  console.log("\n Data import complete! All local data is now in Supabase.");
 }
 
 main()
