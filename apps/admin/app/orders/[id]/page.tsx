@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, Order, PaymentTransaction, UserRole } from "@/lib/types";
-import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
+import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, verifyPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
 import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
@@ -112,6 +112,21 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handleVerifyPayment = async (transactionId: string) => {
+    try {
+      setActionLoading(true);
+      await verifyPayment(orderId, transactionId);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      toast.success("Payment verified successfully");
+    } catch (error: any) {
+      console.warn("Failed to verify payment:", error?.message || error);
+      toast.error(error?.message || "Failed to verify payment");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleApproveDelivery = async () => {
     if (!order?.delivery) return;
     try {
@@ -151,13 +166,24 @@ export default function OrderDetailPage() {
 
     switch (order.status) {
       case OrderStatus.PENDING_PAYMENT:
+        if (pendingVerificationTx && canManageLifecycle) {
+          return (
+            <AsyncButton
+              onClick={() => handleVerifyPayment(pendingVerificationTx.id)}
+              loading={actionLoading}
+              className="px-6"
+            >
+              Verify Payment
+            </AsyncButton>
+          );
+        }
         return (
           <AsyncButton
             onClick={() => setShowPaymentModal(true)}
-            disabled={actionLoading}
+            disabled={actionLoading || !!pendingVerificationTx}
             className="px-6"
           >
-            Record Payment
+            {pendingVerificationTx ? "Verification Pending" : "Record Payment"}
           </AsyncButton>
         );
       case OrderStatus.PAID:
@@ -247,6 +273,9 @@ export default function OrderDetailPage() {
         return null;
     }
   };
+
+  const pendingVerificationTx = order?.transactions?.find((tx) => tx.status === "VERIFICATION_PENDING");
+  const latestTxWithProof = order?.transactions?.slice().reverse().find((tx) => tx.paymentProofUrl);
 
   const handleDownloadInvoice = async () => {
     try {
@@ -441,6 +470,23 @@ export default function OrderDetailPage() {
                 </p>
               </div>
 
+              {latestTxWithProof?.paymentProofUrl && (
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                    Payment Proof
+                  </label>
+                  <a
+                    href={latestTxWithProof.paymentProofUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium underline transition-colors"
+                    style={{ color: theme.accents.primary }}
+                  >
+                    View Proof Document
+                  </a>
+                </div>
+              )}
+
             </div>
           </div>
 
@@ -580,6 +626,7 @@ export default function OrderDetailPage() {
             </h3>
             <div className="flex space-x-4">
               {getActionButton()}
+
               {canManageLifecycle && (
                 <button
                   onClick={() => setShowCancelModal(true)}

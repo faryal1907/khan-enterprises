@@ -88,6 +88,11 @@ export async function recordPayment(id: string, data: {
   return response.data;
 }
 
+export async function verifyPayment(id: string, transactionId: string) {
+  const response = await api.post(`/orders/${id}/verify-payment`, { transactionId });
+  return response.data;
+}
+
 export async function createManualOrder(data: any) {
   const response = await api.post("/orders/manual", data);
   return response.data;

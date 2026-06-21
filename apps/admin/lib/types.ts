@@ -24,6 +24,7 @@ export interface DashboardStats {
   lowStockAlerts: number;
   pendingDeliveries: number;
   ordersWaitingPayment: number;
+  pendingVerifications: number;
   cancelledOrders: number;
   totalRevenue?: number;
   bikesSold?: number;
@@ -221,6 +222,7 @@ export interface PaymentTransaction {
   gatewayResponse: any;
   failureReason: string | null;
   webhookReceivedAt: string | null;
+  paymentProofUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }

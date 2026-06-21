@@ -266,7 +266,7 @@ export class OrdersService {
           orderId: order.id,
           amount: salePrice,
           method: dto.paymentMethod,
-          status: PaymentStatus.PENDING,
+          status: (dto.paymentMethod !== "CASH" && dto.paymentProofUrl) ? PaymentStatus.VERIFICATION_PENDING : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
         },
       });
@@ -475,6 +475,17 @@ export class OrdersService {
         },
       });
 
+      // 4. Update any associated payment transactions to FAILED
+      await tx.paymentTransaction.updateMany({
+        where: { 
+          orderId: id,
+          status: { not: PaymentStatus.FAILED }
+        },
+        data: {
+          status: PaymentStatus.FAILED,
+        },
+      });
+
 
       await tx.auditLog.create({
         data: {
@@ -531,49 +542,75 @@ export class OrdersService {
       }
 
       // 3. Update order with payment method
-      const updatedOrder = await tx.order.update({
+      await tx.order.update({
         where: { id: orderId },
         data: {
           paymentMethod: dto.method,
         },
       });
 
-      // 4. Create PaymentTransaction
-      const transaction = await tx.paymentTransaction.create({
-        data: {
-          orderId,
-          amount: dto.amount,
-          method: dto.method,
-          gatewayReference: dto.referenceNumber || null,
-          status: PaymentStatus.PENDING,
-        },
+      // 4. Update or Create PaymentTransaction
+      // If there's an existing transaction (e.g. from customer order), update it to avoid duplicates
+      const existingTx = await tx.paymentTransaction.findFirst({
+        where: { orderId, status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] } }
       });
 
-      // 5. For CASH payments: set order → PAID, offer → PAID, bike → SOLD, set reservationExpiry to 2 days
-      // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
-      if (dto.method === "CASH") {
-        // Set reservation expiry to 2 days from now
-        const reservationExpiry = new Date();
-        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
-
-        await tx.order.update({
-          where: { id: orderId },
+      let transaction;
+      if (existingTx) {
+        transaction = await tx.paymentTransaction.update({
+          where: { id: existingTx.id },
           data: {
-            status: OrderStatus.PAID,
-            reservationExpiry,
-            processedById: user.id,
-          },
+            amount: dto.amount,
+            method: dto.method,
+            gatewayReference: dto.referenceNumber || null,
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          }
         });
-
-        await tx.bikeUnit.update({
-          where: { id: order.bikeId },
+      } else {
+        transaction = await tx.paymentTransaction.create({
           data: {
-            status: BikeStatus.SOLD,
-            soldAt: new Date(),
-            reservedUntil: null,
+            orderId,
+            amount: dto.amount,
+            method: dto.method,
+            gatewayReference: dto.referenceNumber || null,
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
           },
         });
       }
+
+      // 5. Update order → PAID, bike → SOLD
+      let reservationExpiry = order.reservationExpiry;
+      if (dto.method === "CASH" && order.pickupType === "ONSITE_PICKUP") {
+        // Set reservation expiry to 2 days from now for cash pickups
+        reservationExpiry = new Date();
+        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
+      } else if (dto.method !== "CASH") {
+        // If it's fully paid non-cash, no expiry applies
+        reservationExpiry = null;
+      }
+
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.PAID,
+          paymentVerified: true,
+          reservationExpiry,
+          processedById: user.id,
+        },
+      });
+
+      await tx.bikeUnit.update({
+        where: { id: order.bikeId },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
 
       await tx.auditLog.create({
         data: {
@@ -586,10 +623,7 @@ export class OrdersService {
         },
       });
 
-      // Create alert for payment verification pending (non-CASH payments)
-      if (dto.method !== "CASH") {
-        await this.orderAlertsService.createAlertsForOrder(orderId, AlertType.PAYMENT_PENDING);
-      }
+      // No need for payment verification alerts since admin directly recorded it
 
       return {
         order: updatedOrder,
@@ -764,7 +798,7 @@ export class OrdersService {
           orderId: order.id,
           amount: finalSalePrice,
           method: dto.paymentMethod,
-          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
         },
       });
 
@@ -1015,21 +1049,22 @@ export class OrdersService {
     const transaction = await this.prisma.client.paymentTransaction.findFirst({
       where: {
         orderId,
-        status: PaymentStatus.VERIFICATION_PENDING,
+        status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] },
       },
     });
 
     if (!transaction) {
       throw new BadRequestException(
-        "No pending verification transaction found for this order"
+        "No pending transaction found for this order"
       );
     }
 
-    // Update transaction with payment proof URL
+    // Update transaction with payment proof URL and status
     const updatedTransaction = await this.prisma.client.paymentTransaction.update({
       where: { id: transaction.id },
       data: {
         paymentProofUrl: dto.paymentProofUrl,
+        status: PaymentStatus.VERIFICATION_PENDING,
       },
     });
 
@@ -1189,6 +1224,17 @@ export class OrdersService {
               status: BikeStatus.AVAILABLE,
               soldAt: null,
               reservedUntil: null,
+            },
+          });
+
+          // Update any associated payment transactions to FAILED
+          await tx.paymentTransaction.updateMany({
+            where: { 
+              orderId: order.id,
+              status: { not: PaymentStatus.FAILED }
+            },
+            data: {
+              status: PaymentStatus.FAILED,
             },
           });
 
