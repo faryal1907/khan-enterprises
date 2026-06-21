@@ -223,10 +223,19 @@ export class OrdersService {
       const discountAmount = basePrice - salePrice;
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-      // Set expiry: 2 days for cash (onsite pickup), 7 days for online
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + (isCash ? 2 : 7));
-      const reservationExpiry = isCash ? expiresAt : null;
+      if (!isCash && !dto.paymentProofUrl) {
+        throw new BadRequestException(`Payment proof URL is required for online orders`);
+      }
+
+      // Set expiry: 2 days for cash (onsite pickup), no expiry for online (awaiting verification)
+      let expiresAt: Date | null = null;
+      let reservationExpiry: Date | null = null;
+      
+      if (isCash) {
+        expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 2);
+        reservationExpiry = expiresAt;
+      }
 
       const order = await tx.order.create({
         data: {
@@ -267,7 +276,7 @@ export class OrdersService {
           orderId: order.id,
           amount: salePrice,
           method: dto.paymentMethod,
-          status: !isCash && dto.paymentProofUrl
+          status: !isCash
             ? PaymentStatus.VERIFICATION_PENDING
             : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
@@ -506,14 +515,14 @@ export class OrdersService {
         },
       });
 
-      // 4. Update any associated payment transactions to FAILED
+      // 4. Update any associated payment transactions to CANCELLED
       await tx.paymentTransaction.updateMany({
         where: {
           orderId: id,
-          status: { not: PaymentStatus.FAILED }
+          status: { notIn: [PaymentStatus.FAILED, PaymentStatus.SUCCESS] }
         },
         data: {
-          status: PaymentStatus.FAILED,
+          status: PaymentStatus.CANCELLED,
         },
       });
 
@@ -585,6 +594,8 @@ export class OrdersService {
       const existingTx = await tx.paymentTransaction.findFirst({
         where: { orderId, status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] } }
       });
+
+      let transaction: any = existingTx;
 
       // 5. For CASH payments: set order → PAID, bike → SOLD (sale is finalized immediately)
       // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
@@ -1156,47 +1167,94 @@ export class OrdersService {
         );
       }
 
-      // 3. Update transaction to SUCCESS
-      const updatedTransaction = await tx.paymentTransaction.update({
-        where: { id: dto.transactionId },
-        data: {
-          status: PaymentStatus.SUCCESS,
-          verifiedAt: new Date(),
-          verifiedById: user.id,
-        },
-      });
+      let updatedTransaction;
+      let updatedOrder;
 
-      // 4. Update order to PAID
-      const updatedOrder = await tx.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.PAID,
-          paymentVerified: true,
-          processedById: user.id,
-        },
-      });
+      if (dto.isApproved) {
+        // 3. Update transaction to SUCCESS
+        updatedTransaction = await tx.paymentTransaction.update({
+          where: { id: dto.transactionId },
+          data: {
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          },
+        });
 
-      // 5. Update bike to SOLD
-      await tx.bikeUnit.update({
-        where: { id: order.bikeId },
-        data: {
-          status: BikeStatus.SOLD,
-          soldAt: new Date(),
-          reservedUntil: null,
-        },
-      });
+        // 4. Update order to PAID
+        updatedOrder = await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.PAID,
+            paymentVerified: true,
+            processedById: user.id,
+          },
+        });
 
-      // 7. Create audit log entry
-      await tx.auditLog.create({
-        data: {
-          userId: user.id,
-          userRole: user.role,
-          action: AuditAction.PAYMENT,
-          entityType: "ORDER",
-          entityId: orderId,
-          newValue: JSON.stringify({ paymentVerified: true }),
-        },
-      });
+        // 5. Update bike to SOLD
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
+          },
+        });
+
+        // 7. Create audit log entry
+        await tx.auditLog.create({
+          data: {
+            userId: user.id,
+            userRole: user.role,
+            action: AuditAction.PAYMENT,
+            entityType: "ORDER",
+            entityId: orderId,
+            newValue: JSON.stringify({ paymentVerified: true }),
+          },
+        });
+      } else {
+        // 3. Update transaction to FAILED
+        updatedTransaction = await tx.paymentTransaction.update({
+          where: { id: dto.transactionId },
+          data: {
+            status: PaymentStatus.FAILED,
+            failureReason: dto.reason || "Payment proof rejected by admin",
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          },
+        });
+
+        // 4. Update order to CANCELLED
+        updatedOrder = await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.CANCELLED,
+            processedById: user.id,
+          },
+        });
+
+        // 5. Update bike to AVAILABLE
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.AVAILABLE,
+            soldAt: null,
+            reservedUntil: null,
+          },
+        });
+
+        // 7. Create audit log entry
+        await tx.auditLog.create({
+          data: {
+            userId: user.id,
+            userRole: user.role,
+            action: AuditAction.PAYMENT,
+            entityType: "ORDER",
+            entityId: orderId,
+            newValue: JSON.stringify({ paymentVerified: false, reason: dto.reason }),
+          },
+        });
+      }
 
       return {
         order: updatedOrder,

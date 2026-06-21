@@ -1507,6 +1507,8 @@ export declare const BranchScalarFieldEnum: {
     readonly city: "city";
     readonly address: "address";
     readonly phoneNumber: "phoneNumber";
+    readonly latitude: "latitude";
+    readonly longitude: "longitude";
     readonly managerId: "managerId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -1687,6 +1689,10 @@ export declare const DeliveryRequestScalarFieldEnum: {
     readonly deliveryAddress: "deliveryAddress";
     readonly preferredTimeWindow: "preferredTimeWindow";
     readonly contactNumber: "contactNumber";
+    readonly latitude: "latitude";
+    readonly longitude: "longitude";
+    readonly distanceFromBranch: "distanceFromBranch";
+    readonly deliveryCost: "deliveryCost";
     readonly status: "status";
     readonly approvedAt: "approvedAt";
     readonly deliveredAt: "deliveredAt";
@@ -1755,6 +1761,8 @@ export type EnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 export type ListEnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStatus[]'>;
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>;
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>;
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>;
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>;
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>;
@@ -1782,8 +1790,6 @@ export type EnumFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 export type ListEnumFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FileType[]'>;
 export type EnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditAction'>;
 export type ListEnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditAction[]'>;
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>;
 export type BatchPayload = {
     count: number;
 };

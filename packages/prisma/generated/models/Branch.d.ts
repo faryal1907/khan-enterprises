@@ -3,8 +3,18 @@ import type * as Prisma from "../internal/prismaNamespace.ts";
 export type BranchModel = runtime.Types.Result.DefaultSelection<Prisma.$BranchPayload>;
 export type AggregateBranch = {
     _count: BranchCountAggregateOutputType | null;
+    _avg: BranchAvgAggregateOutputType | null;
+    _sum: BranchSumAggregateOutputType | null;
     _min: BranchMinAggregateOutputType | null;
     _max: BranchMaxAggregateOutputType | null;
+};
+export type BranchAvgAggregateOutputType = {
+    latitude: number | null;
+    longitude: number | null;
+};
+export type BranchSumAggregateOutputType = {
+    latitude: number | null;
+    longitude: number | null;
 };
 export type BranchMinAggregateOutputType = {
     id: string | null;
@@ -12,6 +22,8 @@ export type BranchMinAggregateOutputType = {
     city: string | null;
     address: string | null;
     phoneNumber: string | null;
+    latitude: number | null;
+    longitude: number | null;
     managerId: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -22,6 +34,8 @@ export type BranchMaxAggregateOutputType = {
     city: string | null;
     address: string | null;
     phoneNumber: string | null;
+    latitude: number | null;
+    longitude: number | null;
     managerId: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -32,10 +46,20 @@ export type BranchCountAggregateOutputType = {
     city: number;
     address: number;
     phoneNumber: number;
+    latitude: number;
+    longitude: number;
     managerId: number;
     createdAt: number;
     updatedAt: number;
     _all: number;
+};
+export type BranchAvgAggregateInputType = {
+    latitude?: true;
+    longitude?: true;
+};
+export type BranchSumAggregateInputType = {
+    latitude?: true;
+    longitude?: true;
 };
 export type BranchMinAggregateInputType = {
     id?: true;
@@ -43,6 +67,8 @@ export type BranchMinAggregateInputType = {
     city?: true;
     address?: true;
     phoneNumber?: true;
+    latitude?: true;
+    longitude?: true;
     managerId?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -53,6 +79,8 @@ export type BranchMaxAggregateInputType = {
     city?: true;
     address?: true;
     phoneNumber?: true;
+    latitude?: true;
+    longitude?: true;
     managerId?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -63,6 +91,8 @@ export type BranchCountAggregateInputType = {
     city?: true;
     address?: true;
     phoneNumber?: true;
+    latitude?: true;
+    longitude?: true;
     managerId?: true;
     createdAt?: true;
     updatedAt?: true;
@@ -75,6 +105,8 @@ export type BranchAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
     take?: number;
     skip?: number;
     _count?: true | BranchCountAggregateInputType;
+    _avg?: BranchAvgAggregateInputType;
+    _sum?: BranchSumAggregateInputType;
     _min?: BranchMinAggregateInputType;
     _max?: BranchMaxAggregateInputType;
 };
@@ -89,6 +121,8 @@ export type BranchGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
     take?: number;
     skip?: number;
     _count?: BranchCountAggregateInputType | true;
+    _avg?: BranchAvgAggregateInputType;
+    _sum?: BranchSumAggregateInputType;
     _min?: BranchMinAggregateInputType;
     _max?: BranchMaxAggregateInputType;
 };
@@ -98,10 +132,14 @@ export type BranchGroupByOutputType = {
     city: string;
     address: string;
     phoneNumber: string | null;
+    latitude: number | null;
+    longitude: number | null;
     managerId: string | null;
     createdAt: Date;
     updatedAt: Date;
     _count: BranchCountAggregateOutputType | null;
+    _avg: BranchAvgAggregateOutputType | null;
+    _sum: BranchSumAggregateOutputType | null;
     _min: BranchMinAggregateOutputType | null;
     _max: BranchMaxAggregateOutputType | null;
 };
@@ -117,6 +155,8 @@ export type BranchWhereInput = {
     city?: Prisma.StringFilter<"Branch"> | string;
     address?: Prisma.StringFilter<"Branch"> | string;
     phoneNumber?: Prisma.StringNullableFilter<"Branch"> | string | null;
+    latitude?: Prisma.FloatNullableFilter<"Branch"> | number | null;
+    longitude?: Prisma.FloatNullableFilter<"Branch"> | number | null;
     managerId?: Prisma.StringNullableFilter<"Branch"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
@@ -133,6 +173,8 @@ export type BranchOrderByWithRelationInput = {
     city?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder;
+    latitude?: Prisma.SortOrderInput | Prisma.SortOrder;
+    longitude?: Prisma.SortOrderInput | Prisma.SortOrder;
     managerId?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -153,6 +195,8 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
     city?: Prisma.StringFilter<"Branch"> | string;
     address?: Prisma.StringFilter<"Branch"> | string;
     phoneNumber?: Prisma.StringNullableFilter<"Branch"> | string | null;
+    latitude?: Prisma.FloatNullableFilter<"Branch"> | number | null;
+    longitude?: Prisma.FloatNullableFilter<"Branch"> | number | null;
     managerId?: Prisma.StringNullableFilter<"Branch"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
@@ -169,12 +213,16 @@ export type BranchOrderByWithAggregationInput = {
     city?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder;
+    latitude?: Prisma.SortOrderInput | Prisma.SortOrder;
+    longitude?: Prisma.SortOrderInput | Prisma.SortOrder;
     managerId?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     _count?: Prisma.BranchCountOrderByAggregateInput;
+    _avg?: Prisma.BranchAvgOrderByAggregateInput;
     _max?: Prisma.BranchMaxOrderByAggregateInput;
     _min?: Prisma.BranchMinOrderByAggregateInput;
+    _sum?: Prisma.BranchSumOrderByAggregateInput;
 };
 export type BranchScalarWhereWithAggregatesInput = {
     AND?: Prisma.BranchScalarWhereWithAggregatesInput | Prisma.BranchScalarWhereWithAggregatesInput[];
@@ -185,6 +233,8 @@ export type BranchScalarWhereWithAggregatesInput = {
     city?: Prisma.StringWithAggregatesFilter<"Branch"> | string;
     address?: Prisma.StringWithAggregatesFilter<"Branch"> | string;
     phoneNumber?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null;
+    latitude?: Prisma.FloatNullableWithAggregatesFilter<"Branch"> | number | null;
+    longitude?: Prisma.FloatNullableWithAggregatesFilter<"Branch"> | number | null;
     managerId?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Branch"> | Date | string;
@@ -195,6 +245,8 @@ export type BranchCreateInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
@@ -210,6 +262,8 @@ export type BranchUncheckedCreateInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -225,6 +279,8 @@ export type BranchUpdateInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
@@ -240,6 +296,8 @@ export type BranchUncheckedUpdateInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -255,6 +313,8 @@ export type BranchCreateManyInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -265,6 +325,8 @@ export type BranchUpdateManyMutationInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -274,6 +336,8 @@ export type BranchUncheckedUpdateManyInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -300,9 +364,15 @@ export type BranchCountOrderByAggregateInput = {
     city?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     phoneNumber?: Prisma.SortOrder;
+    latitude?: Prisma.SortOrder;
+    longitude?: Prisma.SortOrder;
     managerId?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type BranchAvgOrderByAggregateInput = {
+    latitude?: Prisma.SortOrder;
+    longitude?: Prisma.SortOrder;
 };
 export type BranchMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -310,6 +380,8 @@ export type BranchMaxOrderByAggregateInput = {
     city?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     phoneNumber?: Prisma.SortOrder;
+    latitude?: Prisma.SortOrder;
+    longitude?: Prisma.SortOrder;
     managerId?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
@@ -320,9 +392,15 @@ export type BranchMinOrderByAggregateInput = {
     city?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     phoneNumber?: Prisma.SortOrder;
+    latitude?: Prisma.SortOrder;
+    longitude?: Prisma.SortOrder;
     managerId?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type BranchSumOrderByAggregateInput = {
+    latitude?: Prisma.SortOrder;
+    longitude?: Prisma.SortOrder;
 };
 export type BranchScalarRelationFilter = {
     is?: Prisma.BranchWhereInput;
@@ -380,6 +458,13 @@ export type BranchUncheckedUpdateManyWithoutManagerNestedInput = {
     updateMany?: Prisma.BranchUpdateManyWithWhereWithoutManagerInput | Prisma.BranchUpdateManyWithWhereWithoutManagerInput[];
     deleteMany?: Prisma.BranchScalarWhereInput | Prisma.BranchScalarWhereInput[];
 };
+export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null;
+    increment?: number;
+    decrement?: number;
+    multiply?: number;
+    divide?: number;
+};
 export type BranchCreateNestedOneWithoutBikeInventoryInput = {
     create?: Prisma.XOR<Prisma.BranchCreateWithoutBikeInventoryInput, Prisma.BranchUncheckedCreateWithoutBikeInventoryInput>;
     connectOrCreate?: Prisma.BranchCreateOrConnectWithoutBikeInventoryInput;
@@ -434,6 +519,8 @@ export type BranchCreateWithoutUsersInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
@@ -448,6 +535,8 @@ export type BranchUncheckedCreateWithoutUsersInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -466,6 +555,8 @@ export type BranchCreateWithoutManagerInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     users?: Prisma.UserCreateNestedManyWithoutBranchInput;
@@ -480,6 +571,8 @@ export type BranchUncheckedCreateWithoutManagerInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
@@ -511,6 +604,8 @@ export type BranchUpdateWithoutUsersInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
@@ -525,6 +620,8 @@ export type BranchUncheckedUpdateWithoutUsersInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -555,6 +652,8 @@ export type BranchScalarWhereInput = {
     city?: Prisma.StringFilter<"Branch"> | string;
     address?: Prisma.StringFilter<"Branch"> | string;
     phoneNumber?: Prisma.StringNullableFilter<"Branch"> | string | null;
+    latitude?: Prisma.FloatNullableFilter<"Branch"> | number | null;
+    longitude?: Prisma.FloatNullableFilter<"Branch"> | number | null;
     managerId?: Prisma.StringNullableFilter<"Branch"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Branch"> | Date | string;
@@ -565,6 +664,8 @@ export type BranchCreateWithoutBikeInventoryInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
@@ -579,6 +680,8 @@ export type BranchUncheckedCreateWithoutBikeInventoryInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -606,6 +709,8 @@ export type BranchUpdateWithoutBikeInventoryInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
@@ -620,6 +725,8 @@ export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -634,6 +741,8 @@ export type BranchCreateWithoutPartInventoryInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
@@ -648,6 +757,8 @@ export type BranchUncheckedCreateWithoutPartInventoryInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -675,6 +786,8 @@ export type BranchUpdateWithoutPartInventoryInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
@@ -689,6 +802,8 @@ export type BranchUncheckedUpdateWithoutPartInventoryInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -703,6 +818,8 @@ export type BranchCreateWithoutOrdersInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
@@ -717,6 +834,8 @@ export type BranchUncheckedCreateWithoutOrdersInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -744,6 +863,8 @@ export type BranchUpdateWithoutOrdersInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
@@ -758,6 +879,8 @@ export type BranchUncheckedUpdateWithoutOrdersInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -772,6 +895,8 @@ export type BranchCreateWithoutPartOrdersInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
@@ -786,6 +911,8 @@ export type BranchUncheckedCreateWithoutPartOrdersInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     managerId?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -813,6 +940,8 @@ export type BranchUpdateWithoutPartOrdersInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
@@ -827,6 +956,8 @@ export type BranchUncheckedUpdateWithoutPartOrdersInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -841,6 +972,8 @@ export type BranchCreateManyManagerInput = {
     city: string;
     address: string;
     phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -850,6 +983,8 @@ export type BranchUpdateWithoutManagerInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
@@ -864,6 +999,8 @@ export type BranchUncheckedUpdateWithoutManagerInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
@@ -878,6 +1015,8 @@ export type BranchUncheckedUpdateManyWithoutManagerInput = {
     city?: Prisma.StringFieldUpdateOperationsInput | string;
     address?: Prisma.StringFieldUpdateOperationsInput | string;
     phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -919,6 +1058,8 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     city?: boolean;
     address?: boolean;
     phoneNumber?: boolean;
+    latitude?: boolean;
+    longitude?: boolean;
     managerId?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -936,6 +1077,8 @@ export type BranchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
     city?: boolean;
     address?: boolean;
     phoneNumber?: boolean;
+    latitude?: boolean;
+    longitude?: boolean;
     managerId?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -947,6 +1090,8 @@ export type BranchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
     city?: boolean;
     address?: boolean;
     phoneNumber?: boolean;
+    latitude?: boolean;
+    longitude?: boolean;
     managerId?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -958,11 +1103,13 @@ export type BranchSelectScalar = {
     city?: boolean;
     address?: boolean;
     phoneNumber?: boolean;
+    latitude?: boolean;
+    longitude?: boolean;
     managerId?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "city" | "address" | "phoneNumber" | "managerId" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>;
+export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "city" | "address" | "phoneNumber" | "latitude" | "longitude" | "managerId" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>;
 export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     manager?: boolean | Prisma.Branch$managerArgs<ExtArgs>;
     users?: boolean | Prisma.Branch$usersArgs<ExtArgs>;
@@ -994,6 +1141,8 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         city: string;
         address: string;
         phoneNumber: string | null;
+        latitude: number | null;
+        longitude: number | null;
         managerId: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -1065,6 +1214,8 @@ export interface BranchFieldRefs {
     readonly city: Prisma.FieldRef<"Branch", 'String'>;
     readonly address: Prisma.FieldRef<"Branch", 'String'>;
     readonly phoneNumber: Prisma.FieldRef<"Branch", 'String'>;
+    readonly latitude: Prisma.FieldRef<"Branch", 'Float'>;
+    readonly longitude: Prisma.FieldRef<"Branch", 'Float'>;
     readonly managerId: Prisma.FieldRef<"Branch", 'String'>;
     readonly createdAt: Prisma.FieldRef<"Branch", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"Branch", 'DateTime'>;

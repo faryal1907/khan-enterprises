@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNotEmpty, MinLength } from "class-validator";
+import { IsString, IsOptional, IsNotEmpty, MinLength, IsNumber } from "class-validator";
 
 export class CreateDeliveryDto {
   @IsString()
@@ -14,4 +14,12 @@ export class CreateDeliveryDto {
   @IsNotEmpty()
   @MinLength(10)
   contactNumber: string;
+
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
 }

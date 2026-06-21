@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsOptional, IsString, IsNumber } from "class-validator";
 import { DeliveryStatus } from "@khan/prisma";
 
 export class UpdateDeliveryStatusDto {
@@ -8,4 +8,8 @@ export class UpdateDeliveryStatusDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsOptional()
+  @IsNumber()
+  deliveryCost?: number;
 }

@@ -14,6 +14,13 @@ export default function DeliveryDetailPage() {
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [notes, setNotes] = useState("");
+  const [deliveryCost, setDeliveryCost] = useState<string>("");
+
+  useEffect(() => {
+    if (delivery) {
+      setDeliveryCost(delivery.deliveryCost ? String(delivery.deliveryCost) : "");
+    }
+  }, [delivery]);
 
   useEffect(() => {
     if (id) {
@@ -44,7 +51,11 @@ export default function DeliveryDetailPage() {
     
     try {
       setUpdating(true);
-      await updateDeliveryStatus(delivery.id, { status: selectedStatus as any, notes });
+      const payload: any = { status: selectedStatus as any, notes };
+      if (deliveryCost !== "") {
+        payload.deliveryCost = parseFloat(deliveryCost);
+      }
+      await updateDeliveryStatus(delivery.id, payload);
       await fetchDelivery();
       setShowNotesModal(false);
       setNotes("");
@@ -347,10 +358,97 @@ export default function DeliveryDetailPage() {
                  delivery.partOrder?.branch ? `${delivery.partOrder.branch.name}, ${delivery.partOrder.branch.city}` : "N/A"}
               </p>
             </div>
+            
+            {/* Added Extra Information */}
+            {delivery.distanceFromBranch != null && (
+              <div>
+                <label
+                  className="block text-xs font-medium uppercase tracking-wider mb-1"
+                  style={{ color: theme.text.muted }}
+                >
+                  Distance
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {delivery.distanceFromBranch.toFixed(2)} km
+                </p>
+              </div>
+            )}
+            
+            {(delivery.latitude || delivery.longitude) && (
+              <div>
+                <label
+                  className="block text-xs font-medium uppercase tracking-wider mb-1"
+                  style={{ color: theme.text.muted }}
+                >
+                  Pinned Coordinates
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {delivery.latitude}, {delivery.longitude}
+                </p>
+              </div>
+            )}
+            
+            <div>
+              <label
+                className="block text-xs font-medium uppercase tracking-wider mb-1"
+                style={{ color: theme.text.muted }}
+              >
+                Delivery Charges
+              </label>
+              <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                {delivery.deliveryCost ? `Rs. ${Number(delivery.deliveryCost).toLocaleString()}` : "Not Set"}
+              </p>
+            </div>
+            
+            {delivery.notes && (
+              <div className="col-span-1 md:col-span-3">
+                <label
+                  className="block text-xs font-medium uppercase tracking-wider mb-1"
+                  style={{ color: theme.text.muted }}
+                >
+                  Notes
+                </label>
+                <div
+                  className="text-sm p-3 rounded-lg"
+                  style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.primary }}
+                >
+                  {delivery.notes}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        
+        {/* Actions Section */}
+        {delivery.status !== "DELIVERED" && getNextStatuses(delivery.status).length > 0 && (
+          <div
+            className="rounded-lg p-6 mb-6"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Update Status
+            </h3>
+            <div className="flex gap-4 flex-wrap">
+              {getNextStatuses(delivery.status).map((nextStatus) => (
+                <button
+                  key={nextStatus}
+                  onClick={() => handleStatusUpdate(nextStatus)}
+                  disabled={updating}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Mark as {nextStatus.replace(/_/g, " ")}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Notes Modal */}
         {showNotesModal && (
@@ -365,20 +463,42 @@ export default function DeliveryDetailPage() {
               style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
             >
               <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-                Add Notes (Optional)
+                Update Delivery Details
               </h3>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg text-sm mb-4"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="Add any notes about this status change..."
-              />
+              <div className="mb-4">
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Delivery Charges (Rs.)
+                </label>
+                <input
+                  type="number"
+                  value={deliveryCost}
+                  onChange={(e) => setDeliveryCost(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="e.g. 500"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Notes (Optional)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Add any notes about this status change..."
+                />
+              </div>
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowNotesModal(false)}

@@ -167,6 +167,7 @@ export enum PaymentStatus {
   SUCCESS = "SUCCESS",
   FAILED = "FAILED",
   VERIFICATION_PENDING = "VERIFICATION_PENDING",
+  CANCELLED = "CANCELLED",
 }
 
 export enum OrderType {

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
@@ -9,6 +9,7 @@ import { getDeliveries, getDeliveryStats } from "@/lib/api/deliveries";
 
 export default function DeliveryQueuePage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
   const isStaff = user?.role === UserRole.SALES_STAFF;
@@ -282,14 +283,22 @@ export default function DeliveryQueuePage() {
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
-                    Actions
-                  </th>
                 </tr>
               </thead>
               <tbody>
                 {deliveries.map((delivery) => (
-                  <tr key={delivery.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                  <tr 
+                    key={delivery.id} 
+                    onClick={() => router.push(`/deliveries/${delivery.id}`)}
+                    className="cursor-pointer transition-colors"
+                    style={{ borderBottom: `1px solid ${theme.borders.light}` }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme.backgrounds.tertiary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
                       {delivery.order?.orderNumber || delivery.partOrder?.orderNumber || "N/A"}
                     </td>
@@ -313,15 +322,6 @@ export default function DeliveryQueuePage() {
                       >
                         {delivery.status.replace(/_/g, " ")}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <Link
-                        href={`/deliveries/${delivery.id}`}
-                        className="text-sm font-medium transition-colors hover:opacity-70"
-                        style={{ color: theme.accents.primary }}
-                      >
-                        Review
-                      </Link>
                     </td>
                   </tr>
                 ))}

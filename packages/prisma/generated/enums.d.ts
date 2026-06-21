@@ -40,6 +40,7 @@ export declare const PaymentStatus: {
     readonly SUCCESS: "SUCCESS";
     readonly FAILED: "FAILED";
     readonly VERIFICATION_PENDING: "VERIFICATION_PENDING";
+    readonly CANCELLED: "CANCELLED";
 };
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 export declare const PaymentMethod: {

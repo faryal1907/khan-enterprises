@@ -24,8 +24,10 @@ export default function OrderDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showRejectDeliveryModal, setShowRejectDeliveryModal] = useState(false);
+  const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [rejectReason, setRejectReason] = useState("");
+  const [rejectPaymentReason, setRejectPaymentReason] = useState("");
   const [paymentData, setPaymentData] = useState({
     method: PaymentMethod.CASH,
     amount: 0,
@@ -115,13 +117,30 @@ export default function OrderDetailPage() {
   const handleVerifyPayment = async (transactionId: string) => {
     try {
       setActionLoading(true);
-      await verifyPayment(orderId, transactionId);
+      await verifyPayment(orderId, transactionId, true);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
       toast.success("Payment verified successfully");
     } catch (error: any) {
       console.warn("Failed to verify payment:", error?.message || error);
       toast.error(error?.message || "Failed to verify payment");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRejectPayment = async (transactionId: string) => {
+    try {
+      setActionLoading(true);
+      await verifyPayment(orderId, transactionId, false, rejectPaymentReason);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      setShowRejectPaymentModal(false);
+      setRejectPaymentReason("");
+      toast.success("Payment rejected successfully");
+    } catch (error: any) {
+      console.warn("Failed to reject payment:", error?.message || error);
+      toast.error(error?.message || "Failed to reject payment");
     } finally {
       setActionLoading(false);
     }
@@ -168,13 +187,26 @@ export default function OrderDetailPage() {
       case OrderStatus.PENDING_PAYMENT:
         if (pendingVerificationTx && canManageLifecycle) {
           return (
-            <AsyncButton
-              onClick={() => handleVerifyPayment(pendingVerificationTx.id)}
-              loading={actionLoading}
-              className="px-6"
-            >
-              Verify Payment
-            </AsyncButton>
+            <div className="flex space-x-3">
+              <AsyncButton
+                onClick={() => handleVerifyPayment(pendingVerificationTx.id)}
+                loading={actionLoading}
+                className="px-6"
+              >
+                Verify Payment
+              </AsyncButton>
+              <button
+                onClick={() => setShowRejectPaymentModal(true)}
+                disabled={actionLoading}
+                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: theme.text.inverse,
+                }}
+              >
+                Reject Payment
+              </button>
+            </div>
           );
         }
         return (
@@ -595,8 +627,21 @@ export default function OrderDetailPage() {
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {transaction.method}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
-                        {transaction.status}
+                      <td className="px-4 py-3 whitespace-nowrap text-xs">
+                        <span
+                          className="px-2 py-1 text-xs font-medium rounded"
+                          style={{
+                            backgroundColor: transaction.status === "SUCCESS" ? "#D1FAE5" : 
+                              transaction.status === "PENDING" ? "#FEF3C7" : 
+                              transaction.status === "CANCELLED" ? theme.backgrounds.tertiary : "#FEE2E2",
+                            color: transaction.status === "SUCCESS" ? "#065F46" : 
+                              transaction.status === "PENDING" ? "#92400E" : 
+                              transaction.status === "CANCELLED" ? theme.text.secondary : "#991B1B",
+                            border: transaction.status === "CANCELLED" ? `1px solid ${theme.borders.medium}` : undefined,
+                          }}
+                        >
+                          {transaction.status}
+                        </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {transaction.gatewayReference || "—"}
@@ -864,6 +909,64 @@ export default function OrderDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Reject Payment Modal */}
+      {showRejectPaymentModal && pendingVerificationTx && (
+        <ActionModal
+          title="Reject Payment"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowRejectPaymentModal(false);
+            setRejectPaymentReason("");
+          }}
+        >
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+              Reason for Rejection
+            </label>
+            <textarea
+              value={rejectPaymentReason}
+              onChange={(e) => setRejectPaymentReason(e.target.value)}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+              rows={4}
+              placeholder="Enter reason for rejecting the payment proof..."
+              disabled={actionLoading}
+            />
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => {
+                setShowRejectPaymentModal(false);
+                setRejectPaymentReason("");
+              }}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={() => handleRejectPayment(pendingVerificationTx.id)}
+              disabled={!rejectPaymentReason.trim() || actionLoading}
+              loading={actionLoading}
+              loadingLabel="Rejecting..."
+              style={{
+                backgroundColor: theme.accents.secondary,
+              }}
+            >
+              Confirm Rejection
+            </AsyncButton>
+          </div>
+        </ActionModal>
       )}
     </div>
   );
