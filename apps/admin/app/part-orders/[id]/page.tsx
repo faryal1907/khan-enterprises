@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, UserRole } from "@/lib/types";
-import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice, markPartOrderAsPickedByCustomer } from "@/lib/api/orders";
+import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice, markPartOrderAsPickedByCustomer, verifyPartPayment } from "@/lib/api/orders";
 import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
@@ -26,6 +26,7 @@ export default function PartOrderDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRejectDeliveryModal, setShowRejectDeliveryModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
 
   const fetchOrder = useCallback(async () => {
     setLoading(true);
@@ -121,11 +122,68 @@ export default function PartOrderDetailPage() {
     }
   };
 
+  const handleVerifyPayment = async () => {
+    try {
+      setActionLoading(true);
+      await verifyPartPayment(orderId, true);
+      const updatedOrder = await getPartOrderById(orderId);
+      setOrder(updatedOrder);
+      toast.success("Payment verified successfully");
+    } catch (error: any) {
+      console.warn("Failed to verify payment:", error?.message || error);
+      toast.error(error?.message || "Failed to verify payment");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRejectPayment = async () => {
+    try {
+      setActionLoading(true);
+      await verifyPartPayment(orderId, false);
+      const updatedOrder = await getPartOrderById(orderId);
+      setOrder(updatedOrder);
+      setShowRejectPaymentModal(false);
+      toast.success("Payment rejected successfully");
+    } catch (error: any) {
+      console.warn("Failed to reject payment:", error?.message || error);
+      toast.error(error?.message || "Failed to reject payment");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const pendingVerificationTx = order?.transactions?.find((tx: any) => tx.status === "VERIFICATION_PENDING");
+
   const getActionButton = () => {
     if (!order) return null;
 
     switch (order.status) {
       case OrderStatus.PENDING_PAYMENT:
+        if (pendingVerificationTx && canManageLifecycle) {
+          return (
+            <div className="flex space-x-3">
+              <AsyncButton
+                onClick={() => handleVerifyPayment()}
+                loading={actionLoading}
+                className="px-6"
+              >
+                Verify Payment
+              </AsyncButton>
+              <button
+                onClick={() => setShowRejectPaymentModal(true)}
+                disabled={actionLoading}
+                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: theme.text.inverse,
+                }}
+              >
+                Reject Payment
+              </button>
+            </div>
+          );
+        }
         return (
           <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.PAID)}
@@ -255,6 +313,8 @@ export default function PartOrderDetailPage() {
       </div>
     );
   }
+
+  const latestTxWithProof = order.transactions?.slice().reverse().find((tx: any) => tx.paymentProofUrl);
 
   return (
     <div className="p-8">
@@ -406,6 +466,23 @@ export default function PartOrderDetailPage() {
                   {order.paymentVerified ? "Yes" : "No"}
                 </p>
               </div>
+
+              {latestTxWithProof?.paymentProofUrl && (
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                    Payment Proof
+                  </label>
+                  <a
+                    href={latestTxWithProof.paymentProofUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium underline transition-colors"
+                    style={{ color: theme.accents.primary }}
+                  >
+                    View Proof Document
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
@@ -582,6 +659,47 @@ export default function PartOrderDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* Reject Payment Modal */}
+      {showRejectPaymentModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+          <div
+            className="rounded-lg p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
+              Reject Payment Proof
+            </h3>
+            <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+              Are you sure you want to reject this payment? The order will remain in Pending Payment status.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowRejectPaymentModal(false)}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRejectPayment}
+                disabled={actionLoading}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.secondary,
+                  color: theme.text.inverse,
+                }}
+              >
+                {actionLoading ? "Rejecting..." : "Reject Payment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cancel Modal */}
       {showCancelModal && (

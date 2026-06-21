@@ -46,4 +46,38 @@ export class PdfService {
 
     return doc as unknown as Readable; // pdfkit creates a readable stream
   }
+
+  generateReceipt(transaction: any): Readable {
+    const doc = new PDFDocument({ margin: 50 });
+    
+    doc.fontSize(20).text('PAYMENT RECEIPT', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(12).text(`Receipt ID: ${transaction.id}`);
+    doc.text(`Date: ${new Date(transaction.createdAt).toLocaleDateString()}`);
+    doc.text(`Status: ${transaction.status}`);
+    doc.moveDown();
+
+    doc.fontSize(14).text('Payment Details', { underline: true });
+    doc.fontSize(12).text(`Amount Paid: Rs. ${Number(transaction.amount).toLocaleString()}`);
+    doc.text(`Payment Method: ${transaction.method}`);
+    if (transaction.gatewayReference) {
+      doc.text(`Gateway Reference: ${transaction.gatewayReference}`);
+    }
+    doc.moveDown();
+
+    if (transaction.order) {
+      doc.fontSize(14).text('Order Details', { underline: true });
+      doc.fontSize(12).text(`Order Number: ${transaction.order.orderNumber}`);
+      doc.text(`Customer Name: ${transaction.order.customerName}`);
+      doc.text(`Customer Phone: ${transaction.order.customerPhone}`);
+    }
+
+    doc.moveDown(4);
+    doc.fontSize(10).text('Thank you for your business!', { align: 'center' });
+
+    doc.end();
+
+    return doc as unknown as Readable;
+  }
 }

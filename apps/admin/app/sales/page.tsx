@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { getBranches } from "@/lib/api/inventory";
@@ -375,7 +376,13 @@ export default function SalesRecordsPage() {
                     style={{ borderBottom: `1px solid ${theme.borders.light}` }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                      {sale.orderNumber}
+                      <Link 
+                        href={sale.type === "PART" ? `/part-orders/${sale.id}` : `/orders/${sale.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:underline text-inherit block w-full"
+                      >
+                        {sale.orderNumber}
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {sale.customerName}

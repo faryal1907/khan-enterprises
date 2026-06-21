@@ -93,6 +93,11 @@ export async function verifyPayment(id: string, transactionId: string, isApprove
   return response.data;
 }
 
+export async function verifyPartPayment(id: string, isApproved: boolean = true) {
+  const response = await api.post(`/part-orders/${id}/verify-payment`, { verified: isApproved });
+  return response.data;
+}
+
 export async function createManualOrder(data: any) {
   const response = await api.post("/orders/manual", data);
   return response.data;

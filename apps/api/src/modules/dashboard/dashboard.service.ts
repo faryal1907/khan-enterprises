@@ -134,6 +134,8 @@ export class DashboardService {
       lowStockAlerts,
       pendingDeliveries,
       ordersWaitingPayment,
+      bikeOrdersWaitingPayment,
+      partOrdersWaitingPayment,
       pendingVerifications,
       cancelledOrders,
     };

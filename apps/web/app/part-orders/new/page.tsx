@@ -32,7 +32,7 @@ export default function NewPartOrderPage() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number | "">(1);
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "ONLINE_TRANSFER" | "">("");
 
   const [createdOrder, setCreatedOrder] = useState<any>(null);
@@ -44,7 +44,7 @@ export default function NewPartOrderPage() {
   const [isDragging, setIsDragging] = useState(false);
 
   const unitPrice = part ? part.sellingPrice : 0;
-  const totalPrice = unitPrice * quantity;
+  const totalPrice = unitPrice * (Number(quantity) || 0);
 
   useEffect(() => {
     if (!user) {
@@ -100,7 +100,7 @@ export default function NewPartOrderPage() {
         customerName,
         customerPhone,
         customerAddress,
-        quantity,
+        quantity: Number(quantity) || 1,
         paymentMethod,
         paymentProofUrl: paymentMethod === "ONLINE_TRANSFER" ? paymentProofUrl || undefined : undefined,
       });
@@ -281,7 +281,7 @@ export default function NewPartOrderPage() {
                 <p className="text-lg font-bold" style={{ color: theme.accents.primary }}>
                   Total: PKR {totalPrice.toLocaleString()}
                 </p>
-                <p className="text-xs" style={{ color: theme.text.muted }}>Qty: {quantity} × PKR {unitPrice.toLocaleString()}</p>
+                <p className="text-xs" style={{ color: theme.text.muted }}>Qty: {quantity || 0} × PKR {unitPrice.toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -310,7 +310,7 @@ export default function NewPartOrderPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Quantity</label>
-              <input type="number" min="1" max={inventory.quantity - inventory.reservedQuantity} value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <input type="number" min="1" max={inventory.quantity - inventory.reservedQuantity} value={quantity} onChange={(e) => setQuantity(e.target.value === "" ? "" : parseInt(e.target.value))} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
               <p className="text-xs mt-1" style={{ color: theme.text.muted }}>Available: {inventory.quantity - inventory.reservedQuantity}</p>
             </div>
           </div>

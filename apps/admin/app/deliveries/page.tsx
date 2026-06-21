@@ -300,7 +300,13 @@ export default function DeliveryQueuePage() {
                     }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                      {delivery.order?.orderNumber || delivery.partOrder?.orderNumber || "N/A"}
+                      <Link 
+                        href={`/deliveries/${delivery.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:underline text-inherit block w-full"
+                      >
+                        {delivery.order?.orderNumber || delivery.partOrder?.orderNumber || "N/A"}
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {delivery.order?.customerName || delivery.partOrder?.customerName || "N/A"}

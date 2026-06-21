@@ -6,12 +6,16 @@ import { Roles } from "../auth/decorators/roles.decorator";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { QueryTransactionsDto } from "./dto/query-transactions.dto";
 import { Response } from "express";
+import { PdfService } from "../pdf/pdf.service";
 
 @Controller("transactions")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles("ADMIN", "MANAGER", "SALES_STAFF")
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(
+    private readonly transactionsService: TransactionsService,
+    private readonly pdfService: PdfService
+  ) {}
 
   /**
    * GET /api/transactions
@@ -29,5 +33,23 @@ export class TransactionsController {
   @Get(":id")
   async getTransaction(@Param("id") id: string, @CurrentUser() user: any) {
     return this.transactionsService.getTransactionById(id);
+  }
+
+  /**
+   * GET /api/transactions/:id/receipt
+   * Download receipt as PDF
+   */
+  @Get(":id/receipt")
+  async downloadReceipt(@Param("id") id: string, @Res() res: Response) {
+    const transaction = await this.transactionsService.getTransactionById(id);
+    
+    const pdfStream = this.pdfService.generateReceipt(transaction);
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="receipt-${id}.pdf"`,
+    });
+
+    pdfStream.pipe(res);
   }
 }

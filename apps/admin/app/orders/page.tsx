@@ -1,14 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AsyncButton } from "@/components/async-button";
 import { OrderStatusBadge } from "@/components/order-status-badge";
 import { getBranches } from "@/lib/api/inventory";
 import { getOrders, getPartOrders, type OrderFilters } from "@/lib/api/orders";
+import { getDashboardStats } from "@/lib/api/dashboard";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
-import { Branch, Order, OrderStatus, UserRole } from "@/lib/types";
+import { Branch, DashboardStats, Order, OrderStatus, UserRole } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 type OrderKind = "BIKE" | "PART";
@@ -56,6 +58,7 @@ export default function OrdersListPage() {
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<OrderKind>((searchParams.get("type") as OrderKind) || "BIKE");
@@ -66,6 +69,10 @@ export default function OrdersListPage() {
     getBranches()
       .then((data) => setBranches(data.branches || []))
       .catch(() => setBranches([]));
+      
+    getDashboardStats()
+      .then((data) => setStats(data))
+      .catch(() => {});
   }, [user]);
 
   useEffect(() => {
@@ -163,19 +170,27 @@ export default function OrdersListPage() {
         </div>
 
         <div className="flex space-x-6 mb-6 border-b" style={{ borderColor: theme.borders.light }}>
-          {(["BIKE", "PART"] as OrderKind[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className="px-2 py-3 text-sm font-medium border-b-2 transition-colors"
-              style={{
-                borderColor: activeTab === tab ? theme.accents.primary : "transparent",
-                color: activeTab === tab ? theme.text.primary : theme.text.secondary,
-              }}
-            >
-              {tab === "BIKE" ? "Bike Orders" : "Part Orders"}
-            </button>
-          ))}
+          {(["BIKE", "PART"] as OrderKind[]).map((tab) => {
+            const pendingCount = tab === "BIKE" ? stats?.bikeOrdersWaitingPayment : stats?.partOrdersWaitingPayment;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="px-2 py-3 text-sm font-medium border-b-2 transition-colors relative"
+                style={{
+                  borderColor: activeTab === tab ? theme.accents.primary : "transparent",
+                  color: activeTab === tab ? theme.text.primary : theme.text.secondary,
+                }}
+              >
+                {tab === "BIKE" ? "Bike Orders" : "Part Orders"}
+                {!!pendingCount && pendingCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center border-2 border-white ">
+                    {pendingCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <div
@@ -368,7 +383,13 @@ export default function OrdersListPage() {
                   className="hover:opacity-80"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                    {order.orderNumber}
+                    <Link 
+                      href={order.type === "BIKE" ? `/orders/${order.id}` : `/part-orders/${order.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="hover:underline text-inherit block w-full"
+                    >
+                      {order.orderNumber}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.orderType === "ONLINE" ? "Online" : "Onsite"}

@@ -578,6 +578,14 @@ export default function OrderDetailPage() {
                   </div>
                 </>
               )}
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
+                  Processed By
+                </label>
+                <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                  {order.processedBy?.fullName || "—"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
