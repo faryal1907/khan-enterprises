@@ -19,7 +19,7 @@ export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly orderAlertsService: OrderAlertsService,
-  ) {}
+  ) { }
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -222,11 +222,20 @@ export class OrdersService {
       const salePrice = basePrice * 0.98;
       const discountAmount = basePrice - salePrice;
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+      if (!isCash && !dto.paymentProofUrl) {
+        throw new BadRequestException(`Payment proof URL is required for online orders`);
+      }
+
+      // Set expiry: 2 days for cash (onsite pickup), no expiry for online (awaiting verification)
+      let expiresAt: Date | null = null;
+      let reservationExpiry: Date | null = null;
       
-      // Set expiry: 2 days for cash (onsite pickup), 7 days for online
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + (isCash ? 2 : 7));
-      const reservationExpiry = isCash ? expiresAt : null;
+      if (isCash) {
+        expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 2);
+        reservationExpiry = expiresAt;
+      }
 
       const order = await tx.order.create({
         data: {
@@ -267,7 +276,7 @@ export class OrdersService {
           orderId: order.id,
           amount: salePrice,
           method: dto.paymentMethod,
-          status: !isCash && dto.paymentProofUrl
+          status: !isCash
             ? PaymentStatus.VERIFICATION_PENDING
             : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
@@ -506,6 +515,17 @@ export class OrdersService {
         },
       });
 
+      // 4. Update any associated payment transactions to CANCELLED
+      await tx.paymentTransaction.updateMany({
+        where: {
+          orderId: id,
+          status: { notIn: [PaymentStatus.FAILED, PaymentStatus.SUCCESS] }
+        },
+        data: {
+          status: PaymentStatus.CANCELLED,
+        },
+      });
+
 
       await tx.auditLog.create({
         data: {
@@ -562,23 +582,20 @@ export class OrdersService {
       }
 
       // 3. Update order with payment method
-      const updatedOrder = await tx.order.update({
+      await tx.order.update({
         where: { id: orderId },
         data: {
           paymentMethod: dto.method,
         },
       });
 
-      // 4. Create PaymentTransaction
-      const transaction = await tx.paymentTransaction.create({
-        data: {
-          orderId,
-          amount: dto.amount,
-          method: dto.method,
-          gatewayReference: dto.referenceNumber || null,
-          status: PaymentStatus.PENDING,
-        },
+      // 4. Update or Create PaymentTransaction
+      // If there's an existing transaction (e.g. from customer order), update it to avoid duplicates
+      const existingTx = await tx.paymentTransaction.findFirst({
+        where: { orderId, status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] } }
       });
+
+      let transaction: any = existingTx;
 
       // 5. For CASH payments: set order → PAID, bike → SOLD (sale is finalized immediately)
       // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
@@ -591,16 +608,49 @@ export class OrdersService {
             processedById: user.id,
           },
         });
-
-        await tx.bikeUnit.update({
-          where: { id: order.bikeId },
+      } else {
+        transaction = await tx.paymentTransaction.create({
           data: {
-            status: BikeStatus.SOLD,
-            soldAt: new Date(),
-            reservedUntil: null,
+            orderId,
+            amount: dto.amount,
+            method: dto.method,
+            gatewayReference: dto.referenceNumber || null,
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
           },
         });
       }
+
+      // 5. Update order → PAID, bike → SOLD
+      let reservationExpiry = order.reservationExpiry;
+      if (dto.method === "CASH" && order.pickupType === "ONSITE_PICKUP") {
+        // Set reservation expiry to 2 days from now for cash pickups
+        reservationExpiry = new Date();
+        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
+      } else if (dto.method !== "CASH") {
+        // If it's fully paid non-cash, no expiry applies
+        reservationExpiry = null;
+      }
+
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.PAID,
+          paymentVerified: true,
+          reservationExpiry,
+          processedById: user.id,
+        },
+      });
+
+      await tx.bikeUnit.update({
+        where: { id: order.bikeId },
+        data: {
+          status: BikeStatus.SOLD,
+          soldAt: new Date(),
+          reservedUntil: null,
+        },
+      });
 
       await tx.auditLog.create({
         data: {
@@ -613,10 +663,7 @@ export class OrdersService {
         },
       });
 
-      // Create alert for payment verification pending (non-CASH payments)
-      if (dto.method !== "CASH") {
-        await this.orderAlertsService.createAlertsForOrder(orderId, AlertType.PAYMENT_PENDING);
-      }
+      // No need for payment verification alerts since admin directly recorded it
 
       return {
         order: updatedOrder,
@@ -710,7 +757,7 @@ export class OrdersService {
       // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
-        include: { 
+        include: {
           branch: true,
           model: true,
         },
@@ -790,7 +837,7 @@ export class OrdersService {
           orderId: order.id,
           amount: finalSalePrice,
           method: dto.paymentMethod,
-          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
         },
       });
 
@@ -1041,21 +1088,22 @@ export class OrdersService {
     const transaction = await this.prisma.client.paymentTransaction.findFirst({
       where: {
         orderId,
-        status: PaymentStatus.VERIFICATION_PENDING,
+        status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] },
       },
     });
 
     if (!transaction) {
       throw new BadRequestException(
-        "No pending verification transaction found for this order"
+        "No pending transaction found for this order"
       );
     }
 
-    // Update transaction with payment proof URL
+    // Update transaction with payment proof URL and status
     const updatedTransaction = await this.prisma.client.paymentTransaction.update({
       where: { id: transaction.id },
       data: {
         paymentProofUrl: dto.paymentProofUrl,
+        status: PaymentStatus.VERIFICATION_PENDING,
       },
     });
 
@@ -1119,47 +1167,94 @@ export class OrdersService {
         );
       }
 
-      // 3. Update transaction to SUCCESS
-      const updatedTransaction = await tx.paymentTransaction.update({
-        where: { id: dto.transactionId },
-        data: {
-          status: PaymentStatus.SUCCESS,
-          verifiedAt: new Date(),
-          verifiedById: user.id,
-        },
-      });
+      let updatedTransaction;
+      let updatedOrder;
 
-      // 4. Update order to PAID
-      const updatedOrder = await tx.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.PAID,
-          paymentVerified: true,
-          processedById: user.id,
-        },
-      });
+      if (dto.isApproved) {
+        // 3. Update transaction to SUCCESS
+        updatedTransaction = await tx.paymentTransaction.update({
+          where: { id: dto.transactionId },
+          data: {
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          },
+        });
 
-      // 5. Update bike to SOLD
-      await tx.bikeUnit.update({
-        where: { id: order.bikeId },
-        data: {
-          status: BikeStatus.SOLD,
-          soldAt: new Date(),
-          reservedUntil: null,
-        },
-      });
+        // 4. Update order to PAID
+        updatedOrder = await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.PAID,
+            paymentVerified: true,
+            processedById: user.id,
+          },
+        });
 
-      // 7. Create audit log entry
-      await tx.auditLog.create({
-        data: {
-          userId: user.id,
-          userRole: user.role,
-          action: AuditAction.PAYMENT,
-          entityType: "ORDER",
-          entityId: orderId,
-          newValue: JSON.stringify({ paymentVerified: true }),
-        },
-      });
+        // 5. Update bike to SOLD
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
+          },
+        });
+
+        // 7. Create audit log entry
+        await tx.auditLog.create({
+          data: {
+            userId: user.id,
+            userRole: user.role,
+            action: AuditAction.PAYMENT,
+            entityType: "ORDER",
+            entityId: orderId,
+            newValue: JSON.stringify({ paymentVerified: true }),
+          },
+        });
+      } else {
+        // 3. Update transaction to FAILED
+        updatedTransaction = await tx.paymentTransaction.update({
+          where: { id: dto.transactionId },
+          data: {
+            status: PaymentStatus.FAILED,
+            failureReason: dto.reason || "Payment proof rejected by admin",
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          },
+        });
+
+        // 4. Update order to CANCELLED
+        updatedOrder = await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.CANCELLED,
+            processedById: user.id,
+          },
+        });
+
+        // 5. Update bike to AVAILABLE
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.AVAILABLE,
+            soldAt: null,
+            reservedUntil: null,
+          },
+        });
+
+        // 7. Create audit log entry
+        await tx.auditLog.create({
+          data: {
+            userId: user.id,
+            userRole: user.role,
+            action: AuditAction.PAYMENT,
+            entityType: "ORDER",
+            entityId: orderId,
+            newValue: JSON.stringify({ paymentVerified: false, reason: dto.reason }),
+          },
+        });
+      }
 
       return {
         order: updatedOrder,
@@ -1175,7 +1270,7 @@ export class OrdersService {
    */
   async expireReservations() {
     const now = new Date();
-    
+
     const expiredOrders = await this.prisma.client.order.findMany({
       where: {
         reservationExpiry: {
@@ -1218,15 +1313,26 @@ export class OrdersService {
             },
           });
 
+          // Update any associated payment transactions to FAILED
+          await tx.paymentTransaction.updateMany({
+            where: {
+              orderId: order.id,
+              status: { not: PaymentStatus.FAILED }
+            },
+            data: {
+              status: PaymentStatus.FAILED,
+            },
+          });
+
           // Create audit log
           await tx.auditLog.create({
             data: {
               action: AuditAction.UPDATE,
               entityType: "ORDER",
               entityId: order.id,
-              newValue: JSON.stringify({ 
-                status: OrderStatus.CANCELLED, 
-                reason: "Reservation expired" 
+              newValue: JSON.stringify({
+                status: OrderStatus.CANCELLED,
+                reason: "Reservation expired"
               }),
             },
           });
@@ -1337,7 +1443,7 @@ export class OrdersService {
     const revenueByBranch = orders.reduce((acc, order) => {
       const branchId = order.branchId;
       const branchRevenue = order.transactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
-      
+
       if (!acc[branchId]) {
         acc[branchId] = {
           branchId,
@@ -1346,10 +1452,10 @@ export class OrdersService {
           orderCount: 0,
         };
       }
-      
+
       acc[branchId].revenue += branchRevenue;
       acc[branchId].orderCount += 1;
-      
+
       return acc;
     }, {} as Record<string, any>);
 

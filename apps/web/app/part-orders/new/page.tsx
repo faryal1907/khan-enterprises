@@ -108,7 +108,12 @@ export default function NewPartOrderPage() {
       setCreatedOrder(response.order);
     } catch (err: any) {
       const data = err.response?.data;
-      setError(data?.message || "Failed to create order. Please try again.");
+      const msg = data?.message;
+      if (Array.isArray(msg)) {
+        setError(msg.join(", "));
+      } else {
+        setError(msg || "Failed to create order. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }

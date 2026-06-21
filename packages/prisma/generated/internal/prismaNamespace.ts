@@ -1751,6 +1751,8 @@ export const BranchScalarFieldEnum = {
   city: 'city',
   address: 'address',
   phoneNumber: 'phoneNumber',
+  latitude: 'latitude',
+  longitude: 'longitude',
   managerId: 'managerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1967,6 +1969,10 @@ export const DeliveryRequestScalarFieldEnum = {
   deliveryAddress: 'deliveryAddress',
   preferredTimeWindow: 'preferredTimeWindow',
   contactNumber: 'contactNumber',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  distanceFromBranch: 'distanceFromBranch',
+  deliveryCost: 'deliveryCost',
   status: 'status',
   approvedAt: 'approvedAt',
   deliveredAt: 'deliveredAt',
@@ -2110,6 +2116,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 
@@ -2299,20 +2319,6 @@ export type EnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'AuditAction[]'
  */
 export type ListEnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditAction[]'>
-    
-
-
-/**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**

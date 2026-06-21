@@ -20,8 +20,24 @@ export type DeliveryRequestModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateDeliveryRequest = {
   _count: DeliveryRequestCountAggregateOutputType | null
+  _avg: DeliveryRequestAvgAggregateOutputType | null
+  _sum: DeliveryRequestSumAggregateOutputType | null
   _min: DeliveryRequestMinAggregateOutputType | null
   _max: DeliveryRequestMaxAggregateOutputType | null
+}
+
+export type DeliveryRequestAvgAggregateOutputType = {
+  latitude: number | null
+  longitude: number | null
+  distanceFromBranch: number | null
+  deliveryCost: runtime.Decimal | null
+}
+
+export type DeliveryRequestSumAggregateOutputType = {
+  latitude: number | null
+  longitude: number | null
+  distanceFromBranch: number | null
+  deliveryCost: runtime.Decimal | null
 }
 
 export type DeliveryRequestMinAggregateOutputType = {
@@ -31,6 +47,10 @@ export type DeliveryRequestMinAggregateOutputType = {
   deliveryAddress: string | null
   preferredTimeWindow: string | null
   contactNumber: string | null
+  latitude: number | null
+  longitude: number | null
+  distanceFromBranch: number | null
+  deliveryCost: runtime.Decimal | null
   status: $Enums.DeliveryStatus | null
   approvedAt: Date | null
   deliveredAt: Date | null
@@ -46,6 +66,10 @@ export type DeliveryRequestMaxAggregateOutputType = {
   deliveryAddress: string | null
   preferredTimeWindow: string | null
   contactNumber: string | null
+  latitude: number | null
+  longitude: number | null
+  distanceFromBranch: number | null
+  deliveryCost: runtime.Decimal | null
   status: $Enums.DeliveryStatus | null
   approvedAt: Date | null
   deliveredAt: Date | null
@@ -61,6 +85,10 @@ export type DeliveryRequestCountAggregateOutputType = {
   deliveryAddress: number
   preferredTimeWindow: number
   contactNumber: number
+  latitude: number
+  longitude: number
+  distanceFromBranch: number
+  deliveryCost: number
   status: number
   approvedAt: number
   deliveredAt: number
@@ -71,6 +99,20 @@ export type DeliveryRequestCountAggregateOutputType = {
 }
 
 
+export type DeliveryRequestAvgAggregateInputType = {
+  latitude?: true
+  longitude?: true
+  distanceFromBranch?: true
+  deliveryCost?: true
+}
+
+export type DeliveryRequestSumAggregateInputType = {
+  latitude?: true
+  longitude?: true
+  distanceFromBranch?: true
+  deliveryCost?: true
+}
+
 export type DeliveryRequestMinAggregateInputType = {
   id?: true
   orderId?: true
@@ -78,6 +120,10 @@ export type DeliveryRequestMinAggregateInputType = {
   deliveryAddress?: true
   preferredTimeWindow?: true
   contactNumber?: true
+  latitude?: true
+  longitude?: true
+  distanceFromBranch?: true
+  deliveryCost?: true
   status?: true
   approvedAt?: true
   deliveredAt?: true
@@ -93,6 +139,10 @@ export type DeliveryRequestMaxAggregateInputType = {
   deliveryAddress?: true
   preferredTimeWindow?: true
   contactNumber?: true
+  latitude?: true
+  longitude?: true
+  distanceFromBranch?: true
+  deliveryCost?: true
   status?: true
   approvedAt?: true
   deliveredAt?: true
@@ -108,6 +158,10 @@ export type DeliveryRequestCountAggregateInputType = {
   deliveryAddress?: true
   preferredTimeWindow?: true
   contactNumber?: true
+  latitude?: true
+  longitude?: true
+  distanceFromBranch?: true
+  deliveryCost?: true
   status?: true
   approvedAt?: true
   deliveredAt?: true
@@ -155,6 +209,18 @@ export type DeliveryRequestAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: DeliveryRequestAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: DeliveryRequestSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: DeliveryRequestMinAggregateInputType
@@ -185,6 +251,8 @@ export type DeliveryRequestGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: DeliveryRequestCountAggregateInputType | true
+  _avg?: DeliveryRequestAvgAggregateInputType
+  _sum?: DeliveryRequestSumAggregateInputType
   _min?: DeliveryRequestMinAggregateInputType
   _max?: DeliveryRequestMaxAggregateInputType
 }
@@ -196,6 +264,10 @@ export type DeliveryRequestGroupByOutputType = {
   deliveryAddress: string
   preferredTimeWindow: string | null
   contactNumber: string
+  latitude: number | null
+  longitude: number | null
+  distanceFromBranch: number | null
+  deliveryCost: runtime.Decimal | null
   status: $Enums.DeliveryStatus
   approvedAt: Date | null
   deliveredAt: Date | null
@@ -203,6 +275,8 @@ export type DeliveryRequestGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: DeliveryRequestCountAggregateOutputType | null
+  _avg: DeliveryRequestAvgAggregateOutputType | null
+  _sum: DeliveryRequestSumAggregateOutputType | null
   _min: DeliveryRequestMinAggregateOutputType | null
   _max: DeliveryRequestMaxAggregateOutputType | null
 }
@@ -232,6 +306,10 @@ export type DeliveryRequestWhereInput = {
   deliveryAddress?: Prisma.StringFilter<"DeliveryRequest"> | string
   preferredTimeWindow?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
   contactNumber?: Prisma.StringFilter<"DeliveryRequest"> | string
+  latitude?: Prisma.FloatNullableFilter<"DeliveryRequest"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"DeliveryRequest"> | number | null
+  distanceFromBranch?: Prisma.FloatNullableFilter<"DeliveryRequest"> | number | null
+  deliveryCost?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFilter<"DeliveryRequest"> | $Enums.DeliveryStatus
   approvedAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   deliveredAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
@@ -249,6 +327,10 @@ export type DeliveryRequestOrderByWithRelationInput = {
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -269,6 +351,10 @@ export type DeliveryRequestWhereUniqueInput = Prisma.AtLeast<{
   deliveryAddress?: Prisma.StringFilter<"DeliveryRequest"> | string
   preferredTimeWindow?: Prisma.StringNullableFilter<"DeliveryRequest"> | string | null
   contactNumber?: Prisma.StringFilter<"DeliveryRequest"> | string
+  latitude?: Prisma.FloatNullableFilter<"DeliveryRequest"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"DeliveryRequest"> | number | null
+  distanceFromBranch?: Prisma.FloatNullableFilter<"DeliveryRequest"> | number | null
+  deliveryCost?: Prisma.DecimalNullableFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFilter<"DeliveryRequest"> | $Enums.DeliveryStatus
   approvedAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
   deliveredAt?: Prisma.DateTimeNullableFilter<"DeliveryRequest"> | Date | string | null
@@ -286,6 +372,10 @@ export type DeliveryRequestOrderByWithAggregationInput = {
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -293,8 +383,10 @@ export type DeliveryRequestOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DeliveryRequestCountOrderByAggregateInput
+  _avg?: Prisma.DeliveryRequestAvgOrderByAggregateInput
   _max?: Prisma.DeliveryRequestMaxOrderByAggregateInput
   _min?: Prisma.DeliveryRequestMinOrderByAggregateInput
+  _sum?: Prisma.DeliveryRequestSumOrderByAggregateInput
 }
 
 export type DeliveryRequestScalarWhereWithAggregatesInput = {
@@ -307,6 +399,10 @@ export type DeliveryRequestScalarWhereWithAggregatesInput = {
   deliveryAddress?: Prisma.StringWithAggregatesFilter<"DeliveryRequest"> | string
   preferredTimeWindow?: Prisma.StringNullableWithAggregatesFilter<"DeliveryRequest"> | string | null
   contactNumber?: Prisma.StringWithAggregatesFilter<"DeliveryRequest"> | string
+  latitude?: Prisma.FloatNullableWithAggregatesFilter<"DeliveryRequest"> | number | null
+  longitude?: Prisma.FloatNullableWithAggregatesFilter<"DeliveryRequest"> | number | null
+  distanceFromBranch?: Prisma.FloatNullableWithAggregatesFilter<"DeliveryRequest"> | number | null
+  deliveryCost?: Prisma.DecimalNullableWithAggregatesFilter<"DeliveryRequest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusWithAggregatesFilter<"DeliveryRequest"> | $Enums.DeliveryStatus
   approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DeliveryRequest"> | Date | string | null
   deliveredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DeliveryRequest"> | Date | string | null
@@ -320,6 +416,10 @@ export type DeliveryRequestCreateInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -337,6 +437,10 @@ export type DeliveryRequestUncheckedCreateInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -350,6 +454,10 @@ export type DeliveryRequestUpdateInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -367,6 +475,10 @@ export type DeliveryRequestUncheckedUpdateInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -382,6 +494,10 @@ export type DeliveryRequestCreateManyInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -395,6 +511,10 @@ export type DeliveryRequestUpdateManyMutationInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -410,6 +530,10 @@ export type DeliveryRequestUncheckedUpdateManyInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -430,12 +554,23 @@ export type DeliveryRequestCountOrderByAggregateInput = {
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type DeliveryRequestAvgOrderByAggregateInput = {
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrder
 }
 
 export type DeliveryRequestMaxOrderByAggregateInput = {
@@ -445,6 +580,10 @@ export type DeliveryRequestMaxOrderByAggregateInput = {
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
@@ -460,12 +599,23 @@ export type DeliveryRequestMinOrderByAggregateInput = {
   deliveryAddress?: Prisma.SortOrder
   preferredTimeWindow?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type DeliveryRequestSumOrderByAggregateInput = {
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  distanceFromBranch?: Prisma.SortOrder
+  deliveryCost?: Prisma.SortOrder
 }
 
 export type DeliveryRequestCreateNestedOneWithoutOrderInput = {
@@ -541,6 +691,10 @@ export type DeliveryRequestCreateWithoutOrderInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -556,6 +710,10 @@ export type DeliveryRequestUncheckedCreateWithoutOrderInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -585,6 +743,10 @@ export type DeliveryRequestUpdateWithoutOrderInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -600,6 +762,10 @@ export type DeliveryRequestUncheckedUpdateWithoutOrderInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -613,6 +779,10 @@ export type DeliveryRequestCreateWithoutPartOrderInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -628,6 +798,10 @@ export type DeliveryRequestUncheckedCreateWithoutPartOrderInput = {
   deliveryAddress: string
   preferredTimeWindow?: string | null
   contactNumber: string
+  latitude?: number | null
+  longitude?: number | null
+  distanceFromBranch?: number | null
+  deliveryCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: $Enums.DeliveryStatus
   approvedAt?: Date | string | null
   deliveredAt?: Date | string | null
@@ -657,6 +831,10 @@ export type DeliveryRequestUpdateWithoutPartOrderInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -672,6 +850,10 @@ export type DeliveryRequestUncheckedUpdateWithoutPartOrderInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   preferredTimeWindow?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  distanceFromBranch?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   status?: Prisma.EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -689,6 +871,10 @@ export type DeliveryRequestSelect<ExtArgs extends runtime.Types.Extensions.Inter
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  distanceFromBranch?: boolean
+  deliveryCost?: boolean
   status?: boolean
   approvedAt?: boolean
   deliveredAt?: boolean
@@ -706,6 +892,10 @@ export type DeliveryRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  distanceFromBranch?: boolean
+  deliveryCost?: boolean
   status?: boolean
   approvedAt?: boolean
   deliveredAt?: boolean
@@ -723,6 +913,10 @@ export type DeliveryRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  distanceFromBranch?: boolean
+  deliveryCost?: boolean
   status?: boolean
   approvedAt?: boolean
   deliveredAt?: boolean
@@ -740,6 +934,10 @@ export type DeliveryRequestSelectScalar = {
   deliveryAddress?: boolean
   preferredTimeWindow?: boolean
   contactNumber?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  distanceFromBranch?: boolean
+  deliveryCost?: boolean
   status?: boolean
   approvedAt?: boolean
   deliveredAt?: boolean
@@ -748,7 +946,7 @@ export type DeliveryRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type DeliveryRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partOrderId" | "deliveryAddress" | "preferredTimeWindow" | "contactNumber" | "status" | "approvedAt" | "deliveredAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["deliveryRequest"]>
+export type DeliveryRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partOrderId" | "deliveryAddress" | "preferredTimeWindow" | "contactNumber" | "latitude" | "longitude" | "distanceFromBranch" | "deliveryCost" | "status" | "approvedAt" | "deliveredAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["deliveryRequest"]>
 export type DeliveryRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.DeliveryRequest$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.DeliveryRequest$partOrderArgs<ExtArgs>
@@ -775,6 +973,10 @@ export type $DeliveryRequestPayload<ExtArgs extends runtime.Types.Extensions.Int
     deliveryAddress: string
     preferredTimeWindow: string | null
     contactNumber: string
+    latitude: number | null
+    longitude: number | null
+    distanceFromBranch: number | null
+    deliveryCost: runtime.Decimal | null
     status: $Enums.DeliveryStatus
     approvedAt: Date | null
     deliveredAt: Date | null
@@ -1212,6 +1414,10 @@ export interface DeliveryRequestFieldRefs {
   readonly deliveryAddress: Prisma.FieldRef<"DeliveryRequest", 'String'>
   readonly preferredTimeWindow: Prisma.FieldRef<"DeliveryRequest", 'String'>
   readonly contactNumber: Prisma.FieldRef<"DeliveryRequest", 'String'>
+  readonly latitude: Prisma.FieldRef<"DeliveryRequest", 'Float'>
+  readonly longitude: Prisma.FieldRef<"DeliveryRequest", 'Float'>
+  readonly distanceFromBranch: Prisma.FieldRef<"DeliveryRequest", 'Float'>
+  readonly deliveryCost: Prisma.FieldRef<"DeliveryRequest", 'Decimal'>
   readonly status: Prisma.FieldRef<"DeliveryRequest", 'DeliveryStatus'>
   readonly approvedAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>
   readonly deliveredAt: Prisma.FieldRef<"DeliveryRequest", 'DateTime'>

@@ -50,7 +50,30 @@ export class DeliveriesService {
           );
         }
 
-        // 3. Create delivery request
+        // 3. Calculate distance (Mock/API)
+        let distanceNote = "";
+        let calculatedDistance: number | null = null;
+        try {
+          const branchAddr = order.branch.address + ", " + order.branch.city;
+          const distance = await this.calculateDistance(
+            branchAddr, 
+            dto.deliveryAddress, 
+            dto.latitude, 
+            dto.longitude,
+            (order.branch as any).latitude,
+            (order.branch as any).longitude
+          );
+          calculatedDistance = distance;
+          if (distance > 10) {
+            distanceNote = `NOTE: Delivery distance is ${distance.toFixed(1)}km (>10km). Delivery charges will be COD and coordinated by the branch.`;
+          } else {
+            distanceNote = `NOTE: Delivery distance is ${distance.toFixed(1)}km (Free delivery).`;
+          }
+        } catch (e) {
+          distanceNote = "NOTE: Could not calculate distance automatically. Please verify if >10km for COD charges.";
+        }
+
+        // 4. Create delivery request
         const delivery = await tx.deliveryRequest.create({
           data: {
             orderId,
@@ -58,6 +81,10 @@ export class DeliveriesService {
             preferredTimeWindow: dto.preferredTimeWindow,
             contactNumber: dto.contactNumber,
             status: DeliveryStatus.REQUESTED,
+            notes: distanceNote,
+            latitude: dto.latitude,
+            longitude: dto.longitude,
+            distanceFromBranch: calculatedDistance,
           },
           include: {
             order: {
@@ -72,7 +99,6 @@ export class DeliveriesService {
             },
           },
         });
-
         return delivery;
       } else {
         // PART order handling
@@ -105,6 +131,29 @@ export class DeliveriesService {
           );
         }
 
+        // Calculate distance (Mock/API)
+        let distanceNote = "";
+        let calculatedDistance: number | null = null;
+        try {
+          const branchAddr = partOrder.branch.address + ", " + partOrder.branch.city;
+          const distance = await this.calculateDistance(
+            branchAddr, 
+            dto.deliveryAddress, 
+            dto.latitude, 
+            dto.longitude,
+            (partOrder.branch as any).latitude,
+            (partOrder.branch as any).longitude
+          );
+          calculatedDistance = distance;
+          if (distance > 10) {
+            distanceNote = `NOTE: Delivery distance is ${distance.toFixed(1)}km (>10km). Delivery charges will be COD and coordinated by the branch.`;
+          } else {
+            distanceNote = `NOTE: Delivery distance is ${distance.toFixed(1)}km (Free delivery).`;
+          }
+        } catch (e) {
+          distanceNote = "NOTE: Could not calculate distance automatically. Please verify if >10km for COD charges.";
+        }
+
         // Create delivery request
         const delivery = await tx.deliveryRequest.create({
           data: {
@@ -113,6 +162,10 @@ export class DeliveriesService {
             preferredTimeWindow: dto.preferredTimeWindow,
             contactNumber: dto.contactNumber,
             status: DeliveryStatus.REQUESTED,
+            notes: distanceNote,
+            latitude: dto.latitude,
+            longitude: dto.longitude,
+            distanceFromBranch: calculatedDistance,
           },
           include: {
             partOrder: {
@@ -311,6 +364,11 @@ export class DeliveriesService {
         updateData.notes = dto.notes;
       }
 
+      // Save deliveryCost if provided
+      if (dto.deliveryCost !== undefined) {
+        updateData.deliveryCost = dto.deliveryCost;
+      }
+
       // Update delivery
       const updatedDelivery = await tx.deliveryRequest.update({
         where: { id },
@@ -493,5 +551,50 @@ export class DeliveriesService {
       inTransit,
       delivered,
     };
+  }
+
+  /**
+   * Helper to calculate distance between two addresses in km.
+   * This uses an open routing API (OSRM) as a demonstration.
+   */
+  async calculateDistance(originAddr: string, destAddr: string, destLat?: number, destLon?: number, branchLat?: number | null, branchLon?: number | null): Promise<number> {
+    try {
+      // 1. Geocode origin (skip if exact coordinates are provided)
+      let lat1 = branchLat;
+      let lon1 = branchLon;
+
+      if (!lat1 || !lon1) {
+        const originRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(originAddr)}&format=json&limit=1`, { headers: { "User-Agent": "KhanEnterprisesApp/1.0" }});
+        const originData = await originRes.json();
+        if (!originData || originData.length === 0) throw new Error("Origin not found");
+        lat1 = originData[0].lat;
+        lon1 = originData[0].lon;
+      }
+
+      // 2. Geocode destination (skip if exact coordinates are provided)
+      let lat2 = destLat;
+      let lon2 = destLon;
+      
+      if (!lat2 || !lon2) {
+        const destRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(destAddr)}&format=json&limit=1`, { headers: { "User-Agent": "KhanEnterprisesApp/1.0" }});
+        const destData = await destRes.json();
+        if (!destData || destData.length === 0) throw new Error("Destination not found");
+        lat2 = destData[0].lat;
+        lon2 = destData[0].lon;
+      }
+
+      // 3. Get route distance using OSRM
+      const routeRes = await fetch(`http://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`);
+      const routeData = await routeRes.json();
+      if (routeData.code !== "Ok" || !routeData.routes || routeData.routes.length === 0) {
+        throw new Error("Route not found");
+      }
+
+      const distanceMeters = routeData.routes[0].distance;
+      return distanceMeters / 1000;
+    } catch (error) {
+      console.error("Failed to calculate distance:", error);
+      throw error;
+    }
   }
 }

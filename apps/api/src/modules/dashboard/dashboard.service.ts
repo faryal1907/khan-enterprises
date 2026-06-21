@@ -30,6 +30,8 @@ export class DashboardService {
       pendingDeliveries,
       bikeOrdersWaitingPayment,
       partOrdersWaitingPayment,
+      bikePendingVerifications,
+      partPendingVerifications,
       cancelledBikeOrders,
       cancelledPartOrders,
     ] = await Promise.all([
@@ -94,6 +96,18 @@ export class DashboardService {
       this.prisma.client.partOrder.count({
         where: { ...branchFilter, status: OrderStatus.PENDING_PAYMENT },
       }),
+      this.prisma.client.paymentTransaction.count({
+        where: {
+          status: PaymentStatus.VERIFICATION_PENDING,
+          order: branchId ? { branchId } : undefined,
+        },
+      }),
+      this.prisma.client.partPaymentTransaction.count({
+        where: {
+          status: PaymentStatus.VERIFICATION_PENDING,
+          partOrder: branchId ? { branchId } : undefined,
+        },
+      }),
       this.prisma.client.order.count({
         where: { ...branchFilter, status: OrderStatus.CANCELLED },
       }),
@@ -108,6 +122,7 @@ export class DashboardService {
       (availablePartsAgg._sum.quantity ?? 0) -
       (availablePartsAgg._sum.reservedQuantity ?? 0);
     const ordersWaitingPayment = bikeOrdersWaitingPayment + partOrdersWaitingPayment;
+    const pendingVerifications = bikePendingVerifications + partPendingVerifications;
     const cancelledOrders = cancelledBikeOrders + cancelledPartOrders;
     const commonStats = {
       scope: branch
@@ -119,6 +134,7 @@ export class DashboardService {
       lowStockAlerts,
       pendingDeliveries,
       ordersWaitingPayment,
+      pendingVerifications,
       cancelledOrders,
     };
 

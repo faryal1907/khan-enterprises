@@ -60,6 +60,7 @@ enum PaymentStatus {
   SUCCESS
   FAILED
   VERIFICATION_PENDING
+  CANCELLED
 }
 
 enum PaymentMethod {
@@ -170,6 +171,8 @@ model Branch {
   city        String
   address     String
   phoneNumber String?
+  latitude    Float?
+  longitude   Float?
 
   managerId String?
   manager   User?   @relation("BranchManager", fields: [managerId], references: [id])
@@ -539,6 +542,11 @@ model DeliveryRequest {
   deliveryAddress     String
   preferredTimeWindow String?
   contactNumber       String
+
+  latitude           Float?
+  longitude          Float?
+  distanceFromBranch Float?
+  deliveryCost       Decimal? @db.Decimal(12, 2)
 
   status DeliveryStatus @default(REQUESTED)
 

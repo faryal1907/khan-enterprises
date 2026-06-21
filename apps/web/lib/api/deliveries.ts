@@ -4,6 +4,8 @@ export interface CreateDeliveryData {
   deliveryAddress: string;
   preferredTimeWindow?: string;
   contactNumber: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface DeliveryRequest {

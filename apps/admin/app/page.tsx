@@ -131,6 +131,12 @@ function DashboardCards({
       href: "/deliveries",
     },
     {
+      label: "Pending Verifications",
+      field: "pendingVerifications",
+      href: "/orders?status=PENDING_PAYMENT", // or wherever verification pending orders are listed
+      emphasis: "secondary",
+    },
+    {
       label: "Available Bikes",
       field: "availableBikes",
       href: "/bikes?status=AVAILABLE",
@@ -179,7 +185,7 @@ function DashboardCards({
   return (
     <>
       <MetricGrid cards={summaryCards} stats={stats} columns={4} />
-      <MetricGrid cards={operationalCards.slice(1, 5)} stats={stats} columns={4} />
+      <MetricGrid cards={operationalCards.slice(1, 6)} stats={stats} columns={4} />
     </>
   );
 }

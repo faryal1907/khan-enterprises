@@ -9,6 +9,7 @@ export interface CreateDeliveryData {
 export interface UpdateDeliveryStatusData {
   status: "REQUESTED" | "UNDER_REVIEW" | "APPROVED" | "IN_TRANSIT" | "DELIVERED";
   notes?: string;
+  deliveryCost?: number;
 }
 
 export interface DeliveryRequest {
@@ -20,6 +21,11 @@ export interface DeliveryRequest {
   status: "REQUESTED" | "UNDER_REVIEW" | "APPROVED" | "IN_TRANSIT" | "DELIVERED";
   approvedAt?: string;
   deliveredAt?: string;
+  notes?: string;
+  latitude?: number;
+  longitude?: number;
+  distanceFromBranch?: number;
+  deliveryCost?: number;
   createdAt: string;
   updatedAt: string;
   order: {

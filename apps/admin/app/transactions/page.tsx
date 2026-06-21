@@ -27,6 +27,7 @@ type TransactionFilters = {
 function getStatusColor(status: string) {
   if (status === PaymentStatus.SUCCESS) return "#22c55e";
   if (status === PaymentStatus.FAILED) return "#ef4444";
+  if (status === PaymentStatus.CANCELLED) return theme.text.secondary;
   return theme.text.secondary;
 }
 
@@ -221,6 +222,7 @@ export default function TransactionsPage() {
                 <option value={PaymentStatus.SUCCESS}>Success</option>
                 <option value={PaymentStatus.PENDING}>Pending</option>
                 <option value={PaymentStatus.FAILED}>Failed</option>
+                <option value={PaymentStatus.CANCELLED}>Cancelled</option>
               </select>
             </div>
 

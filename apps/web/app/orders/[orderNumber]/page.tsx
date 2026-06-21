@@ -8,6 +8,7 @@ import { getPartOrderByNumber } from "@/lib/api/part-orders";
 import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
 import { markAsPickedByCustomer } from "@/lib/api/orders";
 import { api } from "@/lib/api-client";
+import { MapPicker } from "@/components/map-picker";
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -96,6 +97,7 @@ interface Order {
       address: string;
       phoneNumber: string | null;
     };
+    actualSalePrice?: number;
   };
   
   // Part order fields
@@ -132,6 +134,7 @@ interface Order {
     createdAt: string;
     updatedAt: string;
     notes?: string;
+    deliveryCost?: number;
   } | null;
 }
 
@@ -141,7 +144,13 @@ export default function OrderStatusPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showDeliveryForm, setShowDeliveryForm] = useState(false);
-  const [deliveryForm, setDeliveryForm] = useState({
+  const [deliveryForm, setDeliveryForm] = useState<{
+    deliveryAddress: string;
+    preferredTimeWindow: string;
+    contactNumber: string;
+    latitude?: number;
+    longitude?: number;
+  }>({
     deliveryAddress: "",
     preferredTimeWindow: "",
     contactNumber: "",
@@ -203,14 +212,25 @@ export default function OrderStatusPage() {
     try {
       setSubmittingDelivery(true);
       setDeliveryError("");
-      await createDeliveryRequest(order.id, deliveryForm, order.type);
+      
+      const payload = { ...deliveryForm };
+      if (!payload.preferredTimeWindow?.trim()) {
+        delete (payload as any).preferredTimeWindow;
+      }
+
+      await createDeliveryRequest(order.id, payload, order.type);
       // Refresh order data to show delivery status
       await fetchOrder();
       setShowDeliveryForm(false);
       setDeliveryForm({ deliveryAddress: "", preferredTimeWindow: "", contactNumber: "" });
     } catch (err: any) {
       console.error("Failed to create delivery request:", err);
-      setDeliveryError(err.response?.data?.message || "Failed to create delivery request");
+      const msg = err.response?.data?.message;
+      if (Array.isArray(msg)) {
+        setDeliveryError(msg.join(", "));
+      } else {
+        setDeliveryError(msg || "Failed to create delivery request");
+      }
     } finally {
       setSubmittingDelivery(false);
     }
@@ -545,10 +565,31 @@ export default function OrderStatusPage() {
             <form onSubmit={handleDeliveryRequest} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
+                  Pinpoint Exact Location (Optional but recommended)
+                </label>
+                <div className="mb-4">
+                  <MapPicker
+                    onLocationSelected={(lat: number, lng: number) => {
+                      setDeliveryForm(prev => ({ 
+                        ...prev, 
+                        latitude: lat, 
+                        longitude: lng
+                      }));
+                    }}
+                  />
+                  {deliveryForm.latitude && deliveryForm.longitude && (
+                    <p className="text-xs mt-2 text-green-600 font-medium">
+                      ✓ Exact location pinned successfully
+                    </p>
+                  )}
+                </div>
+                
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
                   Delivery Address *
                 </label>
                 <textarea
                   required
+                  minLength={10}
                   rows={3}
                   value={deliveryForm.deliveryAddress}
                   onChange={(e) => setDeliveryForm({ ...deliveryForm, deliveryAddress: e.target.value })}
@@ -558,7 +599,7 @@ export default function OrderStatusPage() {
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
-                  placeholder="Enter your complete delivery address"
+                  placeholder="Enter your complete delivery address (House, Street, Area) - Min 10 chars"
                 />
               </div>
 
@@ -586,6 +627,7 @@ export default function OrderStatusPage() {
                 </label>
                 <input
                   required
+                  minLength={10}
                   type="tel"
                   value={deliveryForm.contactNumber}
                   onChange={(e) => setDeliveryForm({ ...deliveryForm, contactNumber: e.target.value })}
@@ -595,7 +637,7 @@ export default function OrderStatusPage() {
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
-                  placeholder="Enter your contact number for delivery coordination"
+                  placeholder="Enter your contact number for delivery coordination - Min 10 chars"
                 />
               </div>
 
@@ -847,12 +889,28 @@ export default function OrderStatusPage() {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: theme.text.secondary }}>
-                {order.type === "BIKE" ? "Amount" : "Amount"}
+                {order.type === "BIKE" ? "Base Amount" : "Amount"}
               </span>
               <span className="font-semibold" style={{ color: theme.text.primary }}>
-                PKR {Number(order.type === "BIKE" ? order.negotiatedAmount : order.amount).toLocaleString()}
+                PKR {Number(order.type === "BIKE" ? (order.bike?.actualSalePrice || order.bike?.model?.basePrice || 0) : order.amount).toLocaleString()}
               </span>
             </div>
+            {order.delivery && order.delivery.deliveryCost && (
+              <div className="flex justify-between">
+                <span className="text-sm" style={{ color: theme.text.secondary }}>Delivery Charges</span>
+                <span className="font-semibold" style={{ color: theme.text.primary }}>
+                  PKR {Number(order.delivery.deliveryCost).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {order.delivery && order.delivery.deliveryCost && (
+              <div className="flex justify-between pt-2 border-t" style={{ borderColor: theme.borders.light }}>
+                <span className="text-sm font-semibold" style={{ color: theme.text.primary }}>Total Amount</span>
+                <span className="font-semibold" style={{ color: theme.text.primary }}>
+                  PKR {(Number(order.type === "BIKE" ? (order.bike?.actualSalePrice || order.bike?.model?.basePrice || 0) : (order.amount || 0)) + Number(order.delivery.deliveryCost)).toLocaleString()}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: theme.text.secondary }}>Payment Method</span>
               <span className="font-medium" style={{ color: theme.text.primary }}>{order.paymentMethod}</span>
@@ -898,9 +956,12 @@ export default function OrderStatusPage() {
                     className="px-2 py-1 text-xs font-medium rounded"
                     style={{
                       backgroundColor: transaction.status === "SUCCESS" ? "#D1FAE5" : 
-                        transaction.status === "PENDING" ? "#FEF3C7" : "#FEE2E2",
+                        transaction.status === "PENDING" ? "#FEF3C7" : 
+                        transaction.status === "CANCELLED" ? theme.backgrounds.tertiary : "#FEE2E2",
                       color: transaction.status === "SUCCESS" ? "#065F46" : 
-                        transaction.status === "PENDING" ? "#92400E" : "#991B1B",
+                        transaction.status === "PENDING" ? "#92400E" : 
+                        transaction.status === "CANCELLED" ? theme.text.secondary : "#991B1B",
+                      border: transaction.status === "CANCELLED" ? `1px solid ${theme.borders.medium}` : undefined,
                     }}
                   >
                     {transaction.status}
