@@ -239,10 +239,7 @@ export default function TransactionsPage() {
                 }}
               >
                 <option value="">All Methods</option>
-                <option value={PaymentMethod.SAFEPAY}>Safepay</option>
-                <option value={PaymentMethod.JAZZCASH}>JazzCash</option>
-                <option value={PaymentMethod.RAAST}>Raast</option>
-                <option value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</option>
+                <option value={PaymentMethod.ONLINE_TRANSFER}>Online Transfer</option>
                 <option value={PaymentMethod.CASH}>Cash</option>
               </select>
             </div>

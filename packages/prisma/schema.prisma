@@ -1,3 +1,9 @@
+// ============================================================================
+// KHAN DEALERSHIP PLATFORM
+// Production-Grade Prisma Schema
+// Stack: PostgreSQL + Prisma + NestJS
+// ============================================================================
+
 generator client {
   provider     = "prisma-client"
   output       = "./generated"
@@ -8,361 +14,9 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id                  String          @id @default(uuid())
-  email               String          @unique
-  passwordHash        String
-  fullName            String
-  phoneNumber         String?
-  role                UserRole
-  status              UserStatus      @default(ACTIVE)
-  branchId            String?
-  createdAt           DateTime        @default(now())
-  updatedAt           DateTime        @updatedAt
-  vendorId            String?
-  auditLogs           AuditLog[]
-  managedBranches     Branch[]        @relation("BranchManager")
-  documents           Document[]
-  customerOrders      Order[]         @relation("OrderCustomer")
-  processedOrders     Order[]         @relation("OrderProcessedBy")
-  orderAlerts         OrderAlert[]
-  customerPartOrders  PartOrder[]     @relation("PartOrderCustomer")
-  processedPartOrders PartOrder[]     @relation("PartOrderProcessedBy")
-  refreshTokens       RefreshToken[]
-  stockMovements      StockMovement[]
-  branch              Branch?         @relation(fields: [branchId], references: [id])
-  vendor              Vendor?         @relation(fields: [vendorId], references: [id])
-
-  @@index([email])
-  @@index([role])
-  @@index([branchId])
-  @@index([vendorId])
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  tokenHash String   @unique
-  expiresAt DateTime
-  userId    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model Branch {
-  id            String          @id @default(uuid())
-  name          String
-  city          String
-  address       String
-  phoneNumber   String?
-  managerId     String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  bikeInventory BikeUnit[]
-  manager       User?           @relation("BranchManager", fields: [managerId], references: [id])
-  orders        Order[]
-  partInventory PartInventory[]
-  partOrders    PartOrder[]
-  users         User[]
-
-  @@unique([name, city])
-}
-
-model Vendor {
-  id            String     @id @default(uuid())
-  name          String
-  contactPerson String?
-  phoneNumber   String?
-  email         String?
-  address       String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  suppliedBikes BikeUnit[]
-  staff         User[]
-}
-
-model BikeModel {
-  id             String     @id @default(uuid())
-  brand          String
-  modelName      String
-  year           Int
-  engineCapacity String?
-  color          String?
-  description    String?
-  basePrice      Decimal    @db.Decimal(12, 2)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  bikes          BikeUnit[]
-
-  @@index([brand])
-  @@index([modelName])
-}
-
-model BikeUnit {
-  id                    String     @id @default(uuid())
-  vendorId              String
-  branchId              String
-  modelId               String
-  chassisNumber         String     @unique
-  engineNumber          String     @unique
-  serialNumber          String?
-  status                BikeStatus @default(AVAILABLE)
-  negotiatedPrice       Decimal?   @db.Decimal(12, 2)
-  reservedUntil         DateTime?
-  soldAt                DateTime?
-  createdAt             DateTime   @default(now())
-  updatedAt             DateTime   @updatedAt
-  color                 String?
-  media                 String[]   @default([])
-  price                 Decimal?   @db.Decimal(12, 2)
-  onlineDiscountPercent Decimal    @default(2) @db.Decimal(5, 2)
-  actualSalePrice       Decimal?   @db.Decimal(12, 2)
-  branch                Branch     @relation(fields: [branchId], references: [id])
-  model                 BikeModel  @relation(fields: [modelId], references: [id])
-  vendor                Vendor     @relation(fields: [vendorId], references: [id])
-  documents             Document[]
-  orders                Order[]
-
-  @@index([status])
-  @@index([branchId])
-  @@index([modelId])
-  @@index([vendorId])
-  @@index([reservedUntil])
-}
-
-model Part {
-  id           String          @id @default(uuid())
-  name         String
-  sku          String          @unique
-  category     String
-  description  String?
-  sellingPrice Decimal         @db.Decimal(12, 2)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  inventories  PartInventory[]
-  partOrders   PartOrder[]
-
-  @@index([category])
-}
-
-model PartInventory {
-  id               String          @id @default(uuid())
-  partId           String
-  branchId         String
-  quantity         Int             @default(0)
-  reservedQuantity Int             @default(0)
-  reorderLevel     Int             @default(5)
-  updatedAt        DateTime        @updatedAt
-  branch           Branch          @relation(fields: [branchId], references: [id])
-  part             Part            @relation(fields: [partId], references: [id])
-  partOrders       PartOrder[]
-  stockMovements   StockMovement[]
-
-  @@unique([partId, branchId])
-  @@index([branchId])
-}
-
-model StockMovement {
-  id            String                @id @default(uuid())
-  inventoryId   String
-  movementType  InventoryMovementType
-  quantity      Int
-  reason        String?
-  performedById String?
-  createdAt     DateTime              @default(now())
-  inventory     PartInventory         @relation(fields: [inventoryId], references: [id])
-  performedBy   User?                 @relation(fields: [performedById], references: [id])
-
-  @@index([inventoryId])
-}
-
-model Order {
-  id                String               @id @default(uuid())
-  orderNumber       String               @unique
-  bikeId            String
-  branchId          String
-  customerId        String?
-  customerName      String
-  customerPhone     String
-  customerCNIC      String?
-  customerAddress   String?
-  negotiatedAmount  Decimal              @db.Decimal(12, 2)
-  paymentMethod     PaymentMethod
-  status            OrderStatus          @default(PENDING_PAYMENT)
-  processedById     String?
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-  expiresAt         DateTime?
-  appliedDiscount   Decimal?             @db.Decimal(12, 2)
-  paymentVerified   Boolean              @default(false)
-  orderType         OrderType            @default(ONSITE)
-  reservationExpiry DateTime?
-  pickupType        PickupType           @default(ONSITE_PICKUP)
-  isOnlineOrder     Boolean              @default(false)
-  delivery          DeliveryRequest?
-  documents         Document[]
-  bike              BikeUnit             @relation(fields: [bikeId], references: [id])
-  branch            Branch               @relation(fields: [branchId], references: [id])
-  customer          User?                @relation("OrderCustomer", fields: [customerId], references: [id])
-  processedBy       User?                @relation("OrderProcessedBy", fields: [processedById], references: [id])
-  alerts            OrderAlert[]
-  transactions      PaymentTransaction[]
-
-  @@index([status])
-  @@index([branchId])
-  @@index([customerId])
-  @@index([createdAt])
-}
-
-model OrderAlert {
-  id        String   @id @default(uuid())
-  orderId   String
-  userId    String
-  isRead    Boolean  @default(false)
-  alertType String
-  createdAt DateTime @default(now())
-  order     Order    @relation(fields: [orderId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@index([userId, isRead])
-}
-
-model PartOrder {
-  id                String                   @id @default(uuid())
-  orderNumber       String                   @unique
-  partId            String
-  partInventoryId   String
-  branchId          String
-  customerId        String?
-  customerName      String
-  customerPhone     String
-  customerAddress   String
-  quantity          Int
-  amount            Decimal                  @db.Decimal(12, 2)
-  paymentMethod     PaymentMethod
-  status            OrderStatus              @default(PENDING_PAYMENT)
-  processedById     String?
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
-  expiresAt         DateTime?
-  paymentVerified   Boolean                  @default(false)
-  orderType         OrderType                @default(ONSITE)
-  reservationExpiry DateTime?
-  pickupType        PickupType               @default(ONSITE_PICKUP)
-  delivery          DeliveryRequest?
-  branch            Branch                   @relation(fields: [branchId], references: [id])
-  customer          User?                    @relation("PartOrderCustomer", fields: [customerId], references: [id])
-  part              Part                     @relation(fields: [partId], references: [id])
-  partInventory     PartInventory            @relation(fields: [partInventoryId], references: [id])
-  processedBy       User?                    @relation("PartOrderProcessedBy", fields: [processedById], references: [id])
-  transactions      PartPaymentTransaction[]
-
-  @@index([status])
-  @@index([branchId])
-  @@index([customerId])
-  @@index([createdAt])
-}
-
-model PaymentTransaction {
-  id                String        @id @default(uuid())
-  orderId           String
-  gatewayReference  String?       @unique
-  idempotencyKey    String?       @unique
-  amount            Decimal       @db.Decimal(12, 2)
-  method            PaymentMethod
-  status            PaymentStatus @default(PENDING)
-  gatewayResponse   Json?
-  failureReason     String?
-  webhookReceivedAt DateTime?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  paymentProofUrl   String?
-  verifiedAt        DateTime?
-  verifiedById      String?
-  order             Order         @relation(fields: [orderId], references: [id])
-
-  @@index([status])
-  @@index([gatewayReference])
-}
-
-model PartPaymentTransaction {
-  id                String        @id @default(uuid())
-  partOrderId       String
-  gatewayReference  String?       @unique
-  idempotencyKey    String?       @unique
-  amount            Decimal       @db.Decimal(12, 2)
-  method            PaymentMethod
-  status            PaymentStatus @default(PENDING)
-  gatewayResponse   Json?
-  failureReason     String?
-  webhookReceivedAt DateTime?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  paymentProofUrl   String?
-  verifiedAt        DateTime?
-  verifiedById      String?
-  partOrder         PartOrder     @relation(fields: [partOrderId], references: [id])
-
-  @@index([status])
-  @@index([gatewayReference])
-}
-
-model DeliveryRequest {
-  id                  String         @id @default(uuid())
-  orderId             String?        @unique
-  deliveryAddress     String
-  preferredTimeWindow String?
-  contactNumber       String
-  status              DeliveryStatus @default(REQUESTED)
-  approvedAt          DateTime?
-  deliveredAt         DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  notes               String?
-  partOrderId         String?        @unique
-  order               Order?         @relation(fields: [orderId], references: [id])
-  partOrder           PartOrder?     @relation(fields: [partOrderId], references: [id])
-
-  @@index([status])
-}
-
-model Document {
-  id           String    @id @default(uuid())
-  fileName     String
-  fileUrl      String
-  mimeType     String
-  fileSize     Int
-  fileType     FileType
-  bikeId       String?
-  orderId      String?
-  uploadedById String?
-  createdAt    DateTime  @default(now())
-  bike         BikeUnit? @relation(fields: [bikeId], references: [id])
-  order        Order?    @relation(fields: [orderId], references: [id])
-  uploadedBy   User?     @relation(fields: [uploadedById], references: [id])
-
-  @@index([fileType])
-}
-
-model AuditLog {
-  id         String      @id @default(uuid())
-  userId     String?
-  userRole   UserRole?
-  action     AuditAction
-  entityType String
-  entityId   String
-  oldValue   Json?
-  newValue   Json?
-  ipAddress  String?
-  createdAt  DateTime    @default(now())
-  user       User?       @relation(fields: [userId], references: [id])
-
-  @@index([entityType])
-  @@index([entityId])
-  @@index([action])
-  @@index([createdAt])
-}
+// ============================================================================
+// ENUMS
+// ============================================================================
 
 enum UserRole {
   ADMIN
@@ -410,10 +64,7 @@ enum PaymentStatus {
 
 enum PaymentMethod {
   CASH
-  BANK_TRANSFER
-  SAFEPAY
-  JAZZCASH
-  RAAST
+  ONLINE_TRANSFER
 }
 
 enum OrderType {
@@ -435,7 +86,6 @@ enum AuditAction {
   APPROVE
   REJECT
   PAYMENT
-  REFUND
 }
 
 enum InventoryMovementType {
@@ -454,4 +104,512 @@ enum FileType {
   SALES_INVOICE
   PAYMENT_RECEIPT
   SALE_AGREEMENT
+}
+
+// ============================================================================
+// AUTH & USERS
+// ============================================================================
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  fullName     String
+  phoneNumber  String?
+  role         UserRole
+  status       UserStatus @default(ACTIVE)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
+  vendorId String?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  refreshTokens RefreshToken[]
+
+  auditLogs AuditLog[]
+
+  processedOrders     Order[]     @relation("OrderProcessedBy")
+  customerOrders      Order[]     @relation("OrderCustomer")
+  processedPartOrders PartOrder[] @relation("PartOrderProcessedBy")
+  customerPartOrders  PartOrder[] @relation("PartOrderCustomer")
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  managedBranches Branch[]        @relation("BranchManager")
+  stockMovements  StockMovement[]
+  documents       Document[]
+  orderAlerts     OrderAlert[]
+
+  @@index([email])
+  @@index([role])
+  @@index([branchId])
+  @@index([vendorId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ============================================================================
+// BRANCHES & VENDORS
+// ============================================================================
+
+model Branch {
+  id          String  @id @default(uuid())
+  name        String
+  city        String
+  address     String
+  phoneNumber String?
+
+  managerId String?
+  manager   User?   @relation("BranchManager", fields: [managerId], references: [id])
+
+  users User[]
+
+  bikeInventory BikeUnit[]
+  partInventory PartInventory[]
+
+  orders     Order[]
+  partOrders PartOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, city])
+}
+
+model Vendor {
+  id            String  @id @default(uuid())
+  name          String
+  contactPerson String?
+  phoneNumber   String?
+  email         String?
+  address       String?
+
+  suppliedBikes BikeUnit[]
+  staff         User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================================
+// BIKE CATALOG
+// ============================================================================
+
+model BikeModel {
+  id String @id @default(uuid())
+
+  brand          String
+  modelName      String
+  year           Int
+  engineCapacity String?
+  color          String?
+
+  description String?
+  basePrice   Decimal @db.Decimal(12, 2)
+
+  bikes BikeUnit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brand])
+  @@index([modelName])
+}
+
+model BikeUnit {
+  id String @id @default(uuid())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  modelId String
+  model   BikeModel @relation(fields: [modelId], references: [id])
+
+  chassisNumber String  @unique
+  engineNumber  String  @unique
+  serialNumber  String?
+
+  status BikeStatus @default(AVAILABLE)
+
+  price Decimal? @db.Decimal(12, 2)
+  color String?
+  media String[] @default([])
+
+  onlineDiscountPercent Decimal  @default(2) @db.Decimal(5, 2)
+  actualSalePrice       Decimal? @db.Decimal(12, 2)
+
+  reservedUntil DateTime?
+  soldAt        DateTime?
+
+  documents Document[]
+
+  orders Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([branchId])
+  @@index([modelId])
+  @@index([vendorId])
+  @@index([reservedUntil])
+}
+
+// ============================================================================
+// PARTS & ACCESSORIES
+// ============================================================================
+
+model Part {
+  id String @id @default(uuid())
+
+  name     String
+  sku      String @unique
+  category String
+
+  description  String?
+  sellingPrice Decimal @db.Decimal(12, 2)
+
+  inventories PartInventory[]
+  partOrders  PartOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
+
+model PartInventory {
+  id String @id @default(uuid())
+
+  partId String
+  part   Part   @relation(fields: [partId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  quantity         Int @default(0)
+  reservedQuantity Int @default(0)
+  reorderLevel     Int @default(5)
+
+  stockMovements StockMovement[]
+  partOrders     PartOrder[]
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([partId, branchId])
+  @@index([branchId])
+}
+
+model StockMovement {
+  id String @id @default(uuid())
+
+  inventoryId String
+  inventory   PartInventory @relation(fields: [inventoryId], references: [id])
+
+  movementType InventoryMovementType
+
+  quantity Int
+  reason   String?
+
+  performedById String?
+  performedBy   User?   @relation(fields: [performedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([inventoryId])
+}
+
+// ============================================================================
+// ORDERS
+// ============================================================================
+
+model Order {
+  id String @id @default(uuid())
+
+  orderNumber String @unique
+
+  bikeId String
+  bike   BikeUnit @relation(fields: [bikeId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  customerName    String
+  customerPhone   String
+  customerCNIC    String?
+  customerAddress String?
+
+  isOnlineOrder   Boolean  @default(false)
+  appliedDiscount Decimal? @db.Decimal(12, 2)
+
+  paymentMethod PaymentMethod
+
+  status OrderStatus @default(PENDING_PAYMENT)
+
+  paymentVerified   Boolean    @default(false)
+  orderType         OrderType  @default(ONSITE)
+  reservationExpiry DateTime?
+  pickupType        PickupType @default(ONSITE_PICKUP)
+
+  expiresAt DateTime?
+
+  processedById String?
+  processedBy   User?   @relation("OrderProcessedBy", fields: [processedById], references: [id])
+
+  customerId String?
+  customer   User?   @relation("OrderCustomer", fields: [customerId], references: [id])
+
+  transactions PaymentTransaction[]
+
+  delivery DeliveryRequest?
+
+  documents Document[]
+
+  alerts OrderAlert[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([branchId])
+  @@index([createdAt])
+  @@index([customerId])
+}
+
+model OrderAlert {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  isRead    Boolean  @default(false)
+  alertType String // NEW_ORDER, PAYMENT_PENDING, EXPIRY_WARNING
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+}
+
+model PartOrder {
+  id String @id @default(uuid())
+
+  orderNumber String @unique
+
+  partId String
+  part   Part   @relation(fields: [partId], references: [id])
+
+  partInventoryId String
+  partInventory   PartInventory @relation(fields: [partInventoryId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  customerName    String
+  customerPhone   String
+  customerAddress String
+
+  quantity Int
+  amount   Decimal @db.Decimal(12, 2)
+
+  paymentMethod PaymentMethod
+
+  status OrderStatus @default(PENDING_PAYMENT)
+
+  paymentVerified   Boolean    @default(false)
+  orderType         OrderType  @default(ONSITE)
+  reservationExpiry DateTime?
+  pickupType        PickupType @default(ONSITE_PICKUP)
+
+  expiresAt DateTime?
+
+  processedById String?
+  processedBy   User?   @relation("PartOrderProcessedBy", fields: [processedById], references: [id])
+
+  customerId String?
+  customer   User?   @relation("PartOrderCustomer", fields: [customerId], references: [id])
+
+  transactions PartPaymentTransaction[]
+
+  delivery DeliveryRequest?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([branchId])
+  @@index([createdAt])
+  @@index([customerId])
+}
+
+// ============================================================================
+// PAYMENTS
+// ============================================================================
+
+model PaymentTransaction {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  gatewayReference String? @unique
+  idempotencyKey   String? @unique
+
+  amount Decimal @db.Decimal(12, 2)
+
+  method PaymentMethod
+
+  status PaymentStatus @default(PENDING)
+
+  gatewayResponse Json?
+
+  failureReason String?
+
+  paymentProofUrl String?
+  verifiedAt      DateTime?
+  verifiedById    String?
+
+  webhookReceivedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([gatewayReference])
+}
+
+model PartPaymentTransaction {
+  id String @id @default(uuid())
+
+  partOrderId String
+  partOrder   PartOrder @relation(fields: [partOrderId], references: [id])
+
+  gatewayReference String? @unique
+  idempotencyKey   String? @unique
+
+  amount Decimal @db.Decimal(12, 2)
+
+  method PaymentMethod
+
+  status PaymentStatus @default(PENDING)
+
+  gatewayResponse Json?
+
+  failureReason String?
+
+  paymentProofUrl String?
+  verifiedAt      DateTime?
+  verifiedById    String?
+
+  webhookReceivedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([gatewayReference])
+}
+
+// ============================================================================
+// DELIVERY
+// ============================================================================
+
+model DeliveryRequest {
+  id String @id @default(uuid())
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  partOrderId String?
+  partOrder   PartOrder? @relation(fields: [partOrderId], references: [id])
+
+  deliveryAddress     String
+  preferredTimeWindow String?
+  contactNumber       String
+
+  status DeliveryStatus @default(REQUESTED)
+
+  approvedAt  DateTime?
+  deliveredAt DateTime?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId])
+  @@unique([partOrderId])
+  @@index([status])
+}
+
+// ============================================================================
+// DOCUMENT MANAGEMENT
+// ============================================================================
+
+model Document {
+  id String @id @default(uuid())
+
+  fileName String
+  fileUrl  String
+
+  mimeType String
+  fileSize Int
+
+  fileType FileType
+
+  bikeId String?
+  bike   BikeUnit? @relation(fields: [bikeId], references: [id])
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  uploadedById String?
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([fileType])
+}
+
+// ============================================================================
+// AUDIT LOGS
+// ============================================================================
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  userRole UserRole?
+
+  action AuditAction
+
+  entityType String
+  entityId   String
+
+  oldValue Json?
+  newValue Json?
+
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType])
+  @@index([entityId])
+  @@index([action])
+  @@index([createdAt])
 }

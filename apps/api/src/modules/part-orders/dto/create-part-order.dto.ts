@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsDecimal, IsEnum, IsNotEmpty, Min } from 'class-validator';
+import { IsString, IsInt, IsDecimal, IsEnum, IsNotEmpty, IsOptional, Min } from 'class-validator';
 import { PaymentMethod } from '@khan/prisma';
 
 export class CreatePartOrderDto {
@@ -29,4 +29,8 @@ export class CreatePartOrderDto {
   @IsEnum(PaymentMethod)
   @IsNotEmpty()
   paymentMethod: PaymentMethod;
+
+  @IsOptional()
+  @IsString()
+  paymentProofUrl?: string;
 }

@@ -19,7 +19,7 @@ export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly orderAlertsService: OrderAlertsService,
-  ) {}
+  ) { }
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -222,7 +222,7 @@ export class OrdersService {
       const salePrice = basePrice * 0.98;
       const discountAmount = basePrice - salePrice;
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-      
+
       // Set expiry: 2 days for cash (onsite pickup), 7 days for online
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + (isCash ? 2 : 7));
@@ -237,7 +237,6 @@ export class OrdersService {
           customerPhone: dto.customerPhone,
           customerCNIC: dto.customerCNIC || null,
           customerAddress: dto.customerAddress || null,
-          negotiatedAmount: salePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.PENDING_PAYMENT,
           expiresAt,
@@ -256,17 +255,21 @@ export class OrdersService {
           status: BikeStatus.RESERVED,
           soldAt: null,
           reservedUntil: expiresAt,
+          actualSalePrice: salePrice,
           ...(isCash ? {} : { onlineDiscountPercent: 2 }),
         },
       });
 
-      // Cash payment stays PENDING until customer picks up at store
+      // Cash stays PENDING until customer picks up at store.
+      // Online with a proof URL → VERIFICATION_PENDING (awaiting admin review).
       const transaction = await tx.paymentTransaction.create({
         data: {
           orderId: order.id,
           amount: salePrice,
           method: dto.paymentMethod,
-          status: (dto.paymentMethod !== "CASH" && dto.paymentProofUrl) ? PaymentStatus.VERIFICATION_PENDING : PaymentStatus.PENDING,
+          status: !isCash && dto.paymentProofUrl
+            ? PaymentStatus.VERIFICATION_PENDING
+            : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
         },
       });
@@ -377,6 +380,7 @@ export class OrdersService {
 
   /**
    * Advance order through valid state transitions only
+   * Applies inventory side effects: DELIVERED → bike SOLD, CANCELLED → bike AVAILABLE
    */
   async updateOrderStatus(id: string, dto: UpdateOrderStatusDto, user: any) {
     const order = await this.getOrderById(id, user);
@@ -399,28 +403,55 @@ export class OrdersService {
       );
     }
 
-    return this.prisma.client.order.update({
-      where: { id },
-      data: {
-        status: newStatus,
-        processedById: user.id,
-      },
-      include: {
-        bike: {
-          include: {
-            model: true,
-            branch: true,
+    return this.prisma.client.$transaction(async (tx) => {
+      const updatedOrder = await tx.order.update({
+        where: { id },
+        data: {
+          status: newStatus,
+          processedById: user.id,
+        },
+        include: {
+          bike: {
+            include: {
+              model: true,
+              branch: true,
+            },
+          },
+          branch: true,
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
           },
         },
-        branch: true,
-        processedBy: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
+      });
+
+      // Side effects: keep bike status in sync with order lifecycle
+      if (newStatus === OrderStatus.DELIVERED && order.bike.status !== BikeStatus.SOLD) {
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.SOLD,
+            soldAt: new Date(),
+            reservedUntil: null,
           },
-        },
-      },
+        });
+      }
+
+      if (newStatus === OrderStatus.CANCELLED) {
+        await tx.bikeUnit.update({
+          where: { id: order.bikeId },
+          data: {
+            status: BikeStatus.AVAILABLE,
+            reservedUntil: null,
+            soldAt: null,
+          },
+        });
+      }
+
+      return updatedOrder;
     });
   }
 
@@ -477,7 +508,7 @@ export class OrdersService {
 
       // 4. Update any associated payment transactions to FAILED
       await tx.paymentTransaction.updateMany({
-        where: { 
+        where: {
           orderId: id,
           status: { not: PaymentStatus.FAILED }
         },
@@ -555,18 +586,16 @@ export class OrdersService {
         where: { orderId, status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] } }
       });
 
-      let transaction;
-      if (existingTx) {
-        transaction = await tx.paymentTransaction.update({
-          where: { id: existingTx.id },
+      // 5. For CASH payments: set order → PAID, bike → SOLD (sale is finalized immediately)
+      // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
+      if (dto.method === "CASH") {
+        await tx.order.update({
+          where: { id: orderId },
           data: {
-            amount: dto.amount,
-            method: dto.method,
-            gatewayReference: dto.referenceNumber || null,
-            status: PaymentStatus.SUCCESS,
-            verifiedAt: new Date(),
-            verifiedById: user.id,
-          }
+            status: OrderStatus.PAID,
+            reservationExpiry: null,
+            processedById: user.id,
+          },
         });
       } else {
         transaction = await tx.paymentTransaction.create({
@@ -717,7 +746,7 @@ export class OrdersService {
       // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
         where: { chassisNumber: dto.chassisNumber },
-        include: { 
+        include: {
           branch: true,
           model: true,
         },
@@ -768,7 +797,6 @@ export class OrdersService {
           customerPhone: dto.customerPhone,
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
-          negotiatedAmount: finalSalePrice,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.CONFIRMED,
           expiresAt,
@@ -776,7 +804,7 @@ export class OrdersService {
           isOnlineOrder,
           orderType,
           pickupType: orderType === "ONLINE" ? "DELIVERY" : "ONSITE_PICKUP",
-          customerId: dto.customerId ?? user.id,
+          customerId: dto.customerId ?? null,
         },
       });
 
@@ -1184,7 +1212,7 @@ export class OrdersService {
    */
   async expireReservations() {
     const now = new Date();
-    
+
     const expiredOrders = await this.prisma.client.order.findMany({
       where: {
         reservationExpiry: {
@@ -1229,7 +1257,7 @@ export class OrdersService {
 
           // Update any associated payment transactions to FAILED
           await tx.paymentTransaction.updateMany({
-            where: { 
+            where: {
               orderId: order.id,
               status: { not: PaymentStatus.FAILED }
             },
@@ -1244,9 +1272,9 @@ export class OrdersService {
               action: AuditAction.UPDATE,
               entityType: "ORDER",
               entityId: order.id,
-              newValue: JSON.stringify({ 
-                status: OrderStatus.CANCELLED, 
-                reason: "Reservation expired" 
+              newValue: JSON.stringify({
+                status: OrderStatus.CANCELLED,
+                reason: "Reservation expired"
               }),
             },
           });
@@ -1357,7 +1385,7 @@ export class OrdersService {
     const revenueByBranch = orders.reduce((acc, order) => {
       const branchId = order.branchId;
       const branchRevenue = order.transactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
-      
+
       if (!acc[branchId]) {
         acc[branchId] = {
           branchId,
@@ -1366,10 +1394,10 @@ export class OrdersService {
           orderCount: 0,
         };
       }
-      
+
       acc[branchId].revenue += branchRevenue;
       acc[branchId].orderCount += 1;
-      
+
       return acc;
     }, {} as Record<string, any>);
 

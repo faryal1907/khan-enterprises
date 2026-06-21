@@ -1,7 +1,42 @@
+
+> web@0.1.0 build
+> next build
+
 ▲ Next.js 16.2.6 (Turbopack)
 - Environments: .env.local, .env.production
 
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-✓ Compiled successfully in 10.8s
+✓ Compiled successfully in 8.0s
   Running TypeScript ...
+  Finished TypeScript in 10.6s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/13) ...
+  Generating static pages using 15 workers (3/13) 
+  Generating static pages using 15 workers (6/13) 
+  Generating static pages using 15 workers (9/13) 
+✓ Generating static pages using 15 workers (13/13) in 624ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /auth/callback
+├ ○ /bikes
+├ ƒ /bikes/[id]
+├ ○ /login
+├ ○ /orders
+├ ƒ /orders/[orderNumber]
+├ ○ /orders/new
+├ ○ /part-orders/new
+├ ○ /parts
+├ ƒ /parts/[id]
+├ ○ /search
+└ ○ /signup
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -165,7 +165,10 @@ export class DeliveriesService {
     if (user?.role === "CUSTOMER") {
       where.order = {
         ...where.order,
-        customerPhone: user.phoneNumber,
+        OR: [
+          { customerId: user.id },
+          { customerPhone: user.phoneNumber },
+        ],
       };
     }
 

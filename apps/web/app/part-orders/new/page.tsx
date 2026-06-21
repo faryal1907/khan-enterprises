@@ -33,7 +33,7 @@ export default function NewPartOrderPage() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<"CASH" | "BANK_TRANSFER" | "SAFEPAY" | "JAZZCASH" | "">("");
+  const [paymentMethod, setPaymentMethod] = useState<"CASH" | "ONLINE_TRANSFER" | "">("");
 
   const [createdOrder, setCreatedOrder] = useState<any>(null);
   const [paymentProofUrl, setPaymentProofUrl] = useState("");
@@ -102,6 +102,7 @@ export default function NewPartOrderPage() {
         customerAddress,
         quantity,
         paymentMethod,
+        paymentProofUrl: paymentMethod === "ONLINE_TRANSFER" ? paymentProofUrl || undefined : undefined,
       });
 
       setCreatedOrder(response.order);
@@ -250,7 +251,7 @@ export default function NewPartOrderPage() {
     );
   }
 
-  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "BANK_TRANSFER" && proofUploaded);
+  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -329,23 +330,23 @@ export default function NewPartOrderPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setPaymentMethod("BANK_TRANSFER")}
+                onClick={() => setPaymentMethod("ONLINE_TRANSFER")}
                 className="p-4 rounded-lg text-left transition-all"
                 style={{
-                  backgroundColor: paymentMethod === "BANK_TRANSFER" ? theme.accents.primary : theme.backgrounds.tertiary,
-                  color: paymentMethod === "BANK_TRANSFER" ? theme.text.inverse : theme.text.primary,
-                  border: `2px solid ${paymentMethod === "BANK_TRANSFER" ? theme.accents.primary : theme.borders.medium}`,
+                  backgroundColor: paymentMethod === "ONLINE_TRANSFER" ? theme.accents.primary : theme.backgrounds.tertiary,
+                  color: paymentMethod === "ONLINE_TRANSFER" ? theme.text.inverse : theme.text.primary,
+                  border: `2px solid ${paymentMethod === "ONLINE_TRANSFER" ? theme.accents.primary : theme.borders.medium}`,
                 }}
               >
-                <p className="font-semibold">Bank Transfer</p>
-                <p className="text-xs mt-1 opacity-80">2% discount, delivery available</p>
+                <p className="font-semibold">Online Transfer</p>
+                <p className="text-xs mt-1 opacity-80">Pay via bank transfer or mobile wallet</p>
                 <p className="text-sm font-bold mt-2">PKR {totalPrice.toLocaleString()}</p>
               </button>
             </div>
           </div>
 
-          {/* Payment Proof Upload for BANK_TRANSFER */}
-          {paymentMethod === "BANK_TRANSFER" && (
+          {/* Payment Proof Upload for ONLINE_TRANSFER */}
+          {paymentMethod === "ONLINE_TRANSFER" && (
             <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
               <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
               <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>

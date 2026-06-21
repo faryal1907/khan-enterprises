@@ -90,6 +90,14 @@ interface UnifiedOrder {
     name: string;
     city: string;
   };
+  transactions?: Array<{
+    id: string;
+    status: string;
+    method: string;
+    amount: number;
+    createdAt: string;
+    paymentProofUrl?: string | null;
+  }>;
 }
 
 export default function CustomerOrdersPage() {
@@ -200,7 +208,7 @@ export default function CustomerOrdersPage() {
     }
     
     // 2. Check for verification pending on online payments
-    const hasVerificationPending = (order as any).transactions?.some((tx: any) => tx.status === "VERIFICATION_PENDING");
+    const hasVerificationPending = order.transactions?.some((tx) => tx.status === "VERIFICATION_PENDING");
     if (hasVerificationPending) return "VERIFICATION_PENDING";
     
     // 3. Default fallback
@@ -209,6 +217,61 @@ export default function CustomerOrdersPage() {
 
   const getStatusLabel = (status: string) => {
     return status.replace(/_/g, " ");
+  };
+
+  const getPaymentStatusBadgeStyle = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return {
+          backgroundColor: "#FEF3C7",
+          color: "#92400E",
+          border: "1px solid #F59E0B",
+        };
+      case "VERIFICATION_PENDING":
+        return {
+          backgroundColor: "#FEF9C3",
+          color: "#713F12",
+          border: "1px solid #D97706",
+        };
+      case "SUCCESS":
+        return {
+          backgroundColor: "#D1FAE5",
+          color: "#065F46",
+          border: "1px solid #10B981",
+        };
+      case "FAILED":
+        return {
+          backgroundColor: "#FEE2E2",
+          color: "#991B1B",
+          border: "1px solid #EF4444",
+        };
+      default:
+        return {
+          backgroundColor: theme.backgrounds.tertiary,
+          color: theme.text.secondary,
+          border: `1px solid ${theme.borders.medium}`,
+        };
+    }
+  };
+
+  const getPaymentStatus = (order: UnifiedOrder): string | null => {
+    const transactions = order.transactions;
+    if (!transactions || transactions.length === 0) return null;
+    // Return the status of the latest transaction
+    const latest = [...transactions].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )[0];
+    return latest?.status ?? null;
+  };
+
+  const getPaymentStatusLabel = (status: string) => {
+    switch (status) {
+      case "PENDING": return "Payment Pending";
+      case "VERIFICATION_PENDING": return "Proof Submitted";
+      case "SUCCESS": return "Payment Verified";
+      case "FAILED": return "Payment Failed";
+      default: return status.replace(/_/g, " ");
+    }
   };
 
   // Filter orders based on activeTab (history vs current)
@@ -326,6 +389,18 @@ export default function CustomerOrdersPage() {
                       >
                         {getStatusLabel(getDisplayStatus(order))}
                       </span>
+                      {(() => {
+                        const paymentStatus = getPaymentStatus(order);
+                        if (!paymentStatus) return null;
+                        return (
+                          <span
+                            className="inline-block px-3 py-1 text-xs font-medium rounded-full"
+                            style={getPaymentStatusBadgeStyle(paymentStatus)}
+                          >
+                            {getPaymentStatusLabel(paymentStatus)}
+                          </span>
+                        );
+                      })()}
                       {activeTab === "current" && getDisplayStatus(order) === "PENDING_PAYMENT" && (order.expiresAt || order.createdAt) && (
                         <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />
                       )}

@@ -30,10 +30,14 @@ export default function LoginPage() {
       setAuth(user, accessToken, refreshToken);
       router.push("/");
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-        ?? "Invalid email or password.";
-      setError(message);
+      const status = (err as { response?: { status?: number; data?: { message?: string } } })?.response?.status;
+      const apiMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+
+      if (status === 429) {
+        setError("Too many login attempts. Please wait a minute and try again.");
+      } else {
+        setError(apiMessage ?? "Invalid email or password.");
+      }
     }
   };
 

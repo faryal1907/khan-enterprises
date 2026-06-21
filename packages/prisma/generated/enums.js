@@ -41,10 +41,7 @@ exports.PaymentStatus = {
 };
 exports.PaymentMethod = {
     CASH: 'CASH',
-    BANK_TRANSFER: 'BANK_TRANSFER',
-    SAFEPAY: 'SAFEPAY',
-    JAZZCASH: 'JAZZCASH',
-    RAAST: 'RAAST'
+    ONLINE_TRANSFER: 'ONLINE_TRANSFER'
 };
 exports.OrderType = {
     ONLINE: 'ONLINE',
@@ -62,8 +59,7 @@ exports.AuditAction = {
     LOGOUT: 'LOGOUT',
     APPROVE: 'APPROVE',
     REJECT: 'REJECT',
-    PAYMENT: 'PAYMENT',
-    REFUND: 'REFUND'
+    PAYMENT: 'PAYMENT'
 };
 exports.InventoryMovementType = {
     STOCK_IN: 'STOCK_IN',

@@ -151,13 +151,17 @@ export class PartOrdersService {
         },
       });
 
-      // 7. Create payment transaction (cash stays PENDING until picked up at store)
+      // Cash stays PENDING until picked up at store.
+      // Online with a proof URL → VERIFICATION_PENDING (awaiting admin review).
       const transaction = await tx.partPaymentTransaction.create({
         data: {
           partOrderId: partOrder.id,
           amount,
           method: dto.paymentMethod,
-          status: PaymentStatus.PENDING,
+          status: !isCash && dto.paymentProofUrl
+            ? PaymentStatus.VERIFICATION_PENDING
+            : PaymentStatus.PENDING,
+          paymentProofUrl: dto.paymentProofUrl || null,
         },
       });
 
@@ -589,7 +593,7 @@ export class PartOrdersService {
         data: {
           inventoryId: inventory.id,
           movementType: "STOCK_OUT",
-          quantity: dto.quantity,
+          quantity: -dto.quantity,
           reason: `Manual sale: ${orderNumber}`,
           performedById: user.id,
         },
@@ -764,36 +768,12 @@ export class PartOrdersService {
         );
       }
 
-      // 4. Update part order status to DELIVERED
+      // 5. Update part order status to DELIVERED
       const updatedOrder = await tx.partOrder.update({
         where: { id: orderId },
         data: {
           status: OrderStatus.DELIVERED,
           processedById: user.id,
-        },
-      });
-
-      // 5. Update part inventory (clear reserved quantity and deduct stock)
-      await tx.partInventory.update({
-        where: { id: order.partInventoryId },
-        data: {
-          quantity: {
-            decrement: order.quantity,
-          },
-          reservedQuantity: {
-            decrement: order.quantity,
-          },
-        },
-      });
-
-      // Create stock movement record
-      await tx.stockMovement.create({
-        data: {
-          inventoryId: order.partInventoryId,
-          movementType: "STOCK_OUT",
-          quantity: -order.quantity,
-          reason: `Part order picked by customer: ${updatedOrder.orderNumber}`,
-          performedById: user.id,
         },
       });
 
