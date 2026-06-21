@@ -88,6 +88,15 @@ export async function recordPayment(id: string, data: {
   return response.data;
 }
 
+export async function recordPartOrderPayment(id: string, data: {
+  method: string;
+  amount: number;
+  referenceNumber?: string;
+}) {
+  const response = await api.post(`/part-orders/${id}/payment`, data);
+  return response.data;
+}
+
 export async function verifyPayment(id: string, transactionId: string, isApproved: boolean = true, reason?: string) {
   const response = await api.post(`/orders/${id}/verify-payment`, { transactionId, isApproved, reason });
   return response.data;

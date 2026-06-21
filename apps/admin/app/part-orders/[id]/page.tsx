@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, UserRole } from "@/lib/types";
-import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice, markPartOrderAsPickedByCustomer, verifyPartPayment } from "@/lib/api/orders";
+import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice, markPartOrderAsPickedByCustomer, verifyPartPayment, recordPartOrderPayment } from "@/lib/api/orders";
 import { approveDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
@@ -25,6 +25,12 @@ export default function PartOrderDetailPage() {
   const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentData, setPaymentData] = useState({
+    method: PaymentMethod.CASH,
+    amount: 0,
+    referenceNumber: "",
+  });
 
   const fetchOrder = useCallback(async () => {
     setLoading(true);
@@ -32,6 +38,7 @@ export default function PartOrderDetailPage() {
     try {
       const data = await getPartOrderById(orderId);
       setOrder(data);
+      setPaymentData((prev) => ({ ...prev, amount: data.amount || 0 }));
     } catch (fetchError: any) {
       setError(fetchError.response?.data?.message || "Failed to fetch part order");
       setOrder(null);
@@ -134,6 +141,26 @@ export default function PartOrderDetailPage() {
     }
   };
 
+  const handleRecordPayment = async () => {
+    try {
+      setActionLoading(true);
+      const paymentPayload = {
+        ...paymentData,
+        amount: Number(paymentData.amount),
+      };
+      await recordPartOrderPayment(orderId, paymentPayload);
+      const updatedOrder = await getPartOrderById(orderId);
+      setOrder(updatedOrder);
+      setShowPaymentModal(false);
+      toast.success("Payment recorded successfully");
+    } catch (error: any) {
+      console.warn("Failed to record payment:", error?.message || error);
+      toast.error(error?.message || "Failed to record payment");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const pendingVerificationTx = order?.transactions?.find((tx: any) => tx.status === "VERIFICATION_PENDING");
 
   const getActionButton = () => {
@@ -167,11 +194,11 @@ export default function PartOrderDetailPage() {
         }
         return (
           <AsyncButton
-            onClick={() => handleStatusUpdate(OrderStatus.PAID)}
-            loading={actionLoading}
+            onClick={() => setShowPaymentModal(true)}
+            disabled={actionLoading || !!pendingVerificationTx}
             className="px-6"
           >
-            Mark as Paid
+            {pendingVerificationTx ? "Verification Pending" : "Record Payment"}
           </AsyncButton>
         );
       case OrderStatus.PAID:
@@ -669,6 +696,100 @@ export default function PartOrderDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <ActionModal
+          title="Record Payment"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowPaymentModal(false);
+          }}
+        >
+          <div className="space-y-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Payment Method
+              </label>
+              <select
+                value={paymentData.method}
+                onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value as PaymentMethod })}
+                disabled={actionLoading}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              >
+                <option value={PaymentMethod.CASH}>Cash</option>
+                <option value={PaymentMethod.ONLINE_TRANSFER}>Online Transfer</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Amount
+              </label>
+              <input
+                type="number"
+                value={paymentData.amount}
+                onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
+                disabled={actionLoading}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              />
+            </div>
+            {paymentData.method !== PaymentMethod.CASH && (
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                  Reference Number (optional)
+                </label>
+                <input
+                  type="text"
+                  value={paymentData.referenceNumber}
+                  onChange={(e) => setPaymentData({ ...paymentData, referenceNumber: e.target.value })}
+                  disabled={actionLoading}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="e.g. Transaction ID"
+                />
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => setShowPaymentModal(false)}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleRecordPayment}
+              disabled={actionLoading}
+              loading={actionLoading}
+              loadingLabel="Recording..."
+              style={{
+                backgroundColor: theme.accents.primary,
+              }}
+            >
+              Record Payment
+            </AsyncButton>
+          </div>
+        </ActionModal>
       )}
 
       {/* Cancel Modal */}
