@@ -534,7 +534,7 @@ export class OrdersService {
       await tx.paymentTransaction.updateMany({
         where: {
           orderId: id,
-          status: { notIn: [PaymentStatus.FAILED, PaymentStatus.SUCCESS] }
+          status: { not: PaymentStatus.FAILED }
         },
         data: {
           status: PaymentStatus.CANCELLED,
@@ -612,15 +612,16 @@ export class OrdersService {
 
       let transaction: any = existingTx;
 
-      // 5. For CASH payments: set order → PAID, bike → SOLD (sale is finalized immediately)
-      // For non-CASH payments: keep order in PENDING_PAYMENT status for verification
-      if (dto.method === "CASH") {
-        await tx.order.update({
-          where: { id: orderId },
+      if (existingTx) {
+        transaction = await tx.paymentTransaction.update({
+          where: { id: existingTx.id },
           data: {
-            status: OrderStatus.PAID,
-            reservationExpiry: null,
-            processedById: user.id,
+            amount: dto.amount,
+            method: dto.method,
+            gatewayReference: dto.referenceNumber || null,
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
           },
         });
       } else {

@@ -520,6 +520,17 @@ export class PartOrdersService {
         },
       });
 
+      // Update associated payment transactions to CANCELLED
+      await tx.partPaymentTransaction.updateMany({
+        where: {
+          partOrderId: id,
+          status: { not: PaymentStatus.FAILED }
+        },
+        data: {
+          status: PaymentStatus.CANCELLED,
+        },
+      });
+
       await this.restorePartOrderStock(tx, order);
 
       await tx.auditLog.create({
@@ -914,6 +925,15 @@ export class PartOrdersService {
           where: { id: partOrderId },
           data: {
             status: OrderStatus.PAID,
+            paymentVerified: true,
+            processedById: user.id,
+          },
+        });
+      } else {
+        await tx.partOrder.update({
+          where: { id: partOrderId },
+          data: {
+            paymentVerified: false,
             processedById: user.id,
           },
         });
@@ -959,16 +979,38 @@ export class PartOrdersService {
     }
 
     return this.prisma.client.$transaction(async (tx) => {
-      // Create payment transaction
-      const transaction = await tx.partPaymentTransaction.create({
-        data: {
-          partOrderId,
-          amount: dto.amount,
-          method: dto.method,
-          gatewayReference: dto.referenceNumber || null,
-          status: dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
-        },
+      const existingTx = await tx.partPaymentTransaction.findFirst({
+        where: { partOrderId, status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] } }
       });
+
+      const txStatus = dto.method === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING;
+
+      let transaction;
+      if (existingTx) {
+        transaction = await tx.partPaymentTransaction.update({
+          where: { id: existingTx.id },
+          data: {
+            amount: dto.amount,
+            method: dto.method,
+            gatewayReference: dto.referenceNumber || null,
+            status: txStatus,
+            verifiedAt: txStatus === PaymentStatus.SUCCESS ? new Date() : null,
+            verifiedById: txStatus === PaymentStatus.SUCCESS ? user.id : null,
+          },
+        });
+      } else {
+        transaction = await tx.partPaymentTransaction.create({
+          data: {
+            partOrderId,
+            amount: dto.amount,
+            method: dto.method,
+            gatewayReference: dto.referenceNumber || null,
+            status: txStatus,
+            verifiedAt: txStatus === PaymentStatus.SUCCESS ? new Date() : null,
+            verifiedById: txStatus === PaymentStatus.SUCCESS ? user.id : null,
+          },
+        });
+      }
 
       // For cash payments, update order status to PAID
       if (dto.method === "CASH") {
@@ -976,6 +1018,7 @@ export class PartOrdersService {
           where: { id: partOrderId },
           data: {
             status: OrderStatus.PAID,
+            paymentVerified: true,
             processedById: user.id,
           },
         });
