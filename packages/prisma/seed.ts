@@ -47,7 +47,7 @@ async function main() {
     data: {
       name: "Islamabad Branch",
       city: "Islamabad",
-      address: "Noghazi Shop, Fateh Jang Road, Near Faisal Town, Islamabad",
+      address: "Nogazi Shop, Fateh Jang Road, Near Faisal Town, Islamabad",
       phoneNumber: "+923119143977",
     },
   });

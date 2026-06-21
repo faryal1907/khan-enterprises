@@ -2,11 +2,11 @@
 > @khan/prisma@1.0.0 prisma:generate
 > prisma generate
 
-◇ injected env (21) from ..\..\.env // tip: ⌘ enable debugging { debug: true }
-◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (21) from ..\..\.env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
 Loaded Prisma config from prisma.config.ts.
 
 Prisma schema loaded from schema.prisma.
 
-✔ Generated Prisma Client (7.8.0) to .\generated in 328ms
+✔ Generated Prisma Client (7.8.0) to .\generated in 258ms
 

@@ -246,22 +246,7 @@ export default function PartsPage() {
                         {part.category}
                       </p>
 
-                      {/* Stock Availability Indicator */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <span
-                          className="inline-block w-2.5 h-2.5 rounded-full"
-                          style={{
-                            backgroundColor: totalStock > 10 ? '#22c55e' : totalStock > 0 ? '#f59e0b' : '#ef4444',
-                          }}
-                        />
-                        <span className="text-xs font-medium" style={{ color: theme.text.secondary }}>
-                          {totalStock > 10
-                            ? 'In Stock'
-                            : totalStock > 0
-                            ? `Low Stock (${totalStock} left)`
-                            : 'Out of Stock'}
-                        </span>
-                      </div>
+                      
 
                       {/* Branch Info */}
                       {part.inventories && part.inventories.length > 0 && (
