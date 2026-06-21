@@ -428,6 +428,21 @@ export class PartOrdersService {
         },
       });
 
+      // Update payment transaction status when order is paid or beyond
+      if (status === OrderStatus.PAID || status === OrderStatus.CONFIRMED || status === OrderStatus.READY_FOR_DELIVERY || status === OrderStatus.DELIVERED) {
+        await tx.partPaymentTransaction.updateMany({
+          where: {
+            partOrderId: id,
+            status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] }
+          },
+          data: {
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          },
+        });
+      }
+
       // When order is confirmed, deduct the actual inventory quantity
       if (status === OrderStatus.CONFIRMED && currentStatus === OrderStatus.PAID) {
         await tx.partInventory.update({

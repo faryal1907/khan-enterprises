@@ -437,6 +437,21 @@ export class OrdersService {
         },
       });
 
+      // Update payment transaction status when order is paid or beyond
+      if (newStatus === OrderStatus.PAID || newStatus === OrderStatus.CONFIRMED || newStatus === OrderStatus.READY_FOR_DELIVERY || newStatus === OrderStatus.DELIVERED) {
+        await tx.paymentTransaction.updateMany({
+          where: {
+            orderId: id,
+            status: { in: [PaymentStatus.PENDING, PaymentStatus.VERIFICATION_PENDING] }
+          },
+          data: {
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+          },
+        });
+      }
+
       // Side effects: keep bike status in sync with order lifecycle
       if (newStatus === OrderStatus.DELIVERED && order.bike.status !== BikeStatus.SOLD) {
         await tx.bikeUnit.update({
