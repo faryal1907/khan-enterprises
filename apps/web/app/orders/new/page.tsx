@@ -153,6 +153,8 @@ export default function NewOrderPage() {
     if (!file) return;
     setSelectedFile(file);
     setPaymentProofPreview(URL.createObjectURL(file));
+    // Auto-upload the file immediately (pass file directly to avoid async state issue)
+    handleUploadPaymentProof(file);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -177,8 +179,9 @@ export default function NewOrderPage() {
     if (file) handleFileSelect(file);
   };
 
-  const handleUploadPaymentProof = async () => {
-    if (!selectedFile) {
+  const handleUploadPaymentProof = async (file?: File) => {
+    const fileToUpload = file || selectedFile;
+    if (!fileToUpload) {
       setError("Please select a file first");
       return;
     }
@@ -188,7 +191,7 @@ export default function NewOrderPage() {
       setError("");
 
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append("file", fileToUpload);
 
       const uploadResponse = await api.post("/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -431,18 +434,12 @@ export default function NewOrderPage() {
                 <p className="text-xs mb-4" style={{ color: theme.text.muted }}>Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</p>
               )}
 
-              {proofUploaded ? (
-                <p className="text-sm font-semibold" style={{ color: "#10B981" }}>Proof Uploaded</p>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleUploadPaymentProof}
-                  disabled={!selectedFile || uploadingProof}
-                  className="w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                  style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-                >
-                  {uploadingProof ? "Uploading..." : "Submit Payment Proof"}
-                </button>
+              {uploadingProof && (
+                <p className="text-sm font-semibold" style={{ color: theme.accents.primary }}>Uploading payment proof...</p>
+              )}
+
+              {proofUploaded && (
+                <p className="text-sm font-semibold" style={{ color: "#10B981" }}>Proof Uploaded ✓</p>
               )}
             </div>
           )}
