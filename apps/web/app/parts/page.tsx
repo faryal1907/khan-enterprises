@@ -265,7 +265,7 @@ export default function PartsPage() {
                                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                                   <circle cx="12" cy="10" r="3"/>
                                 </svg>
-                                {inv.branch?.name} — {inv.branch?.city}
+                                {inv.branch?.name} 
                               </span>
                               <span style={{
                                 color: inv.quantity > 10 ? '#22c55e' : inv.quantity > 0 ? '#f59e0b' : '#ef4444',

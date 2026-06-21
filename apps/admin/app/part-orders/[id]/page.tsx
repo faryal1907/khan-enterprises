@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, UserRole } from "@/lib/types";
 import { getPartOrderById, updatePartOrderStatus, cancelPartOrder, downloadInvoice, markPartOrderAsPickedByCustomer, verifyPartPayment } from "@/lib/api/orders";
-import { approveDelivery, rejectDelivery } from "@/lib/api/deliveries";
+import { approveDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
 import { ActionModal } from "@/components/action-modal";
@@ -24,8 +24,6 @@ export default function PartOrderDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [showRejectDeliveryModal, setShowRejectDeliveryModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
   const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
 
   const fetchOrder = useCallback(async () => {
@@ -104,23 +102,6 @@ export default function PartOrderDetailPage() {
     }
   };
 
-  const handleRejectDelivery = async () => {
-    if (!order?.delivery) return;
-    try {
-      setActionLoading(true);
-      await rejectDelivery(order.delivery.id, rejectReason);
-      const updatedOrder = await getPartOrderById(orderId);
-      setOrder(updatedOrder);
-      setShowRejectDeliveryModal(false);
-      setRejectReason("");
-      toast.success("Delivery rejected successfully");
-    } catch (error: any) {
-      console.warn("Failed to reject delivery:", error?.message || error);
-      toast.error(error?.message || "Failed to reject delivery");
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   const handleVerifyPayment = async () => {
     try {
@@ -220,17 +201,6 @@ export default function PartOrderDetailPage() {
                   }}
                 >
                   Approve Delivery
-                </button>
-                <button
-                  onClick={() => setShowRejectDeliveryModal(true)}
-                  disabled={actionLoading}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                  style={{
-                    backgroundColor: theme.accents.secondary,
-                    color: theme.text.inverse,
-                  }}
-                >
-                  Reject Delivery
                 </button>
               </div>
             );
@@ -740,63 +710,6 @@ export default function PartOrderDetailPage() {
         </ActionModal>
       )}
 
-      {/* Reject Delivery Modal */}
-      {showRejectDeliveryModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-          <div
-            className="rounded-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-              Reject Delivery Request
-            </h3>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                Reason for rejection (optional)
-              </label>
-              <textarea
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                rows={4}
-                placeholder="Enter reason for rejection..."
-              />
-            </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => {
-                  setShowRejectDeliveryModal(false);
-                  setRejectReason("");
-                }}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRejectDelivery}
-                disabled={actionLoading}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
-              >
-                {actionLoading ? "Rejecting..." : "Reject Delivery"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

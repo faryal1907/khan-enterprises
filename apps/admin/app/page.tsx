@@ -77,7 +77,6 @@ export default function Dashboard() {
           <div className="space-y-2 text-sm">
             <Info label="Role" value={user.role.replace(/_/g, " ")} />
             <Info label="Scope" value={scopeLabel} />
-            <Info label="Status" value={user.status} />
           </div>
         </div>
 

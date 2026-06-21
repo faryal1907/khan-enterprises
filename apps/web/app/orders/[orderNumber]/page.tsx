@@ -785,7 +785,7 @@ export default function OrderStatusPage() {
                       style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
                     >
                       <p className="text-sm" style={{ color: "#3730A3" }}>
-                        <span className="font-semibold">Note from admin:</span> {order.delivery.notes}
+                        <span className="font-semibold"></span> {order.delivery.notes}
                       </p>
                     </div>
                   )}
