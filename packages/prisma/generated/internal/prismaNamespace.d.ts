@@ -1491,6 +1491,7 @@ export declare const UserScalarFieldEnum: {
     readonly vendorId: "vendorId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
+    readonly fcmTokens: "fcmTokens";
 };
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
 export declare const RefreshTokenScalarFieldEnum: {
@@ -1616,6 +1617,7 @@ export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof Or
 export declare const OrderAlertScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
+    readonly partOrderId: "partOrderId";
     readonly userId: "userId";
     readonly isRead: "isRead";
     readonly alertType: "alertType";

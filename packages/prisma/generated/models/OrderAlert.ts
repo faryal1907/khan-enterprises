@@ -27,6 +27,7 @@ export type AggregateOrderAlert = {
 export type OrderAlertMinAggregateOutputType = {
   id: string | null
   orderId: string | null
+  partOrderId: string | null
   userId: string | null
   isRead: boolean | null
   alertType: string | null
@@ -36,6 +37,7 @@ export type OrderAlertMinAggregateOutputType = {
 export type OrderAlertMaxAggregateOutputType = {
   id: string | null
   orderId: string | null
+  partOrderId: string | null
   userId: string | null
   isRead: boolean | null
   alertType: string | null
@@ -45,6 +47,7 @@ export type OrderAlertMaxAggregateOutputType = {
 export type OrderAlertCountAggregateOutputType = {
   id: number
   orderId: number
+  partOrderId: number
   userId: number
   isRead: number
   alertType: number
@@ -56,6 +59,7 @@ export type OrderAlertCountAggregateOutputType = {
 export type OrderAlertMinAggregateInputType = {
   id?: true
   orderId?: true
+  partOrderId?: true
   userId?: true
   isRead?: true
   alertType?: true
@@ -65,6 +69,7 @@ export type OrderAlertMinAggregateInputType = {
 export type OrderAlertMaxAggregateInputType = {
   id?: true
   orderId?: true
+  partOrderId?: true
   userId?: true
   isRead?: true
   alertType?: true
@@ -74,6 +79,7 @@ export type OrderAlertMaxAggregateInputType = {
 export type OrderAlertCountAggregateInputType = {
   id?: true
   orderId?: true
+  partOrderId?: true
   userId?: true
   isRead?: true
   alertType?: true
@@ -155,7 +161,8 @@ export type OrderAlertGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 
 export type OrderAlertGroupByOutputType = {
   id: string
-  orderId: string
+  orderId: string | null
+  partOrderId: string | null
   userId: string
   isRead: boolean
   alertType: string
@@ -185,23 +192,27 @@ export type OrderAlertWhereInput = {
   OR?: Prisma.OrderAlertWhereInput[]
   NOT?: Prisma.OrderAlertWhereInput | Prisma.OrderAlertWhereInput[]
   id?: Prisma.StringFilter<"OrderAlert"> | string
-  orderId?: Prisma.StringFilter<"OrderAlert"> | string
+  orderId?: Prisma.StringNullableFilter<"OrderAlert"> | string | null
+  partOrderId?: Prisma.StringNullableFilter<"OrderAlert"> | string | null
   userId?: Prisma.StringFilter<"OrderAlert"> | string
   isRead?: Prisma.BoolFilter<"OrderAlert"> | boolean
   alertType?: Prisma.StringFilter<"OrderAlert"> | string
   createdAt?: Prisma.DateTimeFilter<"OrderAlert"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
+  partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type OrderAlertOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  orderId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  partOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   alertType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
+  partOrder?: Prisma.PartOrderOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -210,18 +221,21 @@ export type OrderAlertWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.OrderAlertWhereInput | Prisma.OrderAlertWhereInput[]
   OR?: Prisma.OrderAlertWhereInput[]
   NOT?: Prisma.OrderAlertWhereInput | Prisma.OrderAlertWhereInput[]
-  orderId?: Prisma.StringFilter<"OrderAlert"> | string
+  orderId?: Prisma.StringNullableFilter<"OrderAlert"> | string | null
+  partOrderId?: Prisma.StringNullableFilter<"OrderAlert"> | string | null
   userId?: Prisma.StringFilter<"OrderAlert"> | string
   isRead?: Prisma.BoolFilter<"OrderAlert"> | boolean
   alertType?: Prisma.StringFilter<"OrderAlert"> | string
   createdAt?: Prisma.DateTimeFilter<"OrderAlert"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
+  partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type OrderAlertOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  orderId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  partOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   alertType?: Prisma.SortOrder
@@ -236,7 +250,8 @@ export type OrderAlertScalarWhereWithAggregatesInput = {
   OR?: Prisma.OrderAlertScalarWhereWithAggregatesInput[]
   NOT?: Prisma.OrderAlertScalarWhereWithAggregatesInput | Prisma.OrderAlertScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"OrderAlert"> | string
-  orderId?: Prisma.StringWithAggregatesFilter<"OrderAlert"> | string
+  orderId?: Prisma.StringNullableWithAggregatesFilter<"OrderAlert"> | string | null
+  partOrderId?: Prisma.StringNullableWithAggregatesFilter<"OrderAlert"> | string | null
   userId?: Prisma.StringWithAggregatesFilter<"OrderAlert"> | string
   isRead?: Prisma.BoolWithAggregatesFilter<"OrderAlert"> | boolean
   alertType?: Prisma.StringWithAggregatesFilter<"OrderAlert"> | string
@@ -248,13 +263,15 @@ export type OrderAlertCreateInput = {
   isRead?: boolean
   alertType: string
   createdAt?: Date | string
-  order: Prisma.OrderCreateNestedOneWithoutAlertsInput
+  order?: Prisma.OrderCreateNestedOneWithoutAlertsInput
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutAlertsInput
   user: Prisma.UserCreateNestedOneWithoutOrderAlertsInput
 }
 
 export type OrderAlertUncheckedCreateInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
+  partOrderId?: string | null
   userId: string
   isRead?: boolean
   alertType: string
@@ -266,13 +283,15 @@ export type OrderAlertUpdateInput = {
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneRequiredWithoutAlertsNestedInput
+  order?: Prisma.OrderUpdateOneWithoutAlertsNestedInput
+  partOrder?: Prisma.PartOrderUpdateOneWithoutAlertsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrderAlertsNestedInput
 }
 
 export type OrderAlertUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -281,7 +300,8 @@ export type OrderAlertUncheckedUpdateInput = {
 
 export type OrderAlertCreateManyInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
+  partOrderId?: string | null
   userId: string
   isRead?: boolean
   alertType: string
@@ -297,7 +317,8 @@ export type OrderAlertUpdateManyMutationInput = {
 
 export type OrderAlertUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -317,6 +338,7 @@ export type OrderAlertOrderByRelationAggregateInput = {
 export type OrderAlertCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   alertType?: Prisma.SortOrder
@@ -326,6 +348,7 @@ export type OrderAlertCountOrderByAggregateInput = {
 export type OrderAlertMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   alertType?: Prisma.SortOrder
@@ -335,6 +358,7 @@ export type OrderAlertMaxOrderByAggregateInput = {
 export type OrderAlertMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   isRead?: Prisma.SortOrder
   alertType?: Prisma.SortOrder
@@ -425,17 +449,61 @@ export type OrderAlertUncheckedUpdateManyWithoutOrderNestedInput = {
   deleteMany?: Prisma.OrderAlertScalarWhereInput | Prisma.OrderAlertScalarWhereInput[]
 }
 
+export type OrderAlertCreateNestedManyWithoutPartOrderInput = {
+  create?: Prisma.XOR<Prisma.OrderAlertCreateWithoutPartOrderInput, Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput> | Prisma.OrderAlertCreateWithoutPartOrderInput[] | Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput[]
+  connectOrCreate?: Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput | Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput[]
+  createMany?: Prisma.OrderAlertCreateManyPartOrderInputEnvelope
+  connect?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+}
+
+export type OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput = {
+  create?: Prisma.XOR<Prisma.OrderAlertCreateWithoutPartOrderInput, Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput> | Prisma.OrderAlertCreateWithoutPartOrderInput[] | Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput[]
+  connectOrCreate?: Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput | Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput[]
+  createMany?: Prisma.OrderAlertCreateManyPartOrderInputEnvelope
+  connect?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+}
+
+export type OrderAlertUpdateManyWithoutPartOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderAlertCreateWithoutPartOrderInput, Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput> | Prisma.OrderAlertCreateWithoutPartOrderInput[] | Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput[]
+  connectOrCreate?: Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput | Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput[]
+  upsert?: Prisma.OrderAlertUpsertWithWhereUniqueWithoutPartOrderInput | Prisma.OrderAlertUpsertWithWhereUniqueWithoutPartOrderInput[]
+  createMany?: Prisma.OrderAlertCreateManyPartOrderInputEnvelope
+  set?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  disconnect?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  delete?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  connect?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  update?: Prisma.OrderAlertUpdateWithWhereUniqueWithoutPartOrderInput | Prisma.OrderAlertUpdateWithWhereUniqueWithoutPartOrderInput[]
+  updateMany?: Prisma.OrderAlertUpdateManyWithWhereWithoutPartOrderInput | Prisma.OrderAlertUpdateManyWithWhereWithoutPartOrderInput[]
+  deleteMany?: Prisma.OrderAlertScalarWhereInput | Prisma.OrderAlertScalarWhereInput[]
+}
+
+export type OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderAlertCreateWithoutPartOrderInput, Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput> | Prisma.OrderAlertCreateWithoutPartOrderInput[] | Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput[]
+  connectOrCreate?: Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput | Prisma.OrderAlertCreateOrConnectWithoutPartOrderInput[]
+  upsert?: Prisma.OrderAlertUpsertWithWhereUniqueWithoutPartOrderInput | Prisma.OrderAlertUpsertWithWhereUniqueWithoutPartOrderInput[]
+  createMany?: Prisma.OrderAlertCreateManyPartOrderInputEnvelope
+  set?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  disconnect?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  delete?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  connect?: Prisma.OrderAlertWhereUniqueInput | Prisma.OrderAlertWhereUniqueInput[]
+  update?: Prisma.OrderAlertUpdateWithWhereUniqueWithoutPartOrderInput | Prisma.OrderAlertUpdateWithWhereUniqueWithoutPartOrderInput[]
+  updateMany?: Prisma.OrderAlertUpdateManyWithWhereWithoutPartOrderInput | Prisma.OrderAlertUpdateManyWithWhereWithoutPartOrderInput[]
+  deleteMany?: Prisma.OrderAlertScalarWhereInput | Prisma.OrderAlertScalarWhereInput[]
+}
+
 export type OrderAlertCreateWithoutUserInput = {
   id?: string
   isRead?: boolean
   alertType: string
   createdAt?: Date | string
-  order: Prisma.OrderCreateNestedOneWithoutAlertsInput
+  order?: Prisma.OrderCreateNestedOneWithoutAlertsInput
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutAlertsInput
 }
 
 export type OrderAlertUncheckedCreateWithoutUserInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
+  partOrderId?: string | null
   isRead?: boolean
   alertType: string
   createdAt?: Date | string
@@ -472,7 +540,8 @@ export type OrderAlertScalarWhereInput = {
   OR?: Prisma.OrderAlertScalarWhereInput[]
   NOT?: Prisma.OrderAlertScalarWhereInput | Prisma.OrderAlertScalarWhereInput[]
   id?: Prisma.StringFilter<"OrderAlert"> | string
-  orderId?: Prisma.StringFilter<"OrderAlert"> | string
+  orderId?: Prisma.StringNullableFilter<"OrderAlert"> | string | null
+  partOrderId?: Prisma.StringNullableFilter<"OrderAlert"> | string | null
   userId?: Prisma.StringFilter<"OrderAlert"> | string
   isRead?: Prisma.BoolFilter<"OrderAlert"> | boolean
   alertType?: Prisma.StringFilter<"OrderAlert"> | string
@@ -484,11 +553,13 @@ export type OrderAlertCreateWithoutOrderInput = {
   isRead?: boolean
   alertType: string
   createdAt?: Date | string
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutAlertsInput
   user: Prisma.UserCreateNestedOneWithoutOrderAlertsInput
 }
 
 export type OrderAlertUncheckedCreateWithoutOrderInput = {
   id?: string
+  partOrderId?: string | null
   userId: string
   isRead?: boolean
   alertType: string
@@ -521,9 +592,54 @@ export type OrderAlertUpdateManyWithWhereWithoutOrderInput = {
   data: Prisma.XOR<Prisma.OrderAlertUpdateManyMutationInput, Prisma.OrderAlertUncheckedUpdateManyWithoutOrderInput>
 }
 
+export type OrderAlertCreateWithoutPartOrderInput = {
+  id?: string
+  isRead?: boolean
+  alertType: string
+  createdAt?: Date | string
+  order?: Prisma.OrderCreateNestedOneWithoutAlertsInput
+  user: Prisma.UserCreateNestedOneWithoutOrderAlertsInput
+}
+
+export type OrderAlertUncheckedCreateWithoutPartOrderInput = {
+  id?: string
+  orderId?: string | null
+  userId: string
+  isRead?: boolean
+  alertType: string
+  createdAt?: Date | string
+}
+
+export type OrderAlertCreateOrConnectWithoutPartOrderInput = {
+  where: Prisma.OrderAlertWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderAlertCreateWithoutPartOrderInput, Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput>
+}
+
+export type OrderAlertCreateManyPartOrderInputEnvelope = {
+  data: Prisma.OrderAlertCreateManyPartOrderInput | Prisma.OrderAlertCreateManyPartOrderInput[]
+  skipDuplicates?: boolean
+}
+
+export type OrderAlertUpsertWithWhereUniqueWithoutPartOrderInput = {
+  where: Prisma.OrderAlertWhereUniqueInput
+  update: Prisma.XOR<Prisma.OrderAlertUpdateWithoutPartOrderInput, Prisma.OrderAlertUncheckedUpdateWithoutPartOrderInput>
+  create: Prisma.XOR<Prisma.OrderAlertCreateWithoutPartOrderInput, Prisma.OrderAlertUncheckedCreateWithoutPartOrderInput>
+}
+
+export type OrderAlertUpdateWithWhereUniqueWithoutPartOrderInput = {
+  where: Prisma.OrderAlertWhereUniqueInput
+  data: Prisma.XOR<Prisma.OrderAlertUpdateWithoutPartOrderInput, Prisma.OrderAlertUncheckedUpdateWithoutPartOrderInput>
+}
+
+export type OrderAlertUpdateManyWithWhereWithoutPartOrderInput = {
+  where: Prisma.OrderAlertScalarWhereInput
+  data: Prisma.XOR<Prisma.OrderAlertUpdateManyMutationInput, Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderInput>
+}
+
 export type OrderAlertCreateManyUserInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
+  partOrderId?: string | null
   isRead?: boolean
   alertType: string
   createdAt?: Date | string
@@ -534,12 +650,14 @@ export type OrderAlertUpdateWithoutUserInput = {
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneRequiredWithoutAlertsNestedInput
+  order?: Prisma.OrderUpdateOneWithoutAlertsNestedInput
+  partOrder?: Prisma.PartOrderUpdateOneWithoutAlertsNestedInput
 }
 
 export type OrderAlertUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -547,7 +665,8 @@ export type OrderAlertUncheckedUpdateWithoutUserInput = {
 
 export type OrderAlertUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -555,6 +674,7 @@ export type OrderAlertUncheckedUpdateManyWithoutUserInput = {
 
 export type OrderAlertCreateManyOrderInput = {
   id?: string
+  partOrderId?: string | null
   userId: string
   isRead?: boolean
   alertType: string
@@ -566,11 +686,13 @@ export type OrderAlertUpdateWithoutOrderInput = {
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partOrder?: Prisma.PartOrderUpdateOneWithoutAlertsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutOrderAlertsNestedInput
 }
 
 export type OrderAlertUncheckedUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -579,6 +701,43 @@ export type OrderAlertUncheckedUpdateWithoutOrderInput = {
 
 export type OrderAlertUncheckedUpdateManyWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  alertType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OrderAlertCreateManyPartOrderInput = {
+  id?: string
+  orderId?: string | null
+  userId: string
+  isRead?: boolean
+  alertType: string
+  createdAt?: Date | string
+}
+
+export type OrderAlertUpdateWithoutPartOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  alertType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  order?: Prisma.OrderUpdateOneWithoutAlertsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutOrderAlertsNestedInput
+}
+
+export type OrderAlertUncheckedUpdateWithoutPartOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  alertType?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type OrderAlertUncheckedUpdateManyWithoutPartOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   isRead?: Prisma.BoolFieldUpdateOperationsInput | boolean
   alertType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -590,68 +749,80 @@ export type OrderAlertUncheckedUpdateManyWithoutOrderInput = {
 export type OrderAlertSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   userId?: boolean
   isRead?: boolean
   alertType?: boolean
   createdAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderAlert$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.OrderAlert$partOrderArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderAlert"]>
 
 export type OrderAlertSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   userId?: boolean
   isRead?: boolean
   alertType?: boolean
   createdAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderAlert$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.OrderAlert$partOrderArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderAlert"]>
 
 export type OrderAlertSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   userId?: boolean
   isRead?: boolean
   alertType?: boolean
   createdAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderAlert$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.OrderAlert$partOrderArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderAlert"]>
 
 export type OrderAlertSelectScalar = {
   id?: boolean
   orderId?: boolean
+  partOrderId?: boolean
   userId?: boolean
   isRead?: boolean
   alertType?: boolean
   createdAt?: boolean
 }
 
-export type OrderAlertOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "userId" | "isRead" | "alertType" | "createdAt", ExtArgs["result"]["orderAlert"]>
+export type OrderAlertOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "partOrderId" | "userId" | "isRead" | "alertType" | "createdAt", ExtArgs["result"]["orderAlert"]>
 export type OrderAlertInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderAlert$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.OrderAlert$partOrderArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type OrderAlertIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderAlert$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.OrderAlert$partOrderArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type OrderAlertIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderAlert$orderArgs<ExtArgs>
+  partOrder?: boolean | Prisma.OrderAlert$partOrderArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $OrderAlertPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "OrderAlert"
   objects: {
-    order: Prisma.$OrderPayload<ExtArgs>
+    order: Prisma.$OrderPayload<ExtArgs> | null
+    partOrder: Prisma.$PartOrderPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    orderId: string
+    orderId: string | null
+    partOrderId: string | null
     userId: string
     isRead: boolean
     alertType: string
@@ -1050,7 +1221,8 @@ readonly fields: OrderAlertFieldRefs;
  */
 export interface Prisma__OrderAlertClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  order<T extends Prisma.OrderAlert$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderAlert$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  partOrder<T extends Prisma.OrderAlert$partOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderAlert$partOrderArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1083,6 +1255,7 @@ export interface Prisma__OrderAlertClient<T, Null = never, ExtArgs extends runti
 export interface OrderAlertFieldRefs {
   readonly id: Prisma.FieldRef<"OrderAlert", 'String'>
   readonly orderId: Prisma.FieldRef<"OrderAlert", 'String'>
+  readonly partOrderId: Prisma.FieldRef<"OrderAlert", 'String'>
   readonly userId: Prisma.FieldRef<"OrderAlert", 'String'>
   readonly isRead: Prisma.FieldRef<"OrderAlert", 'Boolean'>
   readonly alertType: Prisma.FieldRef<"OrderAlert", 'String'>
@@ -1485,6 +1658,44 @@ export type OrderAlertDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many OrderAlerts to delete.
    */
   limit?: number
+}
+
+/**
+ * OrderAlert.order
+ */
+export type OrderAlert$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+}
+
+/**
+ * OrderAlert.partOrder
+ */
+export type OrderAlert$partOrderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartOrder
+   */
+  select?: Prisma.PartOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartOrder
+   */
+  omit?: Prisma.PartOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartOrderInclude<ExtArgs> | null
+  where?: Prisma.PartOrderWhereInput
 }
 
 /**

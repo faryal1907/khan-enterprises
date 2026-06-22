@@ -1728,7 +1728,8 @@ export const UserScalarFieldEnum = {
   branchId: 'branchId',
   vendorId: 'vendorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  fcmTokens: 'fcmTokens'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1884,6 +1885,7 @@ export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof Or
 export const OrderAlertScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
+  partOrderId: 'partOrderId',
   userId: 'userId',
   isRead: 'isRead',
   alertType: 'alertType',

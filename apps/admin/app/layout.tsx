@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { AuthProvider } from "@/components/auth-provider";
 import { theme } from "@/lib/colors";
 import { Toaster } from "sonner";
+import { PushNotificationProvider } from "@/components/push-notification-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
         style={{ backgroundColor: theme.backgrounds.tertiary }}
       >
         <AuthProvider>
+          <PushNotificationProvider />
           <Navigation>
             <main className="flex-1">{children}</main>
           </Navigation>

@@ -4,17 +4,21 @@ import { QueryDeliveriesDto } from "./dto/query-deliveries.dto";
 import { CreateDeliveryDto } from "./dto/create-delivery.dto";
 import { UpdateDeliveryStatusDto } from "./dto/update-delivery-status.dto";
 import { DeliveryStatus, OrderStatus, BikeStatus, AuditAction } from "@khan/prisma";
+import { OrderAlertsService } from "../order-alerts/order-alerts.service";
 
 @Injectable()
 export class DeliveriesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly orderAlertsService: OrderAlertsService,
+  ) {}
 
   /**
    * Create delivery request for an order or part order
    * Only allowed when order is in CONFIRMED or PAID status
    */
   async createDeliveryRequest(orderId: string, dto: CreateDeliveryDto, orderType: "BIKE" | "PART" = "BIKE") {
-    return this.prisma.client.$transaction(async (tx) => {
+    const delivery = await this.prisma.client.$transaction(async (tx) => {
       if (orderType === "BIKE") {
         // 1. Fetch order and verify status
         const order = await tx.order.findUnique({
@@ -101,6 +105,7 @@ export class DeliveriesService {
         });
         return delivery;
       } else {
+
         // PART order handling
         const partOrder = await tx.partOrder.findUnique({
           where: { id: orderId },
@@ -180,6 +185,12 @@ export class DeliveriesService {
         return delivery;
       }
     });
+
+    // Fire notifications after transaction commits so DB reads in
+    // createAlertsForDeliveryRequest see the committed delivery record.
+    await this.orderAlertsService.createAlertsForDeliveryRequest(delivery.id);
+
+    return delivery;
   }
 
   /**

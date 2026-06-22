@@ -62,7 +62,8 @@ exports.UserScalarFieldEnum = {
     branchId: 'branchId',
     vendorId: 'vendorId',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    fcmTokens: 'fcmTokens'
 };
 exports.RefreshTokenScalarFieldEnum = {
     id: 'id',
@@ -178,6 +179,7 @@ exports.OrderScalarFieldEnum = {
 exports.OrderAlertScalarFieldEnum = {
     id: 'id',
     orderId: 'orderId',
+    partOrderId: 'partOrderId',
     userId: 'userId',
     isRead: 'isRead',
     alertType: 'alertType',

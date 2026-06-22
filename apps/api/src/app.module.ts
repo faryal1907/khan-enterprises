@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { PrismaModule } from "./prisma/prisma.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -17,26 +18,32 @@ import { SchedulerModule } from "./modules/scheduler/scheduler.module";
 import { PdfModule } from "./modules/pdf/pdf.module";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
 import { OrderAlertsModule } from "./modules/order-alerts/order-alerts.module";
+import { FirebaseModule } from './modules/firebase/firebase.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env${process.env.NODE_ENV === 'production' ? '.production' : ''}`,
+    }),
     PrismaModule,
     AuthModule,
-    InventoryModule,
+    DashboardModule,
     BranchModule,
-    TransactionsModule,
-    AuditLogsModule,
-    UploadModule,
     VendorModule,
-    BikeModelsModule,
     CatalogModule,
+    BikeModelsModule,
+    InventoryModule,
     OrdersModule,
     PartOrdersModule,
-    DeliveriesModule,
-    SchedulerModule,
+    TransactionsModule,
+    UploadModule,
     PdfModule,
-    DashboardModule,
+    SchedulerModule,
     OrderAlertsModule,
+    DeliveriesModule,
+    AuditLogsModule,
+    FirebaseModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,  // 1 minute

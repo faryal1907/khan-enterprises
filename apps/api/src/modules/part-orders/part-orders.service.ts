@@ -4,11 +4,16 @@ import { CreatePartOrderDto } from "./dto/create-part-order.dto";
 import { CreateManualPartOrderDto } from "./dto/create-manual-part-order.dto";
 import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
 import { RevenueQueryDto, RevenueDuration } from "../orders/dto/revenue-query.dto";
+import { OrderAlertsService } from "../order-alerts/order-alerts.service";
+import { AlertType } from "../order-alerts/dto/get-alerts.dto";
 import { OrderStatus, PaymentStatus, PaymentMethod, BikeStatus, AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class PartOrdersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly orderAlertsService: OrderAlertsService
+  ) { }
 
   private isAssignedBranchUser(user?: any) {
     return user?.role !== "ADMIN" && user?.role !== "CUSTOMER" && Boolean(user?.branchId);
@@ -68,7 +73,7 @@ export class PartOrdersService {
    * Create a new part order
    */
   async createPartOrder(dto: CreatePartOrderDto, user: any) {
-    return this.prisma.client.$transaction(async (tx) => {
+    const result = await this.prisma.client.$transaction(async (tx) => {
 
       // 1. Verify part exists
       const part = await tx.part.findUnique({
@@ -170,6 +175,13 @@ export class PartOrdersService {
         transaction,
       };
     });
+
+    await this.orderAlertsService.createAlertsForPartOrder(
+      result.order.id, 
+      dto.paymentMethod === "CASH" ? AlertType.NEW_ORDER : AlertType.PAYMENT_PENDING
+    );
+
+    return result;
   }
 
   /**
@@ -556,7 +568,7 @@ export class PartOrdersService {
    * Manual part sale registration (admin bypasses offer workflow)
    */
   async createManualPartOrder(dto: CreateManualPartOrderDto, user: any) {
-    return this.prisma.client.$transaction(async (tx) => {
+    const result = await this.prisma.client.$transaction(async (tx) => {
       const inventoryWhere: any = dto.partInventoryId
         ? { id: dto.partInventoryId, partId: dto.partId }
         : { partId: dto.partId };
@@ -648,6 +660,13 @@ export class PartOrdersService {
 
       return partOrder;
     });
+
+    await this.orderAlertsService.createAlertsForPartOrder(
+      result.id, 
+      AlertType.NEW_ORDER
+    );
+
+    return result;
   }
 
   /**
