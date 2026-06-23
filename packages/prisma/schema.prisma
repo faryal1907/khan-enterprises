@@ -431,7 +431,7 @@ model PartOrder {
 
   customerName    String
   customerPhone   String
-  customerAddress String
+  customerAddress String?
 
   quantity Int
   amount   Decimal @db.Decimal(12, 2)

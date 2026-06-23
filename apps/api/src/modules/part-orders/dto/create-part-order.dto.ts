@@ -19,8 +19,8 @@ export class CreatePartOrderDto {
   customerPhone: string;
 
   @IsString()
-  @IsNotEmpty()
-  customerAddress: string;
+  @IsOptional()
+  customerAddress?: string;
 
   @IsInt()
   @Min(1)

@@ -287,7 +287,7 @@ export type PartOrderGroupByOutputType = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress: string | null
   quantity: number
   amount: runtime.Decimal
   paymentMethod: $Enums.PaymentMethod
@@ -334,7 +334,7 @@ export type PartOrderWhereInput = {
   branchId?: Prisma.StringFilter<"PartOrder"> | string
   customerName?: Prisma.StringFilter<"PartOrder"> | string
   customerPhone?: Prisma.StringFilter<"PartOrder"> | string
-  customerAddress?: Prisma.StringFilter<"PartOrder"> | string
+  customerAddress?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   quantity?: Prisma.IntFilter<"PartOrder"> | number
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
@@ -366,7 +366,7 @@ export type PartOrderOrderByWithRelationInput = {
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
-  customerAddress?: Prisma.SortOrder
+  customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
@@ -401,7 +401,7 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
   branchId?: Prisma.StringFilter<"PartOrder"> | string
   customerName?: Prisma.StringFilter<"PartOrder"> | string
   customerPhone?: Prisma.StringFilter<"PartOrder"> | string
-  customerAddress?: Prisma.StringFilter<"PartOrder"> | string
+  customerAddress?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   quantity?: Prisma.IntFilter<"PartOrder"> | number
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
@@ -433,7 +433,7 @@ export type PartOrderOrderByWithAggregationInput = {
   branchId?: Prisma.SortOrder
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
-  customerAddress?: Prisma.SortOrder
+  customerAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
@@ -465,7 +465,7 @@ export type PartOrderScalarWhereWithAggregatesInput = {
   branchId?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string
   customerName?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string
   customerPhone?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string
-  customerAddress?: Prisma.StringWithAggregatesFilter<"PartOrder"> | string
+  customerAddress?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null
   quantity?: Prisma.IntWithAggregatesFilter<"PartOrder"> | number
   amount?: Prisma.DecimalWithAggregatesFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodWithAggregatesFilter<"PartOrder"> | $Enums.PaymentMethod
@@ -486,7 +486,7 @@ export type PartOrderCreateInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -516,7 +516,7 @@ export type PartOrderUncheckedCreateInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -540,7 +540,7 @@ export type PartOrderUpdateInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -570,7 +570,7 @@ export type PartOrderUncheckedUpdateInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -597,7 +597,7 @@ export type PartOrderCreateManyInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -618,7 +618,7 @@ export type PartOrderUpdateManyMutationInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -640,7 +640,7 @@ export type PartOrderUncheckedUpdateManyInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1019,7 +1019,7 @@ export type PartOrderCreateWithoutProcessedByInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1048,7 +1048,7 @@ export type PartOrderUncheckedCreateWithoutProcessedByInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1081,7 +1081,7 @@ export type PartOrderCreateWithoutCustomerInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1110,7 +1110,7 @@ export type PartOrderUncheckedCreateWithoutCustomerInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1165,7 +1165,7 @@ export type PartOrderScalarWhereInput = {
   branchId?: Prisma.StringFilter<"PartOrder"> | string
   customerName?: Prisma.StringFilter<"PartOrder"> | string
   customerPhone?: Prisma.StringFilter<"PartOrder"> | string
-  customerAddress?: Prisma.StringFilter<"PartOrder"> | string
+  customerAddress?: Prisma.StringNullableFilter<"PartOrder"> | string | null
   quantity?: Prisma.IntFilter<"PartOrder"> | number
   amount?: Prisma.DecimalFilter<"PartOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFilter<"PartOrder"> | $Enums.PaymentMethod
@@ -1202,7 +1202,7 @@ export type PartOrderCreateWithoutBranchInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1230,7 +1230,7 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
   partInventoryId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1280,7 +1280,7 @@ export type PartOrderCreateWithoutPartInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1308,7 +1308,7 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1358,7 +1358,7 @@ export type PartOrderCreateWithoutPartInventoryInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1386,7 +1386,7 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1436,7 +1436,7 @@ export type PartOrderCreateWithoutAlertsInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1465,7 +1465,7 @@ export type PartOrderUncheckedCreateWithoutAlertsInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1504,7 +1504,7 @@ export type PartOrderUpdateWithoutAlertsInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1533,7 +1533,7 @@ export type PartOrderUncheckedUpdateWithoutAlertsInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1556,7 +1556,7 @@ export type PartOrderCreateWithoutTransactionsInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1585,7 +1585,7 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1624,7 +1624,7 @@ export type PartOrderUpdateWithoutTransactionsInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1653,7 +1653,7 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1676,7 +1676,7 @@ export type PartOrderCreateWithoutDeliveryInput = {
   orderNumber: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1705,7 +1705,7 @@ export type PartOrderUncheckedCreateWithoutDeliveryInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1744,7 +1744,7 @@ export type PartOrderUpdateWithoutDeliveryInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1773,7 +1773,7 @@ export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1799,7 +1799,7 @@ export type PartOrderCreateManyProcessedByInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1822,7 +1822,7 @@ export type PartOrderCreateManyCustomerInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -1842,7 +1842,7 @@ export type PartOrderUpdateWithoutProcessedByInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1871,7 +1871,7 @@ export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1897,7 +1897,7 @@ export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1917,7 +1917,7 @@ export type PartOrderUpdateWithoutCustomerInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1946,7 +1946,7 @@ export type PartOrderUncheckedUpdateWithoutCustomerInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1972,7 +1972,7 @@ export type PartOrderUncheckedUpdateManyWithoutCustomerInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -1994,7 +1994,7 @@ export type PartOrderCreateManyBranchInput = {
   partInventoryId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -2015,7 +2015,7 @@ export type PartOrderUpdateWithoutBranchInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2043,7 +2043,7 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
   partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2069,7 +2069,7 @@ export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
   partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2092,7 +2092,7 @@ export type PartOrderCreateManyPartInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -2113,7 +2113,7 @@ export type PartOrderUpdateWithoutPartInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2141,7 +2141,7 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2167,7 +2167,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2190,7 +2190,7 @@ export type PartOrderCreateManyPartInventoryInput = {
   branchId: string
   customerName: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string | null
   quantity: number
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod: $Enums.PaymentMethod
@@ -2211,7 +2211,7 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2239,7 +2239,7 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2265,7 +2265,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
-  customerAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
@@ -2483,7 +2483,7 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     branchId: string
     customerName: string
     customerPhone: string
-    customerAddress: string
+    customerAddress: string | null
     quantity: number
     amount: runtime.Decimal
     paymentMethod: $Enums.PaymentMethod
