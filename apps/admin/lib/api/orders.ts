@@ -74,8 +74,8 @@ export async function updatePartOrderStatus(id: string, status: string) {
   return response.data;
 }
 
-export async function cancelPartOrder(id: string) {
-  const response = await api.patch(`/part-orders/${id}/cancel`);
+export async function cancelPartOrder(id: string, reason?: string) {
+  const response = await api.patch(`/part-orders/${id}/cancel`, { reason });
   return response.data;
 }
 
@@ -102,8 +102,8 @@ export async function verifyPayment(id: string, transactionId: string, isApprove
   return response.data;
 }
 
-export async function verifyPartPayment(id: string, isApproved: boolean = true) {
-  const response = await api.post(`/part-orders/${id}/verify-payment`, { verified: isApproved });
+export async function verifyPartPayment(id: string, isApproved: boolean = true, reason?: string) {
+  const response = await api.post(`/part-orders/${id}/verify-payment`, { verified: isApproved, reason });
   return response.data;
 }
 

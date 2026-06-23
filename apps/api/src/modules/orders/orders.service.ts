@@ -152,6 +152,7 @@ export class OrdersService {
             },
           },
           transactions: true,
+          delivery: true,
         },
         orderBy: { createdAt: "desc" },
       }),
@@ -184,6 +185,7 @@ export class OrdersService {
         },
         branch: true,
         transactions: true,
+        delivery: true,
         processedBy: {
           select: {
             id: true,

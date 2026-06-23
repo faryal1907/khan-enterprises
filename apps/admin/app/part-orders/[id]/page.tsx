@@ -26,6 +26,8 @@ export default function PartOrderDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [rejectPaymentReason, setRejectPaymentReason] = useState("");
   const [paymentData, setPaymentData] = useState({
     method: PaymentMethod.CASH,
     amount: 0,
@@ -67,9 +69,10 @@ export default function PartOrderDetailPage() {
   const handleCancelOrder = async () => {
     try {
       setActionLoading(true);
-      await cancelPartOrder(orderId);
+      await cancelPartOrder(orderId, cancelReason);
       await fetchOrder();
       setShowCancelModal(false);
+      setCancelReason("");
       toast.success("Order cancelled");
     } catch (cancelError: any) {
       toast.error(cancelError.response?.data?.message || "Failed to cancel order");
@@ -93,27 +96,15 @@ export default function PartOrderDetailPage() {
     }
   };
 
-  const handleApproveDelivery = async () => {
-    if (!order?.delivery) return;
-    try {
-      setActionLoading(true);
-      await approveDelivery(order.delivery.id);
-      const updatedOrder = await getPartOrderById(orderId);
-      setOrder(updatedOrder);
-      toast.success("Delivery approved successfully");
-    } catch (error: any) {
-      console.warn("Failed to approve delivery:", error?.message || error);
-      toast.error(error?.message || "Failed to approve delivery");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+
 
 
   const handleVerifyPayment = async () => {
     try {
       setActionLoading(true);
       await verifyPartPayment(orderId, true);
+      // Auto-confirm after payment verified
+      await updatePartOrderStatus(orderId, OrderStatus.CONFIRMED);
       const updatedOrder = await getPartOrderById(orderId);
       setOrder(updatedOrder);
       toast.success("Payment verified successfully");
@@ -128,10 +119,11 @@ export default function PartOrderDetailPage() {
   const handleRejectPayment = async () => {
     try {
       setActionLoading(true);
-      await verifyPartPayment(orderId, false);
+      await verifyPartPayment(orderId, false, rejectPaymentReason);
       const updatedOrder = await getPartOrderById(orderId);
       setOrder(updatedOrder);
       setShowRejectPaymentModal(false);
+      setRejectPaymentReason("");
       toast.success("Payment rejected successfully");
     } catch (error: any) {
       console.warn("Failed to reject payment:", error?.message || error);
@@ -149,6 +141,8 @@ export default function PartOrderDetailPage() {
         amount: Number(paymentData.amount),
       };
       await recordPartOrderPayment(orderId, paymentPayload);
+      // Auto-confirm after payment
+      await updatePartOrderStatus(orderId, OrderStatus.CONFIRMED);
       const updatedOrder = await getPartOrderById(orderId);
       setOrder(updatedOrder);
       setShowPaymentModal(false);
@@ -202,6 +196,7 @@ export default function PartOrderDetailPage() {
           </AsyncButton>
         );
       case OrderStatus.PAID:
+        if (!canManageLifecycle) return null;
         return (
           <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.CONFIRMED)}
@@ -213,39 +208,7 @@ export default function PartOrderDetailPage() {
         );
       case OrderStatus.CONFIRMED:
         if (order.pickupType === "DELIVERY") {
-          if (!order.delivery) return null;
-          // Customer requested delivery - show approve/reject buttons
-          if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
-            return (
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleApproveDelivery}
-                  disabled={actionLoading}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                  }}
-                >
-                  Approve Delivery
-                </button>
-              </div>
-            );
-          }
-          // Delivery already approved - show mark ready for delivery
-          return (
-            <button
-              onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
-              disabled={actionLoading}
-              className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
-            >
-              Mark Ready for Delivery
-            </button>
-          );
+          return null;
         }
         // No delivery request - show picked by customer button
         return (
@@ -262,6 +225,7 @@ export default function PartOrderDetailPage() {
           </button>
         );
       case OrderStatus.READY_FOR_DELIVERY:
+        if (!canManageLifecycle) return null;
         return (
           <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.DELIVERED)}
@@ -614,7 +578,7 @@ export default function PartOrderDetailPage() {
         )}
 
         {/* Status Action Bar */}
-        {canManageLifecycle && order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
+        {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
           <div
             className="rounded-lg p-6 mb-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -627,17 +591,19 @@ export default function PartOrderDetailPage() {
             </h3>
             <div className="flex space-x-4">
               {getActionButton()}
-              <button
-                onClick={() => setShowCancelModal(true)}
-                disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
-              >
-                Cancel Order
-              </button>
+              {canManageLifecycle && (
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={actionLoading}
+                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.secondary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Cancel Order
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -659,43 +625,63 @@ export default function PartOrderDetailPage() {
 
       {/* Reject Payment Modal */}
       {showRejectPaymentModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-          <div
-            className="rounded-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
-              Reject Payment Proof
-            </h3>
+        <ActionModal
+          title="Reject Payment Proof"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowRejectPaymentModal(false);
+            setRejectPaymentReason("");
+          }}
+        >
+          <div className="mb-4">
             <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
               Are you sure you want to reject this payment? The order will remain in Pending Payment status.
             </p>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowRejectPaymentModal(false)}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  color: theme.text.secondary,
-                  border: `1px solid ${theme.borders.medium}`,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRejectPayment}
-                disabled={actionLoading}
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{
-                  backgroundColor: theme.accents.secondary,
-                  color: theme.text.inverse,
-                }}
-              >
-                {actionLoading ? "Rejecting..." : "Reject Payment"}
-              </button>
-            </div>
+            <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+              Reason for rejection
+            </label>
+            <textarea
+              value={rejectPaymentReason}
+              onChange={(e) => setRejectPaymentReason(e.target.value)}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+              rows={4}
+              placeholder="Enter reason for rejection..."
+              disabled={actionLoading}
+            />
           </div>
-        </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => {
+                setShowRejectPaymentModal(false);
+                setRejectPaymentReason("");
+              }}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleRejectPayment}
+              disabled={!rejectPaymentReason.trim() || actionLoading}
+              loading={actionLoading}
+              loadingLabel="Rejecting..."
+              style={{
+                backgroundColor: theme.accents.secondary,
+              }}
+            >
+              Reject Payment
+            </AsyncButton>
+          </div>
+        </ActionModal>
       )}
 
       {/* Payment Modal */}
@@ -799,14 +785,36 @@ export default function PartOrderDetailPage() {
           onClose={() => {
             if (actionLoading) return;
             setShowCancelModal(false);
+            setCancelReason("");
           }}
         >
-          <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-            Are you sure you want to cancel this part order? Reserved or deducted stock will be restored according to the current order status.
-          </p>
+          <div className="mb-4">
+            <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+              Are you sure you want to cancel this part order? Reserved or deducted stock will be restored according to the current order status.
+            </p>
+            <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+              Reason for cancellation
+            </label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+              rows={4}
+              placeholder="Enter reason for cancellation..."
+              disabled={actionLoading}
+            />
+          </div>
           <div className="flex justify-end space-x-4 mt-6">
             <button
-              onClick={() => setShowCancelModal(false)}
+              onClick={() => {
+                setShowCancelModal(false);
+                setCancelReason("");
+              }}
               disabled={actionLoading}
               className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
               style={{
@@ -819,6 +827,7 @@ export default function PartOrderDetailPage() {
             </button>
             <AsyncButton
               onClick={handleCancelOrder}
+              disabled={!cancelReason.trim() || actionLoading}
               loading={actionLoading}
               loadingLabel="Cancelling..."
               style={{

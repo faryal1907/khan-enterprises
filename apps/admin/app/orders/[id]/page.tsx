@@ -86,6 +86,8 @@ export default function OrderDetailPage() {
         amount: Number(paymentData.amount),
       };
       await recordPayment(orderId, paymentPayload);
+      // Auto-confirm after payment
+      await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
       setShowPaymentModal(false);
@@ -116,6 +118,8 @@ export default function OrderDetailPage() {
     try {
       setActionLoading(true);
       await verifyPayment(orderId, transactionId, true);
+      // Auto-confirm after verification
+      await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
       toast.success("Payment verified successfully");
@@ -144,21 +148,7 @@ export default function OrderDetailPage() {
     }
   };
 
-  const handleApproveDelivery = async () => {
-    if (!order?.delivery) return;
-    try {
-      setActionLoading(true);
-      await approveDelivery(order.delivery.id);
-      const updatedOrder = await getOrderById(orderId);
-      setOrder(updatedOrder);
-      toast.success("Delivery approved successfully");
-    } catch (error: any) {
-      console.warn("Failed to approve delivery:", error?.message || error);
-      toast.error(error?.message || "Failed to approve delivery");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+
 
 
   const getActionButton = () => {
@@ -212,39 +202,7 @@ export default function OrderDetailPage() {
         );
       case OrderStatus.CONFIRMED:
         if (order.pickupType === "DELIVERY") {
-          if (!order.delivery) return null;
-          // Customer requested delivery - show approve/reject buttons
-          if (order.delivery.status === "REQUESTED" || order.delivery.status === "UNDER_REVIEW") {
-            return (
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleApproveDelivery}
-                  disabled={actionLoading}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                  }}
-                >
-                  Approve Delivery
-                </button>
-              </div>
-            );
-          }
-          // Delivery already approved - show mark ready for delivery
-          return (
-            <button
-              onClick={() => handleStatusUpdate(OrderStatus.READY_FOR_DELIVERY)}
-              disabled={actionLoading}
-              className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-              style={{
-                backgroundColor: theme.accents.primary,
-                color: theme.text.inverse,
-              }}
-            >
-              Mark Ready for Delivery
-            </button>
-          );
+          return null;
         }
         // No delivery request - show picked by customer button
         return (
@@ -528,7 +486,7 @@ export default function OrderDetailPage() {
                   {order.branch?.name}
                 </p>
               </div>
-              {order.delivery && (
+              {order.pickupType === "DELIVERY" && order.delivery && (
                 <>
                   <div>
                     <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
