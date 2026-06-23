@@ -6,6 +6,7 @@ import { theme, colors } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { getOrders } from "@/lib/api/orders";
 import { getPartOrders } from "@/lib/api/part-orders";
+import { NotificationPermissionBanner } from "@/components/notification-permission-banner";
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -292,6 +293,7 @@ export default function CustomerOrdersPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
+      <NotificationPermissionBanner />
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-8">

@@ -31,7 +31,6 @@ export default function NewPartOrderPage() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
   const [quantity, setQuantity] = useState<number | "">(1);
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "ONLINE_TRANSFER" | "">("");
 
@@ -85,8 +84,8 @@ export default function NewPartOrderPage() {
   const handleCreateOrder = async () => {
     if (!partId || !inventoryId || !user || !paymentMethod) return;
 
-    if (!customerName || !customerPhone || !customerAddress) {
-      setError("Please fill in all required fields");
+    if (!customerName || !customerPhone) {
+      setError("Please fill in your name and phone number");
       return;
     }
 
@@ -99,7 +98,6 @@ export default function NewPartOrderPage() {
         partInventoryId: inventoryId,
         customerName,
         customerPhone,
-        customerAddress,
         quantity: Number(quantity) || 1,
         paymentMethod,
         paymentProofUrl: paymentMethod === "ONLINE_TRANSFER" ? paymentProofUrl || undefined : undefined,
@@ -308,10 +306,6 @@ export default function NewPartOrderPage() {
               <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Delivery Address</label>
-              <textarea value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} rows={2} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
-            </div>
-            <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Quantity</label>
               <input type="number" min="1" max={inventory.quantity - inventory.reservedQuantity} value={quantity} onChange={(e) => setQuantity(e.target.value === "" ? "" : parseInt(e.target.value))} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
               <p className="text-xs mt-1" style={{ color: theme.text.muted }}>Available: {inventory.quantity - inventory.reservedQuantity}</p>
@@ -355,11 +349,20 @@ export default function NewPartOrderPage() {
 
           {/* Payment Proof Upload for ONLINE_TRANSFER */}
           {paymentMethod === "ONLINE_TRANSFER" && (
-            <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
-              <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
-              <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                Transfer PKR {totalPrice.toLocaleString()} to our bank account and upload the payment screenshot below.
-              </p>
+            <>
+              <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: "#DBEAFE", border: "1px solid #3B82F6" }}>
+                <p className="text-sm" style={{ color: "#1E40AF" }}>
+                  <strong>Important:</strong> Please enable notifications to receive updates when your payment is verified by our team so that you can request delivery at the earliest, in case pickup is not feasible.
+                </p>
+                <p className="text-sm" style={{ color: "#1E40AF" }}>
+                  <strong>Delivery is free upto 10km from the chosen branch!</strong> 
+                </p>
+              </div>
+              <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
+                <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
+                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                  Transfer PKR {totalPrice.toLocaleString()} to our bank account and upload the payment screenshot below.
+                </p>
 
               <div
                 onDragOver={handleDragOver}
@@ -397,7 +400,16 @@ export default function NewPartOrderPage() {
               {proofUploaded && (
                 <p className="text-sm font-semibold" style={{ color: "#10B981" }}>Proof Uploaded</p>
               )}
+              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
+                <p className="text-sm mb-2" style={{ color: "#92400E" }}>
+                  <strong>Note:</strong> If you prefer delivery instead of pickup, you can provide your address after your payment is verified.
+                </p>
+                <p className="text-sm" style={{ color: "#92400E" }}>
+                  <strong>Delivery is free up to 10km from the chosen branch!</strong>
+                </p>
+              </div>
             </div>
+            </>
           )}
 
           {paymentMethod === "CASH" && (

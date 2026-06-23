@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { theme } from "@/lib/colors";
+import { NotificationPermissionBanner } from "@/components/notification-permission-banner";
 
 // ── Animation variants ──────────────────────────────────────────────
 const fadeUp = {
@@ -59,6 +60,7 @@ function AccentLine({ width = "4rem" }: { width?: string }) {
 export default function Home() {
   return (
     <div style={{ backgroundColor: theme.backgrounds.primary }} className="min-h-screen">
+      <NotificationPermissionBanner />
 
       {/* Hero Section */}
       <section className="py-20 md:py-28 overflow-hidden">

@@ -5,7 +5,7 @@ export async function createPartOrder(data: {
   partInventoryId: string;
   customerName: string;
   customerPhone: string;
-  customerAddress: string;
+  customerAddress?: string;
   quantity: number;
   paymentMethod: string;
   paymentProofUrl?: string;
