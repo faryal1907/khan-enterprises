@@ -324,4 +324,202 @@ export class OrderAlertsService {
       }
     }
   }
+
+  /**
+   * Create customer-specific alert for order status updates
+   */
+  async createCustomerAlertForOrder(
+    orderId: string,
+    customerId: string,
+    alertType: AlertType,
+    message?: string
+  ) {
+    const order = await this.prisma.client.order.findUnique({
+      where: { id: orderId },
+      include: { bike: { include: { model: true } } },
+    });
+
+    if (!order) return;
+
+    // Get customer user record
+    const customer = await this.prisma.client.user.findUnique({
+      where: { id: customerId },
+    });
+
+    if (!customer) return;
+
+    // Create alert
+    const alert = await this.prisma.client.orderAlert.create({
+      data: {
+        orderId,
+        userId: customerId,
+        alertType,
+        isRead: false,
+      },
+    });
+
+    // Dispatch to Gateway (if customer is online)
+    this.gateway.sendAlertToUser(customerId, alert);
+
+    // Send push notification
+    let title = "Order Update";
+    let body = message || `Your order ${order.orderNumber} has been updated.`;
+    
+    if (alertType === AlertType.PAYMENT_VERIFIED) {
+      title = "Payment Verified";
+      body = `Your payment for order ${order.orderNumber} has been verified.`;
+    } else if (alertType === AlertType.PAYMENT_FAILED) {
+      title = "Payment Failed";
+      body = `Your payment for order ${order.orderNumber} could not be verified. Please try again.`;
+    } else if (alertType === AlertType.ORDER_STATUS_UPDATED) {
+      title = "Order Status Updated";
+      body = `Your order ${order.orderNumber} status is now ${order.status}.`;
+    } else if (alertType === AlertType.ORDER_CANCELLED) {
+      title = "Order Cancelled";
+      body = `Your order ${order.orderNumber} has been cancelled.`;
+    } else if (alertType === AlertType.ORDER_DELIVERED) {
+      title = "Order Delivered";
+      body = `Your order ${order.orderNumber} has been delivered successfully!`;
+    }
+
+    await this.dispatchPushNotification(
+      customer,
+      title,
+      body,
+      { url: `/orders/${order.id}` }
+    );
+
+    return alert;
+  }
+
+  /**
+   * Create customer-specific alert for part order status updates
+   */
+  async createCustomerAlertForPartOrder(
+    partOrderId: string,
+    customerId: string,
+    alertType: AlertType,
+    message?: string
+  ) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id: partOrderId },
+      include: { part: true },
+    });
+
+    if (!order) return;
+
+    // Get customer user record
+    const customer = await this.prisma.client.user.findUnique({
+      where: { id: customerId },
+    });
+
+    if (!customer) return;
+
+    // Create alert
+    const alert = await this.prisma.client.orderAlert.create({
+      data: {
+        partOrderId,
+        userId: customerId,
+        alertType,
+        isRead: false,
+      },
+    });
+
+    // Dispatch to Gateway
+    this.gateway.sendAlertToUser(customerId, alert);
+
+    // Send push notification
+    let title = "Part Order Update";
+    let body = message || `Your part order ${order.orderNumber} has been updated.`;
+    
+    if (alertType === AlertType.PAYMENT_VERIFIED) {
+      title = "Payment Verified";
+      body = `Your payment for part order ${order.orderNumber} has been verified.`;
+    } else if (alertType === AlertType.PAYMENT_FAILED) {
+      title = "Payment Failed";
+      body = `Your payment for part order ${order.orderNumber} could not be verified. Please try again.`;
+    } else if (alertType === AlertType.ORDER_STATUS_UPDATED) {
+      title = "Order Status Updated";
+      body = `Your part order ${order.orderNumber} status is now ${order.status}.`;
+    } else if (alertType === AlertType.ORDER_CANCELLED) {
+      title = "Order Cancelled";
+      body = `Your part order ${order.orderNumber} has been cancelled.`;
+    } else if (alertType === AlertType.ORDER_DELIVERED) {
+      title = "Order Delivered";
+      body = `Your part order ${order.orderNumber} has been delivered successfully!`;
+    }
+
+    await this.dispatchPushNotification(
+      customer,
+      title,
+      body,
+      { url: `/part-orders/${order.id}` }
+    );
+
+    return alert;
+  }
+
+  /**
+   * Create customer-specific alert for delivery status updates
+   */
+  async createCustomerAlertForDeliveryStatus(
+    deliveryRequestId: string,
+    customerId: string,
+    newStatus: string
+  ) {
+    const delivery = await this.prisma.client.deliveryRequest.findUnique({
+      where: { id: deliveryRequestId },
+      include: {
+        order: true,
+        partOrder: true,
+      },
+    });
+
+    if (!delivery) return;
+
+    const customer = await this.prisma.client.user.findUnique({
+      where: { id: customerId },
+    });
+
+    if (!customer) return;
+
+    // Create alert
+    const alert = await this.prisma.client.orderAlert.create({
+      data: {
+        orderId: delivery.orderId,
+        partOrderId: delivery.partOrderId,
+        userId: customerId,
+        alertType: AlertType.DELIVERY_STATUS_UPDATED,
+        isRead: false,
+      },
+    });
+
+    this.gateway.sendAlertToUser(customerId, alert);
+
+    const orderNumber = delivery.order?.orderNumber || delivery.partOrder?.orderNumber;
+    const url = delivery.orderId ? `/orders/${delivery.orderId}` : `/part-orders/${delivery.partOrderId}`;
+
+    let title = "Delivery Update";
+    let body = `Delivery status for order ${orderNumber} is now ${newStatus}.`;
+
+    if (newStatus === 'APPROVED') {
+      title = "Delivery Approved";
+      body = `Your delivery for order ${orderNumber} has been approved.`;
+    } else if (newStatus === 'IN_TRANSIT') {
+      title = "Out for Delivery";
+      body = `Your order ${orderNumber} is out for delivery.`;
+    } else if (newStatus === 'DELIVERED') {
+      title = "Delivered";
+      body = `Your order ${orderNumber} has been delivered!`;
+    }
+
+    await this.dispatchPushNotification(
+      customer,
+      title,
+      body,
+      { url }
+    );
+
+    return alert;
+  }
 }

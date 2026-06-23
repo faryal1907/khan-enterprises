@@ -356,7 +356,7 @@ export class DeliveriesService {
       );
     }
 
-    return this.prisma.client.$transaction(async (tx) => {
+    const updatedDelivery = await this.prisma.client.$transaction(async (tx) => {
       const updateData: any = {
         status: newStatus,
       };
@@ -475,6 +475,18 @@ export class DeliveriesService {
 
       return updatedDelivery;
     });
+
+    // AFTER transaction commits, send customer notification
+    const customerId = delivery.order?.customerId || delivery.partOrder?.customerId;
+    if (customerId && currentStatus !== newStatus) {
+      await this.orderAlertsService.createCustomerAlertForDeliveryStatus(
+        id,
+        customerId,
+        newStatus
+      );
+    }
+
+    return updatedDelivery;
   }
 
   /**

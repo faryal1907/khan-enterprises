@@ -225,9 +225,10 @@ export default function PartsPage() {
                   const topBranch = getBranchInfo(part);
                   const totalStock = getTotalStock(part);
                   return (
-                    <div
+                    <Link
                       key={part.id}
-                      className="rounded-xl p-6"
+                      href={`/parts/${part.id}`}
+                      className="rounded-xl p-6 block hover:opacity-90 transition-opacity"
                       style={{
                         backgroundColor: theme.backgrounds.secondary,
                         border: `1px solid ${theme.borders.light}`,
@@ -299,18 +300,8 @@ export default function PartsPage() {
                         >
                           PKR {part.sellingPrice?.toLocaleString()}
                         </span>
-                        <Link
-                          href={`/parts/${part.id}`}
-                          className="inline-block px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-                          style={{
-                            backgroundColor: theme.accents.secondary,
-                            color: theme.text.inverse,
-                          }}
-                        >
-                          View Details
-                        </Link>
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

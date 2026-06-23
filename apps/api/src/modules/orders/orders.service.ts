@@ -412,7 +412,7 @@ export class OrdersService {
       );
     }
 
-    return this.prisma.client.$transaction(async (tx) => {
+    const updatedOrder = await this.prisma.client.$transaction(async (tx) => {
       const updatedOrder = await tx.order.update({
         where: { id },
         data: {
@@ -477,6 +477,25 @@ export class OrdersService {
 
       return updatedOrder;
     });
+
+    // AFTER transaction commits, send customer notification
+    if (order.customerId && currentStatus !== newStatus) {
+      let alertType = AlertType.ORDER_STATUS_UPDATED;
+      
+      if (newStatus === OrderStatus.CANCELLED) {
+        alertType = AlertType.ORDER_CANCELLED;
+      } else if (newStatus === OrderStatus.DELIVERED) {
+        alertType = AlertType.ORDER_DELIVERED;
+      }
+
+      await this.orderAlertsService.createCustomerAlertForOrder(
+        id,
+        order.customerId!,
+        alertType
+      );
+    }
+
+    return updatedOrder;
   }
 
   /**
@@ -1143,7 +1162,16 @@ export class OrdersService {
    * Updates transaction to SUCCESS, order to PAID, and bike to SOLD
    */
   async verifyPayment(orderId: string, dto: VerifyPaymentDto, user: any) {
-    return this.prisma.client.$transaction(async (tx) => {
+    // Fetch order first to get customerId for notification
+    const order = await this.prisma.client.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${orderId} not found`);
+    }
+
+    const result = await this.prisma.client.$transaction(async (tx) => {
       // 1. Fetch order
       const order = await tx.order.findUnique({
         where: { id: orderId },
@@ -1277,6 +1305,21 @@ export class OrdersService {
         transaction: updatedTransaction,
       };
     });
+
+    // AFTER transaction commits, send customer notification
+    if (order.customerId) {
+      const alertType = dto.isApproved 
+        ? AlertType.PAYMENT_VERIFIED 
+        : AlertType.PAYMENT_FAILED;
+      
+      await this.orderAlertsService.createCustomerAlertForOrder(
+        orderId,
+        order.customerId!,
+        alertType
+      );
+    }
+
+    return result;
   }
 
   /**

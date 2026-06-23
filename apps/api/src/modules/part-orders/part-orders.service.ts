@@ -411,7 +411,7 @@ export class PartOrdersService {
       );
     }
 
-    return this.prisma.client.$transaction(async (tx) => {
+    const updatedOrder = await this.prisma.client.$transaction(async (tx) => {
       if (status === OrderStatus.CONFIRMED && currentStatus === OrderStatus.PAID) {
         const reservedQuantity = order.partInventory.reservedQuantity;
         if (order.partInventory.quantity < order.quantity || reservedQuantity < order.quantity) {
@@ -495,6 +495,25 @@ export class PartOrdersService {
 
       return updatedOrder;
     });
+
+    // AFTER transaction commits, send customer notification
+    if (order && order.customerId && currentStatus !== status) {
+      let alertType = AlertType.ORDER_STATUS_UPDATED;
+      
+      if (status === OrderStatus.CANCELLED) {
+        alertType = AlertType.ORDER_CANCELLED;
+      } else if (status === OrderStatus.DELIVERED) {
+        alertType = AlertType.ORDER_DELIVERED;
+      }
+
+      await this.orderAlertsService.createCustomerAlertForPartOrder(
+        id,
+        order.customerId!,
+        alertType
+      );
+    }
+
+    return updatedOrder;
   }
 
   /**
@@ -897,6 +916,7 @@ export class PartOrdersService {
    * Verify payment for a part order (admin only)
    */
   async verifyPartOrderPayment(partOrderId: string, verified: boolean, user: any) {
+    // Fetch order first to get customerId for notification
     const order = await this.prisma.client.partOrder.findUnique({
       where: { id: partOrderId },
     });
@@ -914,7 +934,7 @@ export class PartOrdersService {
     const newStatus = verified ? PaymentStatus.SUCCESS : PaymentStatus.FAILED;
     const orderStatus = verified ? OrderStatus.PAID : OrderStatus.PENDING_PAYMENT;
 
-    return this.prisma.client.$transaction(async (tx) => {
+    const result = await this.prisma.client.$transaction(async (tx) => {
       // Find pending transaction first
       const pendingTransaction = await tx.partPaymentTransaction.findFirst({
         where: {
@@ -972,6 +992,21 @@ export class PartOrdersService {
 
       return { transaction, orderStatus };
     });
+
+    // AFTER transaction commits, send customer notification
+    if (order.customerId) {
+      const alertType = verified 
+        ? AlertType.PAYMENT_VERIFIED 
+        : AlertType.PAYMENT_FAILED;
+      
+      await this.orderAlertsService.createCustomerAlertForPartOrder(
+        partOrderId,
+        order.customerId!,
+        alertType
+      );
+    }
+
+    return result;
   }
 
   /**
