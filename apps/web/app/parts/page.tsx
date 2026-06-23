@@ -251,30 +251,33 @@ export default function PartsPage() {
                       {/* Branch Info */}
                       {part.inventories && part.inventories.length > 0 && (
                         <div className="mb-4 space-y-1.5">
-                          {part.inventories.slice(0, 2).map((inv: any) => (
-                            <div
-                              key={inv.id}
-                              className="flex items-center justify-between text-xs rounded-lg px-2.5 py-1.5"
-                              style={{
-                                backgroundColor: theme.backgrounds.tertiary,
-                                color: theme.text.secondary,
-                              }}
-                            >
-                              <span className="flex items-center gap-1">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                  <circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                {inv.branch?.name} 
-                              </span>
-                              <span style={{
-                                color: inv.quantity > 10 ? '#22c55e' : inv.quantity > 0 ? '#f59e0b' : '#ef4444',
-                                fontWeight: 600,
-                              }}>
-                                {inv.quantity} pcs
-                              </span>
-                            </div>
-                          ))}
+                          {part.inventories.slice(0, 2).map((inv: any) => {
+                            const availableQuantity = inv.quantity - inv.reservedQuantity;
+                            return (
+                              <div
+                                key={inv.id}
+                                className="flex items-center justify-between text-xs rounded-lg px-2.5 py-1.5"
+                                style={{
+                                  backgroundColor: theme.backgrounds.tertiary,
+                                  color: theme.text.secondary,
+                                }}
+                              >
+                                <span className="flex items-center gap-1">
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                  </svg>
+                                  {inv.branch?.name} 
+                                </span>
+                                <span style={{
+                                  color: availableQuantity > 10 ? '#22c55e' : availableQuantity > 0 ? '#f59e0b' : '#ef4444',
+                                  fontWeight: 600,
+                                }}>
+                                  {availableQuantity} pcs
+                                </span>
+                              </div>
+                            );
+                          })}
                           {part.inventories.length > 2 && (
                             <p className="text-xs text-center" style={{ color: theme.text.muted }}>
                               +{part.inventories.length - 2} more branches
