@@ -31,6 +31,8 @@ export interface DashboardStats {
   pendingVerifications: number;
   cancelledOrders: number;
   totalRevenue?: number;
+  totalExpenses?: number;
+  totalProfit?: number;
   bikesSold?: number;
 }
 
@@ -237,6 +239,29 @@ export interface DeliveryRequest {
   status: string;
   approvedAt: string | null;
   deliveredAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum ExpenseCategory {
+  UTILITIES = "UTILITIES",
+  RENT = "RENT",
+  MAINTENANCE = "MAINTENANCE",
+  SALARY = "SALARY",
+  MARKETING = "MARKETING",
+  OTHER = "OTHER",
+}
+
+export interface Expense {
+  id: string;
+  amount: number;
+  date: string;
+  category: ExpenseCategory;
+  description: string | null;
+  branchId: string;
+  branch: Pick<Branch, "name">;
+  recordedById: string;
+  recordedBy: Pick<User, "fullName">;
   createdAt: string;
   updatedAt: string;
 }

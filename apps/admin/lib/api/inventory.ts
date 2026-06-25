@@ -65,6 +65,11 @@ export async function transferBike(id: string, branchId: string) {
   return response.data;
 }
 
+export async function updateBulkDiscount(discountPercent: number) {
+  const response = await api.patch(`/inventory/bikes/discount/bulk`, { discountPercent });
+  return response.data;
+}
+
 export async function attachDocument(
   bikeId: string,
   data: {

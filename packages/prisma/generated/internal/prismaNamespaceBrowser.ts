@@ -65,6 +65,7 @@ export const ModelName = {
   PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
   PartPaymentTransaction: 'PartPaymentTransaction',
+  Expense: 'Expense',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
   AuditLog: 'AuditLog'
@@ -331,6 +332,21 @@ export const PartPaymentTransactionScalarFieldEnum = {
 } as const
 
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  date: 'date',
+  category: 'category',
+  description: 'description',
+  branchId: 'branchId',
+  recordedById: 'recordedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
 
 
 export const DeliveryRequestScalarFieldEnum = {

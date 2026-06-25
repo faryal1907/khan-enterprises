@@ -88,6 +88,11 @@ export type PaymentTransaction = Prisma.PaymentTransactionModel
  */
 export type PartPaymentTransaction = Prisma.PartPaymentTransactionModel
 /**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel
+/**
  * Model DeliveryRequest
  * 
  */

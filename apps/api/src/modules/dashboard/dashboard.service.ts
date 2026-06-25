@@ -34,6 +34,7 @@ export class DashboardService {
       partPendingVerifications,
       cancelledBikeOrders,
       cancelledPartOrders,
+      expensesAgg,
     ] = await Promise.all([
       branchId
         ? this.prisma.client.branch.findUnique({
@@ -114,10 +115,16 @@ export class DashboardService {
       this.prisma.client.partOrder.count({
         where: { ...branchFilter, status: OrderStatus.CANCELLED },
       }),
+      this.prisma.client.expense.aggregate({
+        where: branchId ? { branchId } : undefined,
+        _sum: { amount: true },
+      }),
     ]);
 
     const totalRevenue =
       Number(bikePayments._sum.amount ?? 0) + Number(partPayments._sum.amount ?? 0);
+    const totalExpenses = Number(expensesAgg._sum.amount ?? 0);
+    const totalProfit = totalRevenue - totalExpenses;
     const availableParts =
       (availablePartsAgg._sum.quantity ?? 0) -
       (availablePartsAgg._sum.reservedQuantity ?? 0);
@@ -147,6 +154,8 @@ export class DashboardService {
     return {
       ...commonStats,
       totalRevenue,
+      totalExpenses,
+      totalProfit,
       bikesSold,
     };
   }

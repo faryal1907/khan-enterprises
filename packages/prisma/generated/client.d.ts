@@ -20,6 +20,7 @@ export type OrderAlert = Prisma.OrderAlertModel;
 export type PartOrder = Prisma.PartOrderModel;
 export type PaymentTransaction = Prisma.PaymentTransactionModel;
 export type PartPaymentTransaction = Prisma.PartPaymentTransactionModel;
+export type Expense = Prisma.ExpenseModel;
 export type DeliveryRequest = Prisma.DeliveryRequestModel;
 export type Document = Prisma.DocumentModel;
 export type AuditLog = Prisma.AuditLogModel;

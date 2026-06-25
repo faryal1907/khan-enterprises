@@ -1,11 +1,46 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Prisma } from "@khan/prisma";
+import { Prisma, AuditAction } from "@khan/prisma";
 import { PrismaService } from "../../prisma/prisma.service";
 import { QueryAuditLogsDto } from "./dto/query-audit-logs.dto";
 
 @Injectable()
 export class AuditLogsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async logAction(
+    userId: string | null,
+    action: AuditAction,
+    entityType: string,
+    entityId: string,
+    oldValue: any | null = null,
+    newValue: any | null = null,
+    ipAddress?: string,
+  ) {
+    let userRole: any = undefined;
+
+    if (userId) {
+      const user = await this.prisma.client.user.findUnique({
+        where: { id: userId },
+        select: { role: true },
+      });
+      if (user) {
+        userRole = user.role;
+      }
+    }
+
+    return this.prisma.client.auditLog.create({
+      data: {
+        userId,
+        userRole,
+        action,
+        entityType,
+        entityId,
+        oldValue: oldValue ? JSON.parse(JSON.stringify(oldValue)) : null,
+        newValue: newValue ? JSON.parse(JSON.stringify(newValue)) : null,
+        ipAddress,
+      },
+    });
+  }
 
   private readonly auditLogSelect = {
     id: true,

@@ -87,3 +87,12 @@ export declare const FileType: {
     readonly SALE_AGREEMENT: "SALE_AGREEMENT";
 };
 export type FileType = (typeof FileType)[keyof typeof FileType];
+export declare const ExpenseCategory: {
+    readonly UTILITIES: "UTILITIES";
+    readonly RENT: "RENT";
+    readonly MAINTENANCE: "MAINTENANCE";
+    readonly SALARY: "SALARY";
+    readonly MARKETING: "MARKETING";
+    readonly OTHER: "OTHER";
+};
+export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory];

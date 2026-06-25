@@ -6,6 +6,7 @@ import { Roles } from "../auth/decorators/roles.decorator";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
+
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { CreateBikeUnitDto } from "./dto/create-bike-unit.dto";
 import { UpdateBikeUnitDto } from "./dto/update-bike-unit.dto";
@@ -14,12 +15,13 @@ import { TransferBikeDto } from "./dto/transfer-bike.dto";
 import { TransferPartDto } from "./dto/transfer-part.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { QueryBikesDto } from "./dto/query-bikes.dto";
+import { UpdateBulkDiscountDto } from "./dto/update-bulk-discount.dto";
 
 @Controller("inventory")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles("ADMIN", "MANAGER", "SALES_STAFF")
 export class InventoryController {
-  constructor(private readonly inventoryService: InventoryService) {}
+  constructor(private readonly inventoryService: InventoryService) { }
 
   /**
    * POST /api/inventory/bikes
@@ -39,6 +41,16 @@ export class InventoryController {
   @Get("bikes")
   async getBikes(@Query() query: QueryBikesDto, @CurrentUser() user: any) {
     return this.inventoryService.getAllBikes(query, user);
+  }
+
+  /**
+   * PATCH /api/inventory/bikes/discount/bulk
+   * Bulk updates onlineDiscountPercent for all AVAILABLE bikes
+   */
+  @Patch("bikes/discount/bulk")
+  @Roles("ADMIN")
+  async updateBulkDiscount(@Body() dto: UpdateBulkDiscountDto, @CurrentUser() user: any) {
+    return this.inventoryService.updateBulkDiscount(dto.discountPercent, user);
   }
 
   /**

@@ -19,6 +19,7 @@ import { PdfModule } from "./modules/pdf/pdf.module";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
 import { OrderAlertsModule } from "./modules/order-alerts/order-alerts.module";
 import { FirebaseModule } from './modules/firebase/firebase.module';
+import { ExpensesModule } from "./modules/expenses/expenses.module";
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
     DeliveriesModule,
     AuditLogsModule,
     FirebaseModule,
+    ExpensesModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,  // 1 minute

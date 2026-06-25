@@ -107,6 +107,15 @@ enum FileType {
   SALE_AGREEMENT
 }
 
+enum ExpenseCategory {
+  UTILITIES
+  RENT
+  MAINTENANCE
+  SALARY
+  MARKETING
+  OTHER
+}
+
 // ============================================================================
 // AUTH & USERS
 // ============================================================================
@@ -141,6 +150,7 @@ model User {
   stockMovements  StockMovement[]
   documents       Document[]
   orderAlerts     OrderAlert[]
+  recordedExpenses Expense[]
   
   fcmTokens       String[]        @default([])
 
@@ -186,6 +196,7 @@ model Branch {
 
   orders     Order[]
   partOrders PartOrder[]
+  expenses   Expense[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -534,6 +545,32 @@ model PartPaymentTransaction {
 
   @@index([status])
   @@index([gatewayReference])
+}
+
+// ============================================================================
+// EXPENSES
+// ============================================================================
+
+model Expense {
+  id String @id @default(uuid())
+
+  amount      Decimal @db.Decimal(12, 2)
+  date        DateTime
+  category    ExpenseCategory
+  description String?
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  recordedById String
+  recordedBy   User   @relation(fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+  @@index([recordedById])
+  @@index([date])
 }
 
 // ============================================================================

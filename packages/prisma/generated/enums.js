@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
+exports.ExpenseCategory = exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
 exports.UserRole = {
     ADMIN: 'ADMIN',
     MANAGER: 'MANAGER',
@@ -77,5 +77,13 @@ exports.FileType = {
     SALES_INVOICE: 'SALES_INVOICE',
     PAYMENT_RECEIPT: 'PAYMENT_RECEIPT',
     SALE_AGREEMENT: 'SALE_AGREEMENT'
+};
+exports.ExpenseCategory = {
+    UTILITIES: 'UTILITIES',
+    RENT: 'RENT',
+    MAINTENANCE: 'MAINTENANCE',
+    SALARY: 'SALARY',
+    MARKETING: 'MARKETING',
+    OTHER: 'OTHER'
 };
 //# sourceMappingURL=enums.js.map

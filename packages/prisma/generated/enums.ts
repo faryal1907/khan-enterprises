@@ -132,3 +132,15 @@ export const FileType = {
 } as const
 
 export type FileType = (typeof FileType)[keyof typeof FileType]
+
+
+export const ExpenseCategory = {
+  UTILITIES: 'UTILITIES',
+  RENT: 'RENT',
+  MAINTENANCE: 'MAINTENANCE',
+  SALARY: 'SALARY',
+  MARKETING: 'MARKETING',
+  OTHER: 'OTHER'
+} as const
+
+export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory]

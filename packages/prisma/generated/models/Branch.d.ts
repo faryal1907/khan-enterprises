@@ -166,6 +166,7 @@ export type BranchWhereInput = {
     partInventory?: Prisma.PartInventoryListRelationFilter;
     orders?: Prisma.OrderListRelationFilter;
     partOrders?: Prisma.PartOrderListRelationFilter;
+    expenses?: Prisma.ExpenseListRelationFilter;
 };
 export type BranchOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -184,6 +185,7 @@ export type BranchOrderByWithRelationInput = {
     partInventory?: Prisma.PartInventoryOrderByRelationAggregateInput;
     orders?: Prisma.OrderOrderByRelationAggregateInput;
     partOrders?: Prisma.PartOrderOrderByRelationAggregateInput;
+    expenses?: Prisma.ExpenseOrderByRelationAggregateInput;
 };
 export type BranchWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -206,6 +208,7 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
     partInventory?: Prisma.PartInventoryListRelationFilter;
     orders?: Prisma.OrderListRelationFilter;
     partOrders?: Prisma.PartOrderListRelationFilter;
+    expenses?: Prisma.ExpenseListRelationFilter;
 }, "id" | "name_city">;
 export type BranchOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -255,6 +258,7 @@ export type BranchCreateInput = {
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateInput = {
     id?: string;
@@ -272,6 +276,7 @@ export type BranchUncheckedCreateInput = {
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -289,6 +294,7 @@ export type BranchUpdateInput = {
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -306,6 +312,7 @@ export type BranchUncheckedUpdateInput = {
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateManyInput = {
     id?: string;
@@ -513,6 +520,18 @@ export type BranchUpdateOneRequiredWithoutPartOrdersNestedInput = {
     connect?: Prisma.BranchWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutPartOrdersInput, Prisma.BranchUpdateWithoutPartOrdersInput>, Prisma.BranchUncheckedUpdateWithoutPartOrdersInput>;
 };
+export type BranchCreateNestedOneWithoutExpensesInput = {
+    create?: Prisma.XOR<Prisma.BranchCreateWithoutExpensesInput, Prisma.BranchUncheckedCreateWithoutExpensesInput>;
+    connectOrCreate?: Prisma.BranchCreateOrConnectWithoutExpensesInput;
+    connect?: Prisma.BranchWhereUniqueInput;
+};
+export type BranchUpdateOneRequiredWithoutExpensesNestedInput = {
+    create?: Prisma.XOR<Prisma.BranchCreateWithoutExpensesInput, Prisma.BranchUncheckedCreateWithoutExpensesInput>;
+    connectOrCreate?: Prisma.BranchCreateOrConnectWithoutExpensesInput;
+    upsert?: Prisma.BranchUpsertWithoutExpensesInput;
+    connect?: Prisma.BranchWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutExpensesInput, Prisma.BranchUpdateWithoutExpensesInput>, Prisma.BranchUncheckedUpdateWithoutExpensesInput>;
+};
 export type BranchCreateWithoutUsersInput = {
     id?: string;
     name: string;
@@ -528,6 +547,7 @@ export type BranchCreateWithoutUsersInput = {
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutUsersInput = {
     id?: string;
@@ -544,6 +564,7 @@ export type BranchUncheckedCreateWithoutUsersInput = {
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutUsersInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -564,6 +585,7 @@ export type BranchCreateWithoutManagerInput = {
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutManagerInput = {
     id?: string;
@@ -580,6 +602,7 @@ export type BranchUncheckedCreateWithoutManagerInput = {
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutManagerInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -613,6 +636,7 @@ export type BranchUpdateWithoutUsersInput = {
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutUsersInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -629,6 +653,7 @@ export type BranchUncheckedUpdateWithoutUsersInput = {
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUpsertWithWhereUniqueWithoutManagerInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -673,6 +698,7 @@ export type BranchCreateWithoutBikeInventoryInput = {
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutBikeInventoryInput = {
     id?: string;
@@ -689,6 +715,7 @@ export type BranchUncheckedCreateWithoutBikeInventoryInput = {
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutBikeInventoryInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -718,6 +745,7 @@ export type BranchUpdateWithoutBikeInventoryInput = {
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -734,6 +762,7 @@ export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateWithoutPartInventoryInput = {
     id?: string;
@@ -750,6 +779,7 @@ export type BranchCreateWithoutPartInventoryInput = {
     bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutPartInventoryInput = {
     id?: string;
@@ -766,6 +796,7 @@ export type BranchUncheckedCreateWithoutPartInventoryInput = {
     bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutPartInventoryInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -795,6 +826,7 @@ export type BranchUpdateWithoutPartInventoryInput = {
     bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutPartInventoryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -811,6 +843,7 @@ export type BranchUncheckedUpdateWithoutPartInventoryInput = {
     bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateWithoutOrdersInput = {
     id?: string;
@@ -827,6 +860,7 @@ export type BranchCreateWithoutOrdersInput = {
     bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutOrdersInput = {
     id?: string;
@@ -843,6 +877,7 @@ export type BranchUncheckedCreateWithoutOrdersInput = {
     bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutOrdersInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -872,6 +907,7 @@ export type BranchUpdateWithoutOrdersInput = {
     bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutOrdersInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -888,6 +924,7 @@ export type BranchUncheckedUpdateWithoutOrdersInput = {
     bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateWithoutPartOrdersInput = {
     id?: string;
@@ -904,6 +941,7 @@ export type BranchCreateWithoutPartOrdersInput = {
     bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput;
 };
 export type BranchUncheckedCreateWithoutPartOrdersInput = {
     id?: string;
@@ -920,6 +958,7 @@ export type BranchUncheckedCreateWithoutPartOrdersInput = {
     bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
     partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
     orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
+    expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput;
 };
 export type BranchCreateOrConnectWithoutPartOrdersInput = {
     where: Prisma.BranchWhereUniqueInput;
@@ -949,6 +988,7 @@ export type BranchUpdateWithoutPartOrdersInput = {
     bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutPartOrdersInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -965,6 +1005,88 @@ export type BranchUncheckedUpdateWithoutPartOrdersInput = {
     bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
+};
+export type BranchCreateWithoutExpensesInput = {
+    id?: string;
+    name: string;
+    city: string;
+    address: string;
+    phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput;
+    users?: Prisma.UserCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput;
+};
+export type BranchUncheckedCreateWithoutExpensesInput = {
+    id?: string;
+    name: string;
+    city: string;
+    address: string;
+    phoneNumber?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    managerId?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput;
+    partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput;
+    orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput;
+    partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput;
+};
+export type BranchCreateOrConnectWithoutExpensesInput = {
+    where: Prisma.BranchWhereUniqueInput;
+    create: Prisma.XOR<Prisma.BranchCreateWithoutExpensesInput, Prisma.BranchUncheckedCreateWithoutExpensesInput>;
+};
+export type BranchUpsertWithoutExpensesInput = {
+    update: Prisma.XOR<Prisma.BranchUpdateWithoutExpensesInput, Prisma.BranchUncheckedUpdateWithoutExpensesInput>;
+    create: Prisma.XOR<Prisma.BranchCreateWithoutExpensesInput, Prisma.BranchUncheckedCreateWithoutExpensesInput>;
+    where?: Prisma.BranchWhereInput;
+};
+export type BranchUpdateToOneWithWhereWithoutExpensesInput = {
+    where?: Prisma.BranchWhereInput;
+    data: Prisma.XOR<Prisma.BranchUpdateWithoutExpensesInput, Prisma.BranchUncheckedUpdateWithoutExpensesInput>;
+};
+export type BranchUpdateWithoutExpensesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    city?: Prisma.StringFieldUpdateOperationsInput | string;
+    address?: Prisma.StringFieldUpdateOperationsInput | string;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput;
+    users?: Prisma.UserUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+};
+export type BranchUncheckedUpdateWithoutExpensesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    city?: Prisma.StringFieldUpdateOperationsInput | string;
+    address?: Prisma.StringFieldUpdateOperationsInput | string;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null;
+    managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput;
+    bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput;
+    partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
+    orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
+    partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchCreateManyManagerInput = {
     id?: string;
@@ -992,6 +1114,7 @@ export type BranchUpdateWithoutManagerInput = {
     partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateWithoutManagerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1008,6 +1131,7 @@ export type BranchUncheckedUpdateWithoutManagerInput = {
     partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput;
     orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput;
     partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput;
+    expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput;
 };
 export type BranchUncheckedUpdateManyWithoutManagerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1026,6 +1150,7 @@ export type BranchCountOutputType = {
     partInventory: number;
     orders: number;
     partOrders: number;
+    expenses: number;
 };
 export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     users?: boolean | BranchCountOutputTypeCountUsersArgs;
@@ -1033,6 +1158,7 @@ export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
     partInventory?: boolean | BranchCountOutputTypeCountPartInventoryArgs;
     orders?: boolean | BranchCountOutputTypeCountOrdersArgs;
     partOrders?: boolean | BranchCountOutputTypeCountPartOrdersArgs;
+    expenses?: boolean | BranchCountOutputTypeCountExpensesArgs;
 };
 export type BranchCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.BranchCountOutputTypeSelect<ExtArgs> | null;
@@ -1052,6 +1178,9 @@ export type BranchCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.E
 export type BranchCountOutputTypeCountPartOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.PartOrderWhereInput;
 };
+export type BranchCountOutputTypeCountExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ExpenseWhereInput;
+};
 export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     name?: boolean;
@@ -1069,6 +1198,7 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     partInventory?: boolean | Prisma.Branch$partInventoryArgs<ExtArgs>;
     orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>;
     partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>;
+    expenses?: boolean | Prisma.Branch$expensesArgs<ExtArgs>;
     _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["branch"]>;
 export type BranchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1117,6 +1247,7 @@ export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     partInventory?: boolean | Prisma.Branch$partInventoryArgs<ExtArgs>;
     orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>;
     partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>;
+    expenses?: boolean | Prisma.Branch$expensesArgs<ExtArgs>;
     _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type BranchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1134,6 +1265,7 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         partInventory: Prisma.$PartInventoryPayload<ExtArgs>[];
         orders: Prisma.$OrderPayload<ExtArgs>[];
         partOrders: Prisma.$PartOrderPayload<ExtArgs>[];
+        expenses: Prisma.$ExpensePayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -1204,6 +1336,7 @@ export interface Prisma__BranchClient<T, Null = never, ExtArgs extends runtime.T
     partInventory<T extends Prisma.Branch$partInventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partInventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     orders<T extends Prisma.Branch$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     partOrders<T extends Prisma.Branch$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    expenses<T extends Prisma.Branch$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -1380,6 +1513,17 @@ export type Branch$partOrdersArgs<ExtArgs extends runtime.Types.Extensions.Inter
     take?: number;
     skip?: number;
     distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[];
+};
+export type Branch$expensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.ExpenseSelect<ExtArgs> | null;
+    omit?: Prisma.ExpenseOmit<ExtArgs> | null;
+    include?: Prisma.ExpenseInclude<ExtArgs> | null;
+    where?: Prisma.ExpenseWhereInput;
+    orderBy?: Prisma.ExpenseOrderByWithRelationInput | Prisma.ExpenseOrderByWithRelationInput[];
+    cursor?: Prisma.ExpenseWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[];
 };
 export type BranchDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.BranchSelect<ExtArgs> | null;

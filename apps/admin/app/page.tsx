@@ -167,6 +167,18 @@ function DashboardCards({
       emphasis: "primary",
     },
     {
+      label: role === UserRole.ADMIN ? "Total Expenses" : "Scope Expenses",
+      field: "totalExpenses",
+      format: "currency",
+      emphasis: "secondary",
+    },
+    {
+      label: role === UserRole.ADMIN ? "Total Profit" : "Scope Profit",
+      field: "totalProfit",
+      format: "currency",
+      emphasis: "primary",
+    },
+    {
       label: "Bikes Sold",
       field: "bikesSold",
       href: "/bikes?status=SOLD",
@@ -181,12 +193,12 @@ function DashboardCards({
     operationalCards[0],
   ];
 
-  return (
-    <>
-      <MetricGrid cards={summaryCards} stats={stats} columns={4} />
-      <MetricGrid cards={operationalCards.slice(1, 6)} stats={stats} columns={4} />
-    </>
-  );
+  const allCards: MetricCard[] = [
+    ...summaryCards,
+    ...operationalCards.slice(1),
+  ];
+
+  return <MetricGrid cards={allCards} stats={stats} columns={4} />;
 }
 
 type MetricCard = {

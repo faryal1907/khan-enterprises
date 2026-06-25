@@ -171,6 +171,7 @@ export declare const ModelName: {
     readonly PartOrder: "PartOrder";
     readonly PaymentTransaction: "PaymentTransaction";
     readonly PartPaymentTransaction: "PartPaymentTransaction";
+    readonly Expense: "Expense";
     readonly DeliveryRequest: "DeliveryRequest";
     readonly Document: "Document";
     readonly AuditLog: "AuditLog";
@@ -186,7 +187,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "deliveryRequest" | "document" | "auditLog";
+        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1226,6 +1227,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        Expense: {
+            payload: Prisma.$ExpensePayload<ExtArgs>;
+            fields: Prisma.ExpenseFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ExpenseFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ExpenseFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>;
+                };
+                findFirst: {
+                    args: Prisma.ExpenseFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ExpenseFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>;
+                };
+                findMany: {
+                    args: Prisma.ExpenseFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>[];
+                };
+                create: {
+                    args: Prisma.ExpenseCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>;
+                };
+                createMany: {
+                    args: Prisma.ExpenseCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.ExpenseCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>[];
+                };
+                delete: {
+                    args: Prisma.ExpenseDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>;
+                };
+                update: {
+                    args: Prisma.ExpenseUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ExpenseDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ExpenseUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.ExpenseUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>[];
+                };
+                upsert: {
+                    args: Prisma.ExpenseUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>;
+                };
+                aggregate: {
+                    args: Prisma.ExpenseAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateExpense>;
+                };
+                groupBy: {
+                    args: Prisma.ExpenseGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ExpenseGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ExpenseCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ExpenseCountAggregateOutputType> | number;
+                };
+            };
+        };
         DeliveryRequest: {
             payload: Prisma.$DeliveryRequestPayload<ExtArgs>;
             fields: Prisma.DeliveryRequestFieldRefs;
@@ -1684,6 +1759,18 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum];
+export declare const ExpenseScalarFieldEnum: {
+    readonly id: "id";
+    readonly amount: "amount";
+    readonly date: "date";
+    readonly category: "category";
+    readonly description: "description";
+    readonly branchId: "branchId";
+    readonly recordedById: "recordedById";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum];
 export declare const DeliveryRequestScalarFieldEnum: {
     readonly id: "id";
     readonly orderId: "orderId";
@@ -1786,6 +1873,8 @@ export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>;
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>;
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>;
+export type EnumExpenseCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExpenseCategory'>;
+export type ListEnumExpenseCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExpenseCategory[]'>;
 export type EnumDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryStatus'>;
 export type ListEnumDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryStatus[]'>;
 export type EnumFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FileType'>;
@@ -1831,6 +1920,7 @@ export type GlobalOmitConfig = {
     partOrder?: Prisma.PartOrderOmit;
     paymentTransaction?: Prisma.PaymentTransactionOmit;
     partPaymentTransaction?: Prisma.PartPaymentTransactionOmit;
+    expense?: Prisma.ExpenseOmit;
     deliveryRequest?: Prisma.DeliveryRequestOmit;
     document?: Prisma.DocumentOmit;
     auditLog?: Prisma.AuditLogOmit;

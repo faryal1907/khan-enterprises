@@ -47,6 +47,7 @@ export const theme = {
     secondary: colors.lime, // positive / highlight accents
     tertiary: colors.maroonTint, // soft highlight backgrounds
     highlight: colors.lime,
+    error: "#EF4444", // standard red for errors
   },
   borders: {
     light: colors.gray200,

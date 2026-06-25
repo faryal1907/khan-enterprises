@@ -16,6 +16,7 @@ import {
   getVendors,
   transferBike,
   updateBikeStatus,
+  updateBulkDiscount,
 } from "@/lib/api/inventory";
 import { useAuthStore } from "@/lib/auth-store";
 import { theme } from "@/lib/colors";
@@ -82,9 +83,11 @@ export default function BikesListPage() {
 
   const [selectedBike, setSelectedBike] = useState<BikeUnit | null>(null);
   const [transferBranchId, setTransferBranchId] = useState("");
-  const [modal, setModal] = useState<"transfer" | "release" | null>(null);
+  const [modal, setModal] = useState<"transfer" | "release" | "discount" | null>(null);
   const [isTransferring, setIsTransferring] = useState(false);
   const [isReleasing, setIsReleasing] = useState(false);
+  const [isSettingDiscount, setIsSettingDiscount] = useState(false);
+  const [bulkDiscountValue, setBulkDiscountValue] = useState<number>(2);
   const requestId = useRef(0);
 
   useEffect(() => {
@@ -144,11 +147,11 @@ export default function BikesListPage() {
   };
 
   const closeModal = useCallback(() => {
-    if (isTransferring || isReleasing) return;
+    if (isTransferring || isReleasing || isSettingDiscount) return;
     setModal(null);
     setSelectedBike(null);
     setTransferBranchId("");
-  }, [isReleasing, isTransferring]);
+  }, [isReleasing, isTransferring, isSettingDiscount]);
 
   const refetch = () => setRefreshKey((key) => key + 1);
 
@@ -186,6 +189,25 @@ export default function BikesListPage() {
     }
   };
 
+  const submitDiscount = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (bulkDiscountValue < 0 || bulkDiscountValue > 100) {
+      toast.error("Discount must be between 0 and 100");
+      return;
+    }
+    setIsSettingDiscount(true);
+    try {
+      await updateBulkDiscount(bulkDiscountValue);
+      toast.success("Global discount applied to all available bikes");
+      setModal(null);
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to apply discount");
+    } finally {
+      setIsSettingDiscount(false);
+    }
+  };
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -199,13 +221,22 @@ export default function BikesListPage() {
             </p>
           </div>
           {isAdmin && (
-            <Link
-              href="/bikes/new"
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-            >
-              Add New Bike
-            </Link>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setModal("discount")}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 bg-transparent"
+                style={{ border: `1px solid ${theme.accents.secondary}`, color: theme.accents.secondary }}
+              >
+                Set Global Discount
+              </button>
+              <Link
+                href="/bikes/new"
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+              >
+                Add New Bike
+              </Link>
+            </div>
           )}
         </div>
 
@@ -373,6 +404,45 @@ export default function BikesListPage() {
               Release Bike
             </AsyncButton>
           </ModalActions>
+        </ActionModal>
+      )}
+
+      {modal === "discount" && (
+        <ActionModal title="Set Global Online Discount" onClose={closeModal}>
+          <form onSubmit={submitDiscount} className="space-y-4">
+            <p className="text-sm" style={{ color: theme.text.secondary }}>
+              Update the online discount percentage for ALL available bikes across all branches. This action requires Admin privileges and cannot be undone directly.
+            </p>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Discount Percentage (%)
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                required
+                value={bulkDiscountValue}
+                onChange={(e) => setBulkDiscountValue(Number(e.target.value))}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+              />
+            </div>
+            <ModalActions onCancel={closeModal}>
+              <AsyncButton
+                type="submit"
+                loading={isSettingDiscount}
+                loadingLabel="Applying..."
+              >
+                Confirm & Apply
+              </AsyncButton>
+            </ModalActions>
+          </form>
         </ActionModal>
       )}
     </div>

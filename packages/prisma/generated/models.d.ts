@@ -12,6 +12,7 @@ export type * from './models/OrderAlert.ts';
 export type * from './models/PartOrder.ts';
 export type * from './models/PaymentTransaction.ts';
 export type * from './models/PartPaymentTransaction.ts';
+export type * from './models/Expense.ts';
 export type * from './models/DeliveryRequest.ts';
 export type * from './models/Document.ts';
 export type * from './models/AuditLog.ts';
