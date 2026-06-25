@@ -235,7 +235,7 @@ export class OrdersService {
       
       if (isCash) {
         expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 2);
+        expiresAt.setDate(expiresAt.getDate() + 1);
         reservationExpiry = expiresAt;
       }
 
@@ -662,9 +662,9 @@ export class OrdersService {
       // 5. Update order → PAID, bike → SOLD
       let reservationExpiry = order.reservationExpiry;
       if (dto.method === "CASH" && order.pickupType === "ONSITE_PICKUP") {
-        // Set reservation expiry to 2 days from now for cash pickups
+        // Set reservation expiry to 1 day from now for cash pickups
         reservationExpiry = new Date();
-        reservationExpiry.setDate(reservationExpiry.getDate() + 2);
+        reservationExpiry.setDate(reservationExpiry.getDate() + 1);
       } else if (dto.method !== "CASH") {
         // If it's fully paid non-cash, no expiry applies
         reservationExpiry = null;

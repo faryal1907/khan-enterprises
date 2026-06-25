@@ -361,7 +361,7 @@ async function main() {
   console.log("🏷️ Seeding Bike Units...");
 
   const reservedExpiry = new Date();
-  reservedExpiry.setHours(reservedExpiry.getHours() + 48);
+  reservedExpiry.setHours(reservedExpiry.getHours() + 24);
 
   // --- Evee Units ---
   await prisma.bikeUnit.upsert({

@@ -157,3 +157,25 @@
 2026-06-25T21:52:39.600399Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
 2026-06-25T21:52:41.899036Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\bdb19216f1d5907b-turbo.log.2026-06-25")}
 2026-06-25T21:52:41.899060Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-25T21:52:42.601301Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\bdb19216f1d5907b-turbo.log.2026-06-25")}
+2026-06-25T21:52:42.601334Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-25T21:52:49.298243Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\bdb19216f1d5907b-turbo.log.2026-06-25")}
+2026-06-25T21:52:49.298262Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-25T21:53:36.598401Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\bdb19216f1d5907b-turbo.log.2026-06-25")}
+2026-06-25T21:53:36.598437Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-25T21:57:08.103290Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\api\\src\\modules\\orders\\orders.service.ts")}
+2026-06-25T21:57:08.103316Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
+2026-06-25T21:57:16.200966Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\api\\src\\modules\\orders\\orders.service.ts")}
+2026-06-25T21:57:16.200986Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
+2026-06-25T21:57:28.409548Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\api\\src\\modules\\part-orders\\part-orders.service.ts")}
+2026-06-25T21:57:28.409568Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
+2026-06-25T21:57:37.703684Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\web\\app\\part-orders\\new\\page.tsx")}
+2026-06-25T21:57:37.703709Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps\\web") }}))
+2026-06-25T21:57:47.804022Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\web\\app\\orders\\[orderNumber]\\page.tsx")}
+2026-06-25T21:57:47.804063Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps\\web") }}))
+2026-06-25T21:57:49.905382Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\web\\app\\orders\\new\\page.tsx")}
+2026-06-25T21:57:49.905414Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("web"), path: AnchoredSystemPathBuf("apps\\web") }}))
+2026-06-25T21:58:06.104887Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\seed.ts")}
+2026-06-25T21:58:06.104908Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
+2026-06-25T21:58:08.106534Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\seed-supabase.ts")}
+2026-06-25T21:58:08.106560Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))

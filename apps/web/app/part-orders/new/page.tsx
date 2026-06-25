@@ -219,10 +219,10 @@ export default function NewPartOrderPage() {
               <div className="rounded-xl p-6 text-left mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
                 <p className="font-semibold" style={{ color: "#065F46" }}>Cash on Delivery — Onsite Pickup</p>
                 <p className="text-sm mt-2" style={{ color: "#065F46" }}>
-                  Your parts have been reserved for <strong>48 hours</strong>. Please visit the store within this time to pick them up.
+                  Your parts have been reserved for <strong>24 hours</strong>. Please visit the store within this time to pick them up.
                 </p>
                 <p className="text-xs mt-1" style={{ color: "#065F46" }}>
-                  If not picked up within 48 hours, your order will be automatically cancelled.
+                  If not picked up within 24 hours, your order will be automatically cancelled.
                 </p>
                 <p className="text-sm mt-2" style={{ color: "#065F46" }}>
                   Total Amount: <strong>PKR {Number(createdOrder.amount).toLocaleString()}</strong>
@@ -415,7 +415,7 @@ export default function NewPartOrderPage() {
           {paymentMethod === "CASH" && (
             <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
               <p className="text-sm" style={{ color: "#92400E" }}>
-                <strong>Note:</strong> Your parts will be reserved for <strong>48 hours</strong>. Please visit the store to complete your purchase. If not picked up within 48 hours, the reservation will be cancelled.
+                <strong>Note:</strong> Your parts will be reserved for <strong>24 hours</strong>. Please visit the store to complete your purchase. If not picked up within 24 hours, the reservation will be cancelled.
               </p>
             </div>
           )}

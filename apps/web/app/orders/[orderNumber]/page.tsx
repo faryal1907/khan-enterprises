@@ -744,7 +744,7 @@ export default function OrderStatusPage() {
                     {order.reservationExpiry && <CountdownTimer expiresAt={order.reservationExpiry} />}
                   </div>
                   <p className="text-sm" style={{ color: theme.text.secondary }}>
-                    Your order is reserved for <strong>48 hours</strong>. Please visit the store to complete payment and pick up your order.
+                    Your order is reserved for <strong>24 hours</strong>. Please visit the store to complete payment and pick up your order.
                   </p>
                 </div>
               </div>

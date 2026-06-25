@@ -111,7 +111,7 @@ export class PartOrdersService {
       const isCash = dto.paymentMethod === "CASH";
       const orderType = isCash ? "ONSITE" : "ONLINE";
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + (isCash ? 2 : 7));
+      expiresAt.setDate(expiresAt.getDate() + (isCash ? 1 : 7));
       const reservationExpiry = isCash ? expiresAt : null;
 
       // 6. Create part order - cash orders are PENDING_PAYMENT (reserved) until actually paid at store

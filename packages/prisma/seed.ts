@@ -319,7 +319,7 @@ async function main() {
   });
 
   const reservedExpiry = new Date();
-  reservedExpiry.setHours(reservedExpiry.getHours() + 48);
+  reservedExpiry.setHours(reservedExpiry.getHours() + 24);
 
   await prisma.bikeUnit.create({
     data: {
