@@ -71,21 +71,10 @@ export default function LoginPage() {
         }}
       >
         {/* Brand header */}
-        <div className="mb-8 text-center">
-          <div
-            className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: theme.accents.primary }}
-          >
-            <span
-              className="font-bold text-2xl"
-              style={{ color: theme.text.inverse }}
-            >
-              K
-            </span>
+        <div className="mb-2 text-center">
+          <div className="w-48 h-48 flex items-center justify-center mx-auto mb-1">
+            <img src="/logo.svg" alt="Ali & Khan's Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-bold" style={{ color: theme.text.primary }}>
-            Ali & Khan's
-          </h1>
           <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
             Sign in to your account
           </p>

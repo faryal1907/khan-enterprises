@@ -40,10 +40,11 @@ export function Navigation() {
 
         {/* Logo / Brand */}
         <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-          
-          <span className="font-bold text-xl hidden sm:block" style={{ color: theme.text.primary }}>
-            ALI & KHAN'S
-          </span>
+          <img
+            src="/logo.svg"
+            alt="Khan Enterprises Logo"
+            className="h-10 w-auto object-contain"
+          />
         </Link>
 
         {/* Navigation Links - Centered */}
