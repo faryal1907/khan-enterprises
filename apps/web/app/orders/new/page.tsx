@@ -48,7 +48,8 @@ export default function NewOrderPage() {
   const [isDragging, setIsDragging] = useState(false);
 
   const basePrice = bike ? (bike.price || bike.model?.basePrice) : 0;
-  const onlinePrice = basePrice * 0.98;
+  const discountPercent = bike?.onlineDiscountPercent || 2;
+  const onlinePrice = basePrice * (1 - discountPercent / 100);
   const discountAmount = basePrice - onlinePrice;
 
   useEffect(() => {
@@ -313,7 +314,9 @@ export default function NewOrderPage() {
                 <p className="text-lg font-bold" style={{ color: theme.accents.primary }}>
                   Online Price: PKR {onlinePrice.toLocaleString()}
                 </p>
-                <p className="text-xs" style={{ color: theme.text.muted }}>You save PKR {discountAmount.toLocaleString()}</p>
+                <p className="text-xs" style={{ color: theme.text.muted }}>
+                  You save PKR {discountAmount.toLocaleString()} ({discountPercent}% discount)
+                </p>
               </div>
             </div>
           )}

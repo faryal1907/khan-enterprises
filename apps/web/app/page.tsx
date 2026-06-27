@@ -154,7 +154,7 @@ export default function Home() {
                 }}
               >
                 <p className="text-xs font-semibold" style={{ color: theme.colors.white, opacity: 0.7 }}>
-                  2% OFF
+                  DISCOUNT 
                 </p>
                 <p className="text-sm font-bold" style={{ color: theme.colors.white }}>
                   on online orders
@@ -206,7 +206,6 @@ export default function Home() {
                   color: theme.colors.white,
                 }}
               >
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: theme.accents.secondary }} />
                 <p className="text-xs font-semibold">Live across 2 branches</p>
               </div>
             </motion.div>
@@ -381,10 +380,10 @@ export default function Home() {
               }}
             >
               <h3 className="text-lg font-bold mb-2" style={{ color: theme.colors.white }}>
-                SafePay
+                Mobile Wallet
               </h3>
               <p style={{ color: theme.colors.white, opacity: 0.7 }} className="text-sm">
-                Visa/Mastercard debit & credit cards
+                Easypaisa, Jazzcash, and other mobile wallets
               </p>
             </motion.div>
 

@@ -47,7 +47,16 @@ export class CatalogService {
 
     const bikes = await this.prisma.client.bikeUnit.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        chassisNumber: true,
+        engineNumber: true,
+        serialNumber: true,
+        status: true,
+        price: true,
+        color: true,
+        media: true,
+        onlineDiscountPercent: true,
         model: true,
         branch: true,
         documents: {
@@ -67,7 +76,16 @@ export class CatalogService {
   async getBikeById(id: string) {
     const bike = await this.prisma.client.bikeUnit.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        chassisNumber: true,
+        engineNumber: true,
+        serialNumber: true,
+        status: true,
+        price: true,
+        color: true,
+        media: true,
+        onlineDiscountPercent: true,
         model: true,
         branch: true,
         documents: {
