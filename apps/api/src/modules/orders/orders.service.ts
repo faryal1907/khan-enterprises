@@ -229,7 +229,7 @@ export class OrdersService {
         throw new BadRequestException(`Payment proof URL is required for online orders`);
       }
 
-      // Set expiry: 2 days for cash (onsite pickup), no expiry for online (awaiting verification)
+      // Set expiry: 1 day for cash (onsite pickup), no expiry for online (awaiting verification)
       let expiresAt: Date | null = null;
       let reservationExpiry: Date | null = null;
       

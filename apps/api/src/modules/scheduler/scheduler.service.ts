@@ -7,6 +7,7 @@ import { OrdersService } from "../orders/orders.service";
 @Injectable()
 export class SchedulerService {
   private readonly logger = new Logger(SchedulerService.name);
+  private isExpiringCashReservations = false;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -16,107 +17,18 @@ export class SchedulerService {
 
 
   /**
-   * Task 3 — Expire orders with pending payment timeout (every hour)
-   * Find all orders (bike and part) where status = PENDING_PAYMENT AND expiresAt < now
-   * → Cancel those orders and return items to inventory
-   */
-  @Cron(CronExpression.EVERY_HOUR)
-  async expirePendingPaymentOrders() {
-    this.logger.log("Running expirePendingPaymentOrders cron job...");
-
-    try {
-      const now = new Date();
-
-      // Find expired bike orders
-      const expiredBikeOrders = await this.prisma.client.order.findMany({
-        where: {
-          status: OrderStatus.PENDING_PAYMENT,
-          expiresAt: {
-            lt: now,
-          },
-        },
-        include: {
-          bike: true,
-        },
-      });
-
-      // Find expired part orders
-      const expiredPartOrders = await this.prisma.client.partOrder.findMany({
-        where: {
-          status: OrderStatus.PENDING_PAYMENT,
-          expiresAt: {
-            lt: now,
-          },
-        },
-        include: {
-          partInventory: true,
-        },
-      });
-
-      if (expiredBikeOrders.length === 0 && expiredPartOrders.length === 0) {
-        this.logger.log("No expired orders found.");
-        return;
-      }
-
-      // Cancel expired bike orders
-      for (const order of expiredBikeOrders) {
-        await this.prisma.client.$transaction(async (tx) => {
-          await tx.order.update({
-            where: { id: order.id },
-            data: { status: OrderStatus.CANCELLED },
-          });
-
-          // Return bike to AVAILABLE status
-          await tx.bikeUnit.update({
-            where: { id: order.bikeId },
-            data: {
-              status: BikeStatus.AVAILABLE,
-              reservedUntil: null,
-              soldAt: null,
-            },
-          });
-
-          this.logger.log(`Cancelled expired bike order ${order.orderNumber}`);
-        });
-      }
-
-      // Cancel expired part orders
-      for (const order of expiredPartOrders) {
-        await this.prisma.client.$transaction(async (tx) => {
-          await tx.partOrder.update({
-            where: { id: order.id },
-            data: { status: OrderStatus.CANCELLED },
-          });
-
-          // Release reserved stock
-          await tx.partInventory.update({
-            where: { id: order.partInventoryId },
-            data: {
-              reservedQuantity: {
-                decrement: order.quantity,
-              },
-            },
-          });
-
-          this.logger.log(`Cancelled expired part order ${order.orderNumber}`);
-        });
-      }
-
-      this.logger.log(
-        `Expired ${expiredBikeOrders.length} bike order(s) and ${expiredPartOrders.length} part order(s).`,
-      );
-    } catch (error) {
-      this.logger.error("Error in expirePendingPaymentOrders cron job:", error);
-    }
-  }
-
-  /**
-   * Task 4 — Expire cash reservations (every hour)
+   * Expire cash reservations (every hour)
    * Find all orders where reservationExpiry < now AND status in [PAID, PENDING_PAYMENT]
    * → Cancel orders and return bikes to AVAILABLE
    */
   @Cron(CronExpression.EVERY_HOUR)
   async expireCashReservations() {
+    if (this.isExpiringCashReservations) {
+      this.logger.warn("expireCashReservations is already running, skipping this execution.");
+      return;
+    }
+
+    this.isExpiringCashReservations = true;
     this.logger.log("Running expireCashReservations cron job...");
 
     try {
@@ -126,6 +38,8 @@ export class SchedulerService {
       );
     } catch (error) {
       this.logger.error("Error in expireCashReservations cron job:", error);
+    } finally {
+      this.isExpiringCashReservations = false;
     }
   }
 }
