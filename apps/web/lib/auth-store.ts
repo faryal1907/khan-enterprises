@@ -76,6 +76,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         Cookies.remove("refreshToken");
         Cookies.remove("user");
       }
+    } else if (token || userCookie) {
+      // Clear partial state
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
+      Cookies.remove("user");
     }
   },
 }));

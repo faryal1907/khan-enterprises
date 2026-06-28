@@ -8,11 +8,16 @@ const publicPaths = ["/login", "/signup", "/", "/bikes", "/parts", "/search", "/
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(WEB_ACCESS_TOKEN_COOKIE);
+  const userCookie = request.cookies.get("user");
 
   // If trying to access public path, allow it
-  if (publicPaths.some((path) => pathname.startsWith(path))) {
+  const isPublicPath = publicPaths.some((path) => 
+    path === "/" ? pathname === "/" : pathname.startsWith(path)
+  );
+
+  if (isPublicPath) {
     // If already logged in and trying to access login, redirect to dashboard
-    if (token && pathname === "/login") {
+    if (token && userCookie && pathname === "/login") {
       return NextResponse.redirect(new URL("/", request.url));
     }
     return NextResponse.next();
