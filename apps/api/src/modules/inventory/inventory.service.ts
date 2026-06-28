@@ -76,7 +76,7 @@ export class InventoryService {
     const summaryWhere = { ...where };
     delete summaryWhere.status;
 
-    const [bikes, total, available, reserved, sold, inDelivery] = await Promise.all([
+    const [bikes, total, statusStats] = await Promise.all([
       this.prisma.client.bikeUnit.findMany({
         where,
         skip,
@@ -112,11 +112,17 @@ export class InventoryService {
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.client.bikeUnit.count({ where }),
-      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.AVAILABLE } }),
-      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.RESERVED } }),
-      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.SOLD } }),
-      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.IN_DELIVERY } }),
+      this.prisma.client.bikeUnit.groupBy({
+        by: ['status'],
+        where: summaryWhere,
+        _count: { id: true },
+      }),
     ]);
+
+    const available = statusStats.find(s => s.status === BikeStatus.AVAILABLE)?._count.id ?? 0;
+    const reserved = statusStats.find(s => s.status === BikeStatus.RESERVED)?._count.id ?? 0;
+    const sold = statusStats.find(s => s.status === BikeStatus.SOLD)?._count.id ?? 0;
+    const inDelivery = statusStats.find(s => s.status === BikeStatus.IN_DELIVERY)?._count.id ?? 0;
 
     return {
       bikes,

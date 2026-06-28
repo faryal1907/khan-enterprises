@@ -23,18 +23,15 @@ export class DashboardService {
       pendingOffers,
       bikePayments,
       partPayments,
-      bikesSold,
-      availableBikes,
       availablePartsAgg,
+      expensesAgg,
+      bikeStatusStats,
+      orderStatusStats,
+      partOrderStatusStats,
       lowStockAlerts,
       pendingDeliveries,
-      bikeOrdersWaitingPayment,
-      partOrdersWaitingPayment,
       bikePendingVerifications,
       partPendingVerifications,
-      cancelledBikeOrders,
-      cancelledPartOrders,
-      expensesAgg,
     ] = await Promise.all([
       branchId
         ? this.prisma.client.branch.findUnique({
@@ -58,15 +55,28 @@ export class DashboardService {
         },
         _sum: { amount: true },
       }),
-      this.prisma.client.bikeUnit.count({
-        where: { ...branchFilter, status: BikeStatus.SOLD },
-      }),
-      this.prisma.client.bikeUnit.count({
-        where: { ...branchFilter, status: BikeStatus.AVAILABLE },
-      }),
       this.prisma.client.partInventory.aggregate({
         where: branchFilter,
         _sum: { quantity: true, reservedQuantity: true },
+      }),
+      this.prisma.client.expense.aggregate({
+        where: branchId ? { branchId } : undefined,
+        _sum: { amount: true },
+      }),
+      this.prisma.client.bikeUnit.groupBy({
+        by: ['status'],
+        where: branchFilter,
+        _count: { id: true },
+      }),
+      this.prisma.client.order.groupBy({
+        by: ['status'],
+        where: branchFilter,
+        _count: { id: true },
+      }),
+      this.prisma.client.partOrder.groupBy({
+        by: ['status'],
+        where: branchFilter,
+        _count: { id: true },
       }),
       this.prisma.client.partInventory.findMany({
         where: branchFilter,
@@ -91,12 +101,6 @@ export class DashboardService {
           },
         },
       }),
-      this.prisma.client.order.count({
-        where: { ...branchFilter, status: OrderStatus.PENDING_PAYMENT },
-      }),
-      this.prisma.client.partOrder.count({
-        where: { ...branchFilter, status: OrderStatus.PENDING_PAYMENT },
-      }),
       this.prisma.client.paymentTransaction.count({
         where: {
           status: PaymentStatus.VERIFICATION_PENDING,
@@ -109,17 +113,17 @@ export class DashboardService {
           partOrder: branchId ? { branchId } : undefined,
         },
       }),
-      this.prisma.client.order.count({
-        where: { ...branchFilter, status: OrderStatus.CANCELLED },
-      }),
-      this.prisma.client.partOrder.count({
-        where: { ...branchFilter, status: OrderStatus.CANCELLED },
-      }),
-      this.prisma.client.expense.aggregate({
-        where: branchId ? { branchId } : undefined,
-        _sum: { amount: true },
-      }),
     ]);
+
+    // Extract counts from grouped results
+    const bikesSold = bikeStatusStats.find(s => s.status === BikeStatus.SOLD)?._count.id ?? 0;
+    const availableBikes = bikeStatusStats.find(s => s.status === BikeStatus.AVAILABLE)?._count.id ?? 0;
+    
+    const bikeOrdersWaitingPayment = orderStatusStats.find(s => s.status === OrderStatus.PENDING_PAYMENT)?._count.id ?? 0;
+    const cancelledBikeOrders = orderStatusStats.find(s => s.status === OrderStatus.CANCELLED)?._count.id ?? 0;
+    
+    const partOrdersWaitingPayment = partOrderStatusStats.find(s => s.status === OrderStatus.PENDING_PAYMENT)?._count.id ?? 0;
+    const cancelledPartOrders = partOrderStatusStats.find(s => s.status === OrderStatus.CANCELLED)?._count.id ?? 0;
 
     const totalRevenue =
       Number(bikePayments._sum.amount ?? 0) + Number(partPayments._sum.amount ?? 0);
