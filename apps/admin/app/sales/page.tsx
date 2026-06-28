@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { getBranches } from "@/lib/api/inventory";
-import { getOrders, getPartOrders, type OrderFilters } from "@/lib/api/orders";
+import { getOrders, getPartOrders, downloadInvoice, type OrderFilters } from "@/lib/api/orders";
+import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { Branch, OrderStatus, PaymentStatus, UserRole } from "@/lib/types";
@@ -111,6 +112,7 @@ export default function SalesRecordsPage() {
   const [error, setError] = useState("");
   const [branches, setBranches] = useState<Branch[]>([]);
   const [staffList, setStaffList] = useState<StaffOption[]>([]);
+  const [invoiceLoadingId, setInvoiceLoadingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -186,6 +188,19 @@ export default function SalesRecordsPage() {
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     if (key === "branch" && isBranchScoped) return;
     setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleDownloadInvoice = async (e: React.MouseEvent, sale: SaleRecord) => {
+    e.stopPropagation();
+    setInvoiceLoadingId(sale.id);
+    try {
+      await downloadInvoice(sale.id, sale.type === "PART");
+      toast.success("Invoice downloaded successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to download invoice");
+    } finally {
+      setInvoiceLoadingId(null);
+    }
   };
 
   const handleExportCSV = () => {
@@ -424,16 +439,26 @@ export default function SalesRecordsPage() {
                       {new Date(sale.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(sale.type === "PART" ? `/part-orders/${sale.id}` : `/orders/${sale.id}`);
-                        }}
-                        className="text-sm font-medium transition-colors hover:opacity-70 bg-transparent border-none p-0 cursor-pointer"
-                        style={{ color: theme.accents.primary }}
-                      >
-                        View Order
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(sale.type === "PART" ? `/part-orders/${sale.id}` : `/orders/${sale.id}`);
+                          }}
+                          className="text-sm font-medium transition-colors hover:opacity-70 bg-transparent border-none p-0 cursor-pointer"
+                          style={{ color: theme.accents.primary }}
+                        >
+                          View Order
+                        </button>
+                        <AsyncButton
+                          onClick={(e) => handleDownloadInvoice(e as any, sale)}
+                          loading={invoiceLoadingId === sale.id}
+                          loadingLabel="Downloading..."
+                          style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+                        >
+                          Invoice
+                        </AsyncButton>
+                      </div>
                     </td>
                   </tr>
                 );
