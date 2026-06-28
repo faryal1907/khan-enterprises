@@ -637,6 +637,7 @@ export class PartOrdersService {
           amount: dto.amount,
           paymentMethod: dto.paymentMethod,
           status: OrderStatus.DELIVERED, // Manual sale assumes immediate delivery
+          paymentVerified: true,
           processedById: user.id,
           // Only link to a customer account if one was explicitly provided.
           // Walk-in sales with no registered customer stay null so the order
@@ -662,7 +663,9 @@ export class PartOrdersService {
           partOrderId: partOrder.id,
           amount: dto.amount,
           method: dto.paymentMethod,
-          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+          status: PaymentStatus.SUCCESS,
+          verifiedAt: new Date(),
+          verifiedById: user.id,
         },
       });
 

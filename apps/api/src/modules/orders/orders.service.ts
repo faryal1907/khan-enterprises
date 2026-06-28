@@ -846,7 +846,8 @@ export class OrdersService {
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
           paymentMethod: dto.paymentMethod,
-          status: OrderStatus.CONFIRMED,
+          status: OrderStatus.DELIVERED,
+          paymentVerified: true,
           expiresAt,
           processedById: user.id,
           isOnlineOrder,
@@ -874,7 +875,9 @@ export class OrdersService {
           orderId: order.id,
           amount: finalSalePrice,
           method: dto.paymentMethod,
-          status: dto.paymentMethod === "CASH" ? PaymentStatus.SUCCESS : PaymentStatus.VERIFICATION_PENDING,
+          status: PaymentStatus.SUCCESS,
+          verifiedAt: new Date(),
+          verifiedById: user.id,
         },
       });
 

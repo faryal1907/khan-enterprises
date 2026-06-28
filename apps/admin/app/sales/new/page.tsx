@@ -699,19 +699,7 @@ export default function ManualOrderPage() {
           </div>
         </div>
 
-        {/* Document Generation Notice */}
-        <div
-          className="rounded-lg p-4 mb-6"
-          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.accents.secondary}` }}
-        >
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
-            Upon submission, the following documents will be auto-generated:
-          </p>
-          <ul className="list-disc list-inside mt-2 text-sm" style={{ color: theme.text.secondary }}>
-            <li>Sale Agreement PDF</li>
-            <li>Invoice PDF</li>
-          </ul>
-        </div>
+        
 
         {/* Actions */}
         <div className="flex justify-end space-x-4 mt-6">
