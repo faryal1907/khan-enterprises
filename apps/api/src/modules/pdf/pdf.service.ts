@@ -154,15 +154,6 @@ export class PdfService {
     const amount = order.bike?.actualSalePrice || order.amount || 0;
     doc.font('Helvetica-Bold').fontSize(14).fillColor('#74950A').text(`Rs. ${Number(amount).toLocaleString()}`, 210, orderY + 11);
 
-    orderY += 60;
-    
-    // Check if we need to add a new page before drawing the footer
-    if (orderY + 60 > doc.page.height - 50) {
-      doc.addPage();
-      orderY = 50;
-    }
-
-
     doc.end();
 
     return doc as unknown as Readable;

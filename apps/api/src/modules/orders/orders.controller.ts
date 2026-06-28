@@ -14,7 +14,7 @@ import { CreateCustomerOrderDto } from "./dto/create-customer-order.dto";
 import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
 import { RevenueQueryDto } from "./dto/revenue-query.dto";
-import { PdfService } from "../pdf/pdf.service";
+import { PdfService } from "../pdf";
 import { Response } from "express";
 
 @Controller("orders")

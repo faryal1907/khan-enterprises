@@ -3,7 +3,7 @@ import { OrdersController } from "./orders.controller";
 import { OrdersService } from "./orders.service";
 import { OrdersCronService } from "./orders.cron";
 import { PrismaModule } from "../../prisma/prisma.module";
-import { PdfModule } from "../pdf/pdf.module";
+import { PdfModule } from "../pdf";
 import { OrderAlertsModule } from "../order-alerts/order-alerts.module";
 
 @Module({
