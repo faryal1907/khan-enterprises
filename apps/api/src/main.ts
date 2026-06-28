@@ -8,6 +8,7 @@ config({ path: resolve(process.cwd(), "../../.env") });
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,12 +24,14 @@ async function bootstrap() {
 
   const port = process.env.PORT || 4000;
 
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   app.useGlobalPipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
 
   await app.listen(port);
