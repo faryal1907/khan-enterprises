@@ -50,6 +50,7 @@ export async function updateBike(id: string, data: {
   price?: number;
   color?: string;
   media?: string[];
+  onlineDiscountPercent?: number;
 }) {
   const response = await api.put(`/inventory/bikes/${id}`, data);
   return response.data;
@@ -140,6 +141,14 @@ export async function adjustStock(
   },
 ) {
   const response = await api.post(`/inventory/parts/${inventoryId}/adjust-stock`, data);
+  return response.data;
+}
+
+export async function updatePartInventoryDiscount(
+  inventoryId: string,
+  onlineDiscountPercent: number,
+) {
+  const response = await api.patch(`/inventory/parts/inventory/${inventoryId}/discount`, { onlineDiscountPercent });
   return response.data;
 }
 

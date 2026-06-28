@@ -142,6 +142,35 @@ export default function PartDetailPage() {
                         <p className="text-sm mb-3" style={{ color: theme.text.secondary }}>
                           Available: {availableQuantity}
                         </p>
+                        {(() => {
+                          const basePrice = part.sellingPrice;
+                          const individualDiscount = inventory.onlineDiscountPercent ? Number(inventory.onlineDiscountPercent) : 0;
+                          const globalDiscount = part.globalDiscountPercent ? Number(part.globalDiscountPercent) : 0;
+                          const effectiveDiscountPercent = individualDiscount + globalDiscount;
+                          const onlinePrice = basePrice * (1 - effectiveDiscountPercent / 100);
+                          
+                          return (
+                            <div className="mb-4">
+                              {effectiveDiscountPercent > 0 ? (
+                                <div>
+                                  <span className="text-sm line-through mr-2" style={{ color: theme.text.muted }}>
+                                    PKR {basePrice?.toLocaleString()}
+                                  </span>
+                                  <span className="text-lg font-bold" style={{ color: theme.text.primary }}>
+                                    PKR {onlinePrice.toLocaleString()}
+                                  </span>
+                                  <p className="text-xs mt-1" style={{ color: theme.accents.primary }}>
+                                    {effectiveDiscountPercent}% online discount!
+                                  </p>
+                                </div>
+                              ) : (
+                                <span className="text-lg font-bold" style={{ color: theme.text.primary }}>
+                                  PKR {basePrice?.toLocaleString()}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                         {availableQuantity > 0 && (
                           <button
                             onClick={() => handleOrderClick(inventory)}

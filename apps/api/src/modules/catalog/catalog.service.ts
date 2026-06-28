@@ -5,6 +5,11 @@ import { PrismaService } from "../../prisma/prisma.service";
 export class CatalogService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async getGlobalDiscount(key: string): Promise<number> {
+    const setting = await this.prisma.client.systemSetting.findUnique({ where: { key } });
+    return setting?.value ? parseFloat(setting.value) : 0;
+  }
+
   /**
    * Get list of available bikes with filters
    * Always returns bikes with status = AVAILABLE
@@ -67,7 +72,12 @@ export class CatalogService {
       },
     });
 
-    return bikes;
+    const globalDiscount = await this.getGlobalDiscount("GLOBAL_BIKE_DISCOUNT");
+
+    return bikes.map(bike => ({
+      ...bike,
+      globalDiscountPercent: globalDiscount,
+    }));
   }
 
   /**
@@ -100,7 +110,12 @@ export class CatalogService {
       throw new Error("Bike not found");
     }
 
-    return bike;
+    const globalDiscount = await this.getGlobalDiscount("GLOBAL_BIKE_DISCOUNT");
+
+    return {
+      ...bike,
+      globalDiscountPercent: globalDiscount,
+    };
   }
 
   /**
@@ -147,7 +162,12 @@ export class CatalogService {
       },
     });
 
-    return parts;
+    const globalDiscount = await this.getGlobalDiscount("GLOBAL_PART_DISCOUNT");
+
+    return parts.map(part => ({
+      ...part,
+      globalDiscountPercent: globalDiscount,
+    }));
   }
 
   /**
@@ -169,7 +189,12 @@ export class CatalogService {
       throw new Error("Part not found");
     }
 
-    return part;
+    const globalDiscount = await this.getGlobalDiscount("GLOBAL_PART_DISCOUNT");
+
+    return {
+      ...part,
+      globalDiscountPercent: globalDiscount,
+    };
   }
 
   /**

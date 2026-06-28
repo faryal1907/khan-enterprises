@@ -169,6 +169,7 @@ export default function EditBikePage() {
 
   // New fields
   const [price, setPrice] = useState("");
+  const [onlineDiscountPercent, setOnlineDiscountPercent] = useState("");
   const [color, setColor] = useState("");
   const [media, setMedia] = useState<string[]>([]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
@@ -207,6 +208,7 @@ export default function EditBikePage() {
         setVendorId(bike.vendor?.id || "");
         setStatus(bike.status || "AVAILABLE");
         setPrice(bike.price ? bike.price.toString() : "");
+        setOnlineDiscountPercent(bike.onlineDiscountPercent !== undefined && bike.onlineDiscountPercent !== null ? bike.onlineDiscountPercent.toString() : "");
         setColor(bike.color || "");
         setMedia(bike.media || []);
 
@@ -294,6 +296,7 @@ export default function EditBikePage() {
       await updateBike(id, {
         vendorId,
         price: price ? parseFloat(price) : undefined,
+        onlineDiscountPercent: onlineDiscountPercent ? parseFloat(onlineDiscountPercent) : undefined,
         color: color || undefined,
         media,
       });
@@ -348,7 +351,7 @@ export default function EditBikePage() {
   };
 
   const selectedModel = bikeModels.find(m => m.id === modelId);
-  const availableColors = selectedModel?.color ? selectedModel.color.split('/').map(c => c.trim()) : [];
+  const availableColors = selectedModel?.colors || [];
 
   if (user && user.role !== UserRole.ADMIN) return null;
 
@@ -501,6 +504,29 @@ export default function EditBikePage() {
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   disabled={!modelId}
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Individual Online Discount (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  className="w-full px-3 py-2 rounded text-sm disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="e.g. 2.5"
+                  value={onlineDiscountPercent}
+                  onChange={(e) => setOnlineDiscountPercent(e.target.value)}
                 />
               </div>
               <div>

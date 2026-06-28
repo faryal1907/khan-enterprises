@@ -242,7 +242,7 @@ export default function EditPartPage() {
               </button>}
               <div className="flex space-x-4">
                 <a
-                  href={`/parts/${partId}`}
+                  href="/parts"
                   className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,

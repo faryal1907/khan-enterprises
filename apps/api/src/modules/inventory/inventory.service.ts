@@ -98,7 +98,7 @@ export class InventoryService {
               modelName: true,
               year: true,
               engineCapacity: true,
-              color: true,
+              colors: true,
               basePrice: true,
             },
           },
@@ -231,6 +231,7 @@ export class InventoryService {
           price: dto.price,
           color: dto.color,
           media: dto.media,
+          onlineDiscountPercent: dto.onlineDiscountPercent,
         },
         include: {
           model: true,
@@ -392,30 +393,6 @@ export class InventoryService {
         bikeId: bikeId,
         uploadedById: userId || null,
       },
-    });
-  }
-
-  /** Bulk update onlineDiscountPercent for all AVAILABLE bikes */
-  async updateBulkDiscount(discountPercent: number, user: any) {
-    return this.prisma.client.$transaction(async (tx) => {
-      const result = await tx.bikeUnit.updateMany({
-        where: { status: BikeStatus.AVAILABLE },
-        data: { onlineDiscountPercent: discountPercent },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          userId: user.id,
-          userRole: user.role,
-          action: AuditAction.UPDATE,
-          entityType: "BIKE",
-          entityId: "BULK",
-          oldValue: JSON.stringify({}),
-          newValue: JSON.stringify({ onlineDiscountPercent: discountPercent, affectedRows: result.count }),
-        },
-      });
-
-      return { count: result.count, discountPercent };
     });
   }
 
@@ -910,5 +887,33 @@ export class InventoryService {
     if (user?.role !== "ADMIN" && user?.branchId && user.branchId !== branchId) {
       throw new NotFoundException("Inventory not found");
     }
+  }
+
+  async updatePartInventoryDiscount(inventoryId: string, onlineDiscountPercent: number, user: any) {
+    const inventory = await this.prisma.client.partInventory.findUnique({
+      where: { id: inventoryId },
+      include: { part: true },
+    });
+    if (!inventory) throw new NotFoundException("Inventory not found");
+    this.assertBranchAccess(inventory.branchId, user);
+
+    const updated = await this.prisma.client.partInventory.update({
+      where: { id: inventoryId },
+      data: { onlineDiscountPercent },
+    });
+
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: AuditAction.UPDATE,
+        entityType: "PART_INVENTORY",
+        entityId: inventoryId,
+        oldValue: JSON.stringify({ onlineDiscountPercent: inventory.onlineDiscountPercent }),
+        newValue: JSON.stringify({ onlineDiscountPercent }),
+      },
+    });
+
+    return updated;
   }
 }

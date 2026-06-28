@@ -15,7 +15,6 @@ import { TransferBikeDto } from "./dto/transfer-bike.dto";
 import { TransferPartDto } from "./dto/transfer-part.dto";
 import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { QueryBikesDto } from "./dto/query-bikes.dto";
-import { UpdateBulkDiscountDto } from "./dto/update-bulk-discount.dto";
 
 @Controller("inventory")
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -41,16 +40,6 @@ export class InventoryController {
   @Get("bikes")
   async getBikes(@Query() query: QueryBikesDto, @CurrentUser() user: any) {
     return this.inventoryService.getAllBikes(query, user);
-  }
-
-  /**
-   * PATCH /api/inventory/bikes/discount/bulk
-   * Bulk updates onlineDiscountPercent for all AVAILABLE bikes
-   */
-  @Patch("bikes/discount/bulk")
-  @Roles("ADMIN")
-  async updateBulkDiscount(@Body() dto: UpdateBulkDiscountDto, @CurrentUser() user: any) {
-    return this.inventoryService.updateBulkDiscount(dto.discountPercent, user);
   }
 
   /**
@@ -239,5 +228,14 @@ export class InventoryController {
       parseInt(limit),
       user,
     );
+  }
+  @Patch("parts/inventory/:inventoryId/discount")
+  @Roles("ADMIN", "MANAGER")
+  async updatePartInventoryDiscount(
+    @Param("inventoryId") inventoryId: string,
+    @Body("onlineDiscountPercent") onlineDiscountPercent: number,
+    @CurrentUser() user: any,
+  ) {
+    return this.inventoryService.updatePartInventoryDiscount(inventoryId, onlineDiscountPercent, user);
   }
 }

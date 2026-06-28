@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.ExpenseScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.SystemSettingScalarFieldEnum = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.ExpenseScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
 const runtime = require("@prisma/client/runtime/client");
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -44,7 +44,8 @@ exports.ModelName = {
     Expense: 'Expense',
     DeliveryRequest: 'DeliveryRequest',
     Document: 'Document',
-    AuditLog: 'AuditLog'
+    AuditLog: 'AuditLog',
+    SystemSetting: 'SystemSetting'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -101,7 +102,7 @@ exports.BikeModelScalarFieldEnum = {
     modelName: 'modelName',
     year: 'year',
     engineCapacity: 'engineCapacity',
-    color: 'color',
+    colors: 'colors',
     description: 'description',
     basePrice: 'basePrice',
     createdAt: 'createdAt',
@@ -143,6 +144,7 @@ exports.PartInventoryScalarFieldEnum = {
     quantity: 'quantity',
     reservedQuantity: 'reservedQuantity',
     reorderLevel: 'reorderLevel',
+    onlineDiscountPercent: 'onlineDiscountPercent',
     updatedAt: 'updatedAt'
 };
 exports.StockMovementScalarFieldEnum = {
@@ -295,6 +297,12 @@ exports.AuditLogScalarFieldEnum = {
     newValue: 'newValue',
     ipAddress: 'ipAddress',
     createdAt: 'createdAt'
+};
+exports.SystemSettingScalarFieldEnum = {
+    id: 'id',
+    key: 'key',
+    value: 'value',
+    updatedAt: 'updatedAt'
 };
 exports.SortOrder = {
     asc: 'asc',

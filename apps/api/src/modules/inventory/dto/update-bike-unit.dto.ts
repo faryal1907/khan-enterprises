@@ -17,4 +17,8 @@ export class UpdateBikeUnitDto {
   @IsString({ each: true })
   @IsOptional()
   media?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  onlineDiscountPercent?: number;
 }

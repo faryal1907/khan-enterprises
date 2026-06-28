@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, Max } from "class-validator";
+import { IsString, IsNotEmpty, IsNumber, IsOptional, Min, Max, IsArray } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreateBikeModelDto {
@@ -21,9 +21,10 @@ export class CreateBikeModelDto {
   @IsOptional()
   engineCapacity?: string;
 
-  @IsString()
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  color?: string;
+  colors?: string[];
 
   @IsString()
   @IsOptional()

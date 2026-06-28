@@ -24,6 +24,9 @@ export default function DeliveryQueuePage() {
   const [error, setError] = useState("");
   const [branches, setBranches] = useState<any[]>([]);
 
+  // A user is restricted to their branch if they are not an admin AND they have a branchId assigned
+  const isBranchRestricted = !isAdmin && !!user?.branchId;
+
   // Fetch branches (only after user is available to ensure token is in cookie)
   useEffect(() => {
     if (!user) return;
@@ -32,12 +35,12 @@ export default function DeliveryQueuePage() {
     }).catch(console.warn);
   }, [user?.id]);
 
-  // Set branch filter to user's branch if not admin
+  // Set branch filter to user's branch if restricted
   useEffect(() => {
-    if (!isAdmin && user?.branchId) {
+    if (isBranchRestricted && user?.branchId) {
       setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
     }
-  }, [isAdmin, user?.branchId]);
+  }, [isBranchRestricted, user?.branchId]);
 
   useEffect(() => {
     if (!user) return;
@@ -67,7 +70,7 @@ export default function DeliveryQueuePage() {
 
   const fetchStats = async () => {
     try {
-      const branchId = isAdmin && filters.branch ? filters.branch : undefined;
+      const branchId = !isBranchRestricted && filters.branch ? filters.branch : undefined;
       const data = await getDeliveryStats(branchId);
       setStats(data);
     } catch (err: any) {
@@ -76,8 +79,8 @@ export default function DeliveryQueuePage() {
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    // Prevent non-admins from changing branch filter
-    if (key === "branch" && !isAdmin) {
+    // Prevent branch-restricted users from changing branch filter
+    if (key === "branch" && isBranchRestricted) {
       return;
     }
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -180,13 +183,13 @@ export default function DeliveryQueuePage() {
               <select
                 value={filters.branch}
                 onChange={(e) => handleFilterChange("branch", e.target.value)}
-                disabled={!isAdmin}
+                disabled={isBranchRestricted}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
                   backgroundColor: theme.backgrounds.tertiary,
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
-                  opacity: !isAdmin ? 0.6 : 1,
+                  opacity: isBranchRestricted ? 0.6 : 1,
                 }}
               >
                 <option value="">All Branches</option>
@@ -194,7 +197,7 @@ export default function DeliveryQueuePage() {
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
-              {!isAdmin && (
+              {isBranchRestricted && (
                 <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
                   Filtered to your branch
                 </p>

@@ -220,8 +220,13 @@ export class OrdersService {
       if (!bike) throw new NotFoundException(`Bike not found`);
       if (bike.status !== BikeStatus.AVAILABLE) throw new BadRequestException(`Bike is not available for sale`);
 
+      const globalDiscountSetting = await tx.systemSetting.findUnique({ where: { key: "GLOBAL_BIKE_DISCOUNT" } });
+      const globalDiscount = globalDiscountSetting?.value ? parseFloat(globalDiscountSetting.value) : 0;
+      const individualDiscount = bike.onlineDiscountPercent ? Number(bike.onlineDiscountPercent) : 0;
+      const effectiveDiscount = globalDiscount + individualDiscount;
+
       const basePrice = Number(bike.model.basePrice);
-      const salePrice = basePrice * 0.98;
+      const salePrice = basePrice * (1 - effectiveDiscount / 100);
       const discountAmount = basePrice - salePrice;
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
@@ -267,7 +272,6 @@ export class OrdersService {
           soldAt: null,
           reservedUntil: expiresAt,
           actualSalePrice: salePrice,
-          ...(isCash ? {} : { onlineDiscountPercent: 2 }),
         },
       });
 
@@ -818,9 +822,13 @@ export class OrdersService {
       let isOnlineOrder: boolean;
 
       if (orderType === "ONLINE") {
-        // ONLINE: auto-apply 2% discount from base price
+        const globalDiscountSetting = await tx.systemSetting.findUnique({ where: { key: "GLOBAL_BIKE_DISCOUNT" } });
+        const globalDiscount = globalDiscountSetting?.value ? parseFloat(globalDiscountSetting.value) : 0;
+        const individualDiscount = bike.onlineDiscountPercent ? Number(bike.onlineDiscountPercent) : 0;
+        const effectiveDiscount = globalDiscount + individualDiscount;
+
         const basePrice = Number(bike.model.basePrice);
-        finalSalePrice = basePrice * 0.98; // 2% discount
+        finalSalePrice = basePrice * (1 - effectiveDiscount / 100);
         isOnlineOrder = true;
       } else {
         // ONSITE: use actualSalePrice if provided, otherwise use salePrice
@@ -865,7 +873,6 @@ export class OrdersService {
           soldAt: new Date(),
           reservedUntil: null,
           actualSalePrice: finalSalePrice,
-          ...(orderType === "ONLINE" && { onlineDiscountPercent: 2 }),
         },
       });
 

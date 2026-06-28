@@ -42,7 +42,6 @@ export type BikeModelMinAggregateOutputType = {
   modelName: string | null
   year: number | null
   engineCapacity: string | null
-  color: string | null
   description: string | null
   basePrice: runtime.Decimal | null
   createdAt: Date | null
@@ -55,7 +54,6 @@ export type BikeModelMaxAggregateOutputType = {
   modelName: string | null
   year: number | null
   engineCapacity: string | null
-  color: string | null
   description: string | null
   basePrice: runtime.Decimal | null
   createdAt: Date | null
@@ -68,7 +66,7 @@ export type BikeModelCountAggregateOutputType = {
   modelName: number
   year: number
   engineCapacity: number
-  color: number
+  colors: number
   description: number
   basePrice: number
   createdAt: number
@@ -93,7 +91,6 @@ export type BikeModelMinAggregateInputType = {
   modelName?: true
   year?: true
   engineCapacity?: true
-  color?: true
   description?: true
   basePrice?: true
   createdAt?: true
@@ -106,7 +103,6 @@ export type BikeModelMaxAggregateInputType = {
   modelName?: true
   year?: true
   engineCapacity?: true
-  color?: true
   description?: true
   basePrice?: true
   createdAt?: true
@@ -119,7 +115,7 @@ export type BikeModelCountAggregateInputType = {
   modelName?: true
   year?: true
   engineCapacity?: true
-  color?: true
+  colors?: true
   description?: true
   basePrice?: true
   createdAt?: true
@@ -219,7 +215,7 @@ export type BikeModelGroupByOutputType = {
   modelName: string
   year: number
   engineCapacity: string | null
-  color: string | null
+  colors: string[]
   description: string | null
   basePrice: runtime.Decimal
   createdAt: Date
@@ -255,7 +251,7 @@ export type BikeModelWhereInput = {
   modelName?: Prisma.StringFilter<"BikeModel"> | string
   year?: Prisma.IntFilter<"BikeModel"> | number
   engineCapacity?: Prisma.StringNullableFilter<"BikeModel"> | string | null
-  color?: Prisma.StringNullableFilter<"BikeModel"> | string | null
+  colors?: Prisma.StringNullableListFilter<"BikeModel">
   description?: Prisma.StringNullableFilter<"BikeModel"> | string | null
   basePrice?: Prisma.DecimalFilter<"BikeModel"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"BikeModel"> | Date | string
@@ -269,7 +265,7 @@ export type BikeModelOrderByWithRelationInput = {
   modelName?: Prisma.SortOrder
   year?: Prisma.SortOrder
   engineCapacity?: Prisma.SortOrderInput | Prisma.SortOrder
-  color?: Prisma.SortOrderInput | Prisma.SortOrder
+  colors?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -286,7 +282,7 @@ export type BikeModelWhereUniqueInput = Prisma.AtLeast<{
   modelName?: Prisma.StringFilter<"BikeModel"> | string
   year?: Prisma.IntFilter<"BikeModel"> | number
   engineCapacity?: Prisma.StringNullableFilter<"BikeModel"> | string | null
-  color?: Prisma.StringNullableFilter<"BikeModel"> | string | null
+  colors?: Prisma.StringNullableListFilter<"BikeModel">
   description?: Prisma.StringNullableFilter<"BikeModel"> | string | null
   basePrice?: Prisma.DecimalFilter<"BikeModel"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"BikeModel"> | Date | string
@@ -300,7 +296,7 @@ export type BikeModelOrderByWithAggregationInput = {
   modelName?: Prisma.SortOrder
   year?: Prisma.SortOrder
   engineCapacity?: Prisma.SortOrderInput | Prisma.SortOrder
-  color?: Prisma.SortOrderInput | Prisma.SortOrder
+  colors?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -321,7 +317,7 @@ export type BikeModelScalarWhereWithAggregatesInput = {
   modelName?: Prisma.StringWithAggregatesFilter<"BikeModel"> | string
   year?: Prisma.IntWithAggregatesFilter<"BikeModel"> | number
   engineCapacity?: Prisma.StringNullableWithAggregatesFilter<"BikeModel"> | string | null
-  color?: Prisma.StringNullableWithAggregatesFilter<"BikeModel"> | string | null
+  colors?: Prisma.StringNullableListFilter<"BikeModel">
   description?: Prisma.StringNullableWithAggregatesFilter<"BikeModel"> | string | null
   basePrice?: Prisma.DecimalWithAggregatesFilter<"BikeModel"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"BikeModel"> | Date | string
@@ -334,7 +330,7 @@ export type BikeModelCreateInput = {
   modelName: string
   year: number
   engineCapacity?: string | null
-  color?: string | null
+  colors?: Prisma.BikeModelCreatecolorsInput | string[]
   description?: string | null
   basePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -348,7 +344,7 @@ export type BikeModelUncheckedCreateInput = {
   modelName: string
   year: number
   engineCapacity?: string | null
-  color?: string | null
+  colors?: Prisma.BikeModelCreatecolorsInput | string[]
   description?: string | null
   basePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -362,7 +358,7 @@ export type BikeModelUpdateInput = {
   modelName?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   engineCapacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colors?: Prisma.BikeModelUpdatecolorsInput | string[]
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   basePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,7 +372,7 @@ export type BikeModelUncheckedUpdateInput = {
   modelName?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   engineCapacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colors?: Prisma.BikeModelUpdatecolorsInput | string[]
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   basePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -390,7 +386,7 @@ export type BikeModelCreateManyInput = {
   modelName: string
   year: number
   engineCapacity?: string | null
-  color?: string | null
+  colors?: Prisma.BikeModelCreatecolorsInput | string[]
   description?: string | null
   basePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -403,7 +399,7 @@ export type BikeModelUpdateManyMutationInput = {
   modelName?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   engineCapacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colors?: Prisma.BikeModelUpdatecolorsInput | string[]
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   basePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,7 +412,7 @@ export type BikeModelUncheckedUpdateManyInput = {
   modelName?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   engineCapacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colors?: Prisma.BikeModelUpdatecolorsInput | string[]
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   basePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -429,7 +425,7 @@ export type BikeModelCountOrderByAggregateInput = {
   modelName?: Prisma.SortOrder
   year?: Prisma.SortOrder
   engineCapacity?: Prisma.SortOrder
-  color?: Prisma.SortOrder
+  colors?: Prisma.SortOrder
   description?: Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -447,7 +443,6 @@ export type BikeModelMaxOrderByAggregateInput = {
   modelName?: Prisma.SortOrder
   year?: Prisma.SortOrder
   engineCapacity?: Prisma.SortOrder
-  color?: Prisma.SortOrder
   description?: Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -460,7 +455,6 @@ export type BikeModelMinOrderByAggregateInput = {
   modelName?: Prisma.SortOrder
   year?: Prisma.SortOrder
   engineCapacity?: Prisma.SortOrder
-  color?: Prisma.SortOrder
   description?: Prisma.SortOrder
   basePrice?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -477,12 +471,21 @@ export type BikeModelScalarRelationFilter = {
   isNot?: Prisma.BikeModelWhereInput
 }
 
+export type BikeModelCreatecolorsInput = {
+  set: string[]
+}
+
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type BikeModelUpdatecolorsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type DecimalFieldUpdateOperationsInput = {
@@ -513,7 +516,7 @@ export type BikeModelCreateWithoutBikesInput = {
   modelName: string
   year: number
   engineCapacity?: string | null
-  color?: string | null
+  colors?: Prisma.BikeModelCreatecolorsInput | string[]
   description?: string | null
   basePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -526,7 +529,7 @@ export type BikeModelUncheckedCreateWithoutBikesInput = {
   modelName: string
   year: number
   engineCapacity?: string | null
-  color?: string | null
+  colors?: Prisma.BikeModelCreatecolorsInput | string[]
   description?: string | null
   basePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -555,7 +558,7 @@ export type BikeModelUpdateWithoutBikesInput = {
   modelName?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   engineCapacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colors?: Prisma.BikeModelUpdatecolorsInput | string[]
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   basePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -568,7 +571,7 @@ export type BikeModelUncheckedUpdateWithoutBikesInput = {
   modelName?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   engineCapacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colors?: Prisma.BikeModelUpdatecolorsInput | string[]
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   basePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -612,7 +615,7 @@ export type BikeModelSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   modelName?: boolean
   year?: boolean
   engineCapacity?: boolean
-  color?: boolean
+  colors?: boolean
   description?: boolean
   basePrice?: boolean
   createdAt?: boolean
@@ -627,7 +630,7 @@ export type BikeModelSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   modelName?: boolean
   year?: boolean
   engineCapacity?: boolean
-  color?: boolean
+  colors?: boolean
   description?: boolean
   basePrice?: boolean
   createdAt?: boolean
@@ -640,7 +643,7 @@ export type BikeModelSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   modelName?: boolean
   year?: boolean
   engineCapacity?: boolean
-  color?: boolean
+  colors?: boolean
   description?: boolean
   basePrice?: boolean
   createdAt?: boolean
@@ -653,14 +656,14 @@ export type BikeModelSelectScalar = {
   modelName?: boolean
   year?: boolean
   engineCapacity?: boolean
-  color?: boolean
+  colors?: boolean
   description?: boolean
   basePrice?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BikeModelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brand" | "modelName" | "year" | "engineCapacity" | "color" | "description" | "basePrice" | "createdAt" | "updatedAt", ExtArgs["result"]["bikeModel"]>
+export type BikeModelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brand" | "modelName" | "year" | "engineCapacity" | "colors" | "description" | "basePrice" | "createdAt" | "updatedAt", ExtArgs["result"]["bikeModel"]>
 export type BikeModelInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bikes?: boolean | Prisma.BikeModel$bikesArgs<ExtArgs>
   _count?: boolean | Prisma.BikeModelCountOutputTypeDefaultArgs<ExtArgs>
@@ -679,7 +682,7 @@ export type $BikeModelPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     modelName: string
     year: number
     engineCapacity: string | null
-    color: string | null
+    colors: string[]
     description: string | null
     basePrice: runtime.Decimal
     createdAt: Date
@@ -1113,7 +1116,7 @@ export interface BikeModelFieldRefs {
   readonly modelName: Prisma.FieldRef<"BikeModel", 'String'>
   readonly year: Prisma.FieldRef<"BikeModel", 'Int'>
   readonly engineCapacity: Prisma.FieldRef<"BikeModel", 'String'>
-  readonly color: Prisma.FieldRef<"BikeModel", 'String'>
+  readonly colors: Prisma.FieldRef<"BikeModel", 'String[]'>
   readonly description: Prisma.FieldRef<"BikeModel", 'String'>
   readonly basePrice: Prisma.FieldRef<"BikeModel", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"BikeModel", 'DateTime'>

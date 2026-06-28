@@ -16,4 +16,5 @@ export type * from './models/Expense.ts';
 export type * from './models/DeliveryRequest.ts';
 export type * from './models/Document.ts';
 export type * from './models/AuditLog.ts';
+export type * from './models/SystemSetting.ts';
 export type * from './commonInputTypes.ts';

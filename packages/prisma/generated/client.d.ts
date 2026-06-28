@@ -24,3 +24,4 @@ export type Expense = Prisma.ExpenseModel;
 export type DeliveryRequest = Prisma.DeliveryRequestModel;
 export type Document = Prisma.DocumentModel;
 export type AuditLog = Prisma.AuditLogModel;
+export type SystemSetting = Prisma.SystemSettingModel;
