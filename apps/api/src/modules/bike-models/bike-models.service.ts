@@ -19,7 +19,7 @@ export class BikeModelsService {
         modelName: true,
         year: true,
         engineCapacity: true,
-        color: true,
+        colors: true,
         basePrice: true,
         description: true,
       },
@@ -48,7 +48,7 @@ export class BikeModelsService {
       brand: data.brand.trim(),
       modelName: data.modelName.trim(),
       engineCapacity: data.engineCapacity?.trim() || undefined,
-      color: data.color?.trim() || undefined,
+      colors: data.colors?.map(c => c.trim()).filter(Boolean) || undefined,
       description: data.description?.trim() || undefined,
     };
     await this.assertUniqueModel(normalizedData.brand, normalizedData.modelName, normalizedData.year);
@@ -79,7 +79,7 @@ export class BikeModelsService {
       ...(data.brand !== undefined && { brand: data.brand.trim() }),
       ...(data.modelName !== undefined && { modelName: data.modelName.trim() }),
       ...(data.engineCapacity !== undefined && { engineCapacity: data.engineCapacity.trim() || undefined }),
-      ...(data.color !== undefined && { color: data.color.trim() || undefined }),
+      ...(data.colors !== undefined && { colors: data.colors.map(c => c.trim()).filter(Boolean) }),
       ...(data.description !== undefined && { description: data.description.trim() || undefined }),
     };
     await this.assertUniqueModel(

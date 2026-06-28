@@ -68,7 +68,8 @@ export const ModelName = {
   Expense: 'Expense',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  SystemSetting: 'SystemSetting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -152,7 +153,7 @@ export const BikeModelScalarFieldEnum = {
   modelName: 'modelName',
   year: 'year',
   engineCapacity: 'engineCapacity',
-  color: 'color',
+  colors: 'colors',
   description: 'description',
   basePrice: 'basePrice',
   createdAt: 'createdAt',
@@ -206,6 +207,7 @@ export const PartInventoryScalarFieldEnum = {
   quantity: 'quantity',
   reservedQuantity: 'reservedQuantity',
   reorderLevel: 'reorderLevel',
+  onlineDiscountPercent: 'onlineDiscountPercent',
   updatedAt: 'updatedAt'
 } as const
 
@@ -401,6 +403,16 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const SystemSettingScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
 
 
 export const SortOrder = {

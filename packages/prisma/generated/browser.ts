@@ -107,3 +107,8 @@ export type Document = Prisma.DocumentModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model SystemSetting
+ * 
+ */
+export type SystemSetting = Prisma.SystemSettingModel

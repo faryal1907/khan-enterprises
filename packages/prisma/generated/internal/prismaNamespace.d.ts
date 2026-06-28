@@ -175,6 +175,7 @@ export declare const ModelName: {
     readonly DeliveryRequest: "DeliveryRequest";
     readonly Document: "Document";
     readonly AuditLog: "AuditLog";
+    readonly SystemSetting: "SystemSetting";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -187,7 +188,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog";
+        modelProps: "user" | "refreshToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1523,6 +1524,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        SystemSetting: {
+            payload: Prisma.$SystemSettingPayload<ExtArgs>;
+            fields: Prisma.SystemSettingFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.SystemSettingFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.SystemSettingFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>;
+                };
+                findFirst: {
+                    args: Prisma.SystemSettingFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.SystemSettingFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>;
+                };
+                findMany: {
+                    args: Prisma.SystemSettingFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>[];
+                };
+                create: {
+                    args: Prisma.SystemSettingCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>;
+                };
+                createMany: {
+                    args: Prisma.SystemSettingCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.SystemSettingCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>[];
+                };
+                delete: {
+                    args: Prisma.SystemSettingDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>;
+                };
+                update: {
+                    args: Prisma.SystemSettingUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.SystemSettingDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.SystemSettingUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.SystemSettingUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>[];
+                };
+                upsert: {
+                    args: Prisma.SystemSettingUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemSettingPayload>;
+                };
+                aggregate: {
+                    args: Prisma.SystemSettingAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateSystemSetting>;
+                };
+                groupBy: {
+                    args: Prisma.SystemSettingGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.SystemSettingGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.SystemSettingCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.SystemSettingCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -1607,7 +1682,7 @@ export declare const BikeModelScalarFieldEnum: {
     readonly modelName: "modelName";
     readonly year: "year";
     readonly engineCapacity: "engineCapacity";
-    readonly color: "color";
+    readonly colors: "colors";
     readonly description: "description";
     readonly basePrice: "basePrice";
     readonly createdAt: "createdAt";
@@ -1652,6 +1727,7 @@ export declare const PartInventoryScalarFieldEnum: {
     readonly quantity: "quantity";
     readonly reservedQuantity: "reservedQuantity";
     readonly reorderLevel: "reorderLevel";
+    readonly onlineDiscountPercent: "onlineDiscountPercent";
     readonly updatedAt: "updatedAt";
 };
 export type PartInventoryScalarFieldEnum = (typeof PartInventoryScalarFieldEnum)[keyof typeof PartInventoryScalarFieldEnum];
@@ -1816,6 +1892,13 @@ export declare const AuditLogScalarFieldEnum: {
     readonly createdAt: "createdAt";
 };
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum];
+export declare const SystemSettingScalarFieldEnum: {
+    readonly id: "id";
+    readonly key: "key";
+    readonly value: "value";
+    readonly updatedAt: "updatedAt";
+};
+export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -1924,6 +2007,7 @@ export type GlobalOmitConfig = {
     deliveryRequest?: Prisma.DeliveryRequestOmit;
     document?: Prisma.DocumentOmit;
     auditLog?: Prisma.AuditLogOmit;
+    systemSetting?: Prisma.SystemSettingOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

@@ -20,10 +20,11 @@ export default function NewBikeModelPage() {
     modelName: "",
     year: new Date().getFullYear(),
     engineCapacity: "",
-    color: "",
+    colors: [] as string[],
     description: "",
     basePrice: "",
   });
+  const [colorInput, setColorInput] = useState("");
 
   useEffect(() => {
     if (user && user.role !== UserRole.ADMIN) router.replace("/models");
@@ -181,7 +182,7 @@ export default function NewBikeModelPage() {
                 />
               </div>
 
-              {/* Color */}
+              {/* Colors */}
               <div>
                 <label
                   className="block text-sm font-medium mb-1"
@@ -189,18 +190,45 @@ export default function NewBikeModelPage() {
                 >
                   Color(s)
                 </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.colors.map((color, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 text-xs rounded-full flex items-center space-x-1"
+                      style={{ backgroundColor: theme.accents.tertiary, color: theme.text.inverse }}
+                    >
+                      <span>{color}</span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, colors: prev.colors.filter((_, i) => i !== idx) }))}
+                        className="hover:opacity-70 focus:outline-none"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
                 <input
                   type="text"
-                  name="color"
-                  value={formData.color}
-                  onChange={handleChange}
+                  value={colorInput}
+                  onChange={(e) => setColorInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      const val = colorInput.trim();
+                      if (val && !formData.colors.includes(val)) {
+                        setFormData(prev => ({ ...prev, colors: [...prev.colors, val] }));
+                        setColorInput("");
+                      }
+                    }
+                  }}
                   className="w-full px-4 py-2 rounded focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
                     color: theme.text.primary,
                   }}
-                  placeholder="e.g. Red / Black"
+                  placeholder="Type a color and press Enter"
                 />
               </div>
 

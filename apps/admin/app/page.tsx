@@ -7,6 +7,8 @@ import { useAuthStore } from "@/lib/auth-store";
 import { theme } from "@/lib/colors";
 import type { DashboardStats } from "@/lib/types";
 import { UserRole } from "@/lib/types";
+import { getSettings, updateSetting } from "@/lib/api/settings";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { user } = useAuthStore();
@@ -104,7 +106,9 @@ export default function Dashboard() {
           </div>
         )}
 
-        <DashboardCards role={user.role} stats={loading ? null : stats} />
+        <DashboardCards role={user.role} stats={loading ? null : stats}>
+          {user.role === UserRole.ADMIN && <GlobalSettings />}
+        </DashboardCards>
       </div>
     </div>
   );
@@ -113,9 +117,11 @@ export default function Dashboard() {
 function DashboardCards({
   role,
   stats,
+  children,
 }: {
   role: UserRole;
   stats: DashboardStats | null;
+  children?: React.ReactNode;
 }) {
   const operationalCards: MetricCard[] = [
     {
@@ -156,7 +162,7 @@ function DashboardCards({
   ];
 
   if (role === UserRole.SALES_STAFF) {
-    return <MetricGrid cards={operationalCards} stats={stats} columns={3} />;
+    return <MetricGrid cards={operationalCards} stats={stats} columns={3}>{children}</MetricGrid>;
   }
 
   const summaryCards: MetricCard[] = [
@@ -198,7 +204,7 @@ function DashboardCards({
     ...operationalCards.slice(1),
   ];
 
-  return <MetricGrid cards={allCards} stats={stats} columns={4} />;
+  return <MetricGrid cards={allCards} stats={stats} columns={4}>{children}</MetricGrid>;
 }
 
 type MetricCard = {
@@ -213,10 +219,12 @@ function MetricGrid({
   cards,
   stats,
   columns,
+  children,
 }: {
   cards: MetricCard[];
   stats: DashboardStats | null;
   columns: 2 | 3 | 4;
+  children?: React.ReactNode;
 }) {
   const columnClass = {
     2: "md:grid-cols-2",
@@ -239,6 +247,7 @@ function MetricGrid({
           />
         );
       })}
+      {children}
     </div>
   );
 }
@@ -248,5 +257,170 @@ function Info({ label, value }: { label: string; value: string }) {
     <p style={{ color: theme.text.secondary }}>
       <span className="font-medium">{label}:</span> {value}
     </p>
+  );
+}
+
+function GlobalSettings() {
+  const [bikeDiscount, setBikeDiscount] = useState<string>("0");
+  const [partDiscount, setPartDiscount] = useState<string>("0");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [editBikeDiscount, setEditBikeDiscount] = useState<string>("0");
+  const [editPartDiscount, setEditPartDiscount] = useState<string>("0");
+
+  useEffect(() => {
+    getSettings()
+      .then((data) => {
+        if (data["GLOBAL_BIKE_DISCOUNT"]) setBikeDiscount(data["GLOBAL_BIKE_DISCOUNT"]);
+        if (data["GLOBAL_PART_DISCOUNT"]) setPartDiscount(data["GLOBAL_PART_DISCOUNT"]);
+      })
+      .catch((err) => {
+        toast.error("Failed to load settings");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const handleOpenModal = () => {
+    setEditBikeDiscount(bikeDiscount);
+    setEditPartDiscount(partDiscount);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await Promise.all([
+        updateSetting("GLOBAL_BIKE_DISCOUNT", editBikeDiscount),
+        updateSetting("GLOBAL_PART_DISCOUNT", editPartDiscount)
+      ]);
+      setBikeDiscount(editBikeDiscount);
+      setPartDiscount(editPartDiscount);
+      toast.success("Global discounts updated successfully");
+      setIsModalOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return null;
+
+  return (
+    <>
+      <div
+        onClick={handleOpenModal}
+        className="rounded-lg p-4 cursor-pointer transition-opacity hover:opacity-80"
+        style={{
+          backgroundColor: theme.backgrounds.primary,
+          border: `1px solid ${theme.borders.light}`,
+        }}
+      >
+        <p className="text-sm" style={{ color: theme.text.secondary }}>
+          Global Discounts
+        </p>
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          <div>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>Bikes</p>
+            <p className="text-xl font-bold" style={{ color: theme.accents.primary }}>
+              {bikeDiscount}%
+            </p>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>Parts</p>
+            <p className="text-xl font-bold" style={{ color: theme.accents.secondary }}>
+              {partDiscount}%
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
+          <div
+            className="rounded-lg shadow-lg p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="text-xl font-bold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Edit Global Discounts
+            </h3>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                  Global Bike Discount (%)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={editBikeDiscount}
+                  onChange={(e) => setEditBikeDiscount(e.target.value)}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                  Global Part Discount (%)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={editPartDiscount}
+                  onChange={(e) => setEditPartDiscount(e.target.value)}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.accents.primary,
+                  color: theme.text.inverse,
+                }}
+              >
+                {saving ? "Saving..." : "Save Discounts"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

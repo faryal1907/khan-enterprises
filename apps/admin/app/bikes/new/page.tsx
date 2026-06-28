@@ -298,7 +298,7 @@ export default function AddBikePage() {
   };
 
   const selectedModel = bikeModels.find(m => m.id === modelId);
-  const availableColors = selectedModel?.color ? selectedModel.color.split('/').map(c => c.trim()) : [];
+  const availableColors = selectedModel?.colors || [];
 
   if (user && user.role !== UserRole.ADMIN) return null;
 

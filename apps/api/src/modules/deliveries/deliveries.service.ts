@@ -199,42 +199,50 @@ export class DeliveriesService {
    * For CUSTOMER: only their own deliveries
    */
   async getDeliveries(query: QueryDeliveriesDto, user?: any) {
-    const where: any = {};
+    const AND: any[] = [];
 
     if (query.status) {
-      where.status = query.status;
+      AND.push({ status: query.status });
     }
 
-    if (query.branchId) {
-      where.order = {
-        branchId: query.branchId,
-      };
+    let effectiveBranchId = query.branchId;
+    if (user && (user.role === "MANAGER" || user.role === "SALES_STAFF") && user.branchId) {
+      effectiveBranchId = user.branchId;
+    }
+
+    if (effectiveBranchId) {
+      AND.push({
+        OR: [
+          { order: { branchId: effectiveBranchId } },
+          { partOrder: { branchId: effectiveBranchId } },
+        ]
+      });
     }
 
     if (query.orderId) {
-      where.orderId = query.orderId;
+      AND.push({ orderId: query.orderId });
     }
 
     if (query.dateFrom || query.dateTo) {
-      where.createdAt = {};
-      if (query.dateFrom) {
-        where.createdAt.gte = new Date(query.dateFrom);
-      }
-      if (query.dateTo) {
-        where.createdAt.lte = new Date(query.dateTo);
-      }
+      const dateFilter: any = {};
+      if (query.dateFrom) dateFilter.gte = new Date(query.dateFrom);
+      if (query.dateTo) dateFilter.lte = new Date(query.dateTo);
+      AND.push({ createdAt: dateFilter });
     }
 
     // Filter by customer for CUSTOMER role
     if (user?.role === "CUSTOMER") {
-      where.order = {
-        ...where.order,
+      AND.push({
         OR: [
-          { customerId: user.id },
-          { customerPhone: user.phoneNumber },
+          { order: { customerId: user.id } },
+          { order: { customerPhone: user.phoneNumber } },
+          { partOrder: { customerId: user.id } },
+          { partOrder: { customerPhone: user.phoneNumber } },
         ],
-      };
+      });
     }
+
+    const where = AND.length > 0 ? { AND } : {};
 
     const page = query.page || 1;
     const limit = query.limit || 20;
@@ -531,12 +539,18 @@ export class DeliveriesService {
   /**
    * Get delivery statistics for dashboard
    */
-  async getDeliveryStats(branchId?: string) {
-    const where = branchId
+  async getDeliveryStats(branchId?: string, user?: any) {
+    let effectiveBranchId = branchId;
+    if (user && (user.role === "MANAGER" || user.role === "SALES_STAFF") && user.branchId) {
+      effectiveBranchId = user.branchId;
+    }
+
+    const where = effectiveBranchId
       ? {
-          order: {
-            branchId,
-          },
+          OR: [
+            { order: { branchId: effectiveBranchId } },
+            { partOrder: { branchId: effectiveBranchId } },
+          ],
         }
       : {};
 

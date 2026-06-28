@@ -293,13 +293,38 @@ export default function PartsPage() {
                         </div>
                       ) : null}
 
-                      <div className="flex items-center justify-between">
-                        <span
-                          className="text-xl font-bold"
-                          style={{ color: theme.text.primary }}
-                        >
-                          PKR {part.sellingPrice?.toLocaleString()}
-                        </span>
+                      <div className="flex flex-col">
+                        {(() => {
+                          const base = part.sellingPrice;
+                          const globalDiscount = part.globalDiscountPercent ? Number(part.globalDiscountPercent) : 0;
+                          const maxIndividualDiscount = part.inventories?.reduce((max: number, inv: any) => {
+                            const d = inv.onlineDiscountPercent ? Number(inv.onlineDiscountPercent) : 0;
+                            return d > max ? d : max;
+                          }, 0) || 0;
+                          const effectiveDiscountPercent = globalDiscount + maxIndividualDiscount;
+                          const onlinePrice = base * (1 - effectiveDiscountPercent / 100);
+
+                          return (
+                            <>
+                              {effectiveDiscountPercent > 0 && (
+                                <span className="text-sm line-through mb-1" style={{ color: theme.text.muted }}>
+                                  PKR {base?.toLocaleString()}
+                                </span>
+                              )}
+                              <span
+                                className="text-xl font-bold"
+                                style={{ color: theme.text.primary }}
+                              >
+                                PKR {effectiveDiscountPercent > 0 ? onlinePrice.toLocaleString() : base?.toLocaleString()}
+                              </span>
+                              {effectiveDiscountPercent > 0 && (
+                                <span className="text-xs font-medium mt-1" style={{ color: theme.accents.primary }}>
+                                  Up to {effectiveDiscountPercent}% OFF Online
+                                </span>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </Link>
                   );

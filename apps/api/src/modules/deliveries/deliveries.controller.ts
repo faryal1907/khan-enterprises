@@ -50,8 +50,8 @@ export class DeliveriesController {
   @Get("stats")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MANAGER")
-  async getDeliveryStats(@Query("branchId") branchId?: string) {
-    return this.deliveriesService.getDeliveryStats(branchId);
+  async getDeliveryStats(@Query("branchId") branchId?: string, @CurrentUser() user?: any) {
+    return this.deliveriesService.getDeliveryStats(branchId, user);
   }
 
   /**

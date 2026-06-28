@@ -230,7 +230,7 @@ model BikeModel {
   modelName      String
   year           Int
   engineCapacity String?
-  color          String?
+  colors         String[] @default([])
 
   description String?
   basePrice   Decimal @db.Decimal(12, 2)
@@ -266,7 +266,7 @@ model BikeUnit {
   color String?
   media String[] @default([])
 
-  onlineDiscountPercent Decimal  @default(2) @db.Decimal(5, 2)
+  onlineDiscountPercent Decimal  @default(0) @db.Decimal(5, 2)
   actualSalePrice       Decimal? @db.Decimal(12, 2)
 
   reservedUntil DateTime?
@@ -321,6 +321,8 @@ model PartInventory {
   quantity         Int @default(0)
   reservedQuantity Int @default(0)
   reorderLevel     Int @default(5)
+
+  onlineDiscountPercent Decimal  @default(0) @db.Decimal(5, 2)
 
   stockMovements StockMovement[]
   partOrders     PartOrder[]
@@ -667,4 +669,16 @@ model AuditLog {
   @@index([entityId])
   @@index([action])
   @@index([createdAt])
+}
+
+// ============================================================================
+// SYSTEM SETTINGS
+// ============================================================================
+
+model SystemSetting {
+  id    String @id @default(uuid())
+  key   String @unique // e.g. "GLOBAL_BIKE_DISCOUNT", "GLOBAL_PART_DISCOUNT"
+  value String // JSON encoded or plain string
+
+  updatedAt DateTime @updatedAt
 }

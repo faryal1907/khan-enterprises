@@ -62,6 +62,7 @@ export interface BikeUnit {
   status: BikeStatus;
   price?: number | null;
   actualSalePrice?: number | null;
+  onlineDiscountPercent?: number | null;
   reservedUntil?: string | null;
   soldAt?: string | null;
   model: BikeModel;
@@ -96,7 +97,7 @@ export interface BikeModel {
   modelName: string;
   year: number;
   engineCapacity: string | null;
-  color: string | null;
+  colors: string[];
   basePrice: number;
 }
 

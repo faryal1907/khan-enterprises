@@ -42,9 +42,13 @@ export default function NewPartOrderPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const unitPrice = part ? part.sellingPrice : 0;
+  const basePrice = part ? part.sellingPrice : 0;
+  const individualDiscount = inventory?.onlineDiscountPercent ? Number(inventory.onlineDiscountPercent) : 0;
+  const globalDiscount = part?.globalDiscountPercent ? Number(part.globalDiscountPercent) : 0;
+  const discountPercent = individualDiscount + globalDiscount;
+  const unitPrice = basePrice * (1 - discountPercent / 100);
+  const discountAmount = basePrice - unitPrice;
   const totalPrice = unitPrice * (Number(quantity) || 0);
-
   useEffect(() => {
     if (!user) {
       router.push("/login");
@@ -276,13 +280,20 @@ export default function NewPartOrderPage() {
               </p>
               <p className="text-sm mt-1" style={{ color: theme.text.muted }}>{inventory.branch?.name}</p>
               <div className="mt-2 pt-2 border-t" style={{ borderColor: theme.borders.light }}>
-                <p className="text-sm" style={{ color: theme.text.secondary }}>
-                  Store Price: <span className="line-through">PKR {unitPrice.toLocaleString()}</span>
-                </p>
+                {discountPercent > 0 && (
+                  <p className="text-sm" style={{ color: theme.text.secondary }}>
+                    Store Price: <span className="line-through">PKR {basePrice.toLocaleString()}</span>
+                  </p>
+                )}
                 <p className="text-lg font-bold" style={{ color: theme.accents.primary }}>
                   Total: PKR {totalPrice.toLocaleString()}
                 </p>
                 <p className="text-xs" style={{ color: theme.text.muted }}>Qty: {quantity || 0} × PKR {unitPrice.toLocaleString()}</p>
+                {discountPercent > 0 && (
+                  <p className="text-xs mt-1" style={{ color: theme.text.muted }}>
+                    You save PKR {discountAmount.toLocaleString()} per unit ({discountPercent}% discount)
+                  </p>
+                )}
               </div>
             </div>
           )}

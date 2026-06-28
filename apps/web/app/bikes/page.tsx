@@ -299,13 +299,35 @@ export default function BikesPage() {
                           {bike.branch?.city}{bike.branch?.city && bike.branch?.address ? ', ' : ''}{bike.branch?.address || ''}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span
-                          className="text-2xl font-bold"
-                          style={{ color: theme.text.primary }}
-                        >
-                          PKR {(bike.price || bike.model?.basePrice)?.toLocaleString()}
-                        </span>
+                      <div className="flex flex-col">
+                        {(() => {
+                          const base = bike.price || bike.model?.basePrice;
+                          const individualDiscount = bike.onlineDiscountPercent ? Number(bike.onlineDiscountPercent) : 0;
+                          const globalDiscount = bike.globalDiscountPercent ? Number(bike.globalDiscountPercent) : 0;
+                          const effectiveDiscountPercent = individualDiscount + globalDiscount;
+                          const onlinePrice = base * (1 - effectiveDiscountPercent / 100);
+                          
+                          return (
+                            <>
+                              {effectiveDiscountPercent > 0 && (
+                                <span className="text-sm line-through mb-1" style={{ color: theme.text.muted }}>
+                                  PKR {base?.toLocaleString()}
+                                </span>
+                              )}
+                              <span
+                                className="text-2xl font-bold"
+                                style={{ color: theme.text.primary }}
+                              >
+                                PKR {effectiveDiscountPercent > 0 ? onlinePrice.toLocaleString() : base?.toLocaleString()}
+                              </span>
+                              {effectiveDiscountPercent > 0 && (
+                                <span className="text-xs font-medium mt-1" style={{ color: theme.accents.primary }}>
+                                  {effectiveDiscountPercent}% OFF Online
+                                </span>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                   </Link>

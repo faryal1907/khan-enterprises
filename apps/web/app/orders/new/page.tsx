@@ -48,7 +48,9 @@ export default function NewOrderPage() {
   const [isDragging, setIsDragging] = useState(false);
 
   const basePrice = bike ? (bike.price || bike.model?.basePrice) : 0;
-  const discountPercent = bike?.onlineDiscountPercent || 2;
+  const individualDiscount = bike?.onlineDiscountPercent ? Number(bike.onlineDiscountPercent) : 0;
+  const globalDiscount = bike?.globalDiscountPercent ? Number(bike.globalDiscountPercent) : 0;
+  const discountPercent = individualDiscount + globalDiscount;
   const onlinePrice = basePrice * (1 - discountPercent / 100);
   const discountAmount = basePrice - onlinePrice;
 

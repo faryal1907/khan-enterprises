@@ -29,7 +29,11 @@ export default function BikeDetailPage() {
   }, [id]);
 
   const price = bike ? (bike.price || bike.model?.basePrice) : 0;
-  const onlinePrice = price * 0.98;
+  const individualDiscount = bike?.onlineDiscountPercent ? Number(bike.onlineDiscountPercent) : 0;
+  const globalDiscount = bike?.globalDiscountPercent ? Number(bike.globalDiscountPercent) : 0;
+  const effectiveDiscountPercent = individualDiscount + globalDiscount;
+  
+  const onlinePrice = price * (1 - effectiveDiscountPercent / 100);
   const discountAmount = price - onlinePrice;
 
   const handleBuyOnline = () => {
@@ -149,7 +153,7 @@ export default function BikeDetailPage() {
                   PKR {onlinePrice.toLocaleString()}
                 </p>
                 <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>
-                  2% discount applied! You save PKR {discountAmount.toLocaleString()}
+                  {effectiveDiscountPercent > 0 && `${effectiveDiscountPercent}% discount applied! `}You save PKR {discountAmount.toLocaleString()}
                 </p>
               </div>
             </div>
@@ -203,7 +207,7 @@ export default function BikeDetailPage() {
                 Order Now 
               </button>
               <p className="text-xs mb-4 text-center" style={{ color: theme.text.muted }}>
-                Online Price: PKR {onlinePrice.toLocaleString()} (2% discount applied)
+                Online Price: PKR {onlinePrice.toLocaleString()} ({effectiveDiscountPercent > 0 ? `${effectiveDiscountPercent}% discount applied` : 'No discount'})
               </p>
 
               {/* Visit Branch */}
