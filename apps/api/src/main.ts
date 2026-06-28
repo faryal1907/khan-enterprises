@@ -10,12 +10,17 @@ import { AppModule } from "./app.module";
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
+import * as morgan from 'morgan';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Security headers — must be applied before CORS and routes
   app.use(helmet());
+
+  // Request logging — essential for debugging production issues
+  // Use 'combined' format in production (Apache-style), 'dev' in development (colored, concise)
+  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
   // Enable CORS for frontend apps (Web: 3000, Admin: 3001)
   app.enableCors({
