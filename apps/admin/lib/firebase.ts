@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
+import type { MessagePayload } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -37,7 +38,7 @@ export const requestForToken = async () => {
 };
 
 export const onMessageListener = () =>
-  new Promise((resolve) => {
+  new Promise<MessagePayload>((resolve) => {
     isSupported().then((supported) => {
       if (supported) {
         const messaging = getMessaging(app);

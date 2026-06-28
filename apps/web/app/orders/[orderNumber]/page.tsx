@@ -5,9 +5,7 @@ import Link from "next/link";
 import { theme } from "@/lib/colors";
 import { getOrderByNumber } from "@/lib/api/orders";
 import { getPartOrderByNumber } from "@/lib/api/part-orders";
-import { createDeliveryRequest, getDeliveryByOrderId } from "@/lib/api/deliveries";
-import { markAsPickedByCustomer } from "@/lib/api/orders";
-import { api } from "@/lib/api-client";
+import { createDeliveryRequest } from "@/lib/api/deliveries";
 import { MapPicker } from "@/components/map-picker";
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
@@ -36,13 +34,18 @@ function CountdownTimer({ expiresAt }: { expiresAt: string }) {
         return `${minutes}m ${seconds}s`;
       }
     };
-
-    setTimeLeft(calculateTimeLeft());
+    let isMounted = true;
+    setTimeout(() => {
+      if (isMounted) setTimeLeft(calculateTimeLeft());
+    }, 0);
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      if (isMounted) setTimeLeft(calculateTimeLeft());
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+    };
   }, [expiresAt]);
 
   return (
@@ -157,18 +160,6 @@ export default function OrderStatusPage() {
   });
   const [submittingDelivery, setSubmittingDelivery] = useState(false);
   const [deliveryError, setDeliveryError] = useState("");
-  const [pickingUp, setPickingUp] = useState(false);
-  const [pickupError, setPickupError] = useState("");
-
-  // Payment proof upload state
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadingProof, setUploadingProof] = useState(false);
-  const [proofUploaded, setProofUploaded] = useState(false);
-  const [proofUploadError, setProofUploadError] = useState("");
-
-  useEffect(() => {
-    fetchOrder();
-  }, [orderNumber]);
 
   const fetchOrder = async () => {
     try {
@@ -183,28 +174,24 @@ export default function OrderStatusPage() {
         const data = await getOrderByNumber(orderNum);
         setOrder({ ...data, type: "BIKE" });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to fetch order:", err);
-      setError(err.response?.data?.message || "Failed to load order details");
+      setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to load order details");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePickupFromStore = async () => {
-    if (!order) return;
-    try {
-      setPickingUp(true);
-      setPickupError("");
-      await markAsPickedByCustomer(order.id);
-      await fetchOrder();
-    } catch (err: any) {
-      console.error("Failed to mark as picked up:", err);
-      setPickupError(err.response?.data?.message || "Failed to process pickup");
-    } finally {
-      setPickingUp(false);
-    }
-  };
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchOrder();
+    }, 0);
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderNumber]);
+
+  // handlePickupFromStore removed as it was unused
+  // handlePickupFromStore removed as it was unused
 
   const handleDeliveryRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,7 +202,7 @@ export default function OrderStatusPage() {
       
       const payload = { ...deliveryForm };
       if (!payload.preferredTimeWindow?.trim()) {
-        delete (payload as any).preferredTimeWindow;
+        delete (payload as { preferredTimeWindow?: string }).preferredTimeWindow;
       }
 
       await createDeliveryRequest(order.id, payload, order.type);
@@ -223,9 +210,9 @@ export default function OrderStatusPage() {
       await fetchOrder();
       setShowDeliveryForm(false);
       setDeliveryForm({ deliveryAddress: "", preferredTimeWindow: "", contactNumber: "" });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to create delivery request:", err);
-      const msg = err.response?.data?.message;
+      const msg = (err as { response?: { data?: { message?: string | string[] } } }).response?.data?.message;
       if (Array.isArray(msg)) {
         setDeliveryError(msg.join(", "));
       } else {
@@ -236,32 +223,7 @@ export default function OrderStatusPage() {
     }
   };
 
-  const handleUploadPaymentProof = async () => {
-    if (!selectedFile || !order) return;
-    try {
-      setUploadingProof(true);
-      setProofUploadError("");
-
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      const uploadResponse = await api.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      const paymentProofUrl = uploadResponse.data.fileUrl;
-
-      // Now submit the proof URL to the order
-      await api.post(`/orders/${order.id}/upload-payment-proof`, {
-        paymentProofUrl,
-      });
-
-      setProofUploaded(true);
-      await fetchOrder();
-    } catch (err: any) {
-      setProofUploadError(err.response?.data?.message || "Failed to upload payment proof");
-    } finally {
-      setUploadingProof(false);
-    }
-  };
+  // handleUploadPaymentProof removed as it was unused
 
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
@@ -401,7 +363,7 @@ export default function OrderStatusPage() {
             style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}
           >
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <svg className="w-6 h-6" style={{ color: "#92400E" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -449,47 +411,26 @@ export default function OrderStatusPage() {
             style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
           >
             <div className="flex items-start gap-4 mb-6">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <svg className="w-6 h-6" style={{ color: "#3730A3" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#3730A3" }}>
-                  How would you like to receive your {order.type === "BIKE" ? "bike" : "order"}?
+                  Would you like to request delivery for your {order.type === "BIKE" ? "bike" : "order"}?
                 </h2>
                 <p className="text-sm mb-4" style={{ color: "#3730A3" }}>
-                  Your order is confirmed! Please choose how you'd like to receive it.
+                  Your order is confirmed! Please request delivery in case you want it to be delivered to your location, rather than picking it up from the branch yourself.
                 </p>
               </div>
             </div>
 
-            {pickupError && (
-              <div
-                className="rounded-lg p-4 mb-4"
-                style={{ backgroundColor: "#FEE2E2", border: "1px solid #EF4444" }}
-              >
-                <p className="text-sm" style={{ color: "#991B1B" }}>{pickupError}</p>
-              </div>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Delivery Option */}
-              <div
-                className="rounded-lg p-6"
-                style={{ backgroundColor: theme.backgrounds.secondary, border: `2px solid ${theme.borders.light}` }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <svg className="w-6 h-6" style={{ color: theme.accents.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                  </svg>
-                  <h3 className="text-base font-semibold" style={{ color: theme.text.primary }}>
-                    Request Delivery
-                  </h3>
-                </div>
-                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                  Get your {order.type === "BIKE" ? "bike" : "order"} delivered to your doorstep. Our team will coordinate with you for timing.
-                </p>
+              
+              
                 <button
                   onClick={() => setShowDeliveryForm(true)}
                   className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
@@ -501,36 +442,6 @@ export default function OrderStatusPage() {
                   Request Delivery
                 </button>
               </div>
-
-              {/* Pickup Option */}
-              <div
-                className="rounded-lg p-6"
-                style={{ backgroundColor: theme.backgrounds.secondary, border: `2px solid ${theme.borders.light}` }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <svg className="w-6 h-6" style={{ color: "#10B981" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <h3 className="text-base font-semibold" style={{ color: theme.text.primary }}>
-                    Pick Up from Store
-                  </h3>
-                </div>
-                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                  Collect your {order.type === "BIKE" ? "bike" : "order"} directly from our branch. Visit us at your convenience during business hours.
-                </p>
-                <button
-                  onClick={handlePickupFromStore}
-                  disabled={pickingUp}
-                  className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                  style={{
-                    backgroundColor: "#10B981",
-                    color: "white",
-                  }}
-                >
-                  {pickingUp ? "Processing..." : "Pick Up from Store"}
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
@@ -682,7 +593,7 @@ export default function OrderStatusPage() {
             {/* Order Created */}
             <div className="flex gap-4">
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                 style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -706,7 +617,7 @@ export default function OrderStatusPage() {
             {hasSuccessTransaction && order.transactions && order.transactions.length > 0 && (
               <div className="flex gap-4">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                   style={{ backgroundColor: "#10B981", color: "white" }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -731,7 +642,7 @@ export default function OrderStatusPage() {
             {showReservedNotice && (
               <div className="flex gap-4">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                   style={{ backgroundColor: "#F59E0B", color: "white" }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -754,7 +665,7 @@ export default function OrderStatusPage() {
             {order.delivery && (
               <div className="flex gap-4">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                   style={{ backgroundColor: "#6366F1", color: "white" }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -797,7 +708,7 @@ export default function OrderStatusPage() {
             {order.delivery && order.delivery.deliveredAt && (
               <div className="flex gap-4">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                   style={{ backgroundColor: "#10B981", color: "white" }}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

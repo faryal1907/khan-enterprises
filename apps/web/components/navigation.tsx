@@ -40,6 +40,7 @@ export function Navigation() {
 
         {/* Logo / Brand */}
         <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.svg"
             alt="Khan Enterprises Logo"

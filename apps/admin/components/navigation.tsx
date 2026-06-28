@@ -13,7 +13,6 @@ import {
   LayoutDashboard,
   Bike,
   Wrench,
-  BadgeDollarSign,
   ShoppingCart,
   DollarSign,
   Truck,
@@ -69,7 +68,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
       }
     };
     fetchLowStockCount();
-  }, [user?.branchId, user?.role]);
+  }, );
 
   if (!user) return <>{children}</>;
 
@@ -124,23 +123,29 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
           {/* Brand */}
           <div
             className={`border-b flex items-center ${
-              collapsed ? "justify-center p-4" : "justify-between p-6"
+              collapsed ? "flex-col justify-center gap-2 p-3" : "justify-between p-6"
             }`}
             style={{ borderColor: theme.borders.light }}
           >
-            {!collapsed && (
-              <div>
-                <span
-                  className="font-bold text-xl"
-                  style={{ color: theme.text.primary }}
-                >
-                  ALI & KHAN&apos;S
-                </span>
+            <Link
+              href="/"
+              className={`flex items-center ${
+                collapsed ? "justify-center" : "min-w-0 flex-col items-start"
+              }`}
+              aria-label="Ali & Khan's Green Wheels admin home"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.svg"
+                alt="Ali & Khan's Green Wheels"
+                className={collapsed ? "h-9 w-auto object-contain" : "h-16 w-auto object-contain"}
+              />
+              {!collapsed && (
                 <p className="text-xs mt-1" style={{ color: theme.text.muted }}>
                   Admin Portal
                 </p>
-              </div>
-            )}
+              )}
+            </Link>
             <button
               onClick={() => setCollapsed(!collapsed)}
               className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg"

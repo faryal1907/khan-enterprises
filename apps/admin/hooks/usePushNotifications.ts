@@ -27,7 +27,7 @@ export const usePushNotifications = () => {
 
       navigator.serviceWorker
         .register(`/firebase-messaging-sw.js?${configParams.toString()}`)
-        .then((registration) => {
+        .then(() => {
           console.log("Service Worker registered successfully.");
         })
         .catch((err) => {
@@ -63,15 +63,17 @@ export const usePushNotifications = () => {
     // Listen for foreground messages
     const listenForMessages = async () => {
       try {
-        const payload: any = await onMessageListener();
+        const payload = await onMessageListener();
         if (payload?.notification) {
+          const notificationUrl = payload.data?.url;
+
           toast(payload.notification.title, {
             description: payload.notification.body,
-            action: payload.data?.url
+            action: notificationUrl
               ? {
                   label: "View",
                   onClick: () => {
-                    window.location.href = payload.data.url;
+                    window.location.href = notificationUrl;
                   },
                 }
               : undefined,

@@ -69,6 +69,7 @@ export default function SignupPage() {
         {/* Brand header */}
         <div className="mb-2 text-center">
           <div className="w-48 h-48 flex items-center justify-center mx-auto mb-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="Ali & Khan's Logo" className="w-full h-full object-contain" />
           </div>
           <p className="text-sm mt-1" style={{ color: theme.text.muted }}>

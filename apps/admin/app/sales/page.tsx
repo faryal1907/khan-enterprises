@@ -126,7 +126,12 @@ export default function SalesRecordsPage() {
     if (!user) return;
 
     if (isBranchScoped) {
-      setFilters((prev) => ({ ...prev, branch: user.branchId || "" }));
+      setTimeout(() => {
+        setFilters((prev) => {
+          if (prev.branch === user.branchId) return prev;
+          return { ...prev, branch: user.branchId || "" };
+        });
+      }, 0);
     }
   }, [isBranchScoped, user]);
 
@@ -172,8 +177,8 @@ export default function SalesRecordsPage() {
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       setSales(completed);
-    } catch (fetchError: any) {
-      setError(fetchError.response?.data?.message || "Failed to load sales records");
+    } catch (fetchError: unknown) {
+      setError((fetchError as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to load sales records");
       setSales([]);
     } finally {
       setLoading(false);
@@ -182,7 +187,10 @@ export default function SalesRecordsPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetchSales();
+    const timeoutId = setTimeout(() => {
+      fetchSales();
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [fetchSales, user]);
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
@@ -196,8 +204,8 @@ export default function SalesRecordsPage() {
     try {
       await downloadInvoice(sale.id, sale.type === "PART");
       toast.success("Invoice downloaded successfully");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to download invoice");
+    } catch (error: unknown) {
+      toast.error((error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to download invoice");
     } finally {
       setInvoiceLoadingId(null);
     }
@@ -451,7 +459,7 @@ export default function SalesRecordsPage() {
                           View Order
                         </button>
                         <AsyncButton
-                          onClick={(e) => handleDownloadInvoice(e as any, sale)}
+                          onClick={(e) => handleDownloadInvoice(e as unknown as React.MouseEvent, sale)}
                           loading={invoiceLoadingId === sale.id}
                           loadingLabel="Downloading..."
                           style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}

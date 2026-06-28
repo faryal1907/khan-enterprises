@@ -48,15 +48,12 @@ export default function LoginPage() {
         style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
       >
         <div className="mb-8 text-center">
-          <h1
-            className="text-2xl font-bold"
-            style={{ color: theme.text.primary }}
-          >
-            Ali & Khan's
-          </h1>
-          <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
-            Sign in to your account
-          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="Ali & Khan's Green Wheels"
+            className="mx-auto h-24 w-auto object-contain"
+          />
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

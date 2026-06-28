@@ -33,9 +33,25 @@ export default function ManualOrderPage() {
     paymentMethod: "",
   });
 
-  const [bikeDetails, setBikeDetails] = useState<any>(null);
+  interface BikeDetail {
+    id: string;
+    model: string;
+    price: string;
+  }
+  const [bikeDetails, setBikeDetails] = useState<BikeDetail | null>(null);
 
-  const [allParts, setAllParts] = useState<any[]>([]);
+  interface PartInventory {
+    id: string;
+    quantity?: number;
+    reservedQuantity?: number;
+    part?: {
+      id: string;
+      name: string;
+      sku: string;
+      sellingPrice?: number | string;
+    };
+  }
+  const [allParts, setAllParts] = useState<PartInventory[]>([]);
   const [partSearchTerm, setPartSearchTerm] = useState("");
   const [isFetchingParts, setIsFetchingParts] = useState(false);
   const [showPartDropdown, setShowPartDropdown] = useState(false);
@@ -61,28 +77,26 @@ export default function ManualOrderPage() {
   }, [allParts.length, isBranchScoped, saleType, user?.branchId]);
 
   const partSearchResults = partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
-    ? allParts.filter((p: any) => 
+    ? allParts.filter((p: PartInventory) => 
         p.part?.name?.toLowerCase().includes(partSearchTerm.toLowerCase()) || 
         p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
       )
     : allParts;
 
-  // Auto-fill sale price for parts
-  useEffect(() => {
-    if (saleType === "PART") {
-      const q = Number(formData.partQuantity);
-      const p = Number(formData.partPrice);
-      if (!isNaN(q) && !isNaN(p) && q > 0 && p >= 0) {
-        setFormData((prev) => ({
-          ...prev,
-          salePrice: (q * p).toLocaleString(),
-        }));
-      }
-    }
-  }, [formData.partQuantity, formData.partPrice, saleType]);
+  // Auto-fill sale price for parts is handled in handleInputChange now.
 
   const handleInputChange = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [key]: value };
+      if (saleType === "PART" && (key === "partQuantity" || key === "partPrice")) {
+        const q = Number(next.partQuantity);
+        const p = Number(next.partPrice);
+        if (!isNaN(q) && !isNaN(p) && q > 0 && p >= 0) {
+          next.salePrice = (q * p).toLocaleString();
+        }
+      }
+      return next;
+    });
   };
 
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -167,9 +181,9 @@ export default function ManualOrderPage() {
         toast.success("Part sale registered successfully!");
         router.push(`/part-orders/${res.id}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Sale registration failed:", error);
-      toast.error(error.response?.data?.message || "Failed to register sale");
+      toast.error((error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to register sale");
     } finally {
       setIsSubmitting(false);
     }
@@ -190,7 +204,7 @@ export default function ManualOrderPage() {
       });
       const bikes = res.bikes || [];
       const exactBike = bikes.find(
-        (b: any) => b.chassisNumber.toUpperCase() === formData.chassisNumber.trim().toUpperCase()
+        (b) => b.chassisNumber.toUpperCase() === formData.chassisNumber.trim().toUpperCase()
       );
 
       if (!exactBike) {
@@ -434,7 +448,7 @@ export default function ManualOrderPage() {
                         Loading parts...
                       </div>
                     ) : partSearchResults.length > 0 ? (
-                      partSearchResults.map((p: any) => (
+                      partSearchResults.map((p: PartInventory) => (
                         <div
                           key={p.id}
                           className="px-3 py-2 text-sm cursor-pointer hover:opacity-80"
@@ -447,8 +461,8 @@ export default function ManualOrderPage() {
                             const availableQuantity = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0));
                             setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`);
                             handleInputChange("partInventoryId", p.id);
-                            handleInputChange("partId", p.part?.id);
-                            handleInputChange("partName", p.part?.name);
+                            handleInputChange("partId", p.part?.id || "");
+                            handleInputChange("partName", p.part?.name || "");
                             handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0");
                             handleInputChange("partMaxQuantity", availableQuantity.toString());
                             setShowPartDropdown(false);

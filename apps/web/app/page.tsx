@@ -197,7 +197,7 @@ export default function Home() {
               animate="show"
               variants={fadeUp}
               transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
-              className="hidden md:block absolute -bottom-4 left-1/2 -translate-x-[60%] z-10"
+              className="hidden md:block absolute -bottom-4 left-1/2 translate-x-[-60%] z-10"
             >
               <div
                 className="px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2"
@@ -507,10 +507,11 @@ export default function Home() {
                 borderLeftColor: theme.accents.secondary,
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782035704/evee-logo_round-500x494_ygddkv.png"
                 alt="EVEE Logo"
-                className="w-32 h-32 object-contain flex-shrink-0"
+                className="w-32 h-32 object-contain shrink-0"
               />
               <div className="text-center md:text-left">
                 <h3 className="text-2xl font-bold mb-3" style={{ color: theme.text.primary }}>
@@ -535,14 +536,14 @@ export default function Home() {
               <img
                 src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782035711/RoadKing-Logo_xbxh5n.png"
                 alt="Road King Logo"
-                className="w-32 h-32 object-contain flex-shrink-0 rounded-lg bg-white p-2"
+                className="w-32 h-32 object-contain shrink-0 rounded-lg bg-white p-2"
               />
               <div className="text-center md:text-left">
                 <h3 className="text-2xl font-bold mb-3" style={{ color: theme.backgrounds.dark }}>
                   Road King
                 </h3>
                 <p style={{ color: theme.backgrounds.dark, opacity: 0.75 }} className="text-sm leading-relaxed">
-                  A pioneering EV company leading Pakistan's electric vehicle revolution. With 400+ dealerships nationwide and monthly capacity of 10,000+ units, Road King is advancing sustainable 2-wheeler and 3-wheeler transportation.
+                  A pioneering EV company leading Pakistan&apos;s electric vehicle revolution. With 400+ dealerships nationwide and monthly capacity of 10,000+ units, Road King is advancing sustainable 2-wheeler and 3-wheeler transportation.
                 </p>
               </div>
             </motion.div>
@@ -585,10 +586,10 @@ export default function Home() {
               }}
             >
               <div className="flex items-start gap-3 mb-4">
-                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" style={{ color: theme.accents.primary }}>
+                <svg className="w-5 h-5 mt-1 shrink-0" fill="currentColor" viewBox="0 0 24 24" style={{ color: theme.accents.primary }}>
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                 </svg>
-                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: theme.accents.primary }}>
+                <svg className="w-5 h-5 mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: theme.accents.primary }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
@@ -608,7 +609,7 @@ export default function Home() {
               style={{ backgroundColor: theme.backgrounds.dark }}
             >
               <div className="flex items-start gap-3 mb-4">
-                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" style={{ color: theme.accents.tertiary }}>
+                <svg className="w-5 h-5 mt-1 shrink-0" fill="currentColor" viewBox="0 0 24 24" style={{ color: theme.accents.tertiary }}>
                   <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
                 </svg>
               </div>
