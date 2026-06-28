@@ -140,11 +140,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
                 alt="Ali & Khan's Green Wheels"
                 className={collapsed ? "h-9 w-auto object-contain" : "h-16 w-auto object-contain"}
               />
-              {!collapsed && (
-                <p className="text-xs mt-1" style={{ color: theme.text.muted }}>
-                  Admin Portal
-                </p>
-              )}
+              {!collapsed}
             </Link>
             <button
               onClick={() => setCollapsed(!collapsed)}

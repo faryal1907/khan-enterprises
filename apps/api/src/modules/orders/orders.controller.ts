@@ -41,7 +41,6 @@ export class OrdersController {
     @Body() dto: CreateCustomerOrderDto,
     @CurrentUser() user: any,
   ) {
-    console.log('createCustomerOrder called', { userRole: user?.role, userId: user?.id });
     return this.ordersService.createCustomerOrder(dto, user);
   }
 

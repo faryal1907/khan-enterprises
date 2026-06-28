@@ -377,3 +377,51 @@
 2026-06-28T08:06:29.233984Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }, WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
 2026-06-28T08:06:29.425191Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
 2026-06-28T08:06:29.425277Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-06-28T08:14:57.244295Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-28")}
+2026-06-28T08:14:57.244382Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:20:01.555876Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("node_modules")}
+2026-06-28T08:20:01.555903Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:20:01.855636Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\api\\package.json")}
+2026-06-28T08:20:01.855666Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
+2026-06-28T08:20:02.645284Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("package-lock.json")}
+2026-06-28T08:20:02.645315Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:20:02.753859Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("package-lock.json")}
+2026-06-28T08:20:02.753894Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:20:23.953864Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\api\\src\\main.ts")}
+2026-06-28T08:20:23.953893Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("api"), path: AnchoredSystemPathBuf("apps\\api") }}))
+2026-06-28T08:21:04.148867Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-28")}
+2026-06-28T08:21:04.148883Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:27:37.047771Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\admin\\components\\navigation.tsx")}
+2026-06-28T08:27:37.047793Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin"), path: AnchoredSystemPathBuf("apps\\admin") }}))
+2026-06-28T08:28:30.045882Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\admin\\components\\navigation.tsx")}
+2026-06-28T08:28:30.045922Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin"), path: AnchoredSystemPathBuf("apps\\admin") }}))
+2026-06-28T08:32:48.552606Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(""), AnchoredSystemPathBuf("check_tokens.js")}
+2026-06-28T08:32:48.552679Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:33:02.043291Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("check_tokens.js")}
+2026-06-28T08:33:02.043332Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:33:02.155136Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("check_tokens.js"), AnchoredSystemPathBuf("")}
+2026-06-28T08:33:02.155151Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:33:36.144736Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(""), AnchoredSystemPathBuf("dummy.pdf")}
+2026-06-28T08:33:36.144751Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:33:45.342646Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(""), AnchoredSystemPathBuf("check_tokens.js")}
+2026-06-28T08:33:45.342666Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:34:01.552082Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("scratch_test.js")}
+2026-06-28T08:34:01.552107Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:34:01.654784Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("")}
+2026-06-28T08:34:01.654812Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({}))
+2026-06-28T08:34:17.243668Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("script.ts")}
+2026-06-28T08:34:17.243696Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:34:17.344434Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("")}
+2026-06-28T08:34:17.344477Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({}))
+2026-06-28T08:34:29.747097Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(""), AnchoredSystemPathBuf("test-ids.js")}
+2026-06-28T08:34:29.747112Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:34:32.342796Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("TODO.md"), AnchoredSystemPathBuf("")}
+2026-06-28T08:34:32.342812Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:34:52.256067Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\fix-refunded.js"), AnchoredSystemPathBuf("packages\\prisma")}
+2026-06-28T08:34:52.256084Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
+2026-06-28T08:35:11.243555Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages\\prisma\\export-data.ts"), AnchoredSystemPathBuf("packages\\prisma")}
+2026-06-28T08:35:11.243586Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@khan/prisma"), path: AnchoredSystemPathBuf("packages\\prisma") }}))
+2026-06-28T08:35:26.749006Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-28")}
+2026-06-28T08:35:26.749021Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-06-28T08:35:27.346526Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\9cd2fa162b7447d7-turbo.log.2026-06-28")}
+2026-06-28T08:35:27.346549Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
