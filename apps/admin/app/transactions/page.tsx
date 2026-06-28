@@ -431,14 +431,16 @@ export default function TransactionsPage() {
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <div className="flex gap-3 whitespace-nowrap">
-                        <AsyncButton
-                          onClick={() => handleDownloadReceipt(transaction)}
-                          loading={receiptLoadingId === transaction.id}
-                          loadingLabel="Downloading..."
-                          style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
-                        >
-                          Receipt
-                        </AsyncButton>
+                        {transaction.status === PaymentStatus.SUCCESS && (
+                          <AsyncButton
+                            onClick={() => handleDownloadReceipt(transaction)}
+                            loading={receiptLoadingId === transaction.id}
+                            loadingLabel="Downloading..."
+                            style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
+                          >
+                            Receipt
+                          </AsyncButton>
+                        )}
                       </div>
                     </td>
                   </tr>
