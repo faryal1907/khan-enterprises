@@ -7,6 +7,7 @@ import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { QueryDeliveriesDto } from "./dto/query-deliveries.dto";
 import { CreateDeliveryDto } from "./dto/create-delivery.dto";
 import { UpdateDeliveryStatusDto } from "./dto/update-delivery-status.dto";
+import { RejectDeliveryDto } from "./dto/reject-delivery.dto";
 
 @Controller("deliveries")
 export class DeliveriesController {
@@ -121,7 +122,7 @@ export class DeliveriesController {
   @Roles("ADMIN", "MANAGER")
   async rejectDelivery(
     @Param("id") id: string,
-    @Body() body: { reason?: string },
+    @Body() body: RejectDeliveryDto,
     @CurrentUser() user: any
   ) {
     return this.deliveriesService.updateDeliveryStatus(id, { status: "REQUESTED", notes: body.reason }, user.id);

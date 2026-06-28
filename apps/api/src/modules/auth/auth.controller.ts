@@ -19,6 +19,8 @@ import { SupabaseAuthService } from "./supabase-auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { RefreshDto } from "./dto/refresh.dto";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./decorators/roles.decorator";
@@ -126,7 +128,7 @@ export class AuthController {
   @Post("users")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async createUser(@Body() dto: any, @CurrentUser() admin: any) {
+  async createUser(@Body() dto: CreateUserDto, @CurrentUser() admin: any) {
     return this.authService.createUser(dto, admin.id);
   }
 
@@ -148,7 +150,7 @@ export class AuthController {
   @Put("users/:id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async updateUser(@Param("id") id: string, @Body() dto: any, @CurrentUser() admin: any) {
+  async updateUser(@Param("id") id: string, @Body() dto: UpdateUserDto, @CurrentUser() admin: any) {
     return this.authService.updateUser(id, dto, admin.id);
   }
 

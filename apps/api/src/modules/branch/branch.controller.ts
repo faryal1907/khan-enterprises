@@ -4,6 +4,9 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { CreateBranchDto } from "./dto/create-branch.dto";
+import { UpdateBranchDto } from "./dto/update-branch.dto";
+import { TransferStockDto } from "./dto/transfer-stock.dto";
 
 @Controller("branches")
 @UseGuards(JwtAuthGuard)
@@ -34,7 +37,7 @@ export class BranchController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async createBranch(@Body() dto: any, @CurrentUser() admin: any) {
+  async createBranch(@Body() dto: CreateBranchDto, @CurrentUser() admin: any) {
     return this.branchService.createBranch(dto, admin.id);
   }
 
@@ -45,7 +48,7 @@ export class BranchController {
   @Patch(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async updateBranch(@Param("id") id: string, @Body() dto: any, @CurrentUser() admin: any) {
+  async updateBranch(@Param("id") id: string, @Body() dto: UpdateBranchDto, @CurrentUser() admin: any) {
     return this.branchService.updateBranch(id, dto, admin.id);
   }
 
@@ -78,7 +81,7 @@ export class BranchController {
   @Post("transfer")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async transferStock(@Body() dto: any, @CurrentUser() admin: any) {
+  async transferStock(@Body() dto: TransferStockDto, @CurrentUser() admin: any) {
     return this.branchService.transferStock(dto, admin.id);
   }
 }

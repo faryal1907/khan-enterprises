@@ -9,6 +9,8 @@ import * as crypto from "crypto";
 import { PrismaService } from "../../prisma/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtPayload } from "./strategies/jwt.strategy";
 import { AuditAction } from "@khan/prisma";
 
@@ -254,15 +256,7 @@ export class AuthService {
   }
 
   async createUser(
-    dto: {
-      email: string;
-      password: string;
-      fullName: string;
-      phoneNumber: string;
-      role: "ADMIN" | "MANAGER" | "SALES_STAFF";
-      branchId?: string;
-      vendorId?: string;
-    },
+    dto: CreateUserDto,
     adminId: string
   ) {
     const existingUser = await this.prisma.client.user.findUnique({
@@ -346,14 +340,7 @@ export class AuthService {
 
   async updateUser(
     id: string,
-    dto: {
-      fullName?: string;
-      phoneNumber?: string;
-      role?: "ADMIN" | "MANAGER" | "SALES_STAFF";
-      branchId?: string | null;
-      vendorId?: string | null;
-      status?: "ACTIVE" | "INACTIVE";
-    },
+    dto: UpdateUserDto,
     adminId: string
   ) {
     return this.prisma.client.$transaction(async (tx) => {

@@ -12,6 +12,7 @@ import { OrderStatus, PaymentMethod } from "@khan/prisma";
 import { PdfService } from "../pdf/pdf.service";
 import { Response } from "express";
 import { UploadPaymentProofDto } from "../orders/dto/upload-payment-proof.dto";
+import { RecordPaymentDto } from "../orders/dto/record-payment.dto";
 import { VerifyPartOrderPaymentDto } from "./dto/verify-part-order-payment.dto";
 
 @Controller("part-orders")
@@ -175,7 +176,7 @@ export class PartOrdersController {
   @Roles("ADMIN", "MANAGER", "SALES_STAFF")
   async recordPayment(
     @Param("id") id: string,
-    @Body() dto: { amount: number; method: PaymentMethod; referenceNumber?: string },
+    @Body() dto: RecordPaymentDto,
     @CurrentUser() user: any
   ) {
     return this.partOrdersService.recordPartOrderPayment(id, dto, user);

@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { AuditAction, UserRole } from "@khan/prisma";
+import { CreateBranchDto } from "./dto/create-branch.dto";
+import { UpdateBranchDto } from "./dto/update-branch.dto";
+import { TransferStockDto } from "./dto/transfer-stock.dto";
 
 @Injectable()
 export class BranchService {
@@ -102,13 +105,7 @@ export class BranchService {
   }
 
   async createBranch(
-    dto: {
-      name: string;
-      city: string;
-      address: string;
-      phoneNumber: string;
-      managerId?: string;
-    },
+    dto: CreateBranchDto,
     adminId: string
   ) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -154,13 +151,7 @@ export class BranchService {
 
   async updateBranch(
     id: string,
-    dto: {
-      name?: string;
-      city?: string;
-      address?: string;
-      phoneNumber?: string;
-      managerId?: string | null;
-    },
+    dto: UpdateBranchDto,
     adminId: string
   ) {
     return this.prisma.client.$transaction(async (tx) => {
@@ -333,13 +324,7 @@ export class BranchService {
   }
 
   async transferStock(
-    dto: {
-      type: "bike" | "part";
-      itemId: string;
-      fromBranchId: string;
-      toBranchId: string;
-      quantity?: number;
-    },
+    dto: TransferStockDto,
     adminId: string
   ) {
     return this.prisma.client.$transaction(async (tx) => {
