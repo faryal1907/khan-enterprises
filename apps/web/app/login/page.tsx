@@ -136,6 +136,17 @@ export default function LoginPage() {
             )}
           </div>
 
+          {/* Forgot password link */}
+          <div className="text-right -mt-3">
+            <a
+              href="/forgot-password"
+              className="text-xs font-medium hover:underline"
+              style={{ color: theme.accents.primary }}
+            >
+              Forgot password?
+            </a>
+          </div>
+
           {/* API error banner */}
           {error && (
             <div

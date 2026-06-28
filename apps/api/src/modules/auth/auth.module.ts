@@ -8,6 +8,7 @@ import { SupabaseAuthService } from "./supabase-auth.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { RolesGuard } from "./guards/roles.guard";
+import { EmailModule } from "../email/email.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RolesGuard } from "./guards/roles.guard";
       secret: process.env.JWT_SECRET,
     }),
     ConfigModule,
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, SupabaseAuthService, JwtStrategy, JwtAuthGuard, RolesGuard],

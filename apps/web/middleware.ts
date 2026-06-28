@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const WEB_ACCESS_TOKEN_COOKIE = "accessToken";
 import type { NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/signup", "/", "/bikes", "/parts", "/search", "/orders"];
+const publicPaths = ["/login", "/signup", "/", "/bikes", "/parts", "/search", "/orders", "/forgot-password", "/reset-password"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -34,5 +34,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.webp).*)"],
 };

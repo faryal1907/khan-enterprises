@@ -152,6 +152,7 @@ export type UserWhereInput = {
     branch?: Prisma.XOR<Prisma.BranchNullableScalarRelationFilter, Prisma.BranchWhereInput> | null;
     vendor?: Prisma.XOR<Prisma.VendorNullableScalarRelationFilter, Prisma.VendorWhereInput> | null;
     refreshTokens?: Prisma.RefreshTokenListRelationFilter;
+    passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter;
     auditLogs?: Prisma.AuditLogListRelationFilter;
     processedOrders?: Prisma.OrderListRelationFilter;
     customerOrders?: Prisma.OrderListRelationFilter;
@@ -179,6 +180,7 @@ export type UserOrderByWithRelationInput = {
     branch?: Prisma.BranchOrderByWithRelationInput;
     vendor?: Prisma.VendorOrderByWithRelationInput;
     refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput;
     auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput;
     processedOrders?: Prisma.OrderOrderByRelationAggregateInput;
     customerOrders?: Prisma.OrderOrderByRelationAggregateInput;
@@ -209,6 +211,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     branch?: Prisma.XOR<Prisma.BranchNullableScalarRelationFilter, Prisma.BranchWhereInput> | null;
     vendor?: Prisma.XOR<Prisma.VendorNullableScalarRelationFilter, Prisma.VendorWhereInput> | null;
     refreshTokens?: Prisma.RefreshTokenListRelationFilter;
+    passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter;
     auditLogs?: Prisma.AuditLogListRelationFilter;
     processedOrders?: Prisma.OrderListRelationFilter;
     customerOrders?: Prisma.OrderListRelationFilter;
@@ -268,6 +271,7 @@ export type UserCreateInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -293,6 +297,7 @@ export type UserUncheckedCreateInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -318,6 +323,7 @@ export type UserUpdateInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -343,6 +349,7 @@ export type UserUncheckedUpdateInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -490,6 +497,18 @@ export type UserUpdateOneRequiredWithoutRefreshTokensNestedInput = {
     upsert?: Prisma.UserUpsertWithoutRefreshTokensInput;
     connect?: Prisma.UserWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRefreshTokensInput, Prisma.UserUpdateWithoutRefreshTokensInput>, Prisma.UserUncheckedUpdateWithoutRefreshTokensInput>;
+};
+export type UserCreateNestedOneWithoutPasswordResetTokensInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput;
+    upsert?: Prisma.UserUpsertWithoutPasswordResetTokensInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, Prisma.UserUpdateWithoutPasswordResetTokensInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>;
 };
 export type UserCreateNestedOneWithoutManagedBranchesInput = {
     create?: Prisma.XOR<Prisma.UserCreateWithoutManagedBranchesInput, Prisma.UserUncheckedCreateWithoutManagedBranchesInput>;
@@ -716,6 +735,7 @@ export type UserCreateWithoutRefreshTokensInput = {
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -740,6 +760,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -777,6 +798,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -801,6 +823,120 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
+    processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
+    customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
+    processedPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput;
+    customerPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutCustomerNestedInput;
+    managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput;
+    stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput;
+    documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput;
+    orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput;
+    recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput;
+};
+export type UserCreateWithoutPasswordResetTokensInput = {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    fullName: string;
+    phoneNumber?: string | null;
+    role: $Enums.UserRole;
+    status?: $Enums.UserStatus;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
+    branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
+    vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
+    refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
+    processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
+    customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
+    processedPartOrders?: Prisma.PartOrderCreateNestedManyWithoutProcessedByInput;
+    customerPartOrders?: Prisma.PartOrderCreateNestedManyWithoutCustomerInput;
+    managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput;
+    stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput;
+    documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput;
+    orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput;
+    recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput;
+};
+export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    fullName: string;
+    phoneNumber?: string | null;
+    role: $Enums.UserRole;
+    status?: $Enums.UserStatus;
+    branchId?: string | null;
+    vendorId?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
+    refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
+    processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
+    customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
+    processedPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutProcessedByInput;
+    customerPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutCustomerInput;
+    managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput;
+    stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput;
+    documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput;
+    orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput;
+    recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput;
+};
+export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>;
+};
+export type UserUpsertWithoutPasswordResetTokensInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>;
+};
+export type UserUpdateWithoutPasswordResetTokensInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    fullName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
+    branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
+    vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
+    refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
+    processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
+    customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
+    processedPartOrders?: Prisma.PartOrderUpdateManyWithoutProcessedByNestedInput;
+    customerPartOrders?: Prisma.PartOrderUpdateManyWithoutCustomerNestedInput;
+    managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput;
+    stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput;
+    documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput;
+    orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput;
+    recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput;
+};
+export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    fullName?: Prisma.StringFieldUpdateOperationsInput | string;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus;
+    branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
+    refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -826,6 +962,7 @@ export type UserCreateWithoutManagedBranchesInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -850,6 +987,7 @@ export type UserUncheckedCreateWithoutManagedBranchesInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -877,6 +1015,7 @@ export type UserCreateWithoutBranchInput = {
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -901,6 +1040,7 @@ export type UserUncheckedCreateWithoutBranchInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -943,6 +1083,7 @@ export type UserUpdateWithoutManagedBranchesInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -967,6 +1108,7 @@ export type UserUncheckedUpdateWithoutManagedBranchesInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1020,6 +1162,7 @@ export type UserCreateWithoutVendorInput = {
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1044,6 +1187,7 @@ export type UserUncheckedCreateWithoutVendorInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1090,6 +1234,7 @@ export type UserCreateWithoutStockMovementsInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1114,6 +1259,7 @@ export type UserUncheckedCreateWithoutStockMovementsInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1151,6 +1297,7 @@ export type UserUpdateWithoutStockMovementsInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -1175,6 +1322,7 @@ export type UserUncheckedUpdateWithoutStockMovementsInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1199,6 +1347,7 @@ export type UserCreateWithoutProcessedOrdersInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
     processedPartOrders?: Prisma.PartOrderCreateNestedManyWithoutProcessedByInput;
@@ -1223,6 +1372,7 @@ export type UserUncheckedCreateWithoutProcessedOrdersInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
     processedPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutProcessedByInput;
@@ -1251,6 +1401,7 @@ export type UserCreateWithoutCustomerOrdersInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     processedPartOrders?: Prisma.PartOrderCreateNestedManyWithoutProcessedByInput;
@@ -1275,6 +1426,7 @@ export type UserUncheckedCreateWithoutCustomerOrdersInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     processedPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutProcessedByInput;
@@ -1312,6 +1464,7 @@ export type UserUpdateWithoutProcessedOrdersInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
     processedPartOrders?: Prisma.PartOrderUpdateManyWithoutProcessedByNestedInput;
@@ -1336,6 +1489,7 @@ export type UserUncheckedUpdateWithoutProcessedOrdersInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
     processedPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput;
@@ -1369,6 +1523,7 @@ export type UserUpdateWithoutCustomerOrdersInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     processedPartOrders?: Prisma.PartOrderUpdateManyWithoutProcessedByNestedInput;
@@ -1393,6 +1548,7 @@ export type UserUncheckedUpdateWithoutCustomerOrdersInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     processedPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput;
@@ -1417,6 +1573,7 @@ export type UserCreateWithoutOrderAlertsInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1441,6 +1598,7 @@ export type UserUncheckedCreateWithoutOrderAlertsInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1478,6 +1636,7 @@ export type UserUpdateWithoutOrderAlertsInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -1502,6 +1661,7 @@ export type UserUncheckedUpdateWithoutOrderAlertsInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1526,6 +1686,7 @@ export type UserCreateWithoutProcessedPartOrdersInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1550,6 +1711,7 @@ export type UserUncheckedCreateWithoutProcessedPartOrdersInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1578,6 +1740,7 @@ export type UserCreateWithoutCustomerPartOrdersInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1602,6 +1765,7 @@ export type UserUncheckedCreateWithoutCustomerPartOrdersInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1639,6 +1803,7 @@ export type UserUpdateWithoutProcessedPartOrdersInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -1663,6 +1828,7 @@ export type UserUncheckedUpdateWithoutProcessedPartOrdersInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1696,6 +1862,7 @@ export type UserUpdateWithoutCustomerPartOrdersInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -1720,6 +1887,7 @@ export type UserUncheckedUpdateWithoutCustomerPartOrdersInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1744,6 +1912,7 @@ export type UserCreateWithoutRecordedExpensesInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1768,6 +1937,7 @@ export type UserUncheckedCreateWithoutRecordedExpensesInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1805,6 +1975,7 @@ export type UserUpdateWithoutRecordedExpensesInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -1829,6 +2000,7 @@ export type UserUncheckedUpdateWithoutRecordedExpensesInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1853,6 +2025,7 @@ export type UserCreateWithoutDocumentsInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
@@ -1877,6 +2050,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
@@ -1914,6 +2088,7 @@ export type UserUpdateWithoutDocumentsInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -1938,6 +2113,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -1962,6 +2138,7 @@ export type UserCreateWithoutAuditLogsInput = {
     branch?: Prisma.BranchCreateNestedOneWithoutUsersInput;
     vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput;
     refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput;
     processedPartOrders?: Prisma.PartOrderCreateNestedManyWithoutProcessedByInput;
@@ -1986,6 +2163,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
     updatedAt?: Date | string;
     fcmTokens?: Prisma.UserCreatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
     processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput;
     customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput;
     processedPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutProcessedByInput;
@@ -2023,6 +2201,7 @@ export type UserUpdateWithoutAuditLogsInput = {
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
     processedPartOrders?: Prisma.PartOrderUpdateManyWithoutProcessedByNestedInput;
@@ -2047,6 +2226,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
     processedPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput;
@@ -2083,6 +2263,7 @@ export type UserUpdateWithoutBranchInput = {
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -2107,6 +2288,7 @@ export type UserUncheckedUpdateWithoutBranchInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -2157,6 +2339,7 @@ export type UserUpdateWithoutVendorInput = {
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput;
     refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput;
@@ -2181,6 +2364,7 @@ export type UserUncheckedUpdateWithoutVendorInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[];
     refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput;
     processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput;
     customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput;
@@ -2207,6 +2391,7 @@ export type UserUncheckedUpdateManyWithoutVendorInput = {
 };
 export type UserCountOutputType = {
     refreshTokens: number;
+    passwordResetTokens: number;
     auditLogs: number;
     processedOrders: number;
     customerOrders: number;
@@ -2220,6 +2405,7 @@ export type UserCountOutputType = {
 };
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs;
+    passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs;
     auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs;
     processedOrders?: boolean | UserCountOutputTypeCountProcessedOrdersArgs;
     customerOrders?: boolean | UserCountOutputTypeCountCustomerOrdersArgs;
@@ -2236,6 +2422,9 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 };
 export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.RefreshTokenWhereInput;
+};
+export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PasswordResetTokenWhereInput;
 };
 export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.AuditLogWhereInput;
@@ -2283,6 +2472,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     branch?: boolean | Prisma.User$branchArgs<ExtArgs>;
     vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>;
     refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>;
+    passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>;
     auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>;
     processedOrders?: boolean | Prisma.User$processedOrdersArgs<ExtArgs>;
     customerOrders?: boolean | Prisma.User$customerOrdersArgs<ExtArgs>;
@@ -2346,6 +2536,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     branch?: boolean | Prisma.User$branchArgs<ExtArgs>;
     vendor?: boolean | Prisma.User$vendorArgs<ExtArgs>;
     refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>;
+    passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>;
     auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>;
     processedOrders?: boolean | Prisma.User$processedOrdersArgs<ExtArgs>;
     customerOrders?: boolean | Prisma.User$customerOrdersArgs<ExtArgs>;
@@ -2372,6 +2563,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         branch: Prisma.$BranchPayload<ExtArgs> | null;
         vendor: Prisma.$VendorPayload<ExtArgs> | null;
         refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[];
+        passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[];
         auditLogs: Prisma.$AuditLogPayload<ExtArgs>[];
         processedOrders: Prisma.$OrderPayload<ExtArgs>[];
         customerOrders: Prisma.$OrderPayload<ExtArgs>[];
@@ -2451,6 +2643,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
     branch<T extends Prisma.User$branchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$branchArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     vendor<T extends Prisma.User$vendorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vendorArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     processedOrders<T extends Prisma.User$processedOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$processedOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     customerOrders<T extends Prisma.User$customerOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customerOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
@@ -2601,6 +2794,17 @@ export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.Inte
     take?: number;
     skip?: number;
     distinct?: Prisma.RefreshTokenScalarFieldEnum | Prisma.RefreshTokenScalarFieldEnum[];
+};
+export type User$passwordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PasswordResetTokenSelect<ExtArgs> | null;
+    omit?: Prisma.PasswordResetTokenOmit<ExtArgs> | null;
+    include?: Prisma.PasswordResetTokenInclude<ExtArgs> | null;
+    where?: Prisma.PasswordResetTokenWhereInput;
+    orderBy?: Prisma.PasswordResetTokenOrderByWithRelationInput | Prisma.PasswordResetTokenOrderByWithRelationInput[];
+    cursor?: Prisma.PasswordResetTokenWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[];
 };
 export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.AuditLogSelect<ExtArgs> | null;

@@ -670,9 +670,6 @@ export type BikeUnitUpdatemediaInput = {
     set?: string[];
     push?: string | string[];
 };
-export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null;
-};
 export type BikeUnitCreateNestedOneWithoutOrdersInput = {
     create?: Prisma.XOR<Prisma.BikeUnitCreateWithoutOrdersInput, Prisma.BikeUnitUncheckedCreateWithoutOrdersInput>;
     connectOrCreate?: Prisma.BikeUnitCreateOrConnectWithoutOrdersInput;

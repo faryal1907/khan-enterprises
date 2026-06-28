@@ -10,8 +10,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Req,
-  Res,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
@@ -19,6 +17,8 @@ import { SupabaseAuthService } from "./supabase-auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { RefreshDto } from "./dto/refresh.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
@@ -90,6 +90,29 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async me(@CurrentUser() user: Express.User) {
     return { user };
+  }
+
+  /**
+   * POST /api/auth/forgot-password
+   * Sends a password reset link to the user's email.
+   * Always returns the same message to prevent email enumeration.
+   */
+  @Post("forgot-password")
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  /**
+   * POST /api/auth/reset-password
+   * Resets the user's password using a valid reset token.
+   */
+  @Post("reset-password")
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   /**

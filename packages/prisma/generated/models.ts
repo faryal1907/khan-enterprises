@@ -10,6 +10,7 @@
  */
 export type * from './models/User.ts'
 export type * from './models/RefreshToken.ts'
+export type * from './models/PasswordResetToken.ts'
 export type * from './models/Branch.ts'
 export type * from './models/Vendor.ts'
 export type * from './models/BikeModel.ts'

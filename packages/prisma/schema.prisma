@@ -135,7 +135,8 @@ model User {
   vendorId String?
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  refreshTokens RefreshToken[]
+  refreshTokens      RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
 
   auditLogs AuditLog[]
 
@@ -170,6 +171,21 @@ model RefreshToken {
 
   createdAt DateTime @default(now())
 
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([tokenHash])
   @@index([userId])
 }
 

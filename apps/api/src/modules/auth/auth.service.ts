@@ -13,12 +13,14 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtPayload } from "./strategies/jwt.strategy";
 import { AuditAction } from "@khan/prisma";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   // ─── Login ────────────────────────────────────────────────────────────────
@@ -161,6 +163,115 @@ export class AuthService {
   }
 
   // ─── User queries (existing, kept intact) ─────────────────────────────────
+
+  // ─── Forgot Password ──────────────────────────────────────────────────────
+
+  async forgotPassword(dto: { email: string }) {
+    // Always succeed silently to prevent email enumeration
+    const user = await this.prisma.client.user.findUnique({
+      where: { email: dto.email },
+      select: { id: true, email: true, fullName: true },
+    });
+
+    if (!user || user.email !== dto.email) {
+      return { message: "If an account with that email exists, a password reset link has been sent." };
+    }
+
+    // Invalidate any existing unused tokens for this user
+    await this.prisma.client.passwordResetToken.updateMany({
+      where: { userId: user.id, usedAt: null, expiresAt: { gt: new Date() } },
+      data: { expiresAt: new Date() }, // expire existing tokens
+    });
+
+    // Generate reset token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = this.hashToken(rawToken);
+
+    await this.prisma.client.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour expiry
+      },
+    });
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const resetLink = `${frontendUrl}/reset-password?token=${rawToken}`;
+
+    // Send email via EmailService (falls back to console log if SMTP not configured)
+    await this.emailService.sendPasswordResetEmail(user.email, resetLink);
+
+    // Also log to audit
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        action: AuditAction.UPDATE,
+        entityType: "PASSWORD_RESET_TOKEN",
+        entityId: user.id,
+        newValue: JSON.stringify({ email: user.email, expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString() }),
+      },
+    }).catch(() => {
+      // Silently fail audit log - non-critical
+    });
+
+    const response: any = {
+      message: "If an account with that email exists, a password reset link has been sent.",
+    };
+
+    // ⚠️ INSECURE - Only for local development convenience
+    // Set DEV_SHOW_RESET_LINK=true in your .env to expose the link via the API
+    if (process.env.DEV_SHOW_RESET_LINK === "true" && process.env.NODE_ENV !== "production") {
+      response.resetLink = resetLink;
+      console.warn(`⚠️  DEV_SHOW_RESET_LINK is enabled! Reset tokens are exposed via API.`);
+    }
+
+    return response;
+  }
+
+  // ─── Reset Password ───────────────────────────────────────────────────────
+
+  async resetPassword(dto: { token: string; password: string }) {
+    const tokenHash = this.hashToken(dto.token);
+
+    const stored = await this.prisma.client.passwordResetToken.findFirst({
+      where: { tokenHash, usedAt: null, expiresAt: { gt: new Date() } },
+      include: {
+        user: { select: { id: true, email: true, role: true, status: true } },
+      },
+    });
+
+    if (!stored) {
+      throw new UnauthorizedException("Invalid or expired reset token.");
+    }
+
+    if (stored.user.status !== "ACTIVE") {
+      throw new ForbiddenException("Account is suspended or inactive.");
+    }
+
+    // Hash new password and update user
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    await this.prisma.client.$transaction(async (tx) => {
+      // Mark token as used
+      await tx.passwordResetToken.update({
+        where: { id: stored.id },
+        data: { usedAt: new Date() },
+      });
+
+      // Update user password
+      await tx.user.update({
+        where: { id: stored.user.id },
+        data: { passwordHash },
+      });
+
+      // Invalidate all refresh tokens for this user (force re-login)
+      await tx.refreshToken.deleteMany({
+        where: { userId: stored.user.id },
+      });
+    });
+
+    return { message: "Password has been reset successfully. Please log in with your new password." };
+  }
 
   async findUserByEmail(email: string) {
     const user = await this.prisma.client.user.findUnique({

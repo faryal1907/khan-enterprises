@@ -21,6 +21,7 @@ import { OrderAlertsModule } from "./modules/order-alerts/order-alerts.module";
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { ExpensesModule } from "./modules/expenses/expenses.module";
 import { SettingsModule } from "./modules/settings/settings.module";
+import { EmailModule } from "./modules/email/email.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
