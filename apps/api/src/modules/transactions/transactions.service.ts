@@ -119,8 +119,8 @@ export class TransactionsService {
   async getTransactions(query: QueryTransactionsDto) {
     const { status, method, branchId, dateFrom, dateTo } = query;
 
-    const paymentWhere: any = {};
-    const partPaymentWhere: any = {};
+    const paymentWhere: any = { orderId: { not: null } };
+    const partPaymentWhere: any = { partOrderId: { not: null } };
 
     if (status) {
       paymentWhere.status = status;
@@ -233,7 +233,7 @@ export class TransactionsService {
    * Get transaction statistics
    */
   async getTransactionStats(branchId?: string) {
-    const where = branchId ? { order: { branchId } } : {};
+    const where: any = branchId ? { order: { branchId }, orderId: { not: null } } : { orderId: { not: null } };
 
     const [
       totalTransactions,

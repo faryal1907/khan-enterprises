@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, ValidateIf } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, ValidateIf, IsNumber } from 'class-validator';
 import { PaymentMethod } from '@khan/prisma';
 
 export class CreateCustomerOrderDto {
@@ -34,4 +34,11 @@ export class CreateCustomerOrderDto {
   @IsString()
   @IsNotEmpty()
   paymentProofUrl?: string;
+
+  @IsOptional()
+  isInstallmentPlan?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  initialPaymentAmount?: number;
 }

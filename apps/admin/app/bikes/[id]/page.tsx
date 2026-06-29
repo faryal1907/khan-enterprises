@@ -81,8 +81,9 @@ export default function BikeDetailPage() {
     if (bike) {
       const currentPercent = bike.onlineDiscountPercent || 0;
       setNewDiscount(currentPercent.toString());
-      if (bike.price) {
-        setNewDiscountAmount(((currentPercent / 100) * bike.price).toString());
+      const currentPrice = bike.price ?? bike.model.basePrice;
+      if (currentPrice) {
+        setNewDiscountAmount(((currentPercent / 100) * currentPrice).toString());
       } else {
         setNewDiscountAmount("0");
       }
@@ -250,7 +251,7 @@ export default function BikeDetailPage() {
                 Price
               </label>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
-                Rs {bike.price?.toLocaleString() || "N/A"}
+                Rs {(bike.price ?? bike.model.basePrice)?.toLocaleString() || "N/A"}
               </p>
             </div>
             <div>
@@ -448,6 +449,10 @@ export default function BikeDetailPage() {
                 </p>
               </div>
               
+              {(() => {
+                const currentPrice = bike.price ?? bike.model.basePrice ?? 0;
+                return (
+                  <>
               <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
@@ -457,13 +462,13 @@ export default function BikeDetailPage() {
                     type="number"
                     step="0.01"
                     min="0"
-                    max={bike.price ? (bike.price * (100 - globalBikeDiscount) / 100) : 0}
+                    max={currentPrice ? (currentPrice * (100 - globalBikeDiscount) / 100) : 0}
                     value={newDiscountAmount}
                     onChange={(e) => {
                       setNewDiscountAmount(e.target.value);
                       const amount = parseFloat(e.target.value);
-                      if (!isNaN(amount) && bike.price && bike.price > 0) {
-                        const percent = (amount / bike.price) * 100;
+                      if (!isNaN(amount) && currentPrice > 0) {
+                        const percent = (amount / currentPrice) * 100;
                         setNewDiscount(percent.toString());
                       } else if (e.target.value === "") {
                         setNewDiscount("0");
@@ -490,8 +495,8 @@ export default function BikeDetailPage() {
                     onChange={(e) => {
                       setNewDiscount(e.target.value);
                       const percent = parseFloat(e.target.value);
-                      if (!isNaN(percent) && bike.price && bike.price > 0) {
-                        const amount = (percent / 100) * bike.price;
+                      if (!isNaN(percent) && currentPrice > 0) {
+                        const amount = (percent / 100) * currentPrice;
                         setNewDiscountAmount(amount.toString());
                       } else if (e.target.value === "") {
                         setNewDiscountAmount("0");
@@ -512,22 +517,25 @@ export default function BikeDetailPage() {
                  <div className="mt-2 space-y-1 text-sm text-gray-600">
                    <div className="flex justify-between">
                      <span>Original Price:</span>
-                     <span>Rs {bike.price?.toLocaleString() || "N/A"}</span>
+                     <span>Rs {currentPrice.toLocaleString() || "N/A"}</span>
                    </div>
                    <div className="flex justify-between text-red-600">
                      <span>Global Discount ({globalBikeDiscount}%):</span>
-                     <span>- Rs {((bike.price || 0) * (globalBikeDiscount / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                     <span>- Rs {(currentPrice * (globalBikeDiscount / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                    </div>
                    <div className="flex justify-between text-red-600">
                      <span>Individual Discount ({parseFloat(newDiscount || "0")}%):</span>
-                     <span>- Rs {((bike.price || 0) * (parseFloat(newDiscount || "0") / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                     <span>- Rs {(currentPrice * (parseFloat(newDiscount || "0") / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                    </div>
                    <div className="flex justify-between font-bold pt-2 border-t border-gray-200 text-gray-900">
                      <span>Final Price:</span>
-                     <span>Rs {((bike.price || 0) * (1 - (globalBikeDiscount + parseFloat(newDiscount || "0")) / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                     <span>Rs {(currentPrice * (1 - (globalBikeDiscount + parseFloat(newDiscount || "0")) / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                    </div>
                  </div>
               </div>
+                  </>
+                );
+              })()}
 
               <div className="flex justify-end space-x-4">
                 <button

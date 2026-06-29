@@ -2,6 +2,10 @@ import { theme } from "@/lib/colors";
 import { BikeStatus } from "@/lib/types";
 
 const STATUS_COLORS: Record<BikeStatus, { backgroundColor: string; color: string }> = {
+  [BikeStatus.PENDING_SETUP]: {
+    backgroundColor: theme.borders.medium,
+    color: theme.text.primary,
+  },
   [BikeStatus.AVAILABLE]: {
     backgroundColor: theme.accents.tertiary,
     color: theme.text.inverse,

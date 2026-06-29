@@ -208,6 +208,7 @@ export type VendorWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   suppliedBikes?: Prisma.BikeUnitListRelationFilter
   staff?: Prisma.UserListRelationFilter
+  purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
 }
 
 export type VendorOrderByWithRelationInput = {
@@ -221,6 +222,7 @@ export type VendorOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   suppliedBikes?: Prisma.BikeUnitOrderByRelationAggregateInput
   staff?: Prisma.UserOrderByRelationAggregateInput
+  purchaseOrders?: Prisma.PurchaseOrderOrderByRelationAggregateInput
 }
 
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
@@ -237,6 +239,7 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string
   suppliedBikes?: Prisma.BikeUnitListRelationFilter
   staff?: Prisma.UserListRelationFilter
+  purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
 }, "id">
 
 export type VendorOrderByWithAggregationInput = {
@@ -278,6 +281,7 @@ export type VendorCreateInput = {
   updatedAt?: Date | string
   suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput
   staff?: Prisma.UserCreateNestedManyWithoutVendorInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateInput = {
@@ -291,6 +295,7 @@ export type VendorUncheckedCreateInput = {
   updatedAt?: Date | string
   suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput
   staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUpdateInput = {
@@ -304,6 +309,7 @@ export type VendorUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput
   staff?: Prisma.UserUpdateManyWithoutVendorNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateInput = {
@@ -317,6 +323,7 @@ export type VendorUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput
   staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateManyInput = {
@@ -425,6 +432,20 @@ export type VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutSuppliedBikesInput, Prisma.VendorUpdateWithoutSuppliedBikesInput>, Prisma.VendorUncheckedUpdateWithoutSuppliedBikesInput>
 }
 
+export type VendorCreateNestedOneWithoutPurchaseOrdersInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutPurchaseOrdersInput, Prisma.VendorUncheckedCreateWithoutPurchaseOrdersInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutPurchaseOrdersInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutPurchaseOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutPurchaseOrdersInput, Prisma.VendorUncheckedCreateWithoutPurchaseOrdersInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutPurchaseOrdersInput
+  upsert?: Prisma.VendorUpsertWithoutPurchaseOrdersInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutPurchaseOrdersInput, Prisma.VendorUpdateWithoutPurchaseOrdersInput>, Prisma.VendorUncheckedUpdateWithoutPurchaseOrdersInput>
+}
+
 export type VendorCreateWithoutStaffInput = {
   id?: string
   name: string
@@ -435,6 +456,7 @@ export type VendorCreateWithoutStaffInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateWithoutStaffInput = {
@@ -447,6 +469,7 @@ export type VendorUncheckedCreateWithoutStaffInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorCreateOrConnectWithoutStaffInput = {
@@ -475,6 +498,7 @@ export type VendorUpdateWithoutStaffInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutStaffInput = {
@@ -487,6 +511,7 @@ export type VendorUncheckedUpdateWithoutStaffInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateWithoutSuppliedBikesInput = {
@@ -499,6 +524,7 @@ export type VendorCreateWithoutSuppliedBikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   staff?: Prisma.UserCreateNestedManyWithoutVendorInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
@@ -511,6 +537,7 @@ export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorCreateOrConnectWithoutSuppliedBikesInput = {
@@ -539,6 +566,7 @@ export type VendorUpdateWithoutSuppliedBikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.UserUpdateManyWithoutVendorNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
@@ -551,6 +579,75 @@ export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorCreateWithoutPurchaseOrdersInput = {
+  id?: string
+  name: string
+  contactPerson?: string | null
+  phoneNumber?: string | null
+  email?: string | null
+  address?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput
+  staff?: Prisma.UserCreateNestedManyWithoutVendorInput
+}
+
+export type VendorUncheckedCreateWithoutPurchaseOrdersInput = {
+  id?: string
+  name: string
+  contactPerson?: string | null
+  phoneNumber?: string | null
+  email?: string | null
+  address?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput
+  staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput
+}
+
+export type VendorCreateOrConnectWithoutPurchaseOrdersInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutPurchaseOrdersInput, Prisma.VendorUncheckedCreateWithoutPurchaseOrdersInput>
+}
+
+export type VendorUpsertWithoutPurchaseOrdersInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutPurchaseOrdersInput, Prisma.VendorUncheckedUpdateWithoutPurchaseOrdersInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutPurchaseOrdersInput, Prisma.VendorUncheckedCreateWithoutPurchaseOrdersInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutPurchaseOrdersInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutPurchaseOrdersInput, Prisma.VendorUncheckedUpdateWithoutPurchaseOrdersInput>
+}
+
+export type VendorUpdateWithoutPurchaseOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  contactPerson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput
+  staff?: Prisma.UserUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutPurchaseOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  contactPerson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput
+  staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 
@@ -561,11 +658,13 @@ export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
 export type VendorCountOutputType = {
   suppliedBikes: number
   staff: number
+  purchaseOrders: number
 }
 
 export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   suppliedBikes?: boolean | VendorCountOutputTypeCountSuppliedBikesArgs
   staff?: boolean | VendorCountOutputTypeCountStaffArgs
+  purchaseOrders?: boolean | VendorCountOutputTypeCountPurchaseOrdersArgs
 }
 
 /**
@@ -592,6 +691,13 @@ export type VendorCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.UserWhereInput
 }
 
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountPurchaseOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PurchaseOrderWhereInput
+}
+
 
 export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -604,6 +710,7 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   updatedAt?: boolean
   suppliedBikes?: boolean | Prisma.Vendor$suppliedBikesArgs<ExtArgs>
   staff?: boolean | Prisma.Vendor$staffArgs<ExtArgs>
+  purchaseOrders?: boolean | Prisma.Vendor$purchaseOrdersArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendor"]>
 
@@ -644,6 +751,7 @@ export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   suppliedBikes?: boolean | Prisma.Vendor$suppliedBikesArgs<ExtArgs>
   staff?: boolean | Prisma.Vendor$staffArgs<ExtArgs>
+  purchaseOrders?: boolean | Prisma.Vendor$purchaseOrdersArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -654,6 +762,7 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     suppliedBikes: Prisma.$BikeUnitPayload<ExtArgs>[]
     staff: Prisma.$UserPayload<ExtArgs>[]
+    purchaseOrders: Prisma.$PurchaseOrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1060,6 +1169,7 @@ export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   suppliedBikes<T extends Prisma.Vendor$suppliedBikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$suppliedBikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staff<T extends Prisma.Vendor$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchaseOrders<T extends Prisma.Vendor$purchaseOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$purchaseOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1535,6 +1645,30 @@ export type Vendor$staffArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+}
+
+/**
+ * Vendor.purchaseOrders
+ */
+export type Vendor$purchaseOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PurchaseOrder
+   */
+  select?: Prisma.PurchaseOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PurchaseOrder
+   */
+  omit?: Prisma.PurchaseOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PurchaseOrderInclude<ExtArgs> | null
+  where?: Prisma.PurchaseOrderWhereInput
+  orderBy?: Prisma.PurchaseOrderOrderByWithRelationInput | Prisma.PurchaseOrderOrderByWithRelationInput[]
+  cursor?: Prisma.PurchaseOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PurchaseOrderScalarFieldEnum | Prisma.PurchaseOrderScalarFieldEnum[]
 }
 
 /**

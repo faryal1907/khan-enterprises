@@ -36,7 +36,33 @@ async function main() {
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "RefreshToken" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "User" CASCADE;');
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Branch" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "JournalEntryLine" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "JournalEntry" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "Account" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "PurchaseOrderItem" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "PurchaseOrder" CASCADE;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "Expense" CASCADE;');
   console.log("✨ Database is now sparkling clean.");
+
+  // ============================================================================
+  // 0. ACCOUNTS
+  // ============================================================================
+  console.log("📊 Seeding Chart of Accounts...");
+  const defaultAccounts = [
+    { code: '1001', name: 'Cash', category: 'ASSET', subtype: 'CASH', isSystem: true },
+    { code: '1002', name: 'Bank - Main', category: 'ASSET', subtype: 'BANK', isSystem: true },
+    { code: '1003', name: 'Inventory', category: 'ASSET', subtype: 'INVENTORY', isSystem: true },
+    { code: '1004', name: 'Accounts Receivable', category: 'ASSET', subtype: 'AR', isSystem: true },
+    { code: '2001', name: 'Accounts Payable', category: 'LIABILITY', subtype: 'AP', isSystem: true },
+    { code: '3001', name: 'Owner Capital', category: 'EQUITY', subtype: 'EQUITY', isSystem: true },
+    { code: '4001', name: 'Sales Revenue', category: 'REVENUE', subtype: 'REVENUE', isSystem: true },
+    { code: '5001', name: 'Cost of Goods Sold', category: 'EXPENSE', subtype: 'COGS', isSystem: true },
+    { code: '5002', name: 'Salary Expense', category: 'EXPENSE', subtype: 'SALARY', isSystem: true },
+    { code: '5003', name: 'General Expense', category: 'EXPENSE', subtype: 'EXPENSE', isSystem: true },
+  ];
+  for (const acc of defaultAccounts) {
+    await prisma.account.create({ data: acc });
+  }
 
   // ============================================================================
   // 1. BRANCHES
@@ -207,7 +233,7 @@ async function main() {
       modelName: "C1 Pro",
       year: 2025,
       engineCapacity: "Electric",
-      color: "Pearl White / Matte Black / Red",
+      colors: ["Pearl White", "Matte Black", "Red"],
       description: "Premium electric scooter with fast charging and a refined urban riding experience.",
       basePrice: 285000,
     },
@@ -219,7 +245,7 @@ async function main() {
       modelName: "E5",
       year: 2025,
       engineCapacity: "Electric",
-      color: "Blue / Silver / Green",
+      colors: ["Blue", "Silver", "Green"],
       description: "Family commuter electric bike with high mileage per charge and a comfortable posture.",
       basePrice: 195000,
     },
@@ -231,7 +257,7 @@ async function main() {
       modelName: "Thunder",
       year: 2025,
       engineCapacity: "Electric",
-      color: "Black / Orange",
+      colors: ["Black", "Orange"],
       description: "Sporty electric bike with powerful torque and aggressive styling.",
       basePrice: 345000,
     },
@@ -243,7 +269,7 @@ async function main() {
       modelName: "City Rider",
       year: 2024,
       engineCapacity: "Electric",
-      color: "White / Grey",
+      colors: ["White", "Grey"],
       description: "Budget-friendly daily commuter electric bike for short city routes.",
       basePrice: 165000,
     },
@@ -256,7 +282,7 @@ async function main() {
       modelName: "RK 125",
       year: 2025,
       engineCapacity: "125cc",
-      color: "Black / Red / Blue",
+      colors: ["Black", "Red", "Blue"],
       description: "Reliable entry-level commuter motorcycle built for everyday city and town use.",
       basePrice: 185000,
     },
@@ -268,7 +294,7 @@ async function main() {
       modelName: "RK 150",
       year: 2025,
       engineCapacity: "150cc",
-      color: "Matte Black / Silver",
+      colors: ["Matte Black", "Silver"],
       description: "Powerful mid-range bike suited for both highway cruising and city commuting.",
       basePrice: 245000,
     },
@@ -280,7 +306,7 @@ async function main() {
       modelName: "RK Cruiser",
       year: 2024,
       engineCapacity: "250cc",
-      color: "Deep Green / Brown",
+      colors: ["Deep Green", "Brown"],
       description: "Classic cruiser-style motorcycle with an ergonomic seat and long-distance comfort.",
       basePrice: 425000,
     },
@@ -292,7 +318,7 @@ async function main() {
       modelName: "RK 70",
       year: 2025,
       engineCapacity: "70cc",
-      color: "Red / Black",
+      colors: ["Red", "Black"],
       description: "Light and fuel-efficient bike ideal for students and beginner riders.",
       basePrice: 135000,
     },
@@ -314,6 +340,7 @@ async function main() {
       chassisNumber: "EVC1P-2025-78492",
       engineNumber: "EMOT-78492-EV25",
       serialNumber: "SR-EV-C1P-001",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -329,6 +356,7 @@ async function main() {
       chassisNumber: "EVC1P-2025-78493",
       engineNumber: "EMOT-78493-EV25",
       serialNumber: "SR-EV-C1P-002",
+      purchasePrice: 150000,
       status: "RESERVED",
       reservedUntil: reservedExpiry,
     },
@@ -342,6 +370,7 @@ async function main() {
       chassisNumber: "EVE5-2025-31904",
       engineNumber: "EMOT-31904-EV25",
       serialNumber: "SR-EV-E5-003",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -354,6 +383,7 @@ async function main() {
       chassisNumber: "EVTHN-2025-67281",
       engineNumber: "EMOT-67281-EV25",
       serialNumber: "SR-EV-THN-001",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -366,6 +396,7 @@ async function main() {
       chassisNumber: "EVCR-2024-55123",
       engineNumber: "EMOT-55123-EV24",
       serialNumber: "SR-EV-CR-004",
+      purchasePrice: 150000,
       status: "SOLD",
       soldAt: new Date("2025-03-15"),
     },
@@ -380,6 +411,7 @@ async function main() {
       chassisNumber: "RK125-2025-44871",
       engineNumber: "RK125ENG-44871",
       serialNumber: "SR-RK-125-005",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -392,6 +424,7 @@ async function main() {
       chassisNumber: "RK150-2025-22904",
       engineNumber: "RK150ENG-22904",
       serialNumber: "SR-RK-150-001",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -404,6 +437,7 @@ async function main() {
       chassisNumber: "RKC-2024-77192",
       engineNumber: "RKC250ENG-77192",
       serialNumber: "SR-RK-CRS-002",
+      purchasePrice: 150000,
       status: "RESERVED",
       reservedUntil: reservedExpiry,
     },
@@ -417,6 +451,7 @@ async function main() {
       chassisNumber: "RK70-2025-11234",
       engineNumber: "RK70ENG-11234",
       serialNumber: "SR-RK-70-006",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -429,6 +464,7 @@ async function main() {
       chassisNumber: "RK125-2025-44872",
       engineNumber: "RK125ENG-44872",
       serialNumber: "SR-RK-125-007",
+      purchasePrice: 150000,
       status: "AVAILABLE",
     },
   });
@@ -551,42 +587,24 @@ async function main() {
   console.log("✅ Seeded 9 parts with inventory across both branches.");
 
   // ============================================================================
-  // 8. SAMPLE ORDER & TRANSACTION (for testing transaction detail page)
+  // 7. INVENTORY ACCOUNT UPDATE
   // ============================================================================
-  console.log("💳 Seeding sample order and transaction...");
+  console.log("💰 Calculating total inventory value...");
 
-  const soldBike = await prisma.bikeUnit.findFirst({ where: { status: "SOLD" } });
+  const allBikes = await prisma.bikeUnit.findMany();
+  const totalBikeValue = allBikes.reduce((sum: number, bike: any) => sum + Number(bike.purchasePrice), 0);
 
-  const sampleOrder = await prisma.order.create({
-    data: {
-      orderNumber: "ORD-2025-001",
-      bikeId: soldBike!.id,
-      branchId: branchHQ.id,
-      customerName: "Ahmed Khan",
-      customerPhone: "+923001234567",
-      customerCNIC: "12345-6789012-3",
-      customerAddress: "House 123, Street 5, F-8 Islamabad",
-      paymentMethod: "ONLINE_TRANSFER",
-      status: "PAID",
-      paymentVerified: true,
-      orderType: "ONSITE",
-      pickupType: "ONSITE_PICKUP",
-    },
+  const allParts = await prisma.partInventory.findMany({ include: { part: true } });
+  const totalPartValue = allParts.reduce((sum: number, pi: any) => sum + (Number(pi.part.sellingPrice) * pi.quantity), 0);
+
+  const totalInventoryValue = totalBikeValue + totalPartValue;
+
+  await prisma.account.update({
+    where: { code: '1003' },
+    data: { openingBalance: totalInventoryValue }
   });
 
-  const sampleTransaction = await prisma.paymentTransaction.create({
-    data: {
-      orderId: sampleOrder.id,
-      gatewayReference: "TXN-2025-001",
-      amount: 175000,
-      method: "ONLINE_TRANSFER",
-      status: "SUCCESS",
-      gatewayResponse: { status: "success", message: "Payment completed" },
-      webhookReceivedAt: new Date(),
-    },
-  });
-
-  console.log("✅ Seeded sample order and transaction.");
+  console.log(`✅ Set Inventory account opening balance to ${totalInventoryValue}`);
 
   // ============================================================================
   // 9. SAMPLE AUDIT LOG (for testing audit log detail page)

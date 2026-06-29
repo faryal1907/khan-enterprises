@@ -13,6 +13,14 @@ export class UpdateBikeUnitDto {
   @IsOptional()
   color?: string;
 
+  @IsString()
+  @IsOptional()
+  chassisNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  engineNumber?: string;
+
   @IsArray()
   @IsString({ each: true })
   @IsOptional()

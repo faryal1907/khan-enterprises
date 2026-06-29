@@ -51,6 +51,8 @@ export async function updateBike(id: string, data: {
   color?: string;
   media?: string[];
   onlineDiscountPercent?: number;
+  chassisNumber?: string;
+  engineNumber?: string;
 }) {
   const response = await api.put(`/inventory/bikes/${id}`, data);
   return response.data;

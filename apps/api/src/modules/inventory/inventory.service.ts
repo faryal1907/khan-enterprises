@@ -76,7 +76,7 @@ export class InventoryService {
     const summaryWhere = { ...where };
     delete summaryWhere.status;
 
-    const [bikes, total, available, reserved, sold, inDelivery] = await Promise.all([
+    const [bikes, total, available, reserved, sold, inDelivery, pendingSetup] = await Promise.all([
       this.prisma.client.bikeUnit.findMany({
         where,
         skip,
@@ -116,6 +116,7 @@ export class InventoryService {
       this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.RESERVED } }),
       this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.SOLD } }),
       this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.IN_DELIVERY } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.PENDING_SETUP } }),
     ]);
 
     return {
@@ -127,11 +128,12 @@ export class InventoryService {
         totalPages: Math.ceil(total / pageSize),
       },
       summary: {
-        total: available + reserved + sold + inDelivery,
+        total: available + reserved + sold + inDelivery + pendingSetup,
         available,
         reserved,
         sold,
         inDelivery,
+        pendingSetup,
       },
     };
   }
@@ -224,6 +226,16 @@ export class InventoryService {
     const oldBike = await this.getBikeById(id, user);
 
     return this.prisma.client.$transaction(async (tx) => {
+      // Determine if status should transition from PENDING_SETUP to AVAILABLE
+      let newStatus = oldBike.status;
+      if (
+        oldBike.status === BikeStatus.PENDING_SETUP && 
+        dto.chassisNumber && !dto.chassisNumber.includes('PENDING') &&
+        dto.engineNumber && !dto.engineNumber.includes('PENDING')
+      ) {
+        newStatus = BikeStatus.AVAILABLE;
+      }
+
       const bike = await tx.bikeUnit.update({
         where: { id },
         data: {
@@ -232,6 +244,9 @@ export class InventoryService {
           color: dto.color,
           media: dto.media,
           onlineDiscountPercent: dto.onlineDiscountPercent,
+          chassisNumber: dto.chassisNumber,
+          engineNumber: dto.engineNumber,
+          status: newStatus,
         },
         include: {
           model: true,

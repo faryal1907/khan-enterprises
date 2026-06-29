@@ -18,6 +18,7 @@ export type PaymentTransactionSumAggregateOutputType = {
 export type PaymentTransactionMinAggregateOutputType = {
     id: string | null;
     orderId: string | null;
+    accountId: string | null;
     gatewayReference: string | null;
     idempotencyKey: string | null;
     amount: runtime.Decimal | null;
@@ -34,6 +35,7 @@ export type PaymentTransactionMinAggregateOutputType = {
 export type PaymentTransactionMaxAggregateOutputType = {
     id: string | null;
     orderId: string | null;
+    accountId: string | null;
     gatewayReference: string | null;
     idempotencyKey: string | null;
     amount: runtime.Decimal | null;
@@ -50,6 +52,7 @@ export type PaymentTransactionMaxAggregateOutputType = {
 export type PaymentTransactionCountAggregateOutputType = {
     id: number;
     orderId: number;
+    accountId: number;
     gatewayReference: number;
     idempotencyKey: number;
     amount: number;
@@ -74,6 +77,7 @@ export type PaymentTransactionSumAggregateInputType = {
 export type PaymentTransactionMinAggregateInputType = {
     id?: true;
     orderId?: true;
+    accountId?: true;
     gatewayReference?: true;
     idempotencyKey?: true;
     amount?: true;
@@ -90,6 +94,7 @@ export type PaymentTransactionMinAggregateInputType = {
 export type PaymentTransactionMaxAggregateInputType = {
     id?: true;
     orderId?: true;
+    accountId?: true;
     gatewayReference?: true;
     idempotencyKey?: true;
     amount?: true;
@@ -106,6 +111,7 @@ export type PaymentTransactionMaxAggregateInputType = {
 export type PaymentTransactionCountAggregateInputType = {
     id?: true;
     orderId?: true;
+    accountId?: true;
     gatewayReference?: true;
     idempotencyKey?: true;
     amount?: true;
@@ -151,7 +157,8 @@ export type PaymentTransactionGroupByArgs<ExtArgs extends runtime.Types.Extensio
 };
 export type PaymentTransactionGroupByOutputType = {
     id: string;
-    orderId: string;
+    orderId: string | null;
+    accountId: string | null;
     gatewayReference: string | null;
     idempotencyKey: string | null;
     amount: runtime.Decimal;
@@ -179,7 +186,8 @@ export type PaymentTransactionWhereInput = {
     OR?: Prisma.PaymentTransactionWhereInput[];
     NOT?: Prisma.PaymentTransactionWhereInput | Prisma.PaymentTransactionWhereInput[];
     id?: Prisma.StringFilter<"PaymentTransaction"> | string;
-    orderId?: Prisma.StringFilter<"PaymentTransaction"> | string;
+    orderId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
+    accountId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     gatewayReference?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     idempotencyKey?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     amount?: Prisma.DecimalFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -193,11 +201,14 @@ export type PaymentTransactionWhereInput = {
     webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null;
     createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string;
-    order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>;
+    order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null;
+    account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
+    allocations?: Prisma.PaymentAllocationListRelationFilter;
 };
 export type PaymentTransactionOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
-    orderId?: Prisma.SortOrder;
+    orderId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    accountId?: Prisma.SortOrderInput | Prisma.SortOrder;
     gatewayReference?: Prisma.SortOrderInput | Prisma.SortOrder;
     idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder;
     amount?: Prisma.SortOrder;
@@ -212,6 +223,8 @@ export type PaymentTransactionOrderByWithRelationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     order?: Prisma.OrderOrderByWithRelationInput;
+    account?: Prisma.AccountOrderByWithRelationInput;
+    allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput;
 };
 export type PaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -220,7 +233,8 @@ export type PaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
     AND?: Prisma.PaymentTransactionWhereInput | Prisma.PaymentTransactionWhereInput[];
     OR?: Prisma.PaymentTransactionWhereInput[];
     NOT?: Prisma.PaymentTransactionWhereInput | Prisma.PaymentTransactionWhereInput[];
-    orderId?: Prisma.StringFilter<"PaymentTransaction"> | string;
+    orderId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
+    accountId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     amount?: Prisma.DecimalFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     method?: Prisma.EnumPaymentMethodFilter<"PaymentTransaction"> | $Enums.PaymentMethod;
     status?: Prisma.EnumPaymentStatusFilter<"PaymentTransaction"> | $Enums.PaymentStatus;
@@ -232,11 +246,14 @@ export type PaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
     webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null;
     createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string;
-    order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>;
+    order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null;
+    account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
+    allocations?: Prisma.PaymentAllocationListRelationFilter;
 }, "id" | "gatewayReference" | "idempotencyKey">;
 export type PaymentTransactionOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
-    orderId?: Prisma.SortOrder;
+    orderId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    accountId?: Prisma.SortOrderInput | Prisma.SortOrder;
     gatewayReference?: Prisma.SortOrderInput | Prisma.SortOrder;
     idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder;
     amount?: Prisma.SortOrder;
@@ -261,7 +278,8 @@ export type PaymentTransactionScalarWhereWithAggregatesInput = {
     OR?: Prisma.PaymentTransactionScalarWhereWithAggregatesInput[];
     NOT?: Prisma.PaymentTransactionScalarWhereWithAggregatesInput | Prisma.PaymentTransactionScalarWhereWithAggregatesInput[];
     id?: Prisma.StringWithAggregatesFilter<"PaymentTransaction"> | string;
-    orderId?: Prisma.StringWithAggregatesFilter<"PaymentTransaction"> | string;
+    orderId?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null;
+    accountId?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null;
     gatewayReference?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null;
     idempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null;
     amount?: Prisma.DecimalWithAggregatesFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -291,11 +309,14 @@ export type PaymentTransactionCreateInput = {
     webhookReceivedAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    order: Prisma.OrderCreateNestedOneWithoutTransactionsInput;
+    order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput;
+    account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput;
 };
 export type PaymentTransactionUncheckedCreateInput = {
     id?: string;
-    orderId: string;
+    orderId?: string | null;
+    accountId?: string | null;
     gatewayReference?: string | null;
     idempotencyKey?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -309,6 +330,7 @@ export type PaymentTransactionUncheckedCreateInput = {
     webhookReceivedAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput;
 };
 export type PaymentTransactionUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -325,11 +347,14 @@ export type PaymentTransactionUpdateInput = {
     webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    order?: Prisma.OrderUpdateOneRequiredWithoutTransactionsNestedInput;
+    order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput;
+    account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput;
 };
 export type PaymentTransactionUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderId?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -343,10 +368,12 @@ export type PaymentTransactionUncheckedUpdateInput = {
     webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput;
 };
 export type PaymentTransactionCreateManyInput = {
     id?: string;
-    orderId: string;
+    orderId?: string | null;
+    accountId?: string | null;
     gatewayReference?: string | null;
     idempotencyKey?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -379,7 +406,8 @@ export type PaymentTransactionUpdateManyMutationInput = {
 };
 export type PaymentTransactionUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderId?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -405,6 +433,7 @@ export type PaymentTransactionOrderByRelationAggregateInput = {
 export type PaymentTransactionCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     orderId?: Prisma.SortOrder;
+    accountId?: Prisma.SortOrder;
     gatewayReference?: Prisma.SortOrder;
     idempotencyKey?: Prisma.SortOrder;
     amount?: Prisma.SortOrder;
@@ -425,6 +454,7 @@ export type PaymentTransactionAvgOrderByAggregateInput = {
 export type PaymentTransactionMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     orderId?: Prisma.SortOrder;
+    accountId?: Prisma.SortOrder;
     gatewayReference?: Prisma.SortOrder;
     idempotencyKey?: Prisma.SortOrder;
     amount?: Prisma.SortOrder;
@@ -441,6 +471,7 @@ export type PaymentTransactionMaxOrderByAggregateInput = {
 export type PaymentTransactionMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     orderId?: Prisma.SortOrder;
+    accountId?: Prisma.SortOrder;
     gatewayReference?: Prisma.SortOrder;
     idempotencyKey?: Prisma.SortOrder;
     amount?: Prisma.SortOrder;
@@ -456,6 +487,10 @@ export type PaymentTransactionMinOrderByAggregateInput = {
 };
 export type PaymentTransactionSumOrderByAggregateInput = {
     amount?: Prisma.SortOrder;
+};
+export type PaymentTransactionScalarRelationFilter = {
+    is?: Prisma.PaymentTransactionWhereInput;
+    isNot?: Prisma.PaymentTransactionWhereInput;
 };
 export type PaymentTransactionCreateNestedManyWithoutOrderInput = {
     create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutOrderInput, Prisma.PaymentTransactionUncheckedCreateWithoutOrderInput> | Prisma.PaymentTransactionCreateWithoutOrderInput[] | Prisma.PaymentTransactionUncheckedCreateWithoutOrderInput[];
@@ -498,6 +533,56 @@ export type PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput = {
 export type EnumPaymentStatusFieldUpdateOperationsInput = {
     set?: $Enums.PaymentStatus;
 };
+export type PaymentTransactionCreateNestedManyWithoutAccountInput = {
+    create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAccountInput, Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PaymentTransactionCreateWithoutAccountInput[] | Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput[];
+    connectOrCreate?: Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput[];
+    createMany?: Prisma.PaymentTransactionCreateManyAccountInputEnvelope;
+    connect?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+};
+export type PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput = {
+    create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAccountInput, Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PaymentTransactionCreateWithoutAccountInput[] | Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput[];
+    connectOrCreate?: Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput[];
+    createMany?: Prisma.PaymentTransactionCreateManyAccountInputEnvelope;
+    connect?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+};
+export type PaymentTransactionUpdateManyWithoutAccountNestedInput = {
+    create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAccountInput, Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PaymentTransactionCreateWithoutAccountInput[] | Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput[];
+    connectOrCreate?: Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput[];
+    upsert?: Prisma.PaymentTransactionUpsertWithWhereUniqueWithoutAccountInput | Prisma.PaymentTransactionUpsertWithWhereUniqueWithoutAccountInput[];
+    createMany?: Prisma.PaymentTransactionCreateManyAccountInputEnvelope;
+    set?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    disconnect?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    delete?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    connect?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    update?: Prisma.PaymentTransactionUpdateWithWhereUniqueWithoutAccountInput | Prisma.PaymentTransactionUpdateWithWhereUniqueWithoutAccountInput[];
+    updateMany?: Prisma.PaymentTransactionUpdateManyWithWhereWithoutAccountInput | Prisma.PaymentTransactionUpdateManyWithWhereWithoutAccountInput[];
+    deleteMany?: Prisma.PaymentTransactionScalarWhereInput | Prisma.PaymentTransactionScalarWhereInput[];
+};
+export type PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput = {
+    create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAccountInput, Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PaymentTransactionCreateWithoutAccountInput[] | Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput[];
+    connectOrCreate?: Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PaymentTransactionCreateOrConnectWithoutAccountInput[];
+    upsert?: Prisma.PaymentTransactionUpsertWithWhereUniqueWithoutAccountInput | Prisma.PaymentTransactionUpsertWithWhereUniqueWithoutAccountInput[];
+    createMany?: Prisma.PaymentTransactionCreateManyAccountInputEnvelope;
+    set?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    disconnect?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    delete?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    connect?: Prisma.PaymentTransactionWhereUniqueInput | Prisma.PaymentTransactionWhereUniqueInput[];
+    update?: Prisma.PaymentTransactionUpdateWithWhereUniqueWithoutAccountInput | Prisma.PaymentTransactionUpdateWithWhereUniqueWithoutAccountInput[];
+    updateMany?: Prisma.PaymentTransactionUpdateManyWithWhereWithoutAccountInput | Prisma.PaymentTransactionUpdateManyWithWhereWithoutAccountInput[];
+    deleteMany?: Prisma.PaymentTransactionScalarWhereInput | Prisma.PaymentTransactionScalarWhereInput[];
+};
+export type PaymentTransactionCreateNestedOneWithoutAllocationsInput = {
+    create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAllocationsInput, Prisma.PaymentTransactionUncheckedCreateWithoutAllocationsInput>;
+    connectOrCreate?: Prisma.PaymentTransactionCreateOrConnectWithoutAllocationsInput;
+    connect?: Prisma.PaymentTransactionWhereUniqueInput;
+};
+export type PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput = {
+    create?: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAllocationsInput, Prisma.PaymentTransactionUncheckedCreateWithoutAllocationsInput>;
+    connectOrCreate?: Prisma.PaymentTransactionCreateOrConnectWithoutAllocationsInput;
+    upsert?: Prisma.PaymentTransactionUpsertWithoutAllocationsInput;
+    connect?: Prisma.PaymentTransactionWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentTransactionUpdateToOneWithWhereWithoutAllocationsInput, Prisma.PaymentTransactionUpdateWithoutAllocationsInput>, Prisma.PaymentTransactionUncheckedUpdateWithoutAllocationsInput>;
+};
 export type PaymentTransactionCreateWithoutOrderInput = {
     id?: string;
     gatewayReference?: string | null;
@@ -513,9 +598,12 @@ export type PaymentTransactionCreateWithoutOrderInput = {
     webhookReceivedAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput;
 };
 export type PaymentTransactionUncheckedCreateWithoutOrderInput = {
     id?: string;
+    accountId?: string | null;
     gatewayReference?: string | null;
     idempotencyKey?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -529,6 +617,7 @@ export type PaymentTransactionUncheckedCreateWithoutOrderInput = {
     webhookReceivedAt?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput;
 };
 export type PaymentTransactionCreateOrConnectWithoutOrderInput = {
     where: Prisma.PaymentTransactionWhereUniqueInput;
@@ -556,7 +645,8 @@ export type PaymentTransactionScalarWhereInput = {
     OR?: Prisma.PaymentTransactionScalarWhereInput[];
     NOT?: Prisma.PaymentTransactionScalarWhereInput | Prisma.PaymentTransactionScalarWhereInput[];
     id?: Prisma.StringFilter<"PaymentTransaction"> | string;
-    orderId?: Prisma.StringFilter<"PaymentTransaction"> | string;
+    orderId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
+    accountId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     gatewayReference?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     idempotencyKey?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null;
     amount?: Prisma.DecimalFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -571,8 +661,151 @@ export type PaymentTransactionScalarWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string;
 };
+export type PaymentTransactionCreateWithoutAccountInput = {
+    id?: string;
+    gatewayReference?: string | null;
+    idempotencyKey?: string | null;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method: $Enums.PaymentMethod;
+    status?: $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: string | null;
+    paymentProofUrl?: string | null;
+    verifiedAt?: Date | string | null;
+    verifiedById?: string | null;
+    webhookReceivedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput;
+};
+export type PaymentTransactionUncheckedCreateWithoutAccountInput = {
+    id?: string;
+    orderId?: string | null;
+    gatewayReference?: string | null;
+    idempotencyKey?: string | null;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method: $Enums.PaymentMethod;
+    status?: $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: string | null;
+    paymentProofUrl?: string | null;
+    verifiedAt?: Date | string | null;
+    verifiedById?: string | null;
+    webhookReceivedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput;
+};
+export type PaymentTransactionCreateOrConnectWithoutAccountInput = {
+    where: Prisma.PaymentTransactionWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAccountInput, Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput>;
+};
+export type PaymentTransactionCreateManyAccountInputEnvelope = {
+    data: Prisma.PaymentTransactionCreateManyAccountInput | Prisma.PaymentTransactionCreateManyAccountInput[];
+    skipDuplicates?: boolean;
+};
+export type PaymentTransactionUpsertWithWhereUniqueWithoutAccountInput = {
+    where: Prisma.PaymentTransactionWhereUniqueInput;
+    update: Prisma.XOR<Prisma.PaymentTransactionUpdateWithoutAccountInput, Prisma.PaymentTransactionUncheckedUpdateWithoutAccountInput>;
+    create: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAccountInput, Prisma.PaymentTransactionUncheckedCreateWithoutAccountInput>;
+};
+export type PaymentTransactionUpdateWithWhereUniqueWithoutAccountInput = {
+    where: Prisma.PaymentTransactionWhereUniqueInput;
+    data: Prisma.XOR<Prisma.PaymentTransactionUpdateWithoutAccountInput, Prisma.PaymentTransactionUncheckedUpdateWithoutAccountInput>;
+};
+export type PaymentTransactionUpdateManyWithWhereWithoutAccountInput = {
+    where: Prisma.PaymentTransactionScalarWhereInput;
+    data: Prisma.XOR<Prisma.PaymentTransactionUpdateManyMutationInput, Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountInput>;
+};
+export type PaymentTransactionCreateWithoutAllocationsInput = {
+    id?: string;
+    gatewayReference?: string | null;
+    idempotencyKey?: string | null;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method: $Enums.PaymentMethod;
+    status?: $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: string | null;
+    paymentProofUrl?: string | null;
+    verifiedAt?: Date | string | null;
+    verifiedById?: string | null;
+    webhookReceivedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput;
+    account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput;
+};
+export type PaymentTransactionUncheckedCreateWithoutAllocationsInput = {
+    id?: string;
+    orderId?: string | null;
+    accountId?: string | null;
+    gatewayReference?: string | null;
+    idempotencyKey?: string | null;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method: $Enums.PaymentMethod;
+    status?: $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: string | null;
+    paymentProofUrl?: string | null;
+    verifiedAt?: Date | string | null;
+    verifiedById?: string | null;
+    webhookReceivedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PaymentTransactionCreateOrConnectWithoutAllocationsInput = {
+    where: Prisma.PaymentTransactionWhereUniqueInput;
+    create: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAllocationsInput, Prisma.PaymentTransactionUncheckedCreateWithoutAllocationsInput>;
+};
+export type PaymentTransactionUpsertWithoutAllocationsInput = {
+    update: Prisma.XOR<Prisma.PaymentTransactionUpdateWithoutAllocationsInput, Prisma.PaymentTransactionUncheckedUpdateWithoutAllocationsInput>;
+    create: Prisma.XOR<Prisma.PaymentTransactionCreateWithoutAllocationsInput, Prisma.PaymentTransactionUncheckedCreateWithoutAllocationsInput>;
+    where?: Prisma.PaymentTransactionWhereInput;
+};
+export type PaymentTransactionUpdateToOneWithWhereWithoutAllocationsInput = {
+    where?: Prisma.PaymentTransactionWhereInput;
+    data: Prisma.XOR<Prisma.PaymentTransactionUpdateWithoutAllocationsInput, Prisma.PaymentTransactionUncheckedUpdateWithoutAllocationsInput>;
+};
+export type PaymentTransactionUpdateWithoutAllocationsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput;
+    account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput;
+};
+export type PaymentTransactionUncheckedUpdateWithoutAllocationsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
 export type PaymentTransactionCreateManyOrderInput = {
     id?: string;
+    accountId?: string | null;
     gatewayReference?: string | null;
     idempotencyKey?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -602,9 +835,30 @@ export type PaymentTransactionUpdateWithoutOrderInput = {
     webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput;
 };
 export type PaymentTransactionUncheckedUpdateWithoutOrderInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput;
+};
+export type PaymentTransactionUncheckedUpdateManyWithoutOrderInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -619,7 +873,24 @@ export type PaymentTransactionUncheckedUpdateWithoutOrderInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
-export type PaymentTransactionUncheckedUpdateManyWithoutOrderInput = {
+export type PaymentTransactionCreateManyAccountInput = {
+    id?: string;
+    orderId?: string | null;
+    gatewayReference?: string | null;
+    idempotencyKey?: string | null;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method: $Enums.PaymentMethod;
+    status?: $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: string | null;
+    paymentProofUrl?: string | null;
+    verifiedAt?: Date | string | null;
+    verifiedById?: string | null;
+    webhookReceivedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type PaymentTransactionUpdateWithoutAccountInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -634,10 +905,60 @@ export type PaymentTransactionUncheckedUpdateManyWithoutOrderInput = {
     webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput;
+};
+export type PaymentTransactionUncheckedUpdateWithoutAccountInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput;
+};
+export type PaymentTransactionUncheckedUpdateManyWithoutAccountInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus;
+    gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue;
+    failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PaymentTransactionCountOutputType = {
+    allocations: number;
+};
+export type PaymentTransactionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    allocations?: boolean | PaymentTransactionCountOutputTypeCountAllocationsArgs;
+};
+export type PaymentTransactionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PaymentTransactionCountOutputTypeSelect<ExtArgs> | null;
+};
+export type PaymentTransactionCountOutputTypeCountAllocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PaymentAllocationWhereInput;
 };
 export type PaymentTransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     orderId?: boolean;
+    accountId?: boolean;
     gatewayReference?: boolean;
     idempotencyKey?: boolean;
     amount?: boolean;
@@ -651,11 +972,15 @@ export type PaymentTransactionSelect<ExtArgs extends runtime.Types.Extensions.In
     webhookReceivedAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>;
+    order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>;
+    account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>;
+    allocations?: boolean | Prisma.PaymentTransaction$allocationsArgs<ExtArgs>;
+    _count?: boolean | Prisma.PaymentTransactionCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["paymentTransaction"]>;
 export type PaymentTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     orderId?: boolean;
+    accountId?: boolean;
     gatewayReference?: boolean;
     idempotencyKey?: boolean;
     amount?: boolean;
@@ -669,11 +994,13 @@ export type PaymentTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.
     webhookReceivedAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>;
+    order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>;
+    account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>;
 }, ExtArgs["result"]["paymentTransaction"]>;
 export type PaymentTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     orderId?: boolean;
+    accountId?: boolean;
     gatewayReference?: boolean;
     idempotencyKey?: boolean;
     amount?: boolean;
@@ -687,11 +1014,13 @@ export type PaymentTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.
     webhookReceivedAt?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>;
+    order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>;
+    account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>;
 }, ExtArgs["result"]["paymentTransaction"]>;
 export type PaymentTransactionSelectScalar = {
     id?: boolean;
     orderId?: boolean;
+    accountId?: boolean;
     gatewayReference?: boolean;
     idempotencyKey?: boolean;
     amount?: boolean;
@@ -706,24 +1035,32 @@ export type PaymentTransactionSelectScalar = {
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type PaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "webhookReceivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentTransaction"]>;
+export type PaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "accountId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "webhookReceivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentTransaction"]>;
 export type PaymentTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>;
+    order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>;
+    account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>;
+    allocations?: boolean | Prisma.PaymentTransaction$allocationsArgs<ExtArgs>;
+    _count?: boolean | Prisma.PaymentTransactionCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type PaymentTransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>;
+    order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>;
+    account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>;
 };
 export type PaymentTransactionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>;
+    order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>;
+    account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>;
 };
 export type $PaymentTransactionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "PaymentTransaction";
     objects: {
-        order: Prisma.$OrderPayload<ExtArgs>;
+        order: Prisma.$OrderPayload<ExtArgs> | null;
+        account: Prisma.$AccountPayload<ExtArgs> | null;
+        allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
-        orderId: string;
+        orderId: string | null;
+        accountId: string | null;
         gatewayReference: string | null;
         idempotencyKey: string | null;
         amount: runtime.Decimal;
@@ -789,7 +1126,9 @@ export interface PaymentTransactionDelegate<ExtArgs extends runtime.Types.Extens
 }
 export interface Prisma__PaymentTransactionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    order<T extends Prisma.PaymentTransaction$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    account<T extends Prisma.PaymentTransaction$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    allocations<T extends Prisma.PaymentTransaction$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -797,6 +1136,7 @@ export interface Prisma__PaymentTransactionClient<T, Null = never, ExtArgs exten
 export interface PaymentTransactionFieldRefs {
     readonly id: Prisma.FieldRef<"PaymentTransaction", 'String'>;
     readonly orderId: Prisma.FieldRef<"PaymentTransaction", 'String'>;
+    readonly accountId: Prisma.FieldRef<"PaymentTransaction", 'String'>;
     readonly gatewayReference: Prisma.FieldRef<"PaymentTransaction", 'String'>;
     readonly idempotencyKey: Prisma.FieldRef<"PaymentTransaction", 'String'>;
     readonly amount: Prisma.FieldRef<"PaymentTransaction", 'Decimal'>;
@@ -910,6 +1250,29 @@ export type PaymentTransactionDeleteArgs<ExtArgs extends runtime.Types.Extension
 export type PaymentTransactionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.PaymentTransactionWhereInput;
     limit?: number;
+};
+export type PaymentTransaction$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.OrderSelect<ExtArgs> | null;
+    omit?: Prisma.OrderOmit<ExtArgs> | null;
+    include?: Prisma.OrderInclude<ExtArgs> | null;
+    where?: Prisma.OrderWhereInput;
+};
+export type PaymentTransaction$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.AccountSelect<ExtArgs> | null;
+    omit?: Prisma.AccountOmit<ExtArgs> | null;
+    include?: Prisma.AccountInclude<ExtArgs> | null;
+    where?: Prisma.AccountWhereInput;
+};
+export type PaymentTransaction$allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PaymentAllocationSelect<ExtArgs> | null;
+    omit?: Prisma.PaymentAllocationOmit<ExtArgs> | null;
+    include?: Prisma.PaymentAllocationInclude<ExtArgs> | null;
+    where?: Prisma.PaymentAllocationWhereInput;
+    orderBy?: Prisma.PaymentAllocationOrderByWithRelationInput | Prisma.PaymentAllocationOrderByWithRelationInput[];
+    cursor?: Prisma.PaymentAllocationWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[];
 };
 export type PaymentTransactionDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PaymentTransactionSelect<ExtArgs> | null;

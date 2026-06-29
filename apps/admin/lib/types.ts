@@ -48,6 +48,7 @@ export interface LoginPayload {
 }
 
 export enum BikeStatus {
+  PENDING_SETUP = "PENDING_SETUP",
   AVAILABLE = "AVAILABLE",
   RESERVED = "RESERVED",
   SOLD = "SOLD",

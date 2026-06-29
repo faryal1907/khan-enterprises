@@ -87,5 +87,26 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get systemSetting(): Prisma.SystemSettingDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get account(): Prisma.AccountDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get journalEntry(): Prisma.JournalEntryDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get journalEntryLine(): Prisma.JournalEntryLineDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get purchaseOrder(): Prisma.PurchaseOrderDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get purchaseOrderItem(): Prisma.PurchaseOrderItemDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get payable(): Prisma.PayableDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get paymentAllocation(): Prisma.PaymentAllocationDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
 }
 export declare function getPrismaClientClass(): PrismaClientConstructor;

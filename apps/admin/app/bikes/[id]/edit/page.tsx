@@ -299,6 +299,8 @@ export default function EditBikePage() {
         onlineDiscountPercent: onlineDiscountPercent ? parseFloat(onlineDiscountPercent) : undefined,
         color: color || undefined,
         media,
+        chassisNumber,
+        engineNumber,
       });
 
       // Attach documents
@@ -394,7 +396,6 @@ export default function EditBikePage() {
                   placeholder="Enter chassis number"
                   value={chassisNumber}
                   onChange={(e) => setChassisNumber(e.target.value)}
-                  disabled
                 />
               </div>
               <div>
@@ -415,7 +416,6 @@ export default function EditBikePage() {
                   placeholder="Enter engine number"
                   value={engineNumber}
                   onChange={(e) => setEngineNumber(e.target.value)}
-                  disabled
                 />
               </div>
             </div>

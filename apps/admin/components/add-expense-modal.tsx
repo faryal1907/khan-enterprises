@@ -7,6 +7,7 @@ import { ActionModal } from "./action-modal";
 import { AsyncButton } from "./async-button";
 import { theme } from "@/lib/colors";
 import { createExpense } from "@/lib/api/expenses";
+import { getAccounts } from "@/lib/api/accounting";
 import { ExpenseCategory, Branch, UserRole } from "@/lib/types";
 import { getBranches } from "@/lib/api/inventory";
 import { useAuthStore } from "@/lib/auth-store";
@@ -17,6 +18,7 @@ const expenseSchema = z.object({
   category: z.nativeEnum(ExpenseCategory),
   description: z.string().optional(),
   branchId: z.string().min(1, "Branch is required"),
+  paymentAccountId: z.string().min(1, "Payment Account is required"),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseSchema>;
@@ -32,6 +34,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [accounts, setAccounts] = useState<any[]>([]);
 
   const {
     register,
@@ -47,6 +50,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
       category: ExpenseCategory.OTHER,
       description: "",
       branchId: defaultBranchId || "",
+      paymentAccountId: "",
     },
   });
 
@@ -56,12 +60,17 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
         .then((data) => setBranches(data.branches || []))
         .catch(() => setBranches([]));
       
+      getAccounts()
+        .then((data) => setAccounts(data.filter((a: any) => a.category === 'ASSET' && (a.subtype === 'CASH' || a.subtype === 'BANK'))))
+        .catch(() => setAccounts([]));
+      
       reset({
         amount: 0,
         date: new Date().toISOString().split("T")[0],
         category: ExpenseCategory.OTHER,
         description: "",
         branchId: defaultBranchId || "",
+        paymentAccountId: "",
       });
     }
   }, [isOpen, reset, defaultBranchId]);
@@ -205,6 +214,33 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
           {errors.description && (
             <p className="mt-1 text-xs" style={{ color: theme.accents.error }}>
               {errors.description.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+            Payment Account
+          </label>
+          <select
+            {...register("paymentAccountId")}
+            className="w-full px-3 py-2 rounded text-sm"
+            style={{
+              backgroundColor: theme.backgrounds.tertiary,
+              border: `1px solid ${errors.paymentAccountId ? theme.accents.error : theme.borders.medium}`,
+              color: theme.text.primary,
+            }}
+          >
+            <option value="">Select Account</option>
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id}>
+                {acc.name} ({acc.code})
+              </option>
+            ))}
+          </select>
+          {errors.paymentAccountId && (
+            <p className="mt-1 text-xs" style={{ color: theme.accents.error }}>
+              {errors.paymentAccountId.message}
             </p>
           )}
         </div>

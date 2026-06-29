@@ -12,6 +12,7 @@ export declare const UserStatus: {
 };
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
 export declare const BikeStatus: {
+    readonly PENDING_SETUP: "PENDING_SETUP";
     readonly AVAILABLE: "AVAILABLE";
     readonly RESERVED: "RESERVED";
     readonly SOLD: "SOLD";
@@ -96,3 +97,53 @@ export declare const ExpenseCategory: {
     readonly OTHER: "OTHER";
 };
 export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory];
+export declare const AccountCategory: {
+    readonly ASSET: "ASSET";
+    readonly LIABILITY: "LIABILITY";
+    readonly EQUITY: "EQUITY";
+    readonly REVENUE: "REVENUE";
+    readonly EXPENSE: "EXPENSE";
+};
+export type AccountCategory = (typeof AccountCategory)[keyof typeof AccountCategory];
+export declare const AccountSubtype: {
+    readonly CASH: "CASH";
+    readonly BANK: "BANK";
+    readonly EWALLET: "EWALLET";
+    readonly AR: "AR";
+    readonly AP: "AP";
+    readonly INVENTORY: "INVENTORY";
+    readonly COGS: "COGS";
+    readonly SALARY: "SALARY";
+    readonly EXPENSE: "EXPENSE";
+    readonly EQUITY: "EQUITY";
+    readonly REVENUE: "REVENUE";
+    readonly OTHER: "OTHER";
+};
+export type AccountSubtype = (typeof AccountSubtype)[keyof typeof AccountSubtype];
+export declare const JournalStatus: {
+    readonly POSTED: "POSTED";
+    readonly VOIDED: "VOIDED";
+    readonly DRAFT: "DRAFT";
+};
+export type JournalStatus = (typeof JournalStatus)[keyof typeof JournalStatus];
+export declare const POStatus: {
+    readonly PENDING: "PENDING";
+    readonly RECEIVED: "RECEIVED";
+    readonly VOIDED: "VOIDED";
+};
+export type POStatus = (typeof POStatus)[keyof typeof POStatus];
+export declare const PayableType: {
+    readonly SUPPLIER: "SUPPLIER";
+    readonly EXPENSE: "EXPENSE";
+    readonly SALARY: "SALARY";
+    readonly LOAN: "LOAN";
+    readonly OTHER: "OTHER";
+};
+export type PayableType = (typeof PayableType)[keyof typeof PayableType];
+export declare const PaymentState: {
+    readonly DUE: "DUE";
+    readonly PARTIAL: "PARTIAL";
+    readonly PAID: "PAID";
+    readonly OVERDUE: "OVERDUE";
+};
+export type PaymentState = (typeof PaymentState)[keyof typeof PaymentState];

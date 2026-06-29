@@ -50,5 +50,13 @@ export class CreateManualOrderDto {
   @IsNumber()
   @IsOptional()
   actualSalePrice?: number;
+
+  @IsOptional()
+  isInstallmentPlan?: boolean;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  initialPaymentAmount?: number;
 }
 

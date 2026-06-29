@@ -134,3 +134,38 @@ export type AuditLog = Prisma.AuditLogModel
  * 
  */
 export type SystemSetting = Prisma.SystemSettingModel
+/**
+ * Model Account
+ * 
+ */
+export type Account = Prisma.AccountModel
+/**
+ * Model JournalEntry
+ * 
+ */
+export type JournalEntry = Prisma.JournalEntryModel
+/**
+ * Model JournalEntryLine
+ * 
+ */
+export type JournalEntryLine = Prisma.JournalEntryLineModel
+/**
+ * Model PurchaseOrder
+ * 
+ */
+export type PurchaseOrder = Prisma.PurchaseOrderModel
+/**
+ * Model PurchaseOrderItem
+ * 
+ */
+export type PurchaseOrderItem = Prisma.PurchaseOrderItemModel
+/**
+ * Model Payable
+ * 
+ */
+export type Payable = Prisma.PayableModel
+/**
+ * Model PaymentAllocation
+ * 
+ */
+export type PaymentAllocation = Prisma.PaymentAllocationModel

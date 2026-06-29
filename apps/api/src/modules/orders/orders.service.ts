@@ -10,7 +10,7 @@ import { CreateCustomerOrderDto } from "./dto/create-customer-order.dto";
 import { UploadPaymentProofDto } from "./dto/upload-payment-proof.dto";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
 import { RevenueQueryDto, RevenueDuration } from "./dto/revenue-query.dto";
-import { OrderStatus, BikeStatus, PaymentStatus, AuditAction } from "@khan/prisma";
+import { OrderStatus, BikeStatus, PaymentStatus, AuditAction, PaymentState, JournalStatus, AccountSubtype } from "@khan/prisma";
 import { OrderAlertsService } from "../order-alerts/order-alerts.service";
 import { AlertType } from "../order-alerts/dto/get-alerts.dto";
 
@@ -262,6 +262,11 @@ export class OrdersService {
           orderType: isCash ? "ONSITE" : "ONLINE",
           pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
           customerId: user.id,
+          totalAmount: salePrice,
+          paidAmount: 0,
+          balanceDue: salePrice,
+          isInstallmentPlan: dto.isInstallmentPlan || false,
+          paymentState: PaymentState.DUE,
         },
       });
 
@@ -288,6 +293,47 @@ export class OrdersService {
           paymentProofUrl: dto.paymentProofUrl || null,
         },
       });
+
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+
+      if (arAcc && revAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-SALE-${orderNumber}`,
+            description: `Sale registered for ${orderNumber}`,
+            sourceRef: orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: salePrice, credit: 0 },
+                { accountId: revAcc.id, debit: 0, credit: salePrice },
+              ]
+            }
+          }
+        });
+      }
+
+      const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
+      const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
+      const costOfGoods = Number(bike.purchasePrice || 0);
+
+      if (cogsAcc && inventoryAcc && costOfGoods > 0) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-COGS-${orderNumber}`,
+            description: `Cost of Goods Sold for ${orderNumber}`,
+            sourceRef: orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: cogsAcc.id, debit: costOfGoods, credit: 0 },
+                { accountId: inventoryAcc.id, debit: 0, credit: costOfGoods },
+              ]
+            }
+          }
+        });
+      }
 
       await tx.auditLog.create({
         data: {
@@ -566,6 +612,44 @@ export class OrdersService {
         },
       });
 
+      // 5. Reverse Accounting Entries
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+      
+      if (arAcc && revAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-REV-${order.orderNumber}`,
+            description: `Reversal of sale for ${order.orderNumber}`,
+            sourceRef: order.orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: revAcc.id, debit: Number(order.totalAmount), credit: 0 },
+                { accountId: arAcc.id, debit: 0, credit: Number(order.totalAmount) },
+              ]
+            }
+          }
+        });
+      }
+
+      if (Number(order.paidAmount) > 0 && cashAcc && arAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-REVPAY-${order.orderNumber}`,
+            description: `Reversal of payment for ${order.orderNumber}`,
+            sourceRef: order.orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: Number(order.paidAmount), credit: 0 },
+                { accountId: cashAcc.id, debit: 0, credit: Number(order.paidAmount) },
+              ]
+            }
+          }
+        });
+      }
 
       await tx.auditLog.create({
         data: {
@@ -636,6 +720,11 @@ export class OrdersService {
       });
 
       let transaction: any = existingTx;
+      
+      const isInitialPayment = Number(order.paidAmount) === 0;
+      if (order.isInstallmentPlan && isInitialPayment && dto.amount < Number(order.totalAmount) * 0.5) {
+        throw new BadRequestException(`Initial payment for an installment plan must be at least 50% of the total amount`);
+      }
 
       if (existingTx) {
         transaction = await tx.paymentTransaction.update({
@@ -663,7 +752,53 @@ export class OrdersService {
         });
       }
 
-      // 5. Update order → PAID, bike → SOLD
+      // Fetch accounts for accounting
+      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+      const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      
+      const paymentAcc = dto.method === "CASH" ? cashAcc : bankAcc;
+
+      if (paymentAcc) {
+        await tx.paymentTransaction.update({
+          where: { id: transaction.id },
+          data: { accountId: paymentAcc.id }
+        });
+      }
+
+      // Create Payment Allocation
+      await tx.paymentAllocation.create({
+        data: {
+          paymentId: transaction.id,
+          orderId: orderId,
+          allocatedAmount: dto.amount,
+        }
+      });
+
+      const newPaidAmount = Number(order.paidAmount) + dto.amount;
+      const newBalance = Number(order.totalAmount) - newPaidAmount;
+      let newPaymentState: PaymentState = PaymentState.PARTIAL;
+      if (newPaidAmount >= Number(order.totalAmount)) newPaymentState = PaymentState.PAID;
+
+      // Generate Journal Entry for Payment
+      if (paymentAcc && arAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
+            description: `Payment received for order ${order.orderNumber} via ${dto.method}`,
+            sourceRef: transaction.id,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: paymentAcc.id, debit: dto.amount, credit: 0 },
+                { accountId: arAcc.id, debit: 0, credit: dto.amount },
+              ]
+            }
+          }
+        });
+      }
+
+      // 5. Update order → PAID (if fully paid) or stay in status, bike → SOLD
       let reservationExpiry = order.reservationExpiry;
       if (dto.method === "CASH" && order.pickupType === "ONSITE_PICKUP") {
         // Set reservation expiry to 1 day from now for cash pickups
@@ -677,10 +812,13 @@ export class OrdersService {
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
-          status: OrderStatus.PAID,
+          status: newPaymentState === PaymentState.PAID ? OrderStatus.PAID : order.status,
           paymentVerified: true,
           reservationExpiry,
           processedById: user.id,
+          paidAmount: newPaidAmount,
+          balanceDue: newBalance,
+          paymentState: newPaymentState,
         },
       });
 
@@ -839,11 +977,24 @@ export class OrdersService {
       // 3. Generate order number
       const orderNumber = `ORD-MAN-${Date.now()}`;
 
-      // 4. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
+      // 4. Validate Installment Rule
+      const isInstallment = dto.isInstallmentPlan || false;
+      const initialPayment = dto.initialPaymentAmount !== undefined ? dto.initialPaymentAmount : finalSalePrice;
+
+      if (isInstallment && initialPayment < finalSalePrice * 0.5) {
+        throw new BadRequestException(`Initial payment for an installment plan must be at least 50% of the total amount`);
+      }
+
+      const balance = finalSalePrice - initialPayment;
+      let paymentState: PaymentState = PaymentState.DUE;
+      if (initialPayment >= finalSalePrice) paymentState = PaymentState.PAID;
+      else if (initialPayment > 0) paymentState = PaymentState.PARTIAL;
+
+      // 5. Set expiresAt to 1 week from now (for manual orders that might be pending payment)
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      // 5. Create Order
+      // 6. Create Order
       const order = await tx.order.create({
         data: {
           orderNumber,
@@ -854,7 +1005,7 @@ export class OrdersService {
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
           paymentMethod: dto.paymentMethod,
-          status: OrderStatus.DELIVERED,
+          status: paymentState === PaymentState.PAID ? OrderStatus.DELIVERED : OrderStatus.PENDING_PAYMENT,
           paymentVerified: true,
           expiresAt,
           processedById: user.id,
@@ -862,6 +1013,11 @@ export class OrdersService {
           orderType,
           pickupType: orderType === "ONLINE" ? "DELIVERY" : "ONSITE_PICKUP",
           customerId: dto.customerId ?? null,
+          totalAmount: finalSalePrice,
+          paidAmount: initialPayment,
+          balanceDue: balance,
+          isInstallmentPlan: isInstallment,
+          paymentState,
         },
       });
 
@@ -876,17 +1032,91 @@ export class OrdersService {
         },
       });
 
-      // 7. Create PaymentTransaction
-      await tx.paymentTransaction.create({
-        data: {
-          orderId: order.id,
-          amount: finalSalePrice,
-          method: dto.paymentMethod,
-          status: PaymentStatus.SUCCESS,
-          verifiedAt: new Date(),
-          verifiedById: user.id,
-        },
-      });
+      // 8. Create PaymentTransaction & Allocations & Journal Entries
+      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+      const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+      const paymentAcc = dto.paymentMethod === "CASH" ? cashAcc : bankAcc;
+
+      let transaction: any = null;
+      if (initialPayment > 0) {
+        transaction = await tx.paymentTransaction.create({
+          data: {
+            orderId: order.id,
+            amount: initialPayment,
+            method: dto.paymentMethod,
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+            accountId: paymentAcc?.id,
+          },
+        });
+        await tx.paymentAllocation.create({
+          data: {
+            paymentId: transaction.id,
+            orderId: order.id,
+            allocatedAmount: initialPayment,
+          }
+        });
+      }
+
+      // Revenue Recognition Journal Entry
+      if (arAcc && revAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-SALE-${order.orderNumber}`,
+            description: `Sale registered for ${order.orderNumber}`,
+            sourceRef: order.orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: finalSalePrice, credit: 0 },
+                { accountId: revAcc.id, debit: 0, credit: finalSalePrice },
+              ]
+            }
+          }
+        });
+      }
+
+      const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
+      const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
+      const costOfGoods = Number(bike.purchasePrice || 0);
+
+      if (cogsAcc && inventoryAcc && costOfGoods > 0) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-COGS-${order.orderNumber}`,
+            description: `Cost of Goods Sold for ${order.orderNumber}`,
+            sourceRef: order.orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: cogsAcc.id, debit: costOfGoods, credit: 0 },
+                { accountId: inventoryAcc.id, debit: 0, credit: costOfGoods },
+              ]
+            }
+          }
+        });
+      }
+
+      // Receipt Journal Entry
+      if (initialPayment > 0 && paymentAcc && arAcc && transaction) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
+            description: `Payment received for ${order.orderNumber} via ${dto.paymentMethod}`,
+            sourceRef: transaction.id,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: paymentAcc.id, debit: initialPayment, credit: 0 },
+                { accountId: arAcc.id, debit: 0, credit: initialPayment },
+              ]
+            }
+          }
+        });
+      }
 
       await tx.auditLog.create({
         data: {
@@ -1244,6 +1474,9 @@ export class OrdersService {
             status: OrderStatus.PAID,
             paymentVerified: true,
             processedById: user.id,
+            paidAmount: order.totalAmount,
+            balanceDue: 0,
+            paymentState: PaymentState.PAID
           },
         });
 
@@ -1256,6 +1489,30 @@ export class OrdersService {
             reservedUntil: null,
           },
         });
+
+        // 6. Generate Receipt Journal Entry
+        const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+        const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        
+        const paymentAcc = updatedTransaction.method === "CASH" ? cashAcc : bankAcc;
+
+        if (paymentAcc && arAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-PAY-${updatedTransaction.id.substring(0, 8)}`,
+              description: `Payment verified for order ${order.orderNumber} via ${updatedTransaction.method}`,
+              sourceRef: updatedTransaction.id,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: paymentAcc.id, debit: Number(updatedTransaction.amount), credit: 0 },
+                  { accountId: arAcc.id, debit: 0, credit: Number(updatedTransaction.amount) },
+                ]
+              }
+            }
+          });
+        }
 
         // 7. Create audit log entry
         await tx.auditLog.create({
@@ -1289,7 +1546,28 @@ export class OrdersService {
           },
         });
 
-        // 5. Update bike to AVAILABLE
+        // 5. Reverse Sale JV
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+        
+        if (arAcc && revAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-REV-${order.orderNumber}`,
+              description: `Reversal of sale for ${order.orderNumber} due to failed payment`,
+              sourceRef: order.orderNumber,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: revAcc.id, debit: Number(order.totalAmount), credit: 0 },
+                  { accountId: arAcc.id, debit: 0, credit: Number(order.totalAmount) },
+                ]
+              }
+            }
+          });
+        }
+
+        // 6. Update bike to AVAILABLE
         await tx.bikeUnit.update({
           where: { id: order.bikeId },
           data: {
