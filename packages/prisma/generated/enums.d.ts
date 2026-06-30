@@ -116,6 +116,7 @@ export declare const AccountSubtype: {
     readonly SALARY: "SALARY";
     readonly EXPENSE: "EXPENSE";
     readonly EQUITY: "EQUITY";
+    readonly DRAWINGS: "DRAWINGS";
     readonly REVENUE: "REVENUE";
     readonly OTHER: "OTHER";
 };

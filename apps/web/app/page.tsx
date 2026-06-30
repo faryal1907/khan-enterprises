@@ -216,7 +216,7 @@ export default function Home() {
               animate="show"
               variants={scaleIn}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-              src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1781621453/three-bikes_uydimg.png"
+              src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782656565/three-bikes_zjwjun.png"
               alt="Featured Motorcycle"
               className="w-full max-w-2xl h-auto object-contain"
             />
@@ -509,7 +509,7 @@ export default function Home() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782656565/three-bikes_zjwjun.png"
+                src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782831698/evee-logo_round_wvff05.png"
                 alt="EVEE Logo"
                 className="w-32 h-32 object-contain shrink-0"
               />
@@ -534,7 +534,7 @@ export default function Home() {
               style={{ backgroundColor: theme.colors.white, borderColor: theme.borders.dark }}
             >
               <img
-                src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782035711/RoadKing-Logo_xbxh5n.png"
+                src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782831723/RoadKing-Logo_enqs1i.png"
                 alt="Road King Logo"
                 className="w-32 h-32 object-contain shrink-0 rounded-lg bg-white p-2"
               />

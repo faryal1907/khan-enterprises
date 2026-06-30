@@ -61,7 +61,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
         .catch(() => setBranches([]));
       
       getAccounts()
-        .then((data) => setAccounts(data.filter((a: any) => a.category === 'ASSET' && (a.subtype === 'CASH' || a.subtype === 'BANK'))))
+        .then((data) => setAccounts(data.filter((a: any) => a.category === 'ASSET' && ['CASH', 'BANK', 'EWALLET'].includes(a.subtype) && a.isActive)))
         .catch(() => setAccounts([]));
       
       reset({

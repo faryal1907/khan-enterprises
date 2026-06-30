@@ -39,3 +39,46 @@ export const payPayable = async (id: string, payload: { amount: number, paymentM
   const { data } = await api.post(`/accounting/payables/${id}/pay`, payload);
   return data;
 };
+
+export const createAccount = async (payload: { code: string; name: string; category: string; subtype: string; accountNumber?: string; openingBalance?: number }) => {
+  const { data } = await api.post('/accounting/accounts', payload);
+  return data;
+};
+
+export const updateAccount = async (id: string, payload: { name?: string; code?: string; category?: string; subtype?: string }) => {
+  const { data } = await api.patch(`/accounting/accounts/${id}`, payload);
+  return data;
+};
+
+export const deleteAccount = async (id: string) => {
+  const { data } = await api.delete(`/accounting/accounts/${id}`);
+  return data;
+};
+
+export const getAccountLedger = async (id: string, page?: number, limit?: number) => {
+  const params = new URLSearchParams();
+  if (page) params.append('page', page.toString());
+  if (limit) params.append('limit', limit.toString());
+  const { data } = await api.get(`/accounting/accounts/${id}/ledger?${params.toString()}`);
+  return data;
+};
+
+export const getAccountBalance = async (id: string) => {
+  const { data } = await api.get(`/accounting/accounts/${id}/balance`);
+  return data;
+};
+
+export const recordCapitalContribution = async (payload: { destinationAccountId: string; amount: number; date: string; source?: string; reference?: string; notes?: string }) => {
+  const { data } = await api.post('/accounting/capital-contribution', payload);
+  return data;
+};
+
+export const recordOwnerWithdrawal = async (payload: { sourceAccountId: string; amount: number; date: string; reason?: string; notes?: string }) => {
+  const { data } = await api.post('/accounting/owner-withdrawal', payload);
+  return data;
+};
+
+export const recordInternalTransfer = async (payload: { fromAccountId: string; toAccountId: string; amount: number; date: string; notes?: string }) => {
+  const { data } = await api.post('/accounting/internal-transfer', payload);
+  return data;
+};

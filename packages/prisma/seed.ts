@@ -55,10 +55,13 @@ async function main() {
     { code: '1004', name: 'Accounts Receivable', category: 'ASSET', subtype: 'AR', isSystem: true },
     { code: '2001', name: 'Accounts Payable', category: 'LIABILITY', subtype: 'AP', isSystem: true },
     { code: '3001', name: 'Owner Capital', category: 'EQUITY', subtype: 'EQUITY', isSystem: true },
+    { code: '3002', name: 'Owner Drawings', category: 'EQUITY', subtype: 'DRAWINGS', isSystem: true },
+    { code: '3003', name: 'Retained Earnings', category: 'EQUITY', subtype: 'EQUITY', isSystem: true },
     { code: '4001', name: 'Sales Revenue', category: 'REVENUE', subtype: 'REVENUE', isSystem: true },
     { code: '5001', name: 'Cost of Goods Sold', category: 'EXPENSE', subtype: 'COGS', isSystem: true },
     { code: '5002', name: 'Salary Expense', category: 'EXPENSE', subtype: 'SALARY', isSystem: true },
     { code: '5003', name: 'General Expense', category: 'EXPENSE', subtype: 'EXPENSE', isSystem: true },
+    { code: '5004', name: 'Cash Adjustment Expense', category: 'EXPENSE', subtype: 'EXPENSE', isSystem: true },
   ];
   for (const acc of defaultAccounts) {
     await prisma.account.create({ data: acc });

@@ -169,6 +169,7 @@ export const AccountSubtype = {
   SALARY: 'SALARY',
   EXPENSE: 'EXPENSE',
   EQUITY: 'EQUITY',
+  DRAWINGS: 'DRAWINGS',
   REVENUE: 'REVENUE',
   OTHER: 'OTHER'
 } as const

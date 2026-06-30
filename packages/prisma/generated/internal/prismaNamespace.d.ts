@@ -2538,6 +2538,7 @@ export declare const JournalEntryScalarFieldEnum: {
     readonly date: "date";
     readonly description: "description";
     readonly sourceRef: "sourceRef";
+    readonly notes: "notes";
     readonly status: "status";
     readonly isManual: "isManual";
 };

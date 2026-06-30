@@ -350,6 +350,7 @@ exports.JournalEntryScalarFieldEnum = {
     date: 'date',
     description: 'description',
     sourceRef: 'sourceRef',
+    notes: 'notes',
     status: 'status',
     isManual: 'isManual'
 };

@@ -13,6 +13,7 @@ export type JournalEntryMinAggregateOutputType = {
     date: Date | null;
     description: string | null;
     sourceRef: string | null;
+    notes: string | null;
     status: $Enums.JournalStatus | null;
     isManual: boolean | null;
 };
@@ -22,6 +23,7 @@ export type JournalEntryMaxAggregateOutputType = {
     date: Date | null;
     description: string | null;
     sourceRef: string | null;
+    notes: string | null;
     status: $Enums.JournalStatus | null;
     isManual: boolean | null;
 };
@@ -31,6 +33,7 @@ export type JournalEntryCountAggregateOutputType = {
     date: number;
     description: number;
     sourceRef: number;
+    notes: number;
     status: number;
     isManual: number;
     _all: number;
@@ -41,6 +44,7 @@ export type JournalEntryMinAggregateInputType = {
     date?: true;
     description?: true;
     sourceRef?: true;
+    notes?: true;
     status?: true;
     isManual?: true;
 };
@@ -50,6 +54,7 @@ export type JournalEntryMaxAggregateInputType = {
     date?: true;
     description?: true;
     sourceRef?: true;
+    notes?: true;
     status?: true;
     isManual?: true;
 };
@@ -59,6 +64,7 @@ export type JournalEntryCountAggregateInputType = {
     date?: true;
     description?: true;
     sourceRef?: true;
+    notes?: true;
     status?: true;
     isManual?: true;
     _all?: true;
@@ -93,6 +99,7 @@ export type JournalEntryGroupByOutputType = {
     date: Date;
     description: string;
     sourceRef: string | null;
+    notes: string | null;
     status: $Enums.JournalStatus;
     isManual: boolean;
     _count: JournalEntryCountAggregateOutputType | null;
@@ -111,6 +118,7 @@ export type JournalEntryWhereInput = {
     date?: Prisma.DateTimeFilter<"JournalEntry"> | Date | string;
     description?: Prisma.StringFilter<"JournalEntry"> | string;
     sourceRef?: Prisma.StringNullableFilter<"JournalEntry"> | string | null;
+    notes?: Prisma.StringNullableFilter<"JournalEntry"> | string | null;
     status?: Prisma.EnumJournalStatusFilter<"JournalEntry"> | $Enums.JournalStatus;
     isManual?: Prisma.BoolFilter<"JournalEntry"> | boolean;
     lines?: Prisma.JournalEntryLineListRelationFilter;
@@ -121,6 +129,7 @@ export type JournalEntryOrderByWithRelationInput = {
     date?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     sourceRef?: Prisma.SortOrderInput | Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isManual?: Prisma.SortOrder;
     lines?: Prisma.JournalEntryLineOrderByRelationAggregateInput;
@@ -134,6 +143,7 @@ export type JournalEntryWhereUniqueInput = Prisma.AtLeast<{
     date?: Prisma.DateTimeFilter<"JournalEntry"> | Date | string;
     description?: Prisma.StringFilter<"JournalEntry"> | string;
     sourceRef?: Prisma.StringNullableFilter<"JournalEntry"> | string | null;
+    notes?: Prisma.StringNullableFilter<"JournalEntry"> | string | null;
     status?: Prisma.EnumJournalStatusFilter<"JournalEntry"> | $Enums.JournalStatus;
     isManual?: Prisma.BoolFilter<"JournalEntry"> | boolean;
     lines?: Prisma.JournalEntryLineListRelationFilter;
@@ -144,6 +154,7 @@ export type JournalEntryOrderByWithAggregationInput = {
     date?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     sourceRef?: Prisma.SortOrderInput | Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isManual?: Prisma.SortOrder;
     _count?: Prisma.JournalEntryCountOrderByAggregateInput;
@@ -159,6 +170,7 @@ export type JournalEntryScalarWhereWithAggregatesInput = {
     date?: Prisma.DateTimeWithAggregatesFilter<"JournalEntry"> | Date | string;
     description?: Prisma.StringWithAggregatesFilter<"JournalEntry"> | string;
     sourceRef?: Prisma.StringNullableWithAggregatesFilter<"JournalEntry"> | string | null;
+    notes?: Prisma.StringNullableWithAggregatesFilter<"JournalEntry"> | string | null;
     status?: Prisma.EnumJournalStatusWithAggregatesFilter<"JournalEntry"> | $Enums.JournalStatus;
     isManual?: Prisma.BoolWithAggregatesFilter<"JournalEntry"> | boolean;
 };
@@ -168,6 +180,7 @@ export type JournalEntryCreateInput = {
     date?: Date | string;
     description: string;
     sourceRef?: string | null;
+    notes?: string | null;
     status?: $Enums.JournalStatus;
     isManual?: boolean;
     lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput;
@@ -178,6 +191,7 @@ export type JournalEntryUncheckedCreateInput = {
     date?: Date | string;
     description: string;
     sourceRef?: string | null;
+    notes?: string | null;
     status?: $Enums.JournalStatus;
     isManual?: boolean;
     lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput;
@@ -188,6 +202,7 @@ export type JournalEntryUpdateInput = {
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus;
     isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput;
@@ -198,6 +213,7 @@ export type JournalEntryUncheckedUpdateInput = {
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus;
     isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput;
@@ -208,6 +224,7 @@ export type JournalEntryCreateManyInput = {
     date?: Date | string;
     description: string;
     sourceRef?: string | null;
+    notes?: string | null;
     status?: $Enums.JournalStatus;
     isManual?: boolean;
 };
@@ -217,6 +234,7 @@ export type JournalEntryUpdateManyMutationInput = {
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus;
     isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
@@ -226,6 +244,7 @@ export type JournalEntryUncheckedUpdateManyInput = {
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus;
     isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
@@ -235,6 +254,7 @@ export type JournalEntryCountOrderByAggregateInput = {
     date?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     sourceRef?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isManual?: Prisma.SortOrder;
 };
@@ -244,6 +264,7 @@ export type JournalEntryMaxOrderByAggregateInput = {
     date?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     sourceRef?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isManual?: Prisma.SortOrder;
 };
@@ -253,6 +274,7 @@ export type JournalEntryMinOrderByAggregateInput = {
     date?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     sourceRef?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isManual?: Prisma.SortOrder;
 };
@@ -281,6 +303,7 @@ export type JournalEntryCreateWithoutLinesInput = {
     date?: Date | string;
     description: string;
     sourceRef?: string | null;
+    notes?: string | null;
     status?: $Enums.JournalStatus;
     isManual?: boolean;
 };
@@ -290,6 +313,7 @@ export type JournalEntryUncheckedCreateWithoutLinesInput = {
     date?: Date | string;
     description: string;
     sourceRef?: string | null;
+    notes?: string | null;
     status?: $Enums.JournalStatus;
     isManual?: boolean;
 };
@@ -312,6 +336,7 @@ export type JournalEntryUpdateWithoutLinesInput = {
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus;
     isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
@@ -321,6 +346,7 @@ export type JournalEntryUncheckedUpdateWithoutLinesInput = {
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus;
     isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
@@ -342,6 +368,7 @@ export type JournalEntrySelect<ExtArgs extends runtime.Types.Extensions.Internal
     date?: boolean;
     description?: boolean;
     sourceRef?: boolean;
+    notes?: boolean;
     status?: boolean;
     isManual?: boolean;
     lines?: boolean | Prisma.JournalEntry$linesArgs<ExtArgs>;
@@ -353,6 +380,7 @@ export type JournalEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
     date?: boolean;
     description?: boolean;
     sourceRef?: boolean;
+    notes?: boolean;
     status?: boolean;
     isManual?: boolean;
 }, ExtArgs["result"]["journalEntry"]>;
@@ -362,6 +390,7 @@ export type JournalEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
     date?: boolean;
     description?: boolean;
     sourceRef?: boolean;
+    notes?: boolean;
     status?: boolean;
     isManual?: boolean;
 }, ExtArgs["result"]["journalEntry"]>;
@@ -371,10 +400,11 @@ export type JournalEntrySelectScalar = {
     date?: boolean;
     description?: boolean;
     sourceRef?: boolean;
+    notes?: boolean;
     status?: boolean;
     isManual?: boolean;
 };
-export type JournalEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryNo" | "date" | "description" | "sourceRef" | "status" | "isManual", ExtArgs["result"]["journalEntry"]>;
+export type JournalEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryNo" | "date" | "description" | "sourceRef" | "notes" | "status" | "isManual", ExtArgs["result"]["journalEntry"]>;
 export type JournalEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     lines?: boolean | Prisma.JournalEntry$linesArgs<ExtArgs>;
     _count?: boolean | Prisma.JournalEntryCountOutputTypeDefaultArgs<ExtArgs>;
@@ -392,6 +422,7 @@ export type $JournalEntryPayload<ExtArgs extends runtime.Types.Extensions.Intern
         date: Date;
         description: string;
         sourceRef: string | null;
+        notes: string | null;
         status: $Enums.JournalStatus;
         isManual: boolean;
     }, ExtArgs["result"]["journalEntry"]>;
@@ -457,6 +488,7 @@ export interface JournalEntryFieldRefs {
     readonly date: Prisma.FieldRef<"JournalEntry", 'DateTime'>;
     readonly description: Prisma.FieldRef<"JournalEntry", 'String'>;
     readonly sourceRef: Prisma.FieldRef<"JournalEntry", 'String'>;
+    readonly notes: Prisma.FieldRef<"JournalEntry", 'String'>;
     readonly status: Prisma.FieldRef<"JournalEntry", 'JournalStatus'>;
     readonly isManual: Prisma.FieldRef<"JournalEntry", 'Boolean'>;
 }

@@ -1,5 +1,6 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
+import { AccountCategory, AccountSubtype } from "@khan/prisma";
 
 @Injectable()
 export class AccountingService {
@@ -30,7 +31,7 @@ export class AccountingService {
         totalCredit += Number(line.credit) || 0;
       });
 
-      if (['ASSET', 'EXPENSE'].includes(acc.category)) {
+      if (['ASSET', 'EXPENSE'].includes(acc.category) || acc.subtype === 'DRAWINGS') {
         balance += totalDebit - totalCredit;
       } else {
         balance += totalCredit - totalDebit;
@@ -104,5 +105,517 @@ export class AccountingService {
         }
       }
     });
+  }
+
+  async createAccount(data: {
+    code: string;
+    name: string;
+    category: AccountCategory;
+    subtype: AccountSubtype;
+    accountNumber?: string;
+    openingBalance?: number;
+  }) {
+    const existingAccount = await this.prisma.client.account.findUnique({
+      where: { code: data.code }
+    });
+
+    if (existingAccount) {
+      throw new BadRequestException(`Account with code ${data.code} already exists`);
+    }
+
+    return this.prisma.client.account.create({
+      data: {
+        code: data.code,
+        name: data.name,
+        category: data.category,
+        subtype: data.subtype,
+        accountNumber: data.accountNumber,
+        openingBalance: data.openingBalance || 0,
+        isActive: true,
+        isSystem: false
+      }
+    });
+  }
+
+  async updateAccount(id: string, data: {
+    name?: string;
+    code?: string;
+    category?: AccountCategory;
+    subtype?: AccountSubtype;
+  }) {
+    const account = await this.prisma.client.account.findUnique({
+      where: { id },
+      include: {
+        lines: true
+      }
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    // Check if account has journal entries
+    const hasJournalEntries = account.lines.length > 0;
+    let warning: string | null = null;
+
+    if (hasJournalEntries) {
+      warning = 'This account has journal entries. Changing code or category may affect historical data integrity.';
+    }
+
+    // If code is being changed, check for uniqueness
+    if (data.code && data.code !== account.code) {
+      const existingAccount = await this.prisma.client.account.findUnique({
+        where: { code: data.code }
+      });
+
+      if (existingAccount) {
+        throw new BadRequestException(`Account with code ${data.code} already exists`);
+      }
+    }
+
+    const updatedAccount = await this.prisma.client.account.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.code && { code: data.code }),
+        ...(data.category && { category: data.category }),
+        ...(data.subtype && { subtype: data.subtype })
+      }
+    });
+
+    return {
+      ...updatedAccount,
+      warning
+    };
+  }
+
+  async deleteAccount(id: string) {
+    const account = await this.prisma.client.account.findUnique({
+      where: { id },
+      include: {
+        lines: true
+      }
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    if (account.isSystem) {
+      throw new BadRequestException('Cannot delete system accounts');
+    }
+
+    // Check if account has journal entries
+    const hasJournalEntries = account.lines.length > 0;
+    let warning: string | null = null;
+
+    if (hasJournalEntries) {
+      warning = 'This account has journal entries. Deactivating it will prevent future transactions but historical data will remain.';
+    }
+
+    const updatedAccount = await this.prisma.client.account.update({
+      where: { id },
+      data: {
+        isActive: false
+      }
+    });
+
+    return {
+      ...updatedAccount,
+      warning
+    };
+  }
+
+  async getAccountLedger(id: string, page: number = 1, limit: number = 50) {
+    const account = await this.prisma.client.account.findUnique({
+      where: { id }
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    const skip = (page - 1) * limit;
+
+    const lines = await this.prisma.client.journalEntryLine.findMany({
+      where: {
+        accountId: id,
+        journalEntry: {
+          status: 'POSTED'
+        }
+      },
+      include: {
+        journalEntry: true
+      },
+      orderBy: {
+        journalEntry: {
+          date: 'asc'
+        }
+      },
+      skip,
+      take: limit
+    });
+
+    const total = await this.prisma.client.journalEntryLine.count({
+      where: {
+        accountId: id,
+        journalEntry: {
+          status: 'POSTED'
+        }
+      }
+    });
+
+    // Calculate running balance
+    let runningBalance = Number(account.openingBalance) || 0;
+    const isDebitAccount = ['ASSET', 'EXPENSE'].includes(account.category) || account.subtype === 'DRAWINGS';
+
+    const ledgerWithBalance = lines.map(line => {
+      const debit = Number(line.debit) || 0;
+      const credit = Number(line.credit) || 0;
+
+      if (isDebitAccount) {
+        runningBalance += debit - credit;
+      } else {
+        runningBalance += credit - debit;
+      }
+
+      return {
+        id: line.id,
+        date: line.journalEntry.date,
+        entryNo: line.journalEntry.entryNo,
+        description: line.journalEntry.description,
+        debit,
+        credit,
+        balance: runningBalance
+      };
+    });
+
+    return {
+      account: {
+        id: account.id,
+        code: account.code,
+        name: account.name,
+        category: account.category,
+        subtype: account.subtype,
+        openingBalance: Number(account.openingBalance)
+      },
+      ledger: ledgerWithBalance,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
+
+  async getAccountBalance(accountId: string): Promise<number> {
+    const account = await this.prisma.client.account.findUnique({
+      where: { id: accountId },
+      include: {
+        lines: {
+          where: {
+            journalEntry: {
+              status: 'POSTED'
+            }
+          }
+        }
+      }
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    let balance = Number(account.openingBalance) || 0;
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    account.lines.forEach(line => {
+      totalDebit += Number(line.debit) || 0;
+      totalCredit += Number(line.credit) || 0;
+    });
+
+    if (['ASSET', 'EXPENSE'].includes(account.category) || account.subtype === 'DRAWINGS') {
+      balance += totalDebit - totalCredit;
+    } else {
+      balance += totalCredit - totalDebit;
+    }
+
+    return balance;
+  }
+
+  async recordCapitalContribution(data: {
+    destinationAccountId: string;
+    amount: number;
+    date: Date;
+    source?: string;
+    reference?: string;
+    notes?: string;
+  }) {
+    console.log("recordCapitalContribution called with:", JSON.stringify({
+      destinationAccountId: data.destinationAccountId,
+      amount: data.amount,
+      date: data.date.toISOString(),
+      source: data.source,
+      notes: data.notes
+    }));
+    return this.prisma.client.$transaction(async (tx) => {
+      console.log("Inside transaction for recordCapitalContribution");
+      const destinationAccount = await tx.account.findUnique({
+        where: { id: data.destinationAccountId }
+      });
+      console.log("Destination account found:", destinationAccount ? { id: destinationAccount.id, code: destinationAccount.code, category: destinationAccount.category, subtype: destinationAccount.subtype } : null);
+
+      if (!destinationAccount) {
+        throw new NotFoundException('Destination account not found');
+      }
+
+      if (destinationAccount.category !== 'ASSET') {
+        throw new BadRequestException('Destination account must be an asset account (Cash, Bank, or E-Wallet)');
+      }
+
+      if (!['CASH', 'BANK', 'EWALLET'].includes(destinationAccount.subtype)) {
+        throw new BadRequestException('Destination account must be Cash, Bank, or E-Wallet');
+      }
+
+      if (data.amount <= 0) {
+        throw new BadRequestException('Amount must be greater than 0');
+      }
+
+      const ownerCapitalAccount = await tx.account.findFirst({
+        where: { code: '3001' }
+      });
+      console.log("Owner Capital account found:", ownerCapitalAccount ? { id: ownerCapitalAccount.id, code: ownerCapitalAccount.code } : null);
+
+      if (!ownerCapitalAccount) {
+        throw new NotFoundException('Owner Capital account not found');
+      }
+
+      const entryNo = `JV-${Date.now()}`;
+      const description = data.source ? `Capital Contribution - ${data.source}` : 'Capital Contribution';
+
+      console.log("Creating journal entry:", { entryNo, description, date: data.date, destinationAccountId: data.destinationAccountId, ownerCapitalId: ownerCapitalAccount.id, amount: data.amount });
+
+      const journalEntry = await tx.journalEntry.create({
+        data: {
+          entryNo,
+          date: data.date,
+          description,
+          notes: data.notes,
+          status: 'POSTED',
+          lines: {
+            create: [
+              {
+                accountId: data.destinationAccountId,
+                debit: data.amount,
+                credit: 0
+              },
+              {
+                accountId: ownerCapitalAccount.id,
+                debit: 0,
+                credit: data.amount
+              }
+            ]
+          }
+        },
+        include: {
+          lines: true
+        }
+      });
+      console.log("Journal entry created with id:", journalEntry.id);
+
+      return journalEntry;
+    });
+  }
+
+  async recordOwnerWithdrawal(data: {
+    sourceAccountId: string;
+    amount: number;
+    date: Date;
+    reason?: string;
+    notes?: string;
+  }) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const sourceAccount = await tx.account.findUnique({
+        where: { id: data.sourceAccountId }
+      });
+
+      if (!sourceAccount) {
+        throw new NotFoundException('Source account not found');
+      }
+
+      if (sourceAccount.category !== 'ASSET') {
+        throw new BadRequestException('Source account must be an asset account (Cash, Bank, or E-Wallet)');
+      }
+
+      if (!['CASH', 'BANK', 'EWALLET'].includes(sourceAccount.subtype)) {
+        throw new BadRequestException('Source account must be Cash, Bank, or E-Wallet');
+      }
+
+      if (data.amount <= 0) {
+        throw new BadRequestException('Amount must be greater than 0');
+      }
+
+      const currentBalance = await this.getAccountBalanceForTx(tx, data.sourceAccountId);
+      if (currentBalance < data.amount) {
+        throw new BadRequestException(`Insufficient balance. Current balance: ${currentBalance}, Withdrawal amount: ${data.amount}`);
+      }
+
+      const ownerDrawingsAccount = await tx.account.findFirst({
+        where: { code: '3002' }
+      });
+
+      if (!ownerDrawingsAccount) {
+        throw new NotFoundException('Owner Drawings account not found');
+      }
+
+      const entryNo = `JV-${Date.now()}`;
+      const description = data.reason ? `Owner Withdrawal - ${data.reason}` : 'Owner Withdrawal';
+
+      const journalEntry = await tx.journalEntry.create({
+        data: {
+          entryNo,
+          date: data.date,
+          description,
+          notes: data.notes,
+          status: 'POSTED',
+          lines: {
+            create: [
+              {
+                accountId: ownerDrawingsAccount.id,
+                debit: data.amount,
+                credit: 0
+              },
+              {
+                accountId: data.sourceAccountId,
+                debit: 0,
+                credit: data.amount
+              }
+            ]
+          }
+        },
+        include: {
+          lines: true
+        }
+      });
+
+      return journalEntry;
+    });
+  }
+
+async recordInternalTransfer(data: {
+    fromAccountId: string;
+    toAccountId: string;
+    amount: number;
+    date: Date;
+    notes?: string;
+  }) {
+    return this.prisma.client.$transaction(async (tx) => {
+      if (data.fromAccountId === data.toAccountId) {
+        throw new BadRequestException('Source and destination accounts cannot be the same');
+      }
+
+      const fromAccount = await tx.account.findUnique({
+        where: { id: data.fromAccountId }
+      });
+
+      const toAccount = await tx.account.findUnique({
+        where: { id: data.toAccountId }
+      });
+
+      if (!fromAccount) {
+        throw new NotFoundException('Source account not found');
+      }
+
+      if (!toAccount) {
+        throw new NotFoundException('Destination account not found');
+      }
+
+      if (fromAccount.category !== 'ASSET' || toAccount.category !== 'ASSET') {
+        throw new BadRequestException('Both accounts must be asset accounts');
+      }
+
+      if (!['CASH', 'BANK', 'EWALLET'].includes(fromAccount.subtype) || !['CASH', 'BANK', 'EWALLET'].includes(toAccount.subtype)) {
+        throw new BadRequestException('Both accounts must be Cash, Bank, or E-Wallet');
+      }
+
+      if (data.amount <= 0) {
+        throw new BadRequestException('Amount must be greater than 0');
+      }
+
+      const currentBalance = await this.getAccountBalanceForTx(tx, data.fromAccountId);
+      if (currentBalance < data.amount) {
+        throw new BadRequestException(`Insufficient balance in source account. Current balance: ${currentBalance}, Transfer amount: ${data.amount}`);
+      }
+
+      const entryNo = `JV-${Date.now()}`;
+      const description = `Internal Transfer: ${fromAccount.name} to ${toAccount.name}`;
+
+      const journalEntry = await tx.journalEntry.create({
+        data: {
+          entryNo,
+          date: data.date,
+          description,
+          notes: data.notes,
+          status: 'POSTED',
+          lines: {
+            create: [
+              {
+                accountId: data.toAccountId,
+                debit: data.amount,
+                credit: 0
+              },
+              {
+                accountId: data.fromAccountId,
+                debit: 0,
+                credit: data.amount
+              }
+            ]
+          }
+        },
+        include: {
+          lines: true
+        }
+      });
+
+      return journalEntry;
+    });
+  }
+
+  private async getAccountBalanceForTx(tx: any, accountId: string): Promise<number> {
+    const account = await tx.account.findUnique({
+      where: { id: accountId },
+      include: {
+        lines: {
+          where: {
+            journalEntry: {
+              status: 'POSTED'
+            }
+          }
+        }
+      }
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    let balance = Number(account.openingBalance) || 0;
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    account.lines.forEach((line: any) => {
+      totalDebit += Number(line.debit) || 0;
+      totalCredit += Number(line.credit) || 0;
+    });
+
+    if (['ASSET', 'EXPENSE'].includes(account.category) || account.subtype === 'DRAWINGS') {
+      balance += totalDebit - totalCredit;
+    } else {
+      balance += totalCredit - totalDebit;
+    }
+
+    return balance;
   }
 }

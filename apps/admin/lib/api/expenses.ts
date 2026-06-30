@@ -7,6 +7,7 @@ export interface CreateExpensePayload {
   category: string;
   description?: string;
   branchId: string;
+  paymentAccountId: string;
 }
 
 export const createExpense = async (payload: CreateExpensePayload) => {

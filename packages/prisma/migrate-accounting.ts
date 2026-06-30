@@ -22,6 +22,8 @@ async function main() {
     { code: '1004', name: 'Accounts Receivable', category: AccountCategory.ASSET, subtype: AccountSubtype.AR, isSystem: true },
     { code: '2001', name: 'Accounts Payable', category: AccountCategory.LIABILITY, subtype: AccountSubtype.AP, isSystem: true },
     { code: '3001', name: 'Owner Capital', category: AccountCategory.EQUITY, subtype: AccountSubtype.EQUITY, isSystem: true },
+    { code: '3002', name: 'Owner Drawings', category: AccountCategory.EQUITY, subtype: AccountSubtype.DRAWINGS, isSystem: true },
+    { code: '3003', name: 'Retained Earnings', category: AccountCategory.EQUITY, subtype: AccountSubtype.EQUITY, isSystem: true },
     { code: '4001', name: 'Sales Revenue', category: AccountCategory.REVENUE, subtype: AccountSubtype.REVENUE, isSystem: true },
     { code: '5001', name: 'Cost of Goods Sold', category: AccountCategory.EXPENSE, subtype: AccountSubtype.COGS, isSystem: true },
     { code: '5002', name: 'Salary Expense', category: AccountCategory.EXPENSE, subtype: AccountSubtype.SALARY, isSystem: true },

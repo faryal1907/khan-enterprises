@@ -136,6 +136,7 @@ enum AccountSubtype {
   SALARY
   EXPENSE
   EQUITY
+  DRAWINGS
   REVENUE
   OTHER
 }
@@ -806,6 +807,7 @@ model JournalEntry {
   date        DateTime      @default(now())
   description String
   sourceRef   String?
+  notes       String?
   status      JournalStatus @default(POSTED)
   isManual    Boolean       @default(false)
 
