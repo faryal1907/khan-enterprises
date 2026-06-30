@@ -196,7 +196,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting";
+        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {

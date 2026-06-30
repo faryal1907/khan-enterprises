@@ -231,7 +231,7 @@ export default function BikeDetailPage() {
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Engine Capacity</p>
+                  <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Motor Power</p>
                   <p className="font-medium" style={{ color: theme.text.primary }}>{bike.model?.engineCapacity || "N/A"}</p>
                 </div>
                 <div>
@@ -243,7 +243,7 @@ export default function BikeDetailPage() {
                   <p className="font-medium" style={{ color: theme.text.primary }}>{bike.chassisNumber}</p>
                 </div>
                 <div>
-                  <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Engine Number</p>
+                  <p className="text-sm mb-1" style={{ color: theme.text.muted }}>Motor Number</p>
                   <p className="font-medium" style={{ color: theme.text.primary }}>{bike.engineNumber}</p>
                 </div>
               </div>

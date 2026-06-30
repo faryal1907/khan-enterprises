@@ -403,7 +403,7 @@ export default function EditBikePage() {
                   className="block text-sm font-medium mb-1"
                   style={{ color: theme.text.secondary }}
                 >
-                  Engine Number *
+                  Motor Number *
                 </label>
                 <input
                   type="text"

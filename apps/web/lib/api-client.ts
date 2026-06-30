@@ -73,12 +73,12 @@ api.interceptors.response.use(
 
         // Update cookies
         Cookies.set("accessToken", accessToken, {
-          expires: 7,
+          expires: 1,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         });
         Cookies.set("refreshToken", newRefreshToken, {
-          expires: 7,
+          expires: 30,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         });

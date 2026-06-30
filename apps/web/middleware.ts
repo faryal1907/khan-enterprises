@@ -23,11 +23,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // If trying to access protected path without token, redirect to login
+  // If trying to access protected path without token, allow if refresh token exists
   if (!token) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    const refreshToken = request.cookies.get("refreshToken");
+    if (!refreshToken) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return NextResponse.next();

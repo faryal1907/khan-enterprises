@@ -22,17 +22,17 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setAuth: (user, accessToken, refreshToken) => {
     Cookies.set("accessToken", accessToken, {
-      expires: 7,
+      expires: 1,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
     Cookies.set("refreshToken", refreshToken, {
-      expires: 7,
+      expires: 30,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
     Cookies.set("user", JSON.stringify(user), {
-      expires: 7,
+      expires: 30,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
@@ -42,12 +42,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setTokens: (accessToken, refreshToken) => {
     Cookies.set("accessToken", accessToken, {
-      expires: 7,
+      expires: 1,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
     Cookies.set("refreshToken", refreshToken, {
-      expires: 7,
+      expires: 30,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
@@ -77,7 +77,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         Cookies.remove("user");
       }
     } else if (token || userCookie) {
-      // Clear partial state
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken");
       Cookies.remove("user");

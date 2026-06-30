@@ -1,24 +1,63 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/auth-store";
+import axios from "axios";
 
-const WEB_ACCESS_TOKEN_COOKIE = "webAccessToken";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
-/**
- * Runs once on mount. Restores auth state from cookies to fix the
- * Zustand store resetting to null on every full page reload.
- */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
-  const { initializeAuth } = useAuthStore();
+  const [refreshing, setRefreshing] = useState(false);
+  const { initializeAuth, setTokens } = useAuthStore();
 
   useEffect(() => {
-    initializeAuth();
-    setHydrated(true);
-  }, []);
+    let cancelled = false;
 
-  // Don't render children until we know auth state — prevents flash of wrong content
-  if (!hydrated) {
+    const boot = async () => {
+      initializeAuth();
+
+      const { accessToken, refreshToken } = useAuthStore.getState();
+
+      if (!accessToken && refreshToken) {
+        setRefreshing(true);
+        try {
+          const response = await axios.post(`${API_URL}/auth/refresh`, {
+            refreshToken,
+          });
+
+          const { accessToken: newAccess, refreshToken: newRefresh } = response.data;
+          if (!cancelled) {
+            setTokens(newAccess, newRefresh);
+          }
+        } catch {
+          if (!cancelled) {
+            useAuthStore.getState().logout();
+            if (typeof window !== "undefined") {
+              window.location.href = "/login";
+            }
+          }
+        } finally {
+          if (!cancelled) {
+            setRefreshing(false);
+            setHydrated(true);
+          }
+        }
+        return;
+      }
+
+      if (!cancelled) {
+        setHydrated(true);
+      }
+    };
+
+    boot();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initializeAuth, setTokens]);
+
+  if (!hydrated || refreshing) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500 text-sm">Loading...</div>

@@ -165,7 +165,7 @@ export default function NewBikeModelPage() {
                   className="block text-sm font-medium mb-1"
                   style={{ color: theme.text.secondary }}
                 >
-                  Engine Capacity
+                  Motor Power
                 </label>
                 <input
                   type="text"
