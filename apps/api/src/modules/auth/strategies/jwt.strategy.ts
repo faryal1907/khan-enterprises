@@ -32,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user || user.status !== "ACTIVE") {
-      throw new UnauthorizedException("Account is inactive or does not exist.");
+      throw new UnauthorizedException("Unauthorized");
     }
 
     return user; // becomes request.user

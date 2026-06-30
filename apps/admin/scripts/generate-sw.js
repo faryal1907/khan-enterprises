@@ -1,13 +1,27 @@
+const fs = require('fs');
+const path = require('path');
+
+// Firebase config - these are public values safe to expose
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyC46MqMT83z35W-uT-F6vhithriQwzeTJk',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'khan-enterprises-b39cb.firebaseapp.com',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'khan-enterprises-b39cb',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'khan-enterprises-b39cb.firebasestorage.app',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1031513194816',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1031513194816:web:1fbf1023d26a838c18faa5',
+};
+
+const swContent = `
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyC46MqMT83z35W-uT-F6vhithriQwzeTJk',
-  authDomain: 'khan-enterprises-b39cb.firebaseapp.com',
-  projectId: 'khan-enterprises-b39cb',
-  storageBucket: 'khan-enterprises-b39cb.firebasestorage.app',
-  messagingSenderId: '1031513194816',
-  appId: '1:1031513194816:web:1fbf1023d26a838c18faa5',
+  apiKey: '${firebaseConfig.apiKey}',
+  authDomain: '${firebaseConfig.authDomain}',
+  projectId: '${firebaseConfig.projectId}',
+  storageBucket: '${firebaseConfig.storageBucket}',
+  messagingSenderId: '${firebaseConfig.messagingSenderId}',
+  appId: '${firebaseConfig.appId}',
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -45,3 +59,10 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+`;
+
+const publicDir = path.join(__dirname, '..', 'public');
+const swPath = path.join(publicDir, 'firebase-messaging-sw.js');
+
+fs.writeFileSync(swPath, swContent.trim());
+console.log('Firebase service worker generated successfully');

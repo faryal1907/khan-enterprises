@@ -2,8 +2,9 @@ import { config } from "dotenv";
 import { resolve } from "path";
 
 // Load root .env when Nest runs from apps/api (monorepo layout)
-config({ path: resolve(process.cwd(), ".env") });
-config({ path: resolve(process.cwd(), "../../.env") });
+// Use override: true to ensure root .env takes precedence
+config({ path: resolve(process.cwd(), ".env"), override: false });
+config({ path: resolve(process.cwd(), "../../.env"), override: true });
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";

@@ -609,9 +609,12 @@ export class AuthService {
   ) {
     const payload: JwtPayload = { sub: userId, email, role, branchId, vendorId };
 
+    const jwtExpire = process.env.JWT_EXPIRE ?? "15m";
+    console.log('JWT_EXPIRE env var:', process.env.JWT_EXPIRE, 'Using:', jwtExpire);
+    
     const accessToken = this.jwt.sign(payload as object, {
       secret: process.env.JWT_SECRET,
-      expiresIn: this.parseDurationSeconds(process.env.JWT_EXPIRE ?? "15m"),
+      expiresIn: this.parseDurationSeconds(jwtExpire),
     });
 
     // Generate a cryptographically random refresh token

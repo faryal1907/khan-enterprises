@@ -54,10 +54,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.logger.warn(`[${request.method}] ${request.url} - ${status}`);
     }
 
-    response.status(status).json({
-      timestamp: new Date().toISOString(),
-      path: request.url,
-      ...(typeof errorResponse === 'object' ? errorResponse : { message: errorResponse }),
-    });
+    if (status === HttpStatus.UNAUTHORIZED) {
+      response.status(status).json(
+        typeof errorResponse === 'object' ? errorResponse : { message: errorResponse }
+      );
+    } else {
+      response.status(status).json({
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        ...(typeof errorResponse === 'object' ? errorResponse : { message: errorResponse }),
+      });
+    }
   }
 }

@@ -15,18 +15,9 @@ export const usePushNotifications = () => {
   useEffect(() => {
     // Only run on client side
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-      // Register service worker with config in URL params
-      const configParams = new URLSearchParams({
-        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
-        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
-        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
-        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
-        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
-      });
-
+      // Register service worker (config is now embedded in the file)
       navigator.serviceWorker
-        .register(`/firebase-messaging-sw.js?${configParams.toString()}`)
+        .register("/firebase-messaging-sw.js")
         .then(() => {
           console.log("Service Worker registered successfully.");
         })

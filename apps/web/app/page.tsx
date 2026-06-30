@@ -509,7 +509,7 @@ export default function Home() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782035704/evee-logo_round-500x494_ygddkv.png"
+                src="https://res.cloudinary.com/dubgzbyz0/image/upload/v1782656565/three-bikes_zjwjun.png"
                 alt="EVEE Logo"
                 className="w-32 h-32 object-contain shrink-0"
               />
