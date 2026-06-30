@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class VerifyPaymentDto {
   @IsNotEmpty()
@@ -7,5 +7,7 @@ export class VerifyPaymentDto {
   @IsNotEmpty()
   isApproved: boolean;
 
+  @IsOptional()
+  @IsString()
   reason?: string;
 }

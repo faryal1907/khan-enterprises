@@ -37,6 +37,7 @@ export type PartPaymentTransactionSumAggregateOutputType = {
 export type PartPaymentTransactionMinAggregateOutputType = {
   id: string | null
   partOrderId: string | null
+  accountId: string | null
   gatewayReference: string | null
   idempotencyKey: string | null
   amount: runtime.Decimal | null
@@ -54,6 +55,7 @@ export type PartPaymentTransactionMinAggregateOutputType = {
 export type PartPaymentTransactionMaxAggregateOutputType = {
   id: string | null
   partOrderId: string | null
+  accountId: string | null
   gatewayReference: string | null
   idempotencyKey: string | null
   amount: runtime.Decimal | null
@@ -71,6 +73,7 @@ export type PartPaymentTransactionMaxAggregateOutputType = {
 export type PartPaymentTransactionCountAggregateOutputType = {
   id: number
   partOrderId: number
+  accountId: number
   gatewayReference: number
   idempotencyKey: number
   amount: number
@@ -99,6 +102,7 @@ export type PartPaymentTransactionSumAggregateInputType = {
 export type PartPaymentTransactionMinAggregateInputType = {
   id?: true
   partOrderId?: true
+  accountId?: true
   gatewayReference?: true
   idempotencyKey?: true
   amount?: true
@@ -116,6 +120,7 @@ export type PartPaymentTransactionMinAggregateInputType = {
 export type PartPaymentTransactionMaxAggregateInputType = {
   id?: true
   partOrderId?: true
+  accountId?: true
   gatewayReference?: true
   idempotencyKey?: true
   amount?: true
@@ -133,6 +138,7 @@ export type PartPaymentTransactionMaxAggregateInputType = {
 export type PartPaymentTransactionCountAggregateInputType = {
   id?: true
   partOrderId?: true
+  accountId?: true
   gatewayReference?: true
   idempotencyKey?: true
   amount?: true
@@ -237,7 +243,8 @@ export type PartPaymentTransactionGroupByArgs<ExtArgs extends runtime.Types.Exte
 
 export type PartPaymentTransactionGroupByOutputType = {
   id: string
-  partOrderId: string
+  partOrderId: string | null
+  accountId: string | null
   gatewayReference: string | null
   idempotencyKey: string | null
   amount: runtime.Decimal
@@ -278,7 +285,8 @@ export type PartPaymentTransactionWhereInput = {
   OR?: Prisma.PartPaymentTransactionWhereInput[]
   NOT?: Prisma.PartPaymentTransactionWhereInput | Prisma.PartPaymentTransactionWhereInput[]
   id?: Prisma.StringFilter<"PartPaymentTransaction"> | string
-  partOrderId?: Prisma.StringFilter<"PartPaymentTransaction"> | string
+  partOrderId?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  accountId?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   gatewayReference?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   idempotencyKey?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   amount?: Prisma.DecimalFilter<"PartPaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -292,12 +300,15 @@ export type PartPaymentTransactionWhereInput = {
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
-  partOrder?: Prisma.XOR<Prisma.PartOrderScalarRelationFilter, Prisma.PartOrderWhereInput>
+  partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  allocations?: Prisma.PaymentAllocationListRelationFilter
 }
 
 export type PartPaymentTransactionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  partOrderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   gatewayReference?: Prisma.SortOrderInput | Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
@@ -312,6 +323,8 @@ export type PartPaymentTransactionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   partOrder?: Prisma.PartOrderOrderByWithRelationInput
+  account?: Prisma.AccountOrderByWithRelationInput
+  allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput
 }
 
 export type PartPaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
@@ -321,7 +334,8 @@ export type PartPaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PartPaymentTransactionWhereInput | Prisma.PartPaymentTransactionWhereInput[]
   OR?: Prisma.PartPaymentTransactionWhereInput[]
   NOT?: Prisma.PartPaymentTransactionWhereInput | Prisma.PartPaymentTransactionWhereInput[]
-  partOrderId?: Prisma.StringFilter<"PartPaymentTransaction"> | string
+  partOrderId?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  accountId?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   amount?: Prisma.DecimalFilter<"PartPaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPaymentMethodFilter<"PartPaymentTransaction"> | $Enums.PaymentMethod
   status?: Prisma.EnumPaymentStatusFilter<"PartPaymentTransaction"> | $Enums.PaymentStatus
@@ -333,12 +347,15 @@ export type PartPaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PartPaymentTransaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
-  partOrder?: Prisma.XOR<Prisma.PartOrderScalarRelationFilter, Prisma.PartOrderWhereInput>
+  partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  allocations?: Prisma.PaymentAllocationListRelationFilter
 }, "id" | "gatewayReference" | "idempotencyKey">
 
 export type PartPaymentTransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  partOrderId?: Prisma.SortOrder
+  partOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   gatewayReference?: Prisma.SortOrderInput | Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
@@ -364,7 +381,8 @@ export type PartPaymentTransactionScalarWhereWithAggregatesInput = {
   OR?: Prisma.PartPaymentTransactionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PartPaymentTransactionScalarWhereWithAggregatesInput | Prisma.PartPaymentTransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PartPaymentTransaction"> | string
-  partOrderId?: Prisma.StringWithAggregatesFilter<"PartPaymentTransaction"> | string
+  partOrderId?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
+  accountId?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
   gatewayReference?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
   idempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"PartPaymentTransaction"> | string | null
   amount?: Prisma.DecimalWithAggregatesFilter<"PartPaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -395,12 +413,15 @@ export type PartPaymentTransactionCreateInput = {
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  partOrder: Prisma.PartOrderCreateNestedOneWithoutTransactionsInput
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutTransactionsInput
+  account?: Prisma.AccountCreateNestedOneWithoutPartPaymentTransactionsInput
+  allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartPaymentTransactionInput
 }
 
 export type PartPaymentTransactionUncheckedCreateInput = {
   id?: string
-  partOrderId: string
+  partOrderId?: string | null
+  accountId?: string | null
   gatewayReference?: string | null
   idempotencyKey?: string | null
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -414,6 +435,7 @@ export type PartPaymentTransactionUncheckedCreateInput = {
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartPaymentTransactionInput
 }
 
 export type PartPaymentTransactionUpdateInput = {
@@ -431,12 +453,15 @@ export type PartPaymentTransactionUpdateInput = {
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  partOrder?: Prisma.PartOrderUpdateOneRequiredWithoutTransactionsNestedInput
+  partOrder?: Prisma.PartOrderUpdateOneWithoutTransactionsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutPartPaymentTransactionsNestedInput
+  allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartPaymentTransactionNestedInput
 }
 
 export type PartPaymentTransactionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  partOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -450,11 +475,13 @@ export type PartPaymentTransactionUncheckedUpdateInput = {
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartPaymentTransactionNestedInput
 }
 
 export type PartPaymentTransactionCreateManyInput = {
   id?: string
-  partOrderId: string
+  partOrderId?: string | null
+  accountId?: string | null
   gatewayReference?: string | null
   idempotencyKey?: string | null
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -489,7 +516,8 @@ export type PartPaymentTransactionUpdateManyMutationInput = {
 
 export type PartPaymentTransactionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  partOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -518,6 +546,7 @@ export type PartPaymentTransactionOrderByRelationAggregateInput = {
 export type PartPaymentTransactionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   partOrderId?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
   gatewayReference?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   amount?: Prisma.SortOrder
@@ -540,6 +569,7 @@ export type PartPaymentTransactionAvgOrderByAggregateInput = {
 export type PartPaymentTransactionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   partOrderId?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
   gatewayReference?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   amount?: Prisma.SortOrder
@@ -557,6 +587,7 @@ export type PartPaymentTransactionMaxOrderByAggregateInput = {
 export type PartPaymentTransactionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   partOrderId?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
   gatewayReference?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   amount?: Prisma.SortOrder
@@ -573,6 +604,11 @@ export type PartPaymentTransactionMinOrderByAggregateInput = {
 
 export type PartPaymentTransactionSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+}
+
+export type PartPaymentTransactionNullableScalarRelationFilter = {
+  is?: Prisma.PartPaymentTransactionWhereInput | null
+  isNot?: Prisma.PartPaymentTransactionWhereInput | null
 }
 
 export type PartPaymentTransactionCreateNestedManyWithoutPartOrderInput = {
@@ -617,6 +653,64 @@ export type PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput
   deleteMany?: Prisma.PartPaymentTransactionScalarWhereInput | Prisma.PartPaymentTransactionScalarWhereInput[]
 }
 
+export type PartPaymentTransactionCreateNestedManyWithoutAccountInput = {
+  create?: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PartPaymentTransactionCreateWithoutAccountInput[] | Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput[]
+  createMany?: Prisma.PartPaymentTransactionCreateManyAccountInputEnvelope
+  connect?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+}
+
+export type PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput = {
+  create?: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PartPaymentTransactionCreateWithoutAccountInput[] | Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput[]
+  createMany?: Prisma.PartPaymentTransactionCreateManyAccountInputEnvelope
+  connect?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+}
+
+export type PartPaymentTransactionUpdateManyWithoutAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PartPaymentTransactionCreateWithoutAccountInput[] | Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput[]
+  upsert?: Prisma.PartPaymentTransactionUpsertWithWhereUniqueWithoutAccountInput | Prisma.PartPaymentTransactionUpsertWithWhereUniqueWithoutAccountInput[]
+  createMany?: Prisma.PartPaymentTransactionCreateManyAccountInputEnvelope
+  set?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  disconnect?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  delete?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  connect?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  update?: Prisma.PartPaymentTransactionUpdateWithWhereUniqueWithoutAccountInput | Prisma.PartPaymentTransactionUpdateWithWhereUniqueWithoutAccountInput[]
+  updateMany?: Prisma.PartPaymentTransactionUpdateManyWithWhereWithoutAccountInput | Prisma.PartPaymentTransactionUpdateManyWithWhereWithoutAccountInput[]
+  deleteMany?: Prisma.PartPaymentTransactionScalarWhereInput | Prisma.PartPaymentTransactionScalarWhereInput[]
+}
+
+export type PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput> | Prisma.PartPaymentTransactionCreateWithoutAccountInput[] | Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput | Prisma.PartPaymentTransactionCreateOrConnectWithoutAccountInput[]
+  upsert?: Prisma.PartPaymentTransactionUpsertWithWhereUniqueWithoutAccountInput | Prisma.PartPaymentTransactionUpsertWithWhereUniqueWithoutAccountInput[]
+  createMany?: Prisma.PartPaymentTransactionCreateManyAccountInputEnvelope
+  set?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  disconnect?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  delete?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  connect?: Prisma.PartPaymentTransactionWhereUniqueInput | Prisma.PartPaymentTransactionWhereUniqueInput[]
+  update?: Prisma.PartPaymentTransactionUpdateWithWhereUniqueWithoutAccountInput | Prisma.PartPaymentTransactionUpdateWithWhereUniqueWithoutAccountInput[]
+  updateMany?: Prisma.PartPaymentTransactionUpdateManyWithWhereWithoutAccountInput | Prisma.PartPaymentTransactionUpdateManyWithWhereWithoutAccountInput[]
+  deleteMany?: Prisma.PartPaymentTransactionScalarWhereInput | Prisma.PartPaymentTransactionScalarWhereInput[]
+}
+
+export type PartPaymentTransactionCreateNestedOneWithoutAllocationsInput = {
+  create?: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAllocationsInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAllocationsInput>
+  connectOrCreate?: Prisma.PartPaymentTransactionCreateOrConnectWithoutAllocationsInput
+  connect?: Prisma.PartPaymentTransactionWhereUniqueInput
+}
+
+export type PartPaymentTransactionUpdateOneWithoutAllocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAllocationsInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAllocationsInput>
+  connectOrCreate?: Prisma.PartPaymentTransactionCreateOrConnectWithoutAllocationsInput
+  upsert?: Prisma.PartPaymentTransactionUpsertWithoutAllocationsInput
+  disconnect?: Prisma.PartPaymentTransactionWhereInput | boolean
+  delete?: Prisma.PartPaymentTransactionWhereInput | boolean
+  connect?: Prisma.PartPaymentTransactionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartPaymentTransactionUpdateToOneWithWhereWithoutAllocationsInput, Prisma.PartPaymentTransactionUpdateWithoutAllocationsInput>, Prisma.PartPaymentTransactionUncheckedUpdateWithoutAllocationsInput>
+}
+
 export type PartPaymentTransactionCreateWithoutPartOrderInput = {
   id?: string
   gatewayReference?: string | null
@@ -632,10 +726,13 @@ export type PartPaymentTransactionCreateWithoutPartOrderInput = {
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  account?: Prisma.AccountCreateNestedOneWithoutPartPaymentTransactionsInput
+  allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartPaymentTransactionInput
 }
 
 export type PartPaymentTransactionUncheckedCreateWithoutPartOrderInput = {
   id?: string
+  accountId?: string | null
   gatewayReference?: string | null
   idempotencyKey?: string | null
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -649,6 +746,7 @@ export type PartPaymentTransactionUncheckedCreateWithoutPartOrderInput = {
   webhookReceivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartPaymentTransactionInput
 }
 
 export type PartPaymentTransactionCreateOrConnectWithoutPartOrderInput = {
@@ -682,7 +780,8 @@ export type PartPaymentTransactionScalarWhereInput = {
   OR?: Prisma.PartPaymentTransactionScalarWhereInput[]
   NOT?: Prisma.PartPaymentTransactionScalarWhereInput | Prisma.PartPaymentTransactionScalarWhereInput[]
   id?: Prisma.StringFilter<"PartPaymentTransaction"> | string
-  partOrderId?: Prisma.StringFilter<"PartPaymentTransaction"> | string
+  partOrderId?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
+  accountId?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   gatewayReference?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   idempotencyKey?: Prisma.StringNullableFilter<"PartPaymentTransaction"> | string | null
   amount?: Prisma.DecimalFilter<"PartPaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -698,8 +797,165 @@ export type PartPaymentTransactionScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PartPaymentTransaction"> | Date | string
 }
 
+export type PartPaymentTransactionCreateWithoutAccountInput = {
+  id?: string
+  gatewayReference?: string | null
+  idempotencyKey?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  status?: $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutTransactionsInput
+  allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartPaymentTransactionInput
+}
+
+export type PartPaymentTransactionUncheckedCreateWithoutAccountInput = {
+  id?: string
+  partOrderId?: string | null
+  gatewayReference?: string | null
+  idempotencyKey?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  status?: $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartPaymentTransactionInput
+}
+
+export type PartPaymentTransactionCreateOrConnectWithoutAccountInput = {
+  where: Prisma.PartPaymentTransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput>
+}
+
+export type PartPaymentTransactionCreateManyAccountInputEnvelope = {
+  data: Prisma.PartPaymentTransactionCreateManyAccountInput | Prisma.PartPaymentTransactionCreateManyAccountInput[]
+  skipDuplicates?: boolean
+}
+
+export type PartPaymentTransactionUpsertWithWhereUniqueWithoutAccountInput = {
+  where: Prisma.PartPaymentTransactionWhereUniqueInput
+  update: Prisma.XOR<Prisma.PartPaymentTransactionUpdateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedUpdateWithoutAccountInput>
+  create: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAccountInput>
+}
+
+export type PartPaymentTransactionUpdateWithWhereUniqueWithoutAccountInput = {
+  where: Prisma.PartPaymentTransactionWhereUniqueInput
+  data: Prisma.XOR<Prisma.PartPaymentTransactionUpdateWithoutAccountInput, Prisma.PartPaymentTransactionUncheckedUpdateWithoutAccountInput>
+}
+
+export type PartPaymentTransactionUpdateManyWithWhereWithoutAccountInput = {
+  where: Prisma.PartPaymentTransactionScalarWhereInput
+  data: Prisma.XOR<Prisma.PartPaymentTransactionUpdateManyMutationInput, Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountInput>
+}
+
+export type PartPaymentTransactionCreateWithoutAllocationsInput = {
+  id?: string
+  gatewayReference?: string | null
+  idempotencyKey?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  status?: $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  partOrder?: Prisma.PartOrderCreateNestedOneWithoutTransactionsInput
+  account?: Prisma.AccountCreateNestedOneWithoutPartPaymentTransactionsInput
+}
+
+export type PartPaymentTransactionUncheckedCreateWithoutAllocationsInput = {
+  id?: string
+  partOrderId?: string | null
+  accountId?: string | null
+  gatewayReference?: string | null
+  idempotencyKey?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  status?: $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PartPaymentTransactionCreateOrConnectWithoutAllocationsInput = {
+  where: Prisma.PartPaymentTransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAllocationsInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAllocationsInput>
+}
+
+export type PartPaymentTransactionUpsertWithoutAllocationsInput = {
+  update: Prisma.XOR<Prisma.PartPaymentTransactionUpdateWithoutAllocationsInput, Prisma.PartPaymentTransactionUncheckedUpdateWithoutAllocationsInput>
+  create: Prisma.XOR<Prisma.PartPaymentTransactionCreateWithoutAllocationsInput, Prisma.PartPaymentTransactionUncheckedCreateWithoutAllocationsInput>
+  where?: Prisma.PartPaymentTransactionWhereInput
+}
+
+export type PartPaymentTransactionUpdateToOneWithWhereWithoutAllocationsInput = {
+  where?: Prisma.PartPaymentTransactionWhereInput
+  data: Prisma.XOR<Prisma.PartPaymentTransactionUpdateWithoutAllocationsInput, Prisma.PartPaymentTransactionUncheckedUpdateWithoutAllocationsInput>
+}
+
+export type PartPaymentTransactionUpdateWithoutAllocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partOrder?: Prisma.PartOrderUpdateOneWithoutTransactionsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutPartPaymentTransactionsNestedInput
+}
+
+export type PartPaymentTransactionUncheckedUpdateWithoutAllocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type PartPaymentTransactionCreateManyPartOrderInput = {
   id?: string
+  accountId?: string | null
   gatewayReference?: string | null
   idempotencyKey?: string | null
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -730,10 +986,32 @@ export type PartPaymentTransactionUpdateWithoutPartOrderInput = {
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  account?: Prisma.AccountUpdateOneWithoutPartPaymentTransactionsNestedInput
+  allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartPaymentTransactionNestedInput
 }
 
 export type PartPaymentTransactionUncheckedUpdateWithoutPartOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartPaymentTransactionNestedInput
+}
+
+export type PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -749,7 +1027,25 @@ export type PartPaymentTransactionUncheckedUpdateWithoutPartOrderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderInput = {
+export type PartPaymentTransactionCreateManyAccountInput = {
+  id?: string
+  partOrderId?: string | null
+  gatewayReference?: string | null
+  idempotencyKey?: string | null
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  status?: $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: string | null
+  paymentProofUrl?: string | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type PartPaymentTransactionUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -764,13 +1060,82 @@ export type PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderInput = {
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partOrder?: Prisma.PartOrderUpdateOneWithoutTransactionsNestedInput
+  allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartPaymentTransactionNestedInput
 }
 
+export type PartPaymentTransactionUncheckedUpdateWithoutAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartPaymentTransactionNestedInput
+}
+
+export type PartPaymentTransactionUncheckedUpdateManyWithoutAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  partOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gatewayReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  status?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+  gatewayResponse?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type PartPaymentTransactionCountOutputType
+ */
+
+export type PartPaymentTransactionCountOutputType = {
+  allocations: number
+}
+
+export type PartPaymentTransactionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  allocations?: boolean | PartPaymentTransactionCountOutputTypeCountAllocationsArgs
+}
+
+/**
+ * PartPaymentTransactionCountOutputType without action
+ */
+export type PartPaymentTransactionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartPaymentTransactionCountOutputType
+   */
+  select?: Prisma.PartPaymentTransactionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PartPaymentTransactionCountOutputType without action
+ */
+export type PartPaymentTransactionCountOutputTypeCountAllocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentAllocationWhereInput
+}
 
 
 export type PartPaymentTransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   partOrderId?: boolean
+  accountId?: boolean
   gatewayReference?: boolean
   idempotencyKey?: boolean
   amount?: boolean
@@ -784,12 +1149,16 @@ export type PartPaymentTransactionSelect<ExtArgs extends runtime.Types.Extension
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
+  partOrder?: boolean | Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>
+  account?: boolean | Prisma.PartPaymentTransaction$accountArgs<ExtArgs>
+  allocations?: boolean | Prisma.PartPaymentTransaction$allocationsArgs<ExtArgs>
+  _count?: boolean | Prisma.PartPaymentTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partPaymentTransaction"]>
 
 export type PartPaymentTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   partOrderId?: boolean
+  accountId?: boolean
   gatewayReference?: boolean
   idempotencyKey?: boolean
   amount?: boolean
@@ -803,12 +1172,14 @@ export type PartPaymentTransactionSelectCreateManyAndReturn<ExtArgs extends runt
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
+  partOrder?: boolean | Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>
+  account?: boolean | Prisma.PartPaymentTransaction$accountArgs<ExtArgs>
 }, ExtArgs["result"]["partPaymentTransaction"]>
 
 export type PartPaymentTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   partOrderId?: boolean
+  accountId?: boolean
   gatewayReference?: boolean
   idempotencyKey?: boolean
   amount?: boolean
@@ -822,12 +1193,14 @@ export type PartPaymentTransactionSelectUpdateManyAndReturn<ExtArgs extends runt
   webhookReceivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
+  partOrder?: boolean | Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>
+  account?: boolean | Prisma.PartPaymentTransaction$accountArgs<ExtArgs>
 }, ExtArgs["result"]["partPaymentTransaction"]>
 
 export type PartPaymentTransactionSelectScalar = {
   id?: boolean
   partOrderId?: boolean
+  accountId?: boolean
   gatewayReference?: boolean
   idempotencyKey?: boolean
   amount?: boolean
@@ -843,25 +1216,33 @@ export type PartPaymentTransactionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PartPaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "partOrderId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "webhookReceivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partPaymentTransaction"]>
+export type PartPaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "partOrderId" | "accountId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "webhookReceivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partPaymentTransaction"]>
 export type PartPaymentTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
+  partOrder?: boolean | Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>
+  account?: boolean | Prisma.PartPaymentTransaction$accountArgs<ExtArgs>
+  allocations?: boolean | Prisma.PartPaymentTransaction$allocationsArgs<ExtArgs>
+  _count?: boolean | Prisma.PartPaymentTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartPaymentTransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
+  partOrder?: boolean | Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>
+  account?: boolean | Prisma.PartPaymentTransaction$accountArgs<ExtArgs>
 }
 export type PartPaymentTransactionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  partOrder?: boolean | Prisma.PartOrderDefaultArgs<ExtArgs>
+  partOrder?: boolean | Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>
+  account?: boolean | Prisma.PartPaymentTransaction$accountArgs<ExtArgs>
 }
 
 export type $PartPaymentTransactionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PartPaymentTransaction"
   objects: {
-    partOrder: Prisma.$PartOrderPayload<ExtArgs>
+    partOrder: Prisma.$PartOrderPayload<ExtArgs> | null
+    account: Prisma.$AccountPayload<ExtArgs> | null
+    allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    partOrderId: string
+    partOrderId: string | null
+    accountId: string | null
     gatewayReference: string | null
     idempotencyKey: string | null
     amount: runtime.Decimal
@@ -1269,7 +1650,9 @@ readonly fields: PartPaymentTransactionFieldRefs;
  */
 export interface Prisma__PartPaymentTransactionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  partOrder<T extends Prisma.PartOrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrderDefaultArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  partOrder<T extends Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartPaymentTransaction$partOrderArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  account<T extends Prisma.PartPaymentTransaction$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartPaymentTransaction$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  allocations<T extends Prisma.PartPaymentTransaction$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartPaymentTransaction$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1301,6 +1684,7 @@ export interface Prisma__PartPaymentTransactionClient<T, Null = never, ExtArgs e
 export interface PartPaymentTransactionFieldRefs {
   readonly id: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
   readonly partOrderId: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
+  readonly accountId: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
   readonly gatewayReference: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
   readonly idempotencyKey: Prisma.FieldRef<"PartPaymentTransaction", 'String'>
   readonly amount: Prisma.FieldRef<"PartPaymentTransaction", 'Decimal'>
@@ -1712,6 +2096,68 @@ export type PartPaymentTransactionDeleteManyArgs<ExtArgs extends runtime.Types.E
    * Limit how many PartPaymentTransactions to delete.
    */
   limit?: number
+}
+
+/**
+ * PartPaymentTransaction.partOrder
+ */
+export type PartPaymentTransaction$partOrderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartOrder
+   */
+  select?: Prisma.PartOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartOrder
+   */
+  omit?: Prisma.PartOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartOrderInclude<ExtArgs> | null
+  where?: Prisma.PartOrderWhereInput
+}
+
+/**
+ * PartPaymentTransaction.account
+ */
+export type PartPaymentTransaction$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Account
+   */
+  select?: Prisma.AccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Account
+   */
+  omit?: Prisma.AccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountInclude<ExtArgs> | null
+  where?: Prisma.AccountWhereInput
+}
+
+/**
+ * PartPaymentTransaction.allocations
+ */
+export type PartPaymentTransaction$allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentAllocation
+   */
+  select?: Prisma.PaymentAllocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentAllocation
+   */
+  omit?: Prisma.PaymentAllocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentAllocationInclude<ExtArgs> | null
+  where?: Prisma.PaymentAllocationWhereInput
+  orderBy?: Prisma.PaymentAllocationOrderByWithRelationInput | Prisma.PaymentAllocationOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentAllocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[]
 }
 
 /**

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExpenseCategory = exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
+exports.PaymentState = exports.PayableType = exports.POStatus = exports.JournalStatus = exports.AccountSubtype = exports.AccountCategory = exports.ExpenseCategory = exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
 exports.UserRole = {
     ADMIN: 'ADMIN',
     MANAGER: 'MANAGER',
@@ -13,6 +13,7 @@ exports.UserStatus = {
     SUSPENDED: 'SUSPENDED'
 };
 exports.BikeStatus = {
+    PENDING_SETUP: 'PENDING_SETUP',
     AVAILABLE: 'AVAILABLE',
     RESERVED: 'RESERVED',
     SOLD: 'SOLD',
@@ -85,5 +86,49 @@ exports.ExpenseCategory = {
     SALARY: 'SALARY',
     MARKETING: 'MARKETING',
     OTHER: 'OTHER'
+};
+exports.AccountCategory = {
+    ASSET: 'ASSET',
+    LIABILITY: 'LIABILITY',
+    EQUITY: 'EQUITY',
+    REVENUE: 'REVENUE',
+    EXPENSE: 'EXPENSE'
+};
+exports.AccountSubtype = {
+    CASH: 'CASH',
+    BANK: 'BANK',
+    EWALLET: 'EWALLET',
+    AR: 'AR',
+    AP: 'AP',
+    INVENTORY: 'INVENTORY',
+    COGS: 'COGS',
+    SALARY: 'SALARY',
+    EXPENSE: 'EXPENSE',
+    EQUITY: 'EQUITY',
+    REVENUE: 'REVENUE',
+    OTHER: 'OTHER'
+};
+exports.JournalStatus = {
+    POSTED: 'POSTED',
+    VOIDED: 'VOIDED',
+    DRAFT: 'DRAFT'
+};
+exports.POStatus = {
+    PENDING: 'PENDING',
+    RECEIVED: 'RECEIVED',
+    VOIDED: 'VOIDED'
+};
+exports.PayableType = {
+    SUPPLIER: 'SUPPLIER',
+    EXPENSE: 'EXPENSE',
+    SALARY: 'SALARY',
+    LOAN: 'LOAN',
+    OTHER: 'OTHER'
+};
+exports.PaymentState = {
+    DUE: 'DUE',
+    PARTIAL: 'PARTIAL',
+    PAID: 'PAID',
+    OVERDUE: 'OVERDUE'
 };
 //# sourceMappingURL=enums.js.map

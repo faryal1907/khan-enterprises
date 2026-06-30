@@ -24,12 +24,40 @@ export class ExpensesService {
       throw new NotFoundException('Branch not found');
     }
 
+    const { paymentAccountId, ...expenseData } = createExpenseDto;
+
     const expense = await this.prisma.client.expense.create({
       data: {
-        ...createExpenseDto,
+        ...expenseData,
         recordedById: user.id,
       },
     });
+
+    // Accounting Entry for the Expense
+    const isSalary = expenseData.category === 'SALARY';
+    const expenseAccountCode = isSalary ? '5002' : '5003';
+    
+    const expenseAccount = await this.prisma.client.account.findUnique({
+      where: { code: expenseAccountCode }
+    });
+
+    if (expenseAccount) {
+    await this.prisma.client.journalEntry.create({
+        data: {
+          entryNo: `JV-EXP-${expense.id}`,
+          date: new Date(expenseData.date),
+          description: expenseData.description || `Expense - ${expenseData.category}`,
+          sourceRef: expense.id,
+          status: 'POSTED',
+          lines: {
+            create: [
+              { accountId: expenseAccount.id, debit: expenseData.amount, credit: 0 },
+              { accountId: paymentAccountId, debit: 0, credit: expenseData.amount },
+            ]
+          }
+        }
+      });
+    }
 
     await this.auditLogsService.logAction(
       user.id,

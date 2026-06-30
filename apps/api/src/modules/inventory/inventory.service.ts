@@ -76,7 +76,7 @@ export class InventoryService {
     const summaryWhere = { ...where };
     delete summaryWhere.status;
 
-    const [bikes, total, statusStats] = await Promise.all([
+    const [bikes, total, available, reserved, sold, inDelivery, pendingSetup] = await Promise.all([
       this.prisma.client.bikeUnit.findMany({
         where,
         skip,
@@ -112,17 +112,12 @@ export class InventoryService {
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.client.bikeUnit.count({ where }),
-      this.prisma.client.bikeUnit.groupBy({
-        by: ['status'],
-        where: summaryWhere,
-        _count: { id: true },
-      }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.AVAILABLE } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.RESERVED } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.SOLD } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.IN_DELIVERY } }),
+      this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.PENDING_SETUP } }),
     ]);
-
-    const available = statusStats.find(s => s.status === BikeStatus.AVAILABLE)?._count.id ?? 0;
-    const reserved = statusStats.find(s => s.status === BikeStatus.RESERVED)?._count.id ?? 0;
-    const sold = statusStats.find(s => s.status === BikeStatus.SOLD)?._count.id ?? 0;
-    const inDelivery = statusStats.find(s => s.status === BikeStatus.IN_DELIVERY)?._count.id ?? 0;
 
     return {
       bikes,
@@ -133,11 +128,12 @@ export class InventoryService {
         totalPages: Math.ceil(total / pageSize),
       },
       summary: {
-        total: available + reserved + sold + inDelivery,
+        total: available + reserved + sold + inDelivery + pendingSetup,
         available,
         reserved,
         sold,
         inDelivery,
+        pendingSetup,
       },
     };
   }
@@ -230,6 +226,16 @@ export class InventoryService {
     const oldBike = await this.getBikeById(id, user);
 
     return this.prisma.client.$transaction(async (tx) => {
+      // Determine if status should transition from PENDING_SETUP to AVAILABLE
+      let newStatus = oldBike.status;
+      if (
+        oldBike.status === BikeStatus.PENDING_SETUP && 
+        dto.chassisNumber && !dto.chassisNumber.includes('PENDING') &&
+        dto.engineNumber && !dto.engineNumber.includes('PENDING')
+      ) {
+        newStatus = BikeStatus.AVAILABLE;
+      }
+
       const bike = await tx.bikeUnit.update({
         where: { id },
         data: {
@@ -238,6 +244,9 @@ export class InventoryService {
           color: dto.color,
           media: dto.media,
           onlineDiscountPercent: dto.onlineDiscountPercent,
+          chassisNumber: dto.chassisNumber,
+          engineNumber: dto.engineNumber,
+          status: newStatus,
         },
         include: {
           model: true,

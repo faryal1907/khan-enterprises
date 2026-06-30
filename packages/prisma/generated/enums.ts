@@ -29,6 +29,7 @@ export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
 
 
 export const BikeStatus = {
+  PENDING_SETUP: 'PENDING_SETUP',
   AVAILABLE: 'AVAILABLE',
   RESERVED: 'RESERVED',
   SOLD: 'SOLD',
@@ -144,3 +145,71 @@ export const ExpenseCategory = {
 } as const
 
 export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory]
+
+
+export const AccountCategory = {
+  ASSET: 'ASSET',
+  LIABILITY: 'LIABILITY',
+  EQUITY: 'EQUITY',
+  REVENUE: 'REVENUE',
+  EXPENSE: 'EXPENSE'
+} as const
+
+export type AccountCategory = (typeof AccountCategory)[keyof typeof AccountCategory]
+
+
+export const AccountSubtype = {
+  CASH: 'CASH',
+  BANK: 'BANK',
+  EWALLET: 'EWALLET',
+  AR: 'AR',
+  AP: 'AP',
+  INVENTORY: 'INVENTORY',
+  COGS: 'COGS',
+  SALARY: 'SALARY',
+  EXPENSE: 'EXPENSE',
+  EQUITY: 'EQUITY',
+  REVENUE: 'REVENUE',
+  OTHER: 'OTHER'
+} as const
+
+export type AccountSubtype = (typeof AccountSubtype)[keyof typeof AccountSubtype]
+
+
+export const JournalStatus = {
+  POSTED: 'POSTED',
+  VOIDED: 'VOIDED',
+  DRAFT: 'DRAFT'
+} as const
+
+export type JournalStatus = (typeof JournalStatus)[keyof typeof JournalStatus]
+
+
+export const POStatus = {
+  PENDING: 'PENDING',
+  RECEIVED: 'RECEIVED',
+  VOIDED: 'VOIDED'
+} as const
+
+export type POStatus = (typeof POStatus)[keyof typeof POStatus]
+
+
+export const PayableType = {
+  SUPPLIER: 'SUPPLIER',
+  EXPENSE: 'EXPENSE',
+  SALARY: 'SALARY',
+  LOAN: 'LOAN',
+  OTHER: 'OTHER'
+} as const
+
+export type PayableType = (typeof PayableType)[keyof typeof PayableType]
+
+
+export const PaymentState = {
+  DUE: 'DUE',
+  PARTIAL: 'PARTIAL',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE'
+} as const
+
+export type PaymentState = (typeof PaymentState)[keyof typeof PaymentState]

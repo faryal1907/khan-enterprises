@@ -21,7 +21,8 @@ import { OrderAlertsModule } from "./modules/order-alerts/order-alerts.module";
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { ExpensesModule } from "./modules/expenses/expenses.module";
 import { SettingsModule } from "./modules/settings/settings.module";
-import { EmailModule } from "./modules/email/email.module";
+import { AccountingModule } from "./modules/accounting/accounting.module";
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -48,6 +49,7 @@ import { EmailModule } from "./modules/email/email.module";
     FirebaseModule,
     ExpensesModule,
     SettingsModule,
+    AccountingModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,  // 1 minute

@@ -70,7 +70,14 @@ export const ModelName = {
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
   AuditLog: 'AuditLog',
-  SystemSetting: 'SystemSetting'
+  SystemSetting: 'SystemSetting',
+  Account: 'Account',
+  JournalEntry: 'JournalEntry',
+  JournalEntryLine: 'JournalEntryLine',
+  PurchaseOrder: 'PurchaseOrder',
+  PurchaseOrderItem: 'PurchaseOrderItem',
+  Payable: 'Payable',
+  PaymentAllocation: 'PaymentAllocation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -186,6 +193,7 @@ export const BikeUnitScalarFieldEnum = {
   serialNumber: 'serialNumber',
   status: 'status',
   price: 'price',
+  purchasePrice: 'purchasePrice',
   color: 'color',
   media: 'media',
   onlineDiscountPercent: 'onlineDiscountPercent',
@@ -260,6 +268,11 @@ export const OrderScalarFieldEnum = {
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   customerId: 'customerId',
+  totalAmount: 'totalAmount',
+  paidAmount: 'paidAmount',
+  balanceDue: 'balanceDue',
+  isInstallmentPlan: 'isInstallmentPlan',
+  paymentState: 'paymentState',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -300,6 +313,10 @@ export const PartOrderScalarFieldEnum = {
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   customerId: 'customerId',
+  paidAmount: 'paidAmount',
+  balanceDue: 'balanceDue',
+  isInstallmentPlan: 'isInstallmentPlan',
+  paymentState: 'paymentState',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -310,6 +327,7 @@ export type PartOrderScalarFieldEnum = (typeof PartOrderScalarFieldEnum)[keyof t
 export const PaymentTransactionScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
+  accountId: 'accountId',
   gatewayReference: 'gatewayReference',
   idempotencyKey: 'idempotencyKey',
   amount: 'amount',
@@ -331,6 +349,7 @@ export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalar
 export const PartPaymentTransactionScalarFieldEnum = {
   id: 'id',
   partOrderId: 'partOrderId',
+  accountId: 'accountId',
   gatewayReference: 'gatewayReference',
   idempotencyKey: 'idempotencyKey',
   amount: 'amount',
@@ -426,6 +445,101 @@ export const SystemSettingScalarFieldEnum = {
 } as const
 
 export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  category: 'category',
+  subtype: 'subtype',
+  accountNumber: 'accountNumber',
+  openingBalance: 'openingBalance',
+  isActive: 'isActive',
+  isSystem: 'isSystem'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const JournalEntryScalarFieldEnum = {
+  id: 'id',
+  entryNo: 'entryNo',
+  date: 'date',
+  description: 'description',
+  sourceRef: 'sourceRef',
+  status: 'status',
+  isManual: 'isManual'
+} as const
+
+export type JournalEntryScalarFieldEnum = (typeof JournalEntryScalarFieldEnum)[keyof typeof JournalEntryScalarFieldEnum]
+
+
+export const JournalEntryLineScalarFieldEnum = {
+  id: 'id',
+  journalEntryId: 'journalEntryId',
+  accountId: 'accountId',
+  debit: 'debit',
+  credit: 'credit'
+} as const
+
+export type JournalEntryLineScalarFieldEnum = (typeof JournalEntryLineScalarFieldEnum)[keyof typeof JournalEntryLineScalarFieldEnum]
+
+
+export const PurchaseOrderScalarFieldEnum = {
+  id: 'id',
+  poNumber: 'poNumber',
+  vendorId: 'vendorId',
+  type: 'type',
+  totalCost: 'totalCost',
+  status: 'status'
+} as const
+
+export type PurchaseOrderScalarFieldEnum = (typeof PurchaseOrderScalarFieldEnum)[keyof typeof PurchaseOrderScalarFieldEnum]
+
+
+export const PurchaseOrderItemScalarFieldEnum = {
+  id: 'id',
+  purchaseOrderId: 'purchaseOrderId',
+  modelId: 'modelId',
+  partId: 'partId',
+  branchId: 'branchId',
+  quantity: 'quantity',
+  purchasePrice: 'purchasePrice',
+  salePrice: 'salePrice'
+} as const
+
+export type PurchaseOrderItemScalarFieldEnum = (typeof PurchaseOrderItemScalarFieldEnum)[keyof typeof PurchaseOrderItemScalarFieldEnum]
+
+
+export const PayableScalarFieldEnum = {
+  id: 'id',
+  ref: 'ref',
+  type: 'type',
+  partyName: 'partyName',
+  description: 'description',
+  total: 'total',
+  paid: 'paid',
+  remaining: 'remaining',
+  dueDate: 'dueDate',
+  status: 'status',
+  poId: 'poId'
+} as const
+
+export type PayableScalarFieldEnum = (typeof PayableScalarFieldEnum)[keyof typeof PayableScalarFieldEnum]
+
+
+export const PaymentAllocationScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  orderId: 'orderId',
+  partOrderId: 'partOrderId',
+  payableId: 'payableId',
+  allocatedAmount: 'allocatedAmount',
+  partPaymentTransactionId: 'partPaymentTransactionId'
+} as const
+
+export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum]
 
 
 export const SortOrder = {

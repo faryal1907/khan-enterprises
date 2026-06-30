@@ -19,4 +19,8 @@ export class CreateExpenseDto {
   @IsString()
   @IsNotEmpty()
   branchId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  paymentAccountId: string;
 }

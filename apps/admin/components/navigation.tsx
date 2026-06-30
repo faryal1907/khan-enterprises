@@ -25,6 +25,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  BookOpen,
 } from "lucide-react";
 
 const navLinks = [
@@ -43,6 +44,7 @@ const operationLinks = [
 const adminLinks = [
   { href: "/transactions", label: "Transactions", icon: CreditCard },
   { href: "/audit-logs", label: "Audit Logs", icon: ClipboardList },
+  { href: "/accounts", label: "Accounts", icon: BookOpen },
   { href: "/users", label: "Users", icon: Users },
   { href: "/branches", label: "Branches", icon: Building2 },
 ];

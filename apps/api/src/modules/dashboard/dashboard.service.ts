@@ -41,19 +41,13 @@ export class DashboardService {
         : Promise.resolve(null),
       // Offers module removed - always return 0
       Promise.resolve(0),
-      this.prisma.client.paymentTransaction.aggregate({
-        where: {
-          status: PaymentStatus.SUCCESS,
-          order: branchId ? { branchId } : undefined,
-        },
-        _sum: { amount: true },
+      this.prisma.client.journalEntryLine.aggregate({
+        where: { account: { category: 'REVENUE' } },
+        _sum: { credit: true, debit: true },
       }),
-      this.prisma.client.partPaymentTransaction.aggregate({
-        where: {
-          status: PaymentStatus.SUCCESS,
-          partOrder: branchId ? { branchId } : undefined,
-        },
-        _sum: { amount: true },
+      this.prisma.client.journalEntryLine.aggregate({
+        where: { account: { category: 'EXPENSE' } },
+        _sum: { debit: true, credit: true },
       }),
       this.prisma.client.partInventory.aggregate({
         where: branchFilter,
@@ -126,8 +120,10 @@ export class DashboardService {
     const cancelledPartOrders = partOrderStatusStats.find(s => s.status === OrderStatus.CANCELLED)?._count.id ?? 0;
 
     const totalRevenue =
-      Number(bikePayments._sum.amount ?? 0) + Number(partPayments._sum.amount ?? 0);
-    const totalExpenses = Number(expensesAgg._sum.amount ?? 0);
+      Number(bikePayments._sum.credit ?? 0) - Number(bikePayments._sum.debit ?? 0);
+    const totalExpenses =
+      Number(partPayments._sum.debit ?? 0) - Number(partPayments._sum.credit ?? 0) +
+      Number(expensesAgg._sum.amount ?? 0); // Keep old expense fallback temporarily
     const totalProfit = totalRevenue - totalExpenses;
     const availableParts =
       (availablePartsAgg._sum.quantity ?? 0) -

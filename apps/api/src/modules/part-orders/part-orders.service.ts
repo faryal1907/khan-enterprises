@@ -6,8 +6,7 @@ import { QueryPartOrdersDto } from "./dto/query-part-orders.dto";
 import { RevenueQueryDto, RevenueDuration } from "../orders/dto/revenue-query.dto";
 import { OrderAlertsService } from "../order-alerts/order-alerts.service";
 import { AlertType } from "../order-alerts/dto/get-alerts.dto";
-import { OrderStatus, PaymentStatus, PaymentMethod, BikeStatus, AuditAction } from "@khan/prisma";
-
+import { OrderStatus, PaymentStatus, PaymentMethod, BikeStatus, AuditAction, AccountSubtype, JournalStatus, PaymentState } from "@khan/prisma";
 @Injectable()
 export class PartOrdersService {
   constructor(
@@ -157,7 +156,6 @@ export class PartOrdersService {
       });
 
       // Cash stays PENDING until picked up at store.
-      // Online with a proof URL → VERIFICATION_PENDING (awaiting admin review).
       const transaction = await tx.partPaymentTransaction.create({
         data: {
           partOrderId: partOrder.id,
@@ -169,6 +167,26 @@ export class PartOrdersService {
           paymentProofUrl: dto.paymentProofUrl || null,
         },
       });
+
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+
+      if (arAcc && revAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-SALE-${orderNumber}`,
+            description: `Part Sale registered for ${orderNumber}`,
+            sourceRef: orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: amount, credit: 0 },
+                { accountId: revAcc.id, debit: 0, credit: amount },
+              ]
+            }
+          }
+        });
+      }
 
       return {
         order: partOrder,
@@ -564,6 +582,45 @@ export class PartOrdersService {
 
       await this.restorePartOrderStock(tx, order);
 
+      // Reverse Accounting Entries
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+      
+      if (arAcc && revAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-REV-${order.orderNumber}`,
+            description: `Reversal of part sale for ${order.orderNumber}`,
+            sourceRef: order.orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: revAcc.id, debit: Number(order.amount), credit: 0 },
+                { accountId: arAcc.id, debit: 0, credit: Number(order.amount) },
+              ]
+            }
+          }
+        });
+      }
+
+      if (Number(order.paidAmount) > 0 && cashAcc && arAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-REVPAY-${order.orderNumber}`,
+            description: `Reversal of payment for ${order.orderNumber}`,
+            sourceRef: order.orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: Number(order.paidAmount), credit: 0 },
+                { accountId: cashAcc.id, debit: 0, credit: Number(order.paidAmount) },
+              ]
+            }
+          }
+        });
+      }
+
       await tx.auditLog.create({
         data: {
           userId: user.id,
@@ -658,7 +715,7 @@ export class PartOrdersService {
       });
 
       // 7. Create Payment Transaction
-      await tx.partPaymentTransaction.create({
+      const transaction = await tx.partPaymentTransaction.create({
         data: {
           partOrderId: partOrder.id,
           amount: dto.amount,
@@ -668,6 +725,46 @@ export class PartOrdersService {
           verifiedById: user.id,
         },
       });
+
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+      const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+      const paymentAcc = dto.paymentMethod === "CASH" ? cashAcc : bankAcc;
+      
+      if (arAcc && revAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-SALE-${orderNumber}`,
+            description: `Part Sale registered for ${orderNumber}`,
+            sourceRef: orderNumber,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: dto.amount, credit: 0 },
+                { accountId: revAcc.id, debit: 0, credit: dto.amount },
+              ]
+            }
+          }
+        });
+      }
+
+      if (paymentAcc && arAcc) {
+        await tx.journalEntry.create({
+          data: {
+            entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
+            description: `Payment received for part order ${orderNumber} via ${dto.paymentMethod}`,
+            sourceRef: transaction.id,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: paymentAcc.id, debit: dto.amount, credit: 0 },
+                { accountId: arAcc.id, debit: 0, credit: dto.amount },
+              ]
+            }
+          }
+        });
+      }
 
       await tx.auditLog.create({
         data: {
@@ -969,8 +1066,34 @@ export class PartOrdersService {
             status: OrderStatus.PAID,
             paymentVerified: true,
             processedById: user.id,
+            paidAmount: order.amount,
+            balanceDue: 0,
+            paymentState: PaymentState.PAID
           },
         });
+
+        const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+        const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        
+        const paymentAcc = transaction.method === "CASH" ? cashAcc : bankAcc;
+
+        if (paymentAcc && arAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
+              description: `Payment verified for part order ${order.orderNumber} via ${transaction.method}`,
+              sourceRef: transaction.id,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: paymentAcc.id, debit: Number(transaction.amount), credit: 0 },
+                  { accountId: arAcc.id, debit: 0, credit: Number(transaction.amount) },
+                ]
+              }
+            }
+          });
+        }
       } else {
         await tx.partOrder.update({
           where: { id: partOrderId },
@@ -979,6 +1102,27 @@ export class PartOrdersService {
             processedById: user.id,
           },
         });
+
+        // Reverse Sale JV
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+        
+        if (arAcc && revAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-REV-${order.orderNumber}`,
+              description: `Reversal of part sale for ${order.orderNumber} due to failed payment`,
+              sourceRef: order.orderNumber,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: revAcc.id, debit: Number(order.amount), credit: 0 },
+                  { accountId: arAcc.id, debit: 0, credit: Number(order.amount) },
+                ]
+              }
+            }
+          });
+        }
       }
 
       await tx.auditLog.create({
@@ -1077,8 +1221,37 @@ export class PartOrdersService {
             status: OrderStatus.PAID,
             paymentVerified: true,
             processedById: user.id,
+            paidAmount: order.amount,
+            balanceDue: 0,
+            paymentState: PaymentState.PAID
           },
         });
+      }
+
+      // Generate Journal Entry for Payment if successful
+      if (txStatus === PaymentStatus.SUCCESS) {
+        const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+        const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        
+        const paymentAcc = dto.method === "CASH" ? cashAcc : bankAcc;
+
+        if (paymentAcc && arAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
+              description: `Payment received for part order ${order.orderNumber} via ${dto.method}`,
+              sourceRef: transaction.id,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: paymentAcc.id, debit: dto.amount, credit: 0 },
+                  { accountId: arAcc.id, debit: 0, credit: dto.amount },
+                ]
+              }
+            }
+          });
+        }
       }
 
       await tx.auditLog.create({
