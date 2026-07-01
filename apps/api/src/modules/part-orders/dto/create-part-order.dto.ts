@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsDecimal, IsEnum, IsNotEmpty, IsOptional, Min } from 'class-validator';
+import { IsString, IsInt, IsEnum, IsNotEmpty, IsOptional, Min, IsNumber } from 'class-validator';
 import { PaymentMethod } from '@khan/prisma';
 
 export class CreatePartOrderDto {
@@ -33,4 +33,17 @@ export class CreatePartOrderDto {
   @IsOptional()
   @IsString()
   paymentProofUrl?: string;
+
+  /**
+   * Amount the customer will pay as advance (minimum 50% of online price).
+   * Only applicable for ONLINE_TRANSFER. If omitted, defaults to 50%.
+   */
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  initialPaymentAmount?: number;
+
+  @IsOptional()
+  @IsString()
+  paymentAccountId?: string;
 }

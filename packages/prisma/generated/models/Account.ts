@@ -251,6 +251,8 @@ export type AccountWhereInput = {
   lines?: Prisma.JournalEntryLineListRelationFilter
   payments?: Prisma.PaymentTransactionListRelationFilter
   partPaymentTransactions?: Prisma.PartPaymentTransactionListRelationFilter
+  orderPayments?: Prisma.OrderListRelationFilter
+  partOrderPayments?: Prisma.PartOrderListRelationFilter
 }
 
 export type AccountOrderByWithRelationInput = {
@@ -266,6 +268,8 @@ export type AccountOrderByWithRelationInput = {
   lines?: Prisma.JournalEntryLineOrderByRelationAggregateInput
   payments?: Prisma.PaymentTransactionOrderByRelationAggregateInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionOrderByRelationAggregateInput
+  orderPayments?: Prisma.OrderOrderByRelationAggregateInput
+  partOrderPayments?: Prisma.PartOrderOrderByRelationAggregateInput
 }
 
 export type AccountWhereUniqueInput = Prisma.AtLeast<{
@@ -284,6 +288,8 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   lines?: Prisma.JournalEntryLineListRelationFilter
   payments?: Prisma.PaymentTransactionListRelationFilter
   partPaymentTransactions?: Prisma.PartPaymentTransactionListRelationFilter
+  orderPayments?: Prisma.OrderListRelationFilter
+  partOrderPayments?: Prisma.PartOrderListRelationFilter
 }, "id" | "code">
 
 export type AccountOrderByWithAggregationInput = {
@@ -331,6 +337,8 @@ export type AccountCreateInput = {
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutAccountInput
   payments?: Prisma.PaymentTransactionCreateNestedManyWithoutAccountInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountUncheckedCreateInput = {
@@ -346,6 +354,8 @@ export type AccountUncheckedCreateInput = {
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutAccountInput
   payments?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountUpdateInput = {
@@ -361,6 +371,8 @@ export type AccountUpdateInput = {
   lines?: Prisma.JournalEntryLineUpdateManyWithoutAccountNestedInput
   payments?: Prisma.PaymentTransactionUpdateManyWithoutAccountNestedInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountUncheckedUpdateInput = {
@@ -376,6 +388,8 @@ export type AccountUncheckedUpdateInput = {
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutAccountNestedInput
   payments?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountCreateManyInput = {
@@ -468,6 +482,38 @@ export type AccountScalarRelationFilter = {
   isNot?: Prisma.AccountWhereInput
 }
 
+export type AccountCreateNestedOneWithoutOrderPaymentsInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutOrderPaymentsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutOrderPaymentsInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneWithoutOrderPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutOrderPaymentsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutOrderPaymentsInput
+  upsert?: Prisma.AccountUpsertWithoutOrderPaymentsInput
+  disconnect?: Prisma.AccountWhereInput | boolean
+  delete?: Prisma.AccountWhereInput | boolean
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutOrderPaymentsInput, Prisma.AccountUpdateWithoutOrderPaymentsInput>, Prisma.AccountUncheckedUpdateWithoutOrderPaymentsInput>
+}
+
+export type AccountCreateNestedOneWithoutPartOrderPaymentsInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutPartOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutPartOrderPaymentsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutPartOrderPaymentsInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneWithoutPartOrderPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutPartOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutPartOrderPaymentsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutPartOrderPaymentsInput
+  upsert?: Prisma.AccountUpsertWithoutPartOrderPaymentsInput
+  disconnect?: Prisma.AccountWhereInput | boolean
+  delete?: Prisma.AccountWhereInput | boolean
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutPartOrderPaymentsInput, Prisma.AccountUpdateWithoutPartOrderPaymentsInput>, Prisma.AccountUncheckedUpdateWithoutPartOrderPaymentsInput>
+}
+
 export type AccountCreateNestedOneWithoutPaymentsInput = {
   create?: Prisma.XOR<Prisma.AccountCreateWithoutPaymentsInput, Prisma.AccountUncheckedCreateWithoutPaymentsInput>
   connectOrCreate?: Prisma.AccountCreateOrConnectWithoutPaymentsInput
@@ -522,6 +568,166 @@ export type AccountUpdateOneRequiredWithoutLinesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutLinesInput, Prisma.AccountUpdateWithoutLinesInput>, Prisma.AccountUncheckedUpdateWithoutLinesInput>
 }
 
+export type AccountCreateWithoutOrderPaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  category: $Enums.AccountCategory
+  subtype: $Enums.AccountSubtype
+  accountNumber?: string | null
+  openingBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: boolean
+  isSystem?: boolean
+  lines?: Prisma.JournalEntryLineCreateNestedManyWithoutAccountInput
+  payments?: Prisma.PaymentTransactionCreateNestedManyWithoutAccountInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
+  partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
+}
+
+export type AccountUncheckedCreateWithoutOrderPaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  category: $Enums.AccountCategory
+  subtype: $Enums.AccountSubtype
+  accountNumber?: string | null
+  openingBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: boolean
+  isSystem?: boolean
+  lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutAccountInput
+  payments?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+}
+
+export type AccountCreateOrConnectWithoutOrderPaymentsInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutOrderPaymentsInput>
+}
+
+export type AccountUpsertWithoutOrderPaymentsInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutOrderPaymentsInput, Prisma.AccountUncheckedUpdateWithoutOrderPaymentsInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutOrderPaymentsInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutOrderPaymentsInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutOrderPaymentsInput, Prisma.AccountUncheckedUpdateWithoutOrderPaymentsInput>
+}
+
+export type AccountUpdateWithoutOrderPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumAccountCategoryFieldUpdateOperationsInput | $Enums.AccountCategory
+  subtype?: Prisma.EnumAccountSubtypeFieldUpdateOperationsInput | $Enums.AccountSubtype
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openingBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lines?: Prisma.JournalEntryLineUpdateManyWithoutAccountNestedInput
+  payments?: Prisma.PaymentTransactionUpdateManyWithoutAccountNestedInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutOrderPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumAccountCategoryFieldUpdateOperationsInput | $Enums.AccountCategory
+  subtype?: Prisma.EnumAccountSubtypeFieldUpdateOperationsInput | $Enums.AccountSubtype
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openingBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutAccountNestedInput
+  payments?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+}
+
+export type AccountCreateWithoutPartOrderPaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  category: $Enums.AccountCategory
+  subtype: $Enums.AccountSubtype
+  accountNumber?: string | null
+  openingBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: boolean
+  isSystem?: boolean
+  lines?: Prisma.JournalEntryLineCreateNestedManyWithoutAccountInput
+  payments?: Prisma.PaymentTransactionCreateNestedManyWithoutAccountInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
+}
+
+export type AccountUncheckedCreateWithoutPartOrderPaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  category: $Enums.AccountCategory
+  subtype: $Enums.AccountSubtype
+  accountNumber?: string | null
+  openingBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: boolean
+  isSystem?: boolean
+  lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutAccountInput
+  payments?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+}
+
+export type AccountCreateOrConnectWithoutPartOrderPaymentsInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutPartOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutPartOrderPaymentsInput>
+}
+
+export type AccountUpsertWithoutPartOrderPaymentsInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutPartOrderPaymentsInput, Prisma.AccountUncheckedUpdateWithoutPartOrderPaymentsInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutPartOrderPaymentsInput, Prisma.AccountUncheckedCreateWithoutPartOrderPaymentsInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutPartOrderPaymentsInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutPartOrderPaymentsInput, Prisma.AccountUncheckedUpdateWithoutPartOrderPaymentsInput>
+}
+
+export type AccountUpdateWithoutPartOrderPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumAccountCategoryFieldUpdateOperationsInput | $Enums.AccountCategory
+  subtype?: Prisma.EnumAccountSubtypeFieldUpdateOperationsInput | $Enums.AccountSubtype
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openingBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lines?: Prisma.JournalEntryLineUpdateManyWithoutAccountNestedInput
+  payments?: Prisma.PaymentTransactionUpdateManyWithoutAccountNestedInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutPartOrderPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumAccountCategoryFieldUpdateOperationsInput | $Enums.AccountCategory
+  subtype?: Prisma.EnumAccountSubtypeFieldUpdateOperationsInput | $Enums.AccountSubtype
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openingBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutAccountNestedInput
+  payments?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+}
+
 export type AccountCreateWithoutPaymentsInput = {
   id?: string
   code: string
@@ -534,6 +740,8 @@ export type AccountCreateWithoutPaymentsInput = {
   isSystem?: boolean
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutAccountInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountUncheckedCreateWithoutPaymentsInput = {
@@ -548,6 +756,8 @@ export type AccountUncheckedCreateWithoutPaymentsInput = {
   isSystem?: boolean
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutAccountInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountCreateOrConnectWithoutPaymentsInput = {
@@ -578,6 +788,8 @@ export type AccountUpdateWithoutPaymentsInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lines?: Prisma.JournalEntryLineUpdateManyWithoutAccountNestedInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutPaymentsInput = {
@@ -592,6 +804,8 @@ export type AccountUncheckedUpdateWithoutPaymentsInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutAccountNestedInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountCreateWithoutPartPaymentTransactionsInput = {
@@ -606,6 +820,8 @@ export type AccountCreateWithoutPartPaymentTransactionsInput = {
   isSystem?: boolean
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutAccountInput
   payments?: Prisma.PaymentTransactionCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountUncheckedCreateWithoutPartPaymentTransactionsInput = {
@@ -620,6 +836,8 @@ export type AccountUncheckedCreateWithoutPartPaymentTransactionsInput = {
   isSystem?: boolean
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutAccountInput
   payments?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountCreateOrConnectWithoutPartPaymentTransactionsInput = {
@@ -650,6 +868,8 @@ export type AccountUpdateWithoutPartPaymentTransactionsInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lines?: Prisma.JournalEntryLineUpdateManyWithoutAccountNestedInput
   payments?: Prisma.PaymentTransactionUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutPartPaymentTransactionsInput = {
@@ -664,6 +884,8 @@ export type AccountUncheckedUpdateWithoutPartPaymentTransactionsInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutAccountNestedInput
   payments?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountCreateWithoutLinesInput = {
@@ -678,6 +900,8 @@ export type AccountCreateWithoutLinesInput = {
   isSystem?: boolean
   payments?: Prisma.PaymentTransactionCreateNestedManyWithoutAccountInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountUncheckedCreateWithoutLinesInput = {
@@ -692,6 +916,8 @@ export type AccountUncheckedCreateWithoutLinesInput = {
   isSystem?: boolean
   payments?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
 }
 
 export type AccountCreateOrConnectWithoutLinesInput = {
@@ -722,6 +948,8 @@ export type AccountUpdateWithoutLinesInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payments?: Prisma.PaymentTransactionUpdateManyWithoutAccountNestedInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutLinesInput = {
@@ -736,6 +964,8 @@ export type AccountUncheckedUpdateWithoutLinesInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payments?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
 }
 
 
@@ -747,12 +977,16 @@ export type AccountCountOutputType = {
   lines: number
   payments: number
   partPaymentTransactions: number
+  orderPayments: number
+  partOrderPayments: number
 }
 
 export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lines?: boolean | AccountCountOutputTypeCountLinesArgs
   payments?: boolean | AccountCountOutputTypeCountPaymentsArgs
   partPaymentTransactions?: boolean | AccountCountOutputTypeCountPartPaymentTransactionsArgs
+  orderPayments?: boolean | AccountCountOutputTypeCountOrderPaymentsArgs
+  partOrderPayments?: boolean | AccountCountOutputTypeCountPartOrderPaymentsArgs
 }
 
 /**
@@ -786,6 +1020,20 @@ export type AccountCountOutputTypeCountPartPaymentTransactionsArgs<ExtArgs exten
   where?: Prisma.PartPaymentTransactionWhereInput
 }
 
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountOrderPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
+}
+
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountPartOrderPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PartOrderWhereInput
+}
+
 
 export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -800,6 +1048,8 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   lines?: boolean | Prisma.Account$linesArgs<ExtArgs>
   payments?: boolean | Prisma.Account$paymentsArgs<ExtArgs>
   partPaymentTransactions?: boolean | Prisma.Account$partPaymentTransactionsArgs<ExtArgs>
+  orderPayments?: boolean | Prisma.Account$orderPaymentsArgs<ExtArgs>
+  partOrderPayments?: boolean | Prisma.Account$partOrderPaymentsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -844,6 +1094,8 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   lines?: boolean | Prisma.Account$linesArgs<ExtArgs>
   payments?: boolean | Prisma.Account$paymentsArgs<ExtArgs>
   partPaymentTransactions?: boolean | Prisma.Account$partPaymentTransactionsArgs<ExtArgs>
+  orderPayments?: boolean | Prisma.Account$orderPaymentsArgs<ExtArgs>
+  partOrderPayments?: boolean | Prisma.Account$partOrderPaymentsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -855,6 +1107,8 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     lines: Prisma.$JournalEntryLinePayload<ExtArgs>[]
     payments: Prisma.$PaymentTransactionPayload<ExtArgs>[]
     partPaymentTransactions: Prisma.$PartPaymentTransactionPayload<ExtArgs>[]
+    orderPayments: Prisma.$OrderPayload<ExtArgs>[]
+    partOrderPayments: Prisma.$PartOrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1263,6 +1517,8 @@ export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.
   lines<T extends Prisma.Account$linesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$linesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JournalEntryLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payments<T extends Prisma.Account$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   partPaymentTransactions<T extends Prisma.Account$partPaymentTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$partPaymentTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orderPayments<T extends Prisma.Account$orderPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$orderPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  partOrderPayments<T extends Prisma.Account$partOrderPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$partOrderPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1763,6 +2019,54 @@ export type Account$partPaymentTransactionsArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.PartPaymentTransactionScalarFieldEnum | Prisma.PartPaymentTransactionScalarFieldEnum[]
+}
+
+/**
+ * Account.orderPayments
+ */
+export type Account$orderPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * Account.partOrderPayments
+ */
+export type Account$partOrderPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartOrder
+   */
+  select?: Prisma.PartOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartOrder
+   */
+  omit?: Prisma.PartOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartOrderInclude<ExtArgs> | null
+  where?: Prisma.PartOrderWhereInput
+  orderBy?: Prisma.PartOrderOrderByWithRelationInput | Prisma.PartOrderOrderByWithRelationInput[]
+  cursor?: Prisma.PartOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[]
 }
 
 /**

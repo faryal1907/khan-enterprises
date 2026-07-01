@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, forwardRef, Inject } from "@nestjs/common";
+import { Injectable, NotFoundException, forwardRef, Inject, Logger } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GetAlertsDto, AlertType } from "./dto/get-alerts.dto";
 import { UserRole } from "@khan/prisma";
@@ -7,6 +7,8 @@ import { OrderAlertsGateway } from "./order-alerts.gateway";
 
 @Injectable()
 export class OrderAlertsService {
+  private readonly logger = new Logger(OrderAlertsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly firebaseService: FirebaseService,
@@ -521,5 +523,59 @@ export class OrderAlertsService {
     );
 
     return alert;
+  }
+
+  /**
+   * Create admin-only alerts for receivables partial payment reminders
+   * This is called by the scheduled job to notify admins about customers
+   * who have been in PARTIAL payment status for 48+ hours
+   */
+  async createAlertsForReceivables(
+    customerPhone: string,
+    customerName: string,
+    outstandingAmount: number,
+    duration: string
+  ) {
+    // Find only ADMIN users (exclude MANAGER and SALES_STAFF)
+    const adminUsers = await this.prisma.client.user.findMany({
+      where: {
+        status: "ACTIVE",
+        role: "ADMIN",
+      },
+    });
+
+    if (adminUsers.length === 0) {
+      this.logger.warn(`No active admin users found to notify about receivables`);
+      return [];
+    }
+
+    const alerts = await Promise.all(
+      adminUsers.map(async (admin) => {
+        const alert = await this.prisma.client.orderAlert.create({
+          data: {
+            userId: admin.id,
+            alertType: AlertType.RECEIVABLES_PARTIAL_REMINDER,
+            isRead: false,
+          },
+        });
+
+        // Dispatch to Gateway
+        this.gateway.sendAlertToUser(admin.id, alert);
+
+        const title = "Partial Payment Reminder";
+        const body = `Customer ${customerName} (${customerPhone}) has been in partial payment status for ${duration}. Outstanding: Rs. ${outstandingAmount.toLocaleString()}`;
+
+        await this.dispatchPushNotification(
+          admin,
+          title,
+          body,
+          { url: `/accounts?tab=receivables` }
+        );
+
+        return alert;
+      })
+    );
+
+    return alerts;
   }
 }

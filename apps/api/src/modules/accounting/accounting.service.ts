@@ -189,41 +189,64 @@ export class AccountingService {
     };
   }
 
-  async deleteAccount(id: string) {
+  async deleteAccount(id: string, transferAccountId?: string) {
     const account = await this.prisma.client.account.findUnique({
       where: { id },
-      include: {
-        lines: true
-      }
+      include: { lines: { where: { journalEntry: { status: 'POSTED' } } } }
     });
 
-    if (!account) {
-      throw new NotFoundException('Account not found');
+    if (!account) throw new NotFoundException('Account not found');
+    if (account.isSystem) throw new BadRequestException('Cannot delete system accounts');
+
+    // Compute current balance
+    const balance = await this.getAccountBalance(id);
+
+    // If balance is non-zero, a transfer destination is required
+    if (balance !== 0 && !transferAccountId) {
+      throw new BadRequestException(
+        `Account has a balance of ${balance}. Please transfer this amount to another account before deactivating.`
+      );
     }
 
-    if (account.isSystem) {
-      throw new BadRequestException('Cannot delete system accounts');
-    }
+    return this.prisma.client.$transaction(async (tx) => {
+      // Post a transfer journal entry to zero out the balance
+      if (balance !== 0 && transferAccountId) {
+        const destination = await tx.account.findUnique({ where: { id: transferAccountId } });
+        if (!destination) throw new NotFoundException('Transfer destination account not found');
+        if (!destination.isActive) throw new BadRequestException('Transfer destination account is inactive');
+        if (destination.id === id) throw new BadRequestException('Cannot transfer to the same account');
 
-    // Check if account has journal entries
-    const hasJournalEntries = account.lines.length > 0;
-    let warning: string | null = null;
-
-    if (hasJournalEntries) {
-      warning = 'This account has journal entries. Deactivating it will prevent future transactions but historical data will remain.';
-    }
-
-    const updatedAccount = await this.prisma.client.account.update({
-      where: { id },
-      data: {
-        isActive: false
+        const entryNo = `JV-CLOSE-${Date.now()}`;
+        await tx.journalEntry.create({
+          data: {
+            entryNo,
+            description: `Balance transfer on deactivation: ${account.name} → ${destination.name}`,
+            status: 'POSTED',
+            lines: {
+              create: [
+                // CR the closing account (reduces its asset balance to zero)
+                { accountId: id, debit: 0, credit: balance },
+                // DR the destination account (adds the balance there)
+                { accountId: transferAccountId, debit: balance, credit: 0 },
+              ],
+            },
+          },
+        });
       }
-    });
 
-    return {
-      ...updatedAccount,
-      warning
-    };
+      const updatedAccount = await tx.account.update({
+        where: { id },
+        data: { isActive: false },
+      });
+
+      const hasJournalEntries = account.lines.length > 0;
+      return {
+        ...updatedAccount,
+        warning: hasJournalEntries
+          ? 'Account deactivated. Historical journal entries are preserved.'
+          : null,
+      };
+    });
   }
 
   async getAccountLedger(id: string, page: number = 1, limit: number = 50) {

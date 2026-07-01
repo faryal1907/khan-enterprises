@@ -77,7 +77,8 @@ export const ModelName = {
   PurchaseOrder: 'PurchaseOrder',
   PurchaseOrderItem: 'PurchaseOrderItem',
   Payable: 'Payable',
-  PaymentAllocation: 'PaymentAllocation'
+  PaymentAllocation: 'PaymentAllocation',
+  ReceivablesAlert: 'ReceivablesAlert'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -260,6 +261,7 @@ export const OrderScalarFieldEnum = {
   isOnlineOrder: 'isOnlineOrder',
   appliedDiscount: 'appliedDiscount',
   paymentMethod: 'paymentMethod',
+  paymentAccountId: 'paymentAccountId',
   status: 'status',
   paymentVerified: 'paymentVerified',
   orderType: 'orderType',
@@ -305,6 +307,7 @@ export const PartOrderScalarFieldEnum = {
   quantity: 'quantity',
   amount: 'amount',
   paymentMethod: 'paymentMethod',
+  paymentAccountId: 'paymentAccountId',
   status: 'status',
   paymentVerified: 'paymentVerified',
   orderType: 'orderType',
@@ -541,6 +544,21 @@ export const PaymentAllocationScalarFieldEnum = {
 } as const
 
 export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum]
+
+
+export const ReceivablesAlertScalarFieldEnum = {
+  id: 'id',
+  customerPhone: 'customerPhone',
+  customerName: 'customerName',
+  lastNotifiedAt: 'lastNotifiedAt',
+  notificationCount: 'notificationCount',
+  outstandingAmount: 'outstandingAmount',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReceivablesAlertScalarFieldEnum = (typeof ReceivablesAlertScalarFieldEnum)[keyof typeof ReceivablesAlertScalarFieldEnum]
 
 
 export const SortOrder = {

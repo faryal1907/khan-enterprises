@@ -445,7 +445,9 @@ model Order {
   isOnlineOrder   Boolean  @default(false)
   appliedDiscount Decimal? @db.Decimal(12, 2)
 
-  paymentMethod PaymentMethod
+  paymentMethod    PaymentMethod
+  paymentAccountId String?
+  paymentAccount   Account? @relation("OrderPaymentAccount", fields: [paymentAccountId], references: [id])
 
   status OrderStatus @default(PENDING_PAYMENT)
 
@@ -526,7 +528,9 @@ model PartOrder {
   quantity Int
   amount   Decimal @db.Decimal(12, 2)
 
-  paymentMethod PaymentMethod
+  paymentMethod    PaymentMethod
+  paymentAccountId String?
+  paymentAccount   Account? @relation("PartOrderPaymentAccount", fields: [paymentAccountId], references: [id])
 
   status OrderStatus @default(PENDING_PAYMENT)
 
@@ -799,6 +803,8 @@ model Account {
   lines                   JournalEntryLine[]
   payments                PaymentTransaction[]
   partPaymentTransactions PartPaymentTransaction[]
+  orderPayments           Order[]    @relation("OrderPaymentAccount")
+  partOrderPayments       PartOrder[] @relation("PartOrderPaymentAccount")
 }
 
 model JournalEntry {
@@ -888,4 +894,24 @@ model PaymentAllocation {
   allocatedAmount          Decimal                 @db.Decimal(12, 2)
   partPaymentTransaction   PartPaymentTransaction? @relation(fields: [partPaymentTransactionId], references: [id])
   partPaymentTransactionId String?
+}
+
+// ============================================================================
+// RECEIVABLES ALERT TRACKING
+// ============================================================================
+
+model ReceivablesAlert {
+  id                  String   @id @default(uuid())
+  customerPhone       String
+  customerName        String
+  lastNotifiedAt      DateTime @default(now())
+  notificationCount   Int      @default(0)
+  outstandingAmount   Decimal  @db.Decimal(12, 2)
+  status              PaymentState
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([customerPhone])
+  @@index([customerPhone])
 }

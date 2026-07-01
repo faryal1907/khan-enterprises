@@ -70,6 +70,8 @@ export class PartOrdersService {
 
   /**
    * Create a new part order
+   * - Online price = sellingPrice * (1 - discount%)
+   * - Customer pays at least 50% advance; remainder becomes a receivable.
    */
   async createPartOrder(dto: CreatePartOrderDto, user: any) {
     const result = await this.prisma.client.$transaction(async (tx) => {
@@ -103,8 +105,14 @@ export class PartOrdersService {
       // 3. Generate unique order number
       const orderNumber = this.generateOrderNumber();
 
-      // 4. Calculate total amount (convert Decimal to number for JSON serialization)
-      const amount = Number(part.sellingPrice) * dto.quantity;
+      // 4. Calculate discounted unit price
+      const baseUnitPrice = Number(part.sellingPrice);
+      const inventoryDiscount = Number(inventory.onlineDiscountPercent) || 0;
+      const globalDiscountSetting = await tx.systemSetting.findFirst({ where: { key: "GLOBAL_PART_DISCOUNT" } });
+      const globalDiscount = globalDiscountSetting?.value ? parseFloat(globalDiscountSetting.value) : 0;
+      const effectiveDiscount = inventoryDiscount + globalDiscount;
+      const unitPrice = baseUnitPrice * (1 - effectiveDiscount / 100);
+      const amount = unitPrice * dto.quantity;
 
       // 5. Determine order type and set expiry
       const isCash = dto.paymentMethod === "CASH";
@@ -113,53 +121,56 @@ export class PartOrdersService {
       expiresAt.setDate(expiresAt.getDate() + (isCash ? 1 : 7));
       const reservationExpiry = isCash ? expiresAt : null;
 
-      // 6. Create part order - cash orders are PENDING_PAYMENT (reserved) until actually paid at store
-      const partOrder = await tx.partOrder.create({
-        data: {
-          orderNumber,
-          partId: dto.partId,
-          partInventoryId: dto.partInventoryId,
-          branchId: inventory.branchId,
-          customerName: dto.customerName,
-          customerPhone: dto.customerPhone,
-          customerAddress: dto.customerAddress || null,
-          quantity: dto.quantity,
-          amount,
-          paymentMethod: dto.paymentMethod,
-          status: OrderStatus.PENDING_PAYMENT,
-          expiresAt,
-          reservationExpiry,
-          orderType,
-          pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
-          customerId: user.id,
+      // 6. Part orders require full payment — no partial/installment allowed
+      if (!isCash && !dto.paymentProofUrl) {
+        throw new BadRequestException(`Payment proof is required for online orders`);
+      }
+      const advanceAmount = isCash ? 0 : amount;
+      const balanceDue = isCash ? amount : 0;
 
-        },
+      // 7. Create part order
+const partOrder = await tx.partOrder.create({
+         data: {
+           orderNumber,
+           partId: dto.partId,
+           partInventoryId: dto.partInventoryId,
+           branchId: inventory.branchId,
+           customerName: dto.customerName,
+           customerPhone: dto.customerPhone,
+           customerAddress: dto.customerAddress || null,
+           quantity: dto.quantity,
+           amount,
+           paymentMethod: dto.paymentMethod,
+           paymentAccountId: dto.paymentMethod !== 'CASH' ? (dto.paymentAccountId || null) : null,
+           status: OrderStatus.PENDING_PAYMENT,
+           expiresAt,
+           reservationExpiry,
+           orderType,
+           pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
+           customerId: user.id,
+           paidAmount: isCash ? 0 : amount,
+           balanceDue: isCash ? amount : 0,
+           isInstallmentPlan: false,
+           paymentState: isCash ? PaymentState.DUE : PaymentState.PAID,
+         },
         include: {
           part: true,
-          partInventory: {
-            include: {
-              branch: true,
-            },
-          },
+          partInventory: { include: { branch: true } },
           branch: true,
         },
       });
 
-      // 6. Reserve the stock
+      // 8. Reserve the stock
       await tx.partInventory.update({
         where: { id: dto.partInventoryId },
-        data: {
-          reservedQuantity: {
-            increment: dto.quantity,
-          },
-        },
+        data: { reservedQuantity: { increment: dto.quantity } },
       });
 
-      // Cash stays PENDING until picked up at store.
+      // 9. Create payment transaction
       const transaction = await tx.partPaymentTransaction.create({
         data: {
           partOrderId: partOrder.id,
-          amount,
+          amount: isCash ? amount : advanceAmount,
           method: dto.paymentMethod,
           status: !isCash && dto.paymentProofUrl
             ? PaymentStatus.VERIFICATION_PENDING
@@ -168,6 +179,7 @@ export class PartOrdersService {
         },
       });
 
+      // 10. Revenue recognition JV (full amount → AR)
       const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
       const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
 
@@ -188,14 +200,11 @@ export class PartOrdersService {
         });
       }
 
-      return {
-        order: partOrder,
-        transaction,
-      };
+      return { order: partOrder, transaction };
     });
 
     await this.orderAlertsService.createAlertsForPartOrder(
-      result.order.id, 
+      result.order.id,
       dto.paymentMethod === "CASH" ? AlertType.NEW_ORDER : AlertType.PAYMENT_PENDING
     );
 
@@ -680,7 +689,18 @@ export class PartOrdersService {
       // 4. Generate order number
       const orderNumber = this.generateOrderNumber();
 
-      // 5. Create PartOrder
+      // 5. Resolve partial payment
+      const totalAmount = dto.amount;
+      const initialPayment = dto.initialPaymentAmount !== undefined ? dto.initialPaymentAmount : totalAmount;
+      const balance = totalAmount - initialPayment;
+
+      let paymentState: PaymentState = PaymentState.DUE;
+      if (initialPayment >= totalAmount) paymentState = PaymentState.PAID;
+      else if (initialPayment > 0) paymentState = PaymentState.PARTIAL;
+
+      const isDelivered = paymentState === PaymentState.PAID;
+
+      // 6. Create PartOrder
       const partOrder = await tx.partOrder.create({
         data: {
           orderNumber,
@@ -691,15 +711,16 @@ export class PartOrdersService {
           customerPhone: dto.customerPhone,
           customerAddress: dto.customerAddress || null,
           quantity: dto.quantity,
-          amount: dto.amount,
+          amount: totalAmount,
           paymentMethod: dto.paymentMethod,
-          status: OrderStatus.DELIVERED, // Manual sale assumes immediate delivery
+          status: isDelivered ? OrderStatus.DELIVERED : OrderStatus.CONFIRMED,
           paymentVerified: true,
           processedById: user.id,
-          // Only link to a customer account if one was explicitly provided.
-          // Walk-in sales with no registered customer stay null so the order
-          // remains matchable by phone if the customer registers later.
           customerId: dto.customerId ?? null,
+          paidAmount: initialPayment,
+          balanceDue: balance,
+          isInstallmentPlan: dto.isInstallmentPlan || false,
+          paymentState,
         },
       });
 
@@ -714,56 +735,88 @@ export class PartOrdersService {
         },
       });
 
-      // 7. Create Payment Transaction
-      const transaction = await tx.partPaymentTransaction.create({
-        data: {
-          partOrderId: partOrder.id,
-          amount: dto.amount,
-          method: dto.paymentMethod,
-          status: PaymentStatus.SUCCESS,
-          verifiedAt: new Date(),
-          verifiedById: user.id,
-        },
-      });
+      // 7. Create Payment Transaction (only if something was paid upfront)
+      let transaction: any = null;
+      if (initialPayment > 0) {
+        // Resolve payment account
+        let paymentAcc: any = null;
+        if (dto.paymentMethod === 'CASH') {
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+        } else if (dto.accountId) {
+          paymentAcc = await tx.account.findUnique({ where: { id: dto.accountId } });
+        }
+        if (!paymentAcc) {
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        }
 
-      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
-      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-      const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
-      const paymentAcc = dto.paymentMethod === "CASH" ? cashAcc : bankAcc;
-      
-      if (arAcc && revAcc) {
-        await tx.journalEntry.create({
+        transaction = await tx.partPaymentTransaction.create({
           data: {
-            entryNo: `JV-SALE-${orderNumber}`,
-            description: `Part Sale registered for ${orderNumber}`,
-            sourceRef: orderNumber,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: arAcc.id, debit: dto.amount, credit: 0 },
-                { accountId: revAcc.id, debit: 0, credit: dto.amount },
-              ]
-            }
-          }
+            partOrderId: partOrder.id,
+            amount: initialPayment,
+            method: dto.paymentMethod,
+            status: PaymentStatus.SUCCESS,
+            verifiedAt: new Date(),
+            verifiedById: user.id,
+            accountId: paymentAcc?.id,
+          },
         });
-      }
 
-      if (paymentAcc && arAcc) {
-        await tx.journalEntry.create({
-          data: {
-            entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
-            description: `Payment received for part order ${orderNumber} via ${dto.paymentMethod}`,
-            sourceRef: transaction.id,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: paymentAcc.id, debit: dto.amount, credit: 0 },
-                { accountId: arAcc.id, debit: 0, credit: dto.amount },
-              ]
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+
+        if (arAcc && revAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-SALE-${orderNumber}`,
+              description: `Part Sale registered for ${orderNumber}`,
+              sourceRef: orderNumber,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: arAcc.id, debit: totalAmount, credit: 0 },
+                  { accountId: revAcc.id, debit: 0, credit: totalAmount },
+                ]
+              }
             }
-          }
-        });
+          });
+        }
+
+        if (paymentAcc && arAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
+              description: `Payment received for part order ${orderNumber} via ${dto.paymentMethod}`,
+              sourceRef: transaction.id,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: paymentAcc.id, debit: initialPayment, credit: 0 },
+                  { accountId: arAcc.id, debit: 0, credit: initialPayment },
+                ]
+              }
+            }
+          });
+        }
+      } else {
+        // No upfront payment — still record the sale revenue JV
+        const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+        const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+        if (arAcc && revAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-SALE-${orderNumber}`,
+              description: `Part Sale registered for ${orderNumber} (balance due)`,
+              sourceRef: orderNumber,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: arAcc.id, debit: totalAmount, credit: 0 },
+                  { accountId: revAcc.id, debit: 0, credit: totalAmount },
+                ]
+              }
+            }
+          });
+        }
       }
 
       await tx.auditLog.create({
@@ -1058,27 +1111,39 @@ export class PartOrdersService {
         },
       });
 
-      // If verified, update order status to PAID
+      // If verified, update order status — paidAmount was already set at order creation
       if (verified) {
         await tx.partOrder.update({
           where: { id: partOrderId },
           data: {
-            status: OrderStatus.PAID,
+            status: OrderStatus.CONFIRMED,
             paymentVerified: true,
             processedById: user.id,
-            paidAmount: order.amount,
-            balanceDue: 0,
-            paymentState: PaymentState.PAID
+            paymentState: Number(order.balanceDue) <= 0 ? PaymentState.PAID : PaymentState.PARTIAL,
           },
         });
 
-        const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-        const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
         const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-        
-        const paymentAcc = transaction.method === "CASH" ? cashAcc : bankAcc;
+
+        // Resolve the payment account: prefer the account the customer selected at order time,
+        // fall back to subtype-based lookup for backward compatibility.
+        let paymentAcc: any = null;
+        if (transaction.method === "CASH") {
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+        } else if (order.paymentAccountId) {
+          paymentAcc = await tx.account.findUnique({ where: { id: order.paymentAccountId } });
+        }
+        if (!paymentAcc) {
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        }
 
         if (paymentAcc && arAcc) {
+          // Link the transaction to the resolved account
+          await tx.partPaymentTransaction.update({
+            where: { id: transaction.id },
+            data: { accountId: paymentAcc.id },
+          });
+
           await tx.journalEntry.create({
             data: {
               entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
@@ -1156,10 +1221,10 @@ export class PartOrdersService {
     return result;
   }
 
-  /**
-   * Record payment for a part order
-   */
-  async recordPartOrderPayment(partOrderId: string, dto: { amount: number; method: PaymentMethod; referenceNumber?: string }, user: any) {
+/**
+    * Record payment for a part order
+    */
+  async recordPartOrderPayment(partOrderId: string, dto: { amount: number; method: PaymentMethod; referenceNumber?: string; accountId?: string }, user: any) {
     const order = await this.prisma.client.partOrder.findUnique({
       where: { id: partOrderId },
       include: {
@@ -1231,10 +1296,18 @@ export class PartOrdersService {
       // Generate Journal Entry for Payment if successful
       if (txStatus === PaymentStatus.SUCCESS) {
         const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-        const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
         const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
         
-        const paymentAcc = dto.method === "CASH" ? cashAcc : bankAcc;
+        // For online payments: use selected accountId if provided, otherwise fallback to generic BANK account
+        let paymentAcc: any = cashAcc;
+        if (dto.method !== "CASH") {
+          if (dto.accountId) {
+            paymentAcc = await tx.account.findUnique({ where: { id: dto.accountId } });
+          } else {
+            // Fallback: find any bank account for backward compatibility
+            paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+          }
+        }
 
         if (paymentAcc && arAcc) {
           await tx.journalEntry.create({
@@ -1250,6 +1323,12 @@ export class PartOrdersService {
                 ]
               }
             }
+          });
+          
+          // Update transaction with the account
+          await tx.partPaymentTransaction.update({
+            where: { id: transaction.id },
+            data: { accountId: paymentAcc.id }
           });
         }
       }

@@ -9,6 +9,10 @@ export interface CreateOrderPayload {
   customerAddress?: string;
   paymentMethod: "CASH" | "ONLINE_TRANSFER";
   paymentProofUrl?: string;
+  /** Amount the customer is paying now (minimum 50% of online price). Defaults to 50% if omitted. */
+  initialPaymentAmount?: number;
+  /** ID of the bank/wallet account the customer transferred to. */
+  paymentAccountId?: string;
 }
 
 export async function createCustomerOrder(payload: CreateOrderPayload) {

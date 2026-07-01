@@ -206,8 +206,10 @@ export class OrdersService {
   }
 
   /**
-   * Create an online order directly by a customer (no negotiation)
-   * Auto-applies 2% discount for online orders
+   * Create an online order directly by a customer.
+   * - Online price = basePrice * (1 - discount)
+   * - Advance payment = initialPaymentAmount (must be >= 50% of online price)
+   * - Remaining balance becomes a receivable; order is confirmed once admin verifies proof.
    */
   async createCustomerOrder(dto: CreateCustomerOrderDto, user: any) {
     const isCash = dto.paymentMethod === "CASH";
@@ -228,16 +230,34 @@ export class OrdersService {
       const basePrice = Number(bike.model.basePrice);
       const salePrice = basePrice * (1 - effectiveDiscount / 100);
       const discountAmount = basePrice - salePrice;
+      const minimumPayment = Math.ceil(salePrice * 0.5);
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-      if (!isCash && !dto.paymentProofUrl) {
-        throw new BadRequestException(`Payment proof URL is required for online orders`);
+      // For online (non-cash) orders: customer pays an advance of at least 50%
+      let advanceAmount: number;
+      if (isCash) {
+        advanceAmount = salePrice; // cash = full amount at store
+      } else {
+        if (!dto.paymentProofUrl) {
+          throw new BadRequestException(`Payment proof URL is required for online orders`);
+        }
+        advanceAmount = dto.initialPaymentAmount ?? minimumPayment;
+        if (advanceAmount < minimumPayment) {
+          throw new BadRequestException(
+            `Minimum advance payment is Rs. ${minimumPayment.toLocaleString()} (50% of Rs. ${salePrice.toLocaleString()})`
+          );
+        }
+        if (advanceAmount > salePrice) {
+          advanceAmount = salePrice; // cap at full price
+        }
       }
 
-      // Set expiry: 1 day for cash (onsite pickup), no expiry for online (awaiting verification)
+      const balanceDue = salePrice - advanceAmount;
+      const paymentState = balanceDue <= 0 ? PaymentState.PAID : PaymentState.PARTIAL;
+
+      // Set expiry: 1 day for cash, no expiry for online
       let expiresAt: Date | null = null;
       let reservationExpiry: Date | null = null;
-      
       if (isCash) {
         expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 1);
@@ -254,6 +274,7 @@ export class OrdersService {
           customerCNIC: dto.customerCNIC || null,
           customerAddress: dto.customerAddress || null,
           paymentMethod: dto.paymentMethod,
+          paymentAccountId: dto.paymentMethod !== 'CASH' ? (dto.paymentAccountId || null) : null,
           status: OrderStatus.PENDING_PAYMENT,
           expiresAt,
           reservationExpiry,
@@ -263,10 +284,10 @@ export class OrdersService {
           pickupType: isCash ? "ONSITE_PICKUP" : "DELIVERY",
           customerId: user.id,
           totalAmount: salePrice,
-          paidAmount: 0,
-          balanceDue: salePrice,
-          isInstallmentPlan: dto.isInstallmentPlan || false,
-          paymentState: PaymentState.DUE,
+          paidAmount: isCash ? 0 : advanceAmount,   // cash: 0 until store visit; online: advance recorded immediately
+          balanceDue: isCash ? salePrice : balanceDue,
+          isInstallmentPlan: balanceDue > 0,
+          paymentState: isCash ? PaymentState.DUE : paymentState,
         },
       });
 
@@ -280,20 +301,18 @@ export class OrdersService {
         },
       });
 
-      // Cash stays PENDING until customer picks up at store.
-      // Online with a proof URL → VERIFICATION_PENDING (awaiting admin review).
+      // Create the advance payment transaction (VERIFICATION_PENDING for online, PENDING for cash)
       const transaction = await tx.paymentTransaction.create({
         data: {
           orderId: order.id,
-          amount: salePrice,
+          amount: isCash ? salePrice : advanceAmount,
           method: dto.paymentMethod,
-          status: !isCash
-            ? PaymentStatus.VERIFICATION_PENDING
-            : PaymentStatus.PENDING,
+          status: !isCash ? PaymentStatus.VERIFICATION_PENDING : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
         },
       });
 
+      // Revenue recognition journal entry (full sale price → AR)
       const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
       const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
 
@@ -339,7 +358,7 @@ export class OrdersService {
         data: {
           userId: user.id, userRole: user.role, action: AuditAction.CREATE,
           entityType: "ORDER", entityId: order.id,
-          newValue: JSON.stringify({ ...dto, finalSalePrice: salePrice, discountApplied: discountAmount }),
+          newValue: JSON.stringify({ ...dto, finalSalePrice: salePrice, discountApplied: discountAmount, advanceAmount }),
         },
       });
 
@@ -754,10 +773,18 @@ export class OrdersService {
 
       // Fetch accounts for accounting
       const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-      const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
       const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
       
-      const paymentAcc = dto.method === "CASH" ? cashAcc : bankAcc;
+      // For online payments: use selected accountId if provided, otherwise fallback to generic BANK account
+      let paymentAcc: any = cashAcc;
+      if (dto.method !== "CASH") {
+        if (dto.accountId) {
+          paymentAcc = await tx.account.findUnique({ where: { id: dto.accountId } });
+        } else {
+          // Fallback: find any bank account for backward compatibility
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        }
+      }
 
       if (paymentAcc) {
         await tx.paymentTransaction.update({
@@ -1005,7 +1032,7 @@ export class OrdersService {
           customerCNIC: dto.customerCNIC,
           customerAddress: dto.customerAddress,
           paymentMethod: dto.paymentMethod,
-          status: paymentState === PaymentState.PAID ? OrderStatus.DELIVERED : OrderStatus.PENDING_PAYMENT,
+          status: paymentState === PaymentState.PAID ? OrderStatus.DELIVERED : paymentState === PaymentState.PARTIAL ? OrderStatus.CONFIRMED : OrderStatus.PENDING_PAYMENT,
           paymentVerified: true,
           expiresAt,
           processedById: user.id,
@@ -1034,10 +1061,19 @@ export class OrdersService {
 
       // 8. Create PaymentTransaction & Allocations & Journal Entries
       const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-      const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
       const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
       const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
-      const paymentAcc = dto.paymentMethod === "CASH" ? cashAcc : bankAcc;
+
+      // Resolve payment account: use explicitly selected account, fall back by subtype
+      let paymentAcc: any = null;
+      if (dto.paymentMethod === 'CASH') {
+        paymentAcc = cashAcc;
+      } else if (dto.accountId) {
+        paymentAcc = await tx.account.findUnique({ where: { id: dto.accountId } });
+      }
+      if (!paymentAcc) {
+        paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+      }
 
       let transaction: any = null;
       if (initialPayment > 0) {
@@ -1467,16 +1503,19 @@ export class OrdersService {
           },
         });
 
-        // 4. Update order to PAID
+        // The advance payment was already recorded on paidAmount at order creation.
+        // No need to change paidAmount/balanceDue here — they are already correct.
+        // Move order to PAID only if balanceDue is 0 (full payment), else CONFIRMED.
+        const isFullyPaid = Number(order.balanceDue) <= 0;
+
+        // 4. Update order to PAID or CONFIRMED
         updatedOrder = await tx.order.update({
           where: { id: orderId },
           data: {
-            status: OrderStatus.PAID,
+            status: isFullyPaid ? OrderStatus.PAID : OrderStatus.CONFIRMED,
             paymentVerified: true,
             processedById: user.id,
-            paidAmount: order.totalAmount,
-            balanceDue: 0,
-            paymentState: PaymentState.PAID
+            paymentState: isFullyPaid ? PaymentState.PAID : PaymentState.PARTIAL,
           },
         });
 
@@ -1490,18 +1529,33 @@ export class OrdersService {
           },
         });
 
-        // 6. Generate Receipt Journal Entry
-        const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-        const bankAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        // 6. Generate Receipt Journal Entry for the advance payment
         const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-        
-        const paymentAcc = updatedTransaction.method === "CASH" ? cashAcc : bankAcc;
+
+        // Resolve the payment account: prefer the account the customer selected at order time,
+        // fall back to subtype-based lookup for backward compatibility.
+        let paymentAcc: any = null;
+        if (updatedTransaction.method === "CASH") {
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+        } else if (order.paymentAccountId) {
+          paymentAcc = await tx.account.findUnique({ where: { id: order.paymentAccountId } });
+        }
+        if (!paymentAcc) {
+          // fallback: first BANK account
+          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+        }
 
         if (paymentAcc && arAcc) {
+          // Link the transaction to the resolved account
+          await tx.paymentTransaction.update({
+            where: { id: updatedTransaction.id },
+            data: { accountId: paymentAcc.id },
+          });
+
           await tx.journalEntry.create({
             data: {
               entryNo: `JV-PAY-${updatedTransaction.id.substring(0, 8)}`,
-              description: `Payment verified for order ${order.orderNumber} via ${updatedTransaction.method}`,
+              description: `Advance payment verified for order ${order.orderNumber} via ${updatedTransaction.method}`,
               sourceRef: updatedTransaction.id,
               status: JournalStatus.POSTED,
               lines: {

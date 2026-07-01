@@ -25,4 +25,5 @@ export type * from './models/PurchaseOrder.ts';
 export type * from './models/PurchaseOrderItem.ts';
 export type * from './models/Payable.ts';
 export type * from './models/PaymentAllocation.ts';
+export type * from './models/ReceivablesAlert.ts';
 export type * from './commonInputTypes.ts';

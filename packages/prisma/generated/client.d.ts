@@ -33,3 +33,4 @@ export type PurchaseOrder = Prisma.PurchaseOrderModel;
 export type PurchaseOrderItem = Prisma.PurchaseOrderItemModel;
 export type Payable = Prisma.PayableModel;
 export type PaymentAllocation = Prisma.PaymentAllocationModel;
+export type ReceivablesAlert = Prisma.ReceivablesAlertModel;

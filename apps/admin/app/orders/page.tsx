@@ -383,13 +383,20 @@ export default function OrdersListPage() {
                   className="hover:opacity-80"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
-                    <Link 
-                      href={order.type === "BIKE" ? `/orders/${order.id}` : `/part-orders/${order.id}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="hover:underline text-inherit block w-full"
-                    >
-                      {order.orderNumber}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link 
+                        href={order.type === "BIKE" ? `/orders/${order.id}` : `/part-orders/${order.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:underline text-inherit"
+                      >
+                        {order.orderNumber}
+                      </Link>
+                      {Number((order as any).balanceDue) > 0 && (
+                        <span className="text-yellow-500" title="Outstanding balance">
+                          ★
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.orderType === "ONLINE" ? "Online" : "Onsite"}

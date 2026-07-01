@@ -28,8 +28,6 @@ export class CreateManualOrderDto {
   @IsNotEmpty()
   customerAddress!: string;
 
-  // If created by staff we still store the customer ownership.
-  // Use `user.id` when not provided.
   @IsString()
   @IsOptional()
   customerId?: string;
@@ -58,5 +56,10 @@ export class CreateManualOrderDto {
   @Type(() => Number)
   @IsNumber()
   initialPaymentAmount?: number;
+
+  /** Specific account (CASH/BANK/EWALLET) to credit the payment to */
+  @IsString()
+  @IsOptional()
+  accountId?: string;
 }
 

@@ -5,10 +5,19 @@ import { theme } from "@/lib/colors";
 import { toast } from "sonner";
 import { getBikes, getParts } from "@/lib/api/inventory";
 import { createManualOrder, createManualPartOrder } from "@/lib/api/orders";
+import { getPaymentAccounts } from "@/lib/api/accounting";
 import { numberToWords } from "@repo/utils";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { AsyncButton } from "@/components/async-button";
+
+interface PaymentAccount {
+  id: string;
+  name: string;
+  subtype: string;
+  accountNumber: string | null;
+  code: string;
+}
 
 export default function ManualOrderPage() {
   const router = useRouter();
@@ -30,8 +39,14 @@ export default function ManualOrderPage() {
     customerPhone: "",
     customerAddress: "",
     salePrice: "",
-    paymentMethod: "",
   });
+
+  // Payment state
+  const [paymentAccounts, setPaymentAccounts] = useState<PaymentAccount[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
+  const [selectedMethod, setSelectedMethod] = useState<string>("");
+  const [initialPaymentDisplay, setInitialPaymentDisplay] = useState<string>("");
+  const [isPartial, setIsPartial] = useState(false);
 
   interface BikeDetail {
     id: string;
@@ -57,8 +72,11 @@ export default function ManualOrderPage() {
   const [showPartDropdown, setShowPartDropdown] = useState(false);
 
   useEffect(() => {
+    getPaymentAccounts().then(setPaymentAccounts).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (saleType !== "PART") return;
-    
     const fetchAllParts = async () => {
       setIsFetchingParts(true);
       try {
@@ -70,20 +88,17 @@ export default function ManualOrderPage() {
         setIsFetchingParts(false);
       }
     };
-
-    if (allParts.length === 0) {
-      fetchAllParts();
-    }
+    if (allParts.length === 0) fetchAllParts();
   }, [allParts.length, isBranchScoped, saleType, user?.branchId]);
 
-  const partSearchResults = partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
-    ? allParts.filter((p: PartInventory) => 
-        p.part?.name?.toLowerCase().includes(partSearchTerm.toLowerCase()) || 
-        p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
-      )
-    : allParts;
-
-  // Auto-fill sale price for parts is handled in handleInputChange now.
+  const partSearchResults =
+    partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
+      ? allParts.filter(
+          (p: PartInventory) =>
+            p.part?.name?.toLowerCase().includes(partSearchTerm.toLowerCase()) ||
+            p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
+        )
+      : allParts;
 
   const handleInputChange = (key: string, value: string) => {
     setFormData((prev) => {
@@ -97,6 +112,26 @@ export default function ManualOrderPage() {
       }
       return next;
     });
+    // When sale price changes, reset partial payment to full
+    if (key === "salePrice" && !isPartial) {
+      setInitialPaymentDisplay(value);
+    }
+  };
+
+  // When sale price is updated and not partial mode, keep initial payment in sync
+  useEffect(() => {
+    if (!isPartial) setInitialPaymentDisplay(formData.salePrice);
+  }, [formData.salePrice, isPartial]);
+
+  const salePriceNum = Number(formData.salePrice.replace(/,/g, "")) || 0;
+  const initialPaymentNum = isPartial
+    ? Number(initialPaymentDisplay.replace(/,/g, "")) || 0
+    : salePriceNum;
+  const balanceDue = Math.max(0, salePriceNum - initialPaymentNum);
+
+  const selectAccount = (acc: PaymentAccount) => {
+    setSelectedAccountId(acc.id);
+    setSelectedMethod(acc.subtype === "CASH" ? "CASH" : "ONLINE_TRANSFER");
   };
 
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -104,8 +139,12 @@ export default function ManualOrderPage() {
 
   const handleRegisterSale = async () => {
     try {
-      if (!formData.customerName || !formData.customerPhone || !formData.customerAddress || !formData.paymentMethod) {
-        toast.error("Please fill in all required fields");
+      if (!formData.customerName || !formData.customerPhone || !formData.customerAddress) {
+        toast.error("Please fill in all required customer fields");
+        return;
+      }
+      if (!selectedAccountId || !selectedMethod) {
+        toast.error("Please select a payment account");
         return;
       }
 
@@ -120,10 +159,16 @@ export default function ManualOrderPage() {
           toast.error("CNIC is required for bike sales");
           return;
         }
-
-        const salePriceClean = Number(formData.salePrice.replace(/,/g, ""));
-        if (!salePriceClean || salePriceClean <= 0) {
+        if (!salePriceNum || salePriceNum <= 0) {
           toast.error("Please enter a valid sale price");
+          return;
+        }
+        if (isPartial && initialPaymentNum <= 0) {
+          toast.error("Initial payment must be greater than zero");
+          return;
+        }
+        if (isPartial && initialPaymentNum < salePriceNum * 0.5) {
+          toast.error("Initial payment must be at least 50% of the sale price");
           return;
         }
 
@@ -133,8 +178,11 @@ export default function ManualOrderPage() {
           customerCNIC: formData.customerCNIC,
           customerPhone: formData.customerPhone,
           customerAddress: formData.customerAddress,
-          salePrice: salePriceClean,
-          paymentMethod: formData.paymentMethod,
+          salePrice: salePriceNum,
+          paymentMethod: selectedMethod,
+          accountId: selectedAccountId,
+          isInstallmentPlan: isPartial && balanceDue > 0,
+          initialPaymentAmount: initialPaymentNum,
         };
 
         const res = await createManualOrder(payload);
@@ -145,24 +193,22 @@ export default function ManualOrderPage() {
           toast.error("Please fill in all part details");
           return;
         }
-
         const quantityClean = Number(formData.partQuantity);
-        const priceClean = Number(formData.partPrice);
         const maxClean = Number(formData.partMaxQuantity || 0);
-
-        if (quantityClean <= 0 || priceClean < 0) {
-          toast.error("Please enter valid quantity and price");
+        if (quantityClean <= 0) {
+          toast.error("Please enter valid quantity");
           return;
         }
-
         if (quantityClean > maxClean) {
           toast.error(`Quantity cannot exceed available stock (${maxClean})`);
           return;
         }
-
-        const salePriceClean = Number(formData.salePrice.replace(/,/g, ""));
-        if (!salePriceClean || salePriceClean <= 0) {
+        if (!salePriceNum || salePriceNum <= 0) {
           toast.error("Please enter a valid sale price");
+          return;
+        }
+        if (isPartial && initialPaymentNum <= 0) {
+          toast.error("Initial payment must be greater than zero");
           return;
         }
 
@@ -170,11 +216,14 @@ export default function ManualOrderPage() {
           partId: formData.partId,
           partInventoryId: formData.partInventoryId,
           quantity: quantityClean,
-          amount: salePriceClean,
+          amount: salePriceNum,
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           customerAddress: formData.customerAddress,
-          paymentMethod: formData.paymentMethod,
+          paymentMethod: selectedMethod,
+          accountId: selectedAccountId,
+          isInstallmentPlan: isPartial && balanceDue > 0,
+          initialPaymentAmount: initialPaymentNum,
         };
 
         const res = await createManualPartOrder(payload);
@@ -183,7 +232,10 @@ export default function ManualOrderPage() {
       }
     } catch (error: unknown) {
       console.error("Sale registration failed:", error);
-      toast.error((error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to register sale");
+      toast.error(
+        (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+          "Failed to register sale"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -194,7 +246,6 @@ export default function ManualOrderPage() {
       toast.error("Please enter a chassis number");
       return;
     }
-
     try {
       setLookupLoading(true);
       const res = await getBikes({
@@ -206,33 +257,23 @@ export default function ManualOrderPage() {
       const exactBike = bikes.find(
         (b) => b.chassisNumber.toUpperCase() === formData.chassisNumber.trim().toUpperCase()
       );
-
       if (!exactBike) {
         toast.error("No bike found with this chassis number");
         return;
       }
-
       if (exactBike.status !== "AVAILABLE") {
         toast.error(`Bike cannot be sold. Current status is ${exactBike.status}`);
         return;
       }
-
       const modelName = `${exactBike.model.brand} ${exactBike.model.modelName}`;
       const price = exactBike.price || exactBike.model.basePrice || 0;
-
-      setBikeDetails({
-        id: exactBike.id,
-        model: modelName,
-        price: price.toString(),
-      });
-
+      setBikeDetails({ id: exactBike.id, model: modelName, price: price.toString() });
       setFormData((prev) => ({
         ...prev,
         bikeModel: modelName,
         bikePrice: Number(price).toLocaleString(),
         salePrice: Number(price).toLocaleString(),
       }));
-
       toast.success("Bike found and available");
     } catch (error) {
       console.error("Lookup failed:", error);
@@ -242,149 +283,63 @@ export default function ManualOrderPage() {
     }
   };
 
+  // ── Shared input style
+  const inputStyle = {
+    backgroundColor: theme.backgrounds.tertiary,
+    border: `1px solid ${theme.borders.medium}`,
+    color: theme.text.primary,
+  };
+
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: theme.text.primary }}
-          >
-            Register Sale
-          </h1>
-          <p style={{ color: theme.text.secondary }}>
-            Manual sale entry with auto-generated documents
-          </p>
+          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>Register Sale</h1>
+          <p style={{ color: theme.text.secondary }}>Manual sale entry with auto-generated documents</p>
         </div>
 
-        {/* Sale Type Selection */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Sale Type
-          </h3>
+        {/* Sale Type */}
+        <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Sale Type</h3>
           <div className="flex gap-4">
-            <button
-              onClick={() => setSaleType("BIKE")}
-              disabled={isSubmitting}
-              className={`px-6 py-3 text-sm font-medium rounded transition-colors ${
-                saleType === "BIKE" ? "opacity-100" : "opacity-60 hover:opacity-80"
-              }`}
-              style={{
-                backgroundColor: saleType === "BIKE" ? theme.accents.primary : theme.backgrounds.tertiary,
-                color: saleType === "BIKE" ? theme.text.inverse : theme.text.primary,
-                border: `1px solid ${saleType === "BIKE" ? theme.accents.primary : theme.borders.medium}`,
-              }}
-            >
-              Bike
-            </button>
-            <button
-              onClick={() => setSaleType("PART")}
-              disabled={isSubmitting}
-              className={`px-6 py-3 text-sm font-medium rounded transition-colors ${
-                saleType === "PART" ? "opacity-100" : "opacity-60 hover:opacity-80"
-              }`}
-              style={{
-                backgroundColor: saleType === "PART" ? theme.accents.primary : theme.backgrounds.tertiary,
-                color: saleType === "PART" ? theme.text.inverse : theme.text.primary,
-                border: `1px solid ${saleType === "PART" ? theme.accents.primary : theme.borders.medium}`,
-              }}
-            >
-              Part
-            </button>
+            {(["BIKE", "PART"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setSaleType(t)}
+                disabled={isSubmitting}
+                className="px-6 py-3 text-sm font-medium rounded transition-colors"
+                style={{
+                  backgroundColor: saleType === t ? theme.accents.primary : theme.backgrounds.tertiary,
+                  color: saleType === t ? theme.text.inverse : theme.text.primary,
+                  border: `1px solid ${saleType === t ? theme.accents.primary : theme.borders.medium}`,
+                  opacity: isSubmitting ? 0.6 : 1,
+                }}
+              >
+                {t === "BIKE" ? "Bike" : "Part"}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Bike Information */}
         {saleType === "BIKE" && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="text-lg font-semibold mb-4"
-              style={{ color: theme.text.primary }}
-            >
-              Bike Information
-            </h3>
+          <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Bike Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Chassis Number *
-                </label>
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Chassis Number *</label>
                 <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={formData.chassisNumber}
-                    onChange={(e) => handleInputChange("chassisNumber", e.target.value)}
-                    disabled={lookupLoading || isSubmitting}
-                    className="flex-1 px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter chassis number"
-                  />
-                  <AsyncButton
-                    onClick={handleChassisLookup}
-                    loading={lookupLoading}
-                    loadingLabel="Looking up..."
-                    disabled={isSubmitting}
-                  >
-                    Lookup
-                  </AsyncButton>
+                  <input type="text" value={formData.chassisNumber} onChange={(e) => handleInputChange("chassisNumber", e.target.value)} disabled={lookupLoading || isSubmitting} className="flex-1 px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Enter chassis number" />
+                  <AsyncButton onClick={handleChassisLookup} loading={lookupLoading} loadingLabel="Looking up..." disabled={isSubmitting}>Lookup</AsyncButton>
                 </div>
               </div>
               <div>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Model
-                </label>
-                <input
-                  type="text"
-                  value={formData.bikeModel}
-                  readOnly
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                    opacity: 0.7,
-                  }}
-                  placeholder="Auto-filled from chassis"
-                />
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Model</label>
+                <input type="text" value={formData.bikeModel} readOnly className="w-full px-3 py-2 rounded text-sm" style={{ ...inputStyle, opacity: 0.7 }} placeholder="Auto-filled from chassis" />
               </div>
               <div>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Base Price
-                </label>
-                <input
-                  type="text"
-                  value={formData.bikePrice}
-                  readOnly
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                    opacity: 0.7,
-                  }}
-                  placeholder="Auto-filled from chassis"
-                />
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Base Price</label>
+                <input type="text" value={formData.bikePrice} readOnly className="w-full px-3 py-2 rounded text-sm" style={{ ...inputStyle, opacity: 0.7 }} placeholder="Auto-filled from chassis" />
               </div>
             </div>
           </div>
@@ -392,348 +347,180 @@ export default function ManualOrderPage() {
 
         {/* Part Information */}
         {saleType === "PART" && (
-          <div
-            className="rounded-lg p-6 mb-6"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="text-lg font-semibold mb-4"
-              style={{ color: theme.text.primary }}
-            >
-              Part Information
-            </h3>
+          <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Part Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="relative">
-                <label
-                  className="block text-sm font-medium mb-1"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Part *
-                </label>
-                <input
-                  type="text"
-                  value={partSearchTerm}
-                  onChange={(e) => {
-                    setPartSearchTerm(e.target.value);
-                    if (formData.partId) {
-                      handleInputChange("partInventoryId", "");
-                      handleInputChange("partId", "");
-                      handleInputChange("partName", "");
-                      handleInputChange("partPrice", "");
-                      handleInputChange("partMaxQuantity", "");
-                    }
-                    setShowPartDropdown(true);
-                  }}
-                  onFocus={() => setShowPartDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowPartDropdown(false), 200)}
-                  disabled={isSubmitting}
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                  placeholder="Search for a part..."
-                />
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Part *</label>
+                <input type="text" value={partSearchTerm} onChange={(e) => { setPartSearchTerm(e.target.value); if (formData.partId) { ["partInventoryId","partId","partName","partPrice","partMaxQuantity"].forEach(k => handleInputChange(k, "")); } setShowPartDropdown(true); }} onFocus={() => setShowPartDropdown(true)} onBlur={() => setTimeout(() => setShowPartDropdown(false), 200)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Search for a part..." />
                 {showPartDropdown && (
-                  <div
-                    className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto"
-                    style={{
-                      backgroundColor: theme.backgrounds.primary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
+                  <div className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}` }}>
                     {isFetchingParts ? (
-                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>
-                        Loading parts...
-                      </div>
+                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>Loading parts...</div>
                     ) : partSearchResults.length > 0 ? (
                       partSearchResults.map((p: PartInventory) => (
-                        <div
-                          key={p.id}
-                          className="px-3 py-2 text-sm cursor-pointer hover:opacity-80"
-                          style={{
-                            color: theme.text.primary,
-                            backgroundColor: theme.backgrounds.tertiary,
-                            borderBottom: `1px solid ${theme.borders.light}`,
-                          }}
-                          onClick={() => {
-                            const availableQuantity = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0));
-                            setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`);
-                            handleInputChange("partInventoryId", p.id);
-                            handleInputChange("partId", p.part?.id || "");
-                            handleInputChange("partName", p.part?.name || "");
-                            handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0");
-                            handleInputChange("partMaxQuantity", availableQuantity.toString());
-                            setShowPartDropdown(false);
-                          }}
-                        >
+                        <div key={p.id} className="px-3 py-2 text-sm cursor-pointer hover:opacity-80" style={{ color: theme.text.primary, backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }} onClick={() => { const avail = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0)); setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`); handleInputChange("partInventoryId", p.id); handleInputChange("partId", p.part?.id || ""); handleInputChange("partName", p.part?.name || ""); handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0"); handleInputChange("partMaxQuantity", avail.toString()); setShowPartDropdown(false); }}>
                           <div className="font-medium">{p.part?.name}</div>
-                          <div className="text-xs" style={{ color: theme.text.secondary }}>
-                            SKU: {p.part?.sku} | Rs. {Number(p.part?.sellingPrice || 0).toLocaleString()} | Available: {Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0))}
-                          </div>
+                          <div className="text-xs" style={{ color: theme.text.secondary }}>SKU: {p.part?.sku} | Rs. {Number(p.part?.sellingPrice || 0).toLocaleString()} | Available: {Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0))}</div>
                         </div>
                       ))
                     ) : (
-                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>
-                        No part found
-                      </div>
+                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>No part found</div>
                     )}
                   </div>
                 )}
               </div>
               <div>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Quantity *
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max={formData.partMaxQuantity || undefined}
-                  value={formData.partQuantity}
-                  onChange={(e) => {
-                    let val = e.target.value;
-                    if (formData.partMaxQuantity && val) {
-                      const maxVal = parseInt(formData.partMaxQuantity, 10);
-                      const numVal = parseInt(val, 10);
-                      if (!isNaN(numVal) && numVal > maxVal) {
-                        val = formData.partMaxQuantity;
-                        toast.error(`Only ${maxVal} units available in stock`);
-                      }
-                    }
-                    handleInputChange("partQuantity", val);
-                  }}
-                  disabled={!formData.partInventoryId || isSubmitting}
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                  placeholder="Quantity"
-                />
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Quantity *</label>
+                <input type="number" min="1" max={formData.partMaxQuantity || undefined} value={formData.partQuantity} onChange={(e) => { let val = e.target.value; if (formData.partMaxQuantity && val) { const mx = parseInt(formData.partMaxQuantity, 10); const nv = parseInt(val, 10); if (!isNaN(nv) && nv > mx) { val = formData.partMaxQuantity; toast.error(`Only ${mx} units available`); } } handleInputChange("partQuantity", val); }} disabled={!formData.partInventoryId || isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Quantity" />
               </div>
               <div>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  style={{ color: theme.text.secondary }}
-                >
-                  Unit Price *
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.partPrice}
-                  onChange={(e) => handleInputChange("partPrice", e.target.value)}
-                  disabled={!formData.partInventoryId || isSubmitting}
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                  placeholder="Price per unit"
-                />
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Unit Price *</label>
+                <input type="number" min="0" step="0.01" value={formData.partPrice} onChange={(e) => handleInputChange("partPrice", e.target.value)} disabled={!formData.partInventoryId || isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Price per unit" />
               </div>
             </div>
           </div>
         )}
 
         {/* Customer Information */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Customer Information
-          </h3>
+        <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Customer Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Customer Name *
-              </label>
-              <input
-                type="text"
-                value={formData.customerName}
-                onChange={(e) => handleInputChange("customerName", e.target.value)}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="Customer name"
-              />
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Customer Name *</label>
+              <input type="text" value={formData.customerName} onChange={(e) => handleInputChange("customerName", e.target.value)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Customer name" />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                CNIC {saleType === "BIKE" ? "*" : ""}
-              </label>
-              <input
-                type="text"
-                value={formData.customerCNIC}
-                onChange={(e) => handleInputChange("customerCNIC", e.target.value)}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="CNIC number"
-              />
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>CNIC {saleType === "BIKE" ? "*" : ""}</label>
+              <input type="text" value={formData.customerCNIC} onChange={(e) => handleInputChange("customerCNIC", e.target.value)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="CNIC number" />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Phone *
-              </label>
-              <input
-                type="text"
-                value={formData.customerPhone}
-                onChange={(e) => handleInputChange("customerPhone", e.target.value)}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="Phone number"
-              />
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Phone *</label>
+              <input type="text" value={formData.customerPhone} onChange={(e) => handleInputChange("customerPhone", e.target.value)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Phone number" />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Address *
-              </label>
-              <input
-                type="text"
-                value={formData.customerAddress}
-                onChange={(e) => handleInputChange("customerAddress", e.target.value)}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="Customer address"
-              />
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Address *</label>
+              <input type="text" value={formData.customerAddress} onChange={(e) => handleInputChange("customerAddress", e.target.value)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Customer address" />
             </div>
           </div>
         </div>
 
         {/* Sale Details */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: theme.text.primary }}
-          >
-            Sale Details
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Sale Price *
-              </label>
-              <input
-                type="text"
-                value={formData.salePrice}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, "");
-                  if (val) {
-                    handleInputChange("salePrice", Number(val).toLocaleString());
-                  } else {
-                    handleInputChange("salePrice", "");
-                  }
-                }}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-                placeholder="Final sale price"
-              />
-              {formData.salePrice && (
-                <p className="text-sm mt-2 font-medium" style={{ color: "#059669" }}>
-                  {numberToWords(parseFloat(formData.salePrice.replace(/,/g, "")))}
-                </p>
-              )}
+        <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Sale Details</h3>
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Sale Price *</label>
+            <input
+              type="text"
+              value={formData.salePrice}
+              onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); handleInputChange("salePrice", val ? Number(val).toLocaleString() : ""); }}
+              disabled={isSubmitting}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={inputStyle}
+              placeholder="Final sale price"
+            />
+            {salePriceNum > 0 && (
+              <p className="text-sm mt-1 font-medium" style={{ color: "#059669" }}>{numberToWords(salePriceNum)}</p>
+            )}
+          </div>
+
+          {/* Partial payment toggle */}
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              type="button"
+              onClick={() => { setIsPartial(!isPartial); if (!isPartial) setInitialPaymentDisplay(""); }}
+              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+              style={{ backgroundColor: isPartial ? theme.accents.primary : theme.borders.medium }}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isPartial ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <span className="text-sm font-medium" style={{ color: theme.text.primary }}>Partial Payment</span>
+            {isPartial && <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-semibold">Balance will be recorded as receivable</span>}
+          </div>
+
+          {isPartial && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-lg mb-4" style={{ backgroundColor: theme.backgrounds.secondary }}>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Amount Paid Now *</label>
+                <input
+                  type="text"
+                  value={initialPaymentDisplay}
+                  onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); setInitialPaymentDisplay(val ? Number(val).toLocaleString() : ""); }}
+                  disabled={isSubmitting}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={inputStyle}
+                  placeholder="Amount received now"
+                />
+                {initialPaymentNum > 0 && (
+                  <p className="text-xs mt-1" style={{ color: theme.text.muted }}>{numberToWords(initialPaymentNum)}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Balance Due</label>
+                <div className="px-3 py-2 rounded text-sm font-semibold" style={{ ...inputStyle, opacity: 0.7, color: balanceDue > 0 ? "#EF4444" : "#10B981" }}>
+                  Rs. {balanceDue.toLocaleString()}
+                </div>
+                {balanceDue > 0 && <p className="text-xs mt-1" style={{ color: theme.text.muted }}>{numberToWords(balanceDue)}</p>}
+              </div>
+              <div className="flex items-end">
+                {saleType === "BIKE" && salePriceNum > 0 && (
+                  <p className="text-xs" style={{ color: theme.text.muted }}>
+                    Min. advance: Rs. {Math.ceil(salePriceNum * 0.5).toLocaleString()} (50%)
+                  </p>
+                )}
+              </div>
             </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
-                Payment Method *
-              </label>
-              <select
-                value={formData.paymentMethod}
-                onChange={(e) => handleInputChange("paymentMethod", e.target.value)}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: theme.backgrounds.tertiary,
-                  border: `1px solid ${theme.borders.medium}`,
-                  color: theme.text.primary,
-                }}
-              >
-                <option value="">Select payment method</option>
-                <option value="CASH">Cash</option>
-                <option value="ONLINE_TRANSFER">Online Transfer</option>
-              </select>
-            </div>
+          )}
+
+          {/* Payment Account Selection */}
+          <div>
+            <label className="block text-sm font-medium mb-3" style={{ color: theme.text.secondary }}>
+              Payment Account * <span className="font-normal" style={{ color: theme.text.muted }}>— where is the money going?</span>
+            </label>
+            {paymentAccounts.length === 0 ? (
+              <p className="text-sm" style={{ color: theme.text.muted }}>Loading accounts...</p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {paymentAccounts.map((acc) => {
+                  const isSelected = selectedAccountId === acc.id;
+                  const isCash = acc.subtype === "CASH";
+                  const isBank = acc.subtype === "BANK";
+                  return (
+                    <button
+                      key={acc.id}
+                      type="button"
+                      onClick={() => selectAccount(acc)}
+                      disabled={isSubmitting}
+                      className="flex flex-col items-start p-3 rounded-lg text-left transition-all"
+                      style={{
+                        border: `2px solid ${isSelected ? theme.accents.primary : theme.borders.medium}`,
+                        backgroundColor: isSelected ? theme.accents.primary + "12" : theme.backgrounds.tertiary,
+                      }}
+                    >
+                      <span className="px-1.5 py-0.5 rounded text-xs font-bold mb-1.5" style={{ backgroundColor: isCash ? "#FEF9C3" : isBank ? "#DBEAFE" : "#F0FDF4", color: isCash ? "#713F12" : isBank ? "#1D4ED8" : "#15803D" }}>
+                        {acc.subtype}
+                      </span>
+                      <span className="text-sm font-semibold leading-tight" style={{ color: theme.text.primary }}>{acc.name}</span>
+                      {acc.accountNumber && <span className="text-xs font-mono mt-0.5" style={{ color: theme.text.secondary }}>{acc.accountNumber}</span>}
+                      {isSelected && (
+                        <svg className="w-4 h-4 mt-1.5" fill="none" stroke={theme.accents.primary} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        
-
         {/* Actions */}
         <div className="flex justify-end space-x-4 mt-6">
-          <a
-            href="/sales"
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
+          <a href="/sales" className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70" style={{ backgroundColor: theme.backgrounds.primary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}>
             Cancel
           </a>
-          <AsyncButton
-            onClick={handleRegisterSale}
-            loading={isSubmitting}
-            loadingLabel="Registering..."
-            className="px-6"
-          >
+          <AsyncButton onClick={handleRegisterSale} loading={isSubmitting} loadingLabel="Registering..." className="px-6">
             Register Sale
           </AsyncButton>
         </div>

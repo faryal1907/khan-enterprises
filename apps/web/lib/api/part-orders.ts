@@ -9,6 +9,8 @@ export async function createPartOrder(data: {
   quantity: number;
   paymentMethod: string;
   paymentProofUrl?: string;
+  /** ID of the bank/wallet account the customer transferred to. */
+  paymentAccountId?: string;
 }) {
   const response = await api.post("/part-orders", data);
   return response.data;
@@ -51,5 +53,10 @@ export async function recordPartOrderPayment(orderId: string, data: {
   referenceNumber?: string;
 }) {
   const response = await api.post(`/part-orders/${orderId}/payment`, data);
+  return response.data;
+}
+
+export async function markPartOrderAsPickedByCustomer(orderId: string) {
+  const response = await api.patch(`/part-orders/${orderId}/picked-up`);
   return response.data;
 }

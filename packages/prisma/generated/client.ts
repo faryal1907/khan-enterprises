@@ -174,3 +174,8 @@ export type Payable = Prisma.PayableModel
  * 
  */
 export type PaymentAllocation = Prisma.PaymentAllocationModel
+/**
+ * Model ReceivablesAlert
+ * 
+ */
+export type ReceivablesAlert = Prisma.ReceivablesAlertModel

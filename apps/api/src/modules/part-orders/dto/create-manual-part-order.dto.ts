@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, Min, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, Min, IsEnum, IsOptional, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PaymentMethod } from '@khan/prisma';
 
@@ -36,8 +36,22 @@ export class CreateManualPartOrderDto {
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
 
-  // Optional: link the order to a registered customer account.
-  // Leave null for walk-in customers who have no account yet.
+  /** Amount paid now — defaults to full amount if omitted */
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  initialPaymentAmount?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isInstallmentPlan?: boolean;
+
+  /** Specific account (CASH/BANK/EWALLET) to credit the payment to */
+  @IsString()
+  @IsOptional()
+  accountId?: string;
+
   @IsString()
   @IsOptional()
   customerId?: string;

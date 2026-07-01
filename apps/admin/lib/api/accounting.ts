@@ -5,6 +5,11 @@ export const getAccounts = async () => {
   return data;
 };
 
+export const getPaymentAccounts = async () => {
+  const { data } = await api.get('/accounting/receivables/payment-accounts');
+  return data;
+};
+
 export const getJournalEntries = async () => {
   const { data } = await api.get('/accounting/journals');
   return data;
@@ -50,8 +55,10 @@ export const updateAccount = async (id: string, payload: { name?: string; code?:
   return data;
 };
 
-export const deleteAccount = async (id: string) => {
-  const { data } = await api.delete(`/accounting/accounts/${id}`);
+export const deleteAccount = async (id: string, transferAccountId?: string) => {
+  const { data } = await api.delete(`/accounting/accounts/${id}`, {
+    data: { transferAccountId },
+  });
   return data;
 };
 
@@ -80,5 +87,30 @@ export const recordOwnerWithdrawal = async (payload: { sourceAccountId: string; 
 
 export const recordInternalTransfer = async (payload: { fromAccountId: string; toAccountId: string; amount: number; date: string; notes?: string }) => {
   const { data } = await api.post('/accounting/internal-transfer', payload);
+  return data;
+};
+
+// ─── Receivables ──────────────────────────────────────────────────────────────
+
+export const getReceivables = async () => {
+  const { data } = await api.get('/accounting/receivables');
+  return data;
+};
+
+export const getCustomerLedger = async (customerPhone: string) => {
+  const { data } = await api.get(`/accounting/receivables/${encodeURIComponent(customerPhone)}/ledger`);
+  return data;
+};
+
+export const getCustomerStatement = async (customerPhone: string) => {
+  const { data } = await api.get(`/accounting/receivables/${encodeURIComponent(customerPhone)}/statement`);
+  return data;
+};
+
+export const collectReceivable = async (
+  customerPhone: string,
+  payload: { amount: number; paymentMethod: string; notes?: string; accountId?: string }
+) => {
+  const { data } = await api.post(`/accounting/receivables/${encodeURIComponent(customerPhone)}/collect`, payload);
   return data;
 };

@@ -95,4 +95,14 @@ export class CatalogController {
   async getBranches() {
     return this.catalogService.getBranches();
   }
+
+  /**
+   * GET /api/catalog/payment-accounts
+   * Returns active BANK and EWALLET accounts for payment method selection.
+   * Public endpoint — no auth required, no balances exposed.
+   */
+  @Get("payment-accounts")
+  async getPaymentAccounts() {
+    return this.catalogService.getPaymentAccounts();
+  }
 }

@@ -68,6 +68,18 @@ export async function getCatalogBranches() {
   return response.data;
 }
 
+export interface PaymentAccount {
+  id: string;
+  name: string;
+  subtype: string;
+  accountNumber: string | null;
+}
+
+export async function getPaymentAccounts(): Promise<PaymentAccount[]> {
+  const response = await api.get("/catalog/payment-accounts");
+  return response.data;
+}
+
 // Stub for Sprint 6 backend
 export async function submitOffer(data: OfferData) {
   // TODO: Implement when Sprint 6 backend is ready

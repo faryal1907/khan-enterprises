@@ -3,15 +3,18 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { PrismaService } from "../../prisma/prisma.service";
 import { BikeStatus, OrderStatus } from "@khan/prisma";
 import { OrdersService } from "../orders/orders.service";
+import { ReceivablesAlertService } from "../accounting/receivables-alert.service";
 
 @Injectable()
 export class SchedulerService {
   private readonly logger = new Logger(SchedulerService.name);
   private isExpiringCashReservations = false;
+  private isCheckingReceivables = false;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly ordersService: OrdersService,
+    private readonly receivablesAlertService: ReceivablesAlertService,
   ) {}
 
 
@@ -40,6 +43,32 @@ export class SchedulerService {
       this.logger.error("Error in expireCashReservations cron job:", error);
     } finally {
       this.isExpiringCashReservations = false;
+    }
+  }
+
+  /**
+   * Check for partial payment reminders (every hour)
+   * Find customers in PARTIAL status for 48+ hours and notify admins
+   */
+  @Cron(CronExpression.EVERY_HOUR)
+  async checkReceivablesPartialPayments() {
+    if (this.isCheckingReceivables) {
+      this.logger.warn("checkReceivablesPartialPayments is already running, skipping this execution.");
+      return;
+    }
+
+    this.isCheckingReceivables = true;
+    this.logger.log("Running checkReceivablesPartialPayments cron job...");
+
+    try {
+      const result = await this.receivablesAlertService.checkAndNotifyPartialPayments();
+      this.logger.log(
+        `Partial payment reminders sent: ${result.notificationsSent}`,
+      );
+    } catch (error) {
+      this.logger.error("Error in checkReceivablesPartialPayments cron job:", error);
+    } finally {
+      this.isCheckingReceivables = false;
     }
   }
 }

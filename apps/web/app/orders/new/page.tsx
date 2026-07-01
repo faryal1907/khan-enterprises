@@ -6,6 +6,7 @@ import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { createCustomerOrder, CreateOrderPayload } from "@/lib/api/create-order";
+import { getPaymentAccounts, PaymentAccount } from "@/lib/api/catalog";
 
 const CameraIcon = () => (
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto", display: "block" }}>
@@ -46,13 +47,20 @@ export default function NewOrderPage() {
   const [proofUploaded, setProofUploaded] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [paymentAccounts, setPaymentAccounts] = useState<PaymentAccount[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   const basePrice = bike ? (bike.price || bike.model?.basePrice) : 0;
   const individualDiscount = bike?.onlineDiscountPercent ? Number(bike.onlineDiscountPercent) : 0;
   const globalDiscount = bike?.globalDiscountPercent ? Number(bike.globalDiscountPercent) : 0;
   const discountPercent = individualDiscount + globalDiscount;
-  const onlinePrice = basePrice * (1 - discountPercent / 100);
+  const onlinePrice = Math.round(basePrice * (1 - discountPercent / 100));
   const discountAmount = basePrice - onlinePrice;
+  const minimumAdvance = Math.ceil(onlinePrice * 0.5);
+
+  // Advance payment state (only relevant for ONLINE_TRANSFER)
+  const [advanceDisplay, setAdvanceDisplay] = useState("");
+  const [advanceAmount, setAdvanceAmount] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -65,6 +73,7 @@ export default function NewOrderPage() {
       return;
     }
     fetchBike();
+    getPaymentAccounts().then(setPaymentAccounts).catch(() => {});
   }, [user, bikeId]);
 
   useEffect(() => {
@@ -74,6 +83,14 @@ export default function NewOrderPage() {
       if (!customerEmail) setCustomerEmail(user.email || "");
     }
   }, [user]);
+
+  // Reset advance amount when payment method or price changes
+  useEffect(() => {
+    if (paymentMethod === "ONLINE_TRANSFER" && minimumAdvance > 0) {
+      setAdvanceAmount(minimumAdvance);
+      setAdvanceDisplay(minimumAdvance.toLocaleString());
+    }
+  }, [paymentMethod, minimumAdvance]);
 
   const fetchBike = async () => {
     try {
@@ -112,8 +129,19 @@ export default function NewOrderPage() {
       return;
     }
 
-    if (customerCNIC && !validateCNIC(customerCNIC)) {
+    // CNIC is mandatory
+    if (!customerCNIC || !validateCNIC(customerCNIC)) {
       setError("Please enter a valid CNIC");
+      return;
+    }
+
+    if (paymentMethod === "ONLINE_TRANSFER" && advanceAmount < minimumAdvance) {
+      setError(`Advance payment must be at least Rs. ${minimumAdvance.toLocaleString()} (50% of online price)`);
+      return;
+    }
+
+    if (paymentMethod === "ONLINE_TRANSFER" && !selectedAccountId) {
+      setError("Please select the bank/wallet account you transferred to");
       return;
     }
 
@@ -128,11 +156,14 @@ export default function NewOrderPage() {
         customerEmail: customerEmail || undefined,
         customerCNIC: customerCNIC || undefined,
         paymentMethod,
-        // For CASH orders we must not send empty/invalid paymentProofUrl
         paymentProofUrl:
           paymentMethod === "ONLINE_TRANSFER"
             ? paymentProofUrl || undefined
             : undefined,
+        initialPaymentAmount:
+          paymentMethod === "ONLINE_TRANSFER" ? advanceAmount : undefined,
+        paymentAccountId:
+          paymentMethod === "ONLINE_TRANSFER" ? selectedAccountId || undefined : undefined,
       };
 
       const order = await createCustomerOrder(payload);
@@ -291,7 +322,7 @@ export default function NewOrderPage() {
     );
   }
 
-  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded);
+  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded && !!selectedAccountId);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -364,6 +395,11 @@ export default function NewOrderPage() {
           {/* Payment Method Selector */}
           <div className="mb-6">
             <label className="block text-sm font-medium mb-3" style={{ color: theme.text.secondary }}>Select Payment Method</label>
+            <div className="mb-3 p-3 rounded-lg" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
+              <p className="text-xs" style={{ color: theme.text.secondary }}>
+                <strong style={{ color: theme.text.primary }}>Online Transfer:</strong> Minimum 50% advance required (PKR {minimumAdvance.toLocaleString()}) to confirm your order.
+              </p>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -406,9 +442,51 @@ export default function NewOrderPage() {
               </div>
               <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
                 <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
-                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                  Transfer PKR {onlinePrice.toLocaleString()} to our bank account and upload the payment screenshot below.
-                </p>
+
+              {/* Account selector */}
+              {paymentAccounts.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                    Transfer To <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <div className="space-y-2">
+                    {paymentAccounts.map((acc) => (
+                      <button
+                        key={acc.id}
+                        type="button"
+                        onClick={() => setSelectedAccountId(acc.id)}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all"
+                        style={{
+                          backgroundColor: selectedAccountId === acc.id ? theme.accents.primary + "15" : theme.backgrounds.primary,
+                          border: `2px solid ${selectedAccountId === acc.id ? theme.accents.primary : theme.borders.medium}`,
+                        }}
+                      >
+                        <span
+                          className="px-2 py-0.5 rounded text-xs font-bold shrink-0"
+                          style={{
+                            backgroundColor: acc.subtype === 'BANK' ? '#DBEAFE' : '#F0FDF4',
+                            color: acc.subtype === 'BANK' ? '#1D4ED8' : '#15803D',
+                          }}
+                        >
+                          {acc.subtype === 'BANK' ? 'BANK' : 'WALLET'}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm truncate" style={{ color: theme.text.primary }}>{acc.name}</p>
+                          {acc.accountNumber && (
+                            <p className="text-xs mt-0.5 font-mono" style={{ color: theme.text.secondary }}>{acc.accountNumber}</p>
+                          )}
+                        </div>
+                        {selectedAccountId === acc.id && (
+                          <svg className="w-5 h-5 shrink-0" fill="none" stroke={theme.accents.primary} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+                
 
               <div
                 onDragOver={handleDragOver}

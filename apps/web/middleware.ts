@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const WEB_ACCESS_TOKEN_COOKIE = "accessToken";
 import type { NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/signup", "/", "/bikes", "/parts", "/search", "/orders", "/forgot-password", "/reset-password"];
+const publicPaths = ["/login", "/signup", "/", "/bikes", "/parts", "/search", "/orders", "/forgot-password", "/reset-password", "/auth/callback"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

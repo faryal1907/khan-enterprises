@@ -26,7 +26,10 @@ export function OwnerEquityModal({
 
   const ownerCapital = accounts.find((a) => a.code === '3001')?.balance || 0;
   const ownerDrawings = accounts.find((a) => a.code === '3002')?.balance || 0;
-  const netEquity = ownerCapital - ownerDrawings;
+  const totalRevenue = accounts.filter((a: any) => a.category === 'REVENUE').reduce((s: number, a: any) => s + (a.balance || 0), 0);
+  const totalExpenses = accounts.filter((a: any) => a.category === 'EXPENSE').reduce((s: number, a: any) => s + (a.balance || 0), 0);
+  const netProfit = totalRevenue - totalExpenses;
+  const netEquity = ownerCapital - ownerDrawings + netProfit;
 
   return (
     <div
@@ -54,7 +57,7 @@ export function OwnerEquityModal({
         </div>
 
         {/* Balances */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <div
             className="p-3 rounded text-center"
             style={{ backgroundColor: theme.backgrounds.secondary }}
@@ -71,6 +74,15 @@ export function OwnerEquityModal({
             <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>Owner Drawings</div>
             <div className="text-sm font-semibold" style={{ color: theme.text.primary }}>
               {formatCurrency(ownerDrawings)}
+            </div>
+          </div>
+          <div
+            className="p-3 rounded text-center"
+            style={{ backgroundColor: theme.backgrounds.secondary }}
+          >
+            <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>Net Profit</div>
+            <div className="text-sm font-semibold" style={{ color: netProfit >= 0 ? '#22c55e' : '#ef4444' }}>
+              {formatCurrency(netProfit)}
             </div>
           </div>
           <div

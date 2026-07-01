@@ -10,6 +10,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { ActionModal } from "@/components/action-modal";
 import { AsyncButton } from "@/components/async-button";
 import { OrderStatusBadge } from "@/components/order-status-badge";
+import { getPaymentAccounts } from "@/lib/api/accounting";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -26,10 +27,12 @@ export default function OrderDetailPage() {
   const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [rejectPaymentReason, setRejectPaymentReason] = useState("");
+  const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
   const [paymentData, setPaymentData] = useState({
     method: PaymentMethod.CASH,
     amount: 0,
     referenceNumber: "",
+    accountId: "",
   });
 
   useEffect(() => {
@@ -37,7 +40,10 @@ export default function OrderDetailPage() {
       try {
         const data = await getOrderById(orderId);
         setOrder(data);
-        setPaymentData((prev) => ({ ...prev, amount: data.bike?.actualSalePrice || 0 }));
+        // Default to remaining balance so partial payments adjust correctly
+        const balanceDue = data.balanceDue !== undefined ? Number(data.balanceDue) : 0;
+        const fullAmount = data.bike?.actualSalePrice ? Number(data.bike.actualSalePrice) : 0;
+        setPaymentData((prev) => ({ ...prev, amount: balanceDue || fullAmount }));
       } catch (error: any) {
         console.warn("Failed to fetch order:", error?.message || error);
         toast.error("Failed to fetch order");
@@ -47,6 +53,12 @@ export default function OrderDetailPage() {
     };
     fetchOrder();
   }, [orderId]);
+
+  useEffect(() => {
+    if (showPaymentModal) {
+      getPaymentAccounts().then(setPaymentAccounts).catch(() => setPaymentAccounts([]));
+    }
+  }, [showPaymentModal]);
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
@@ -84,6 +96,7 @@ export default function OrderDetailPage() {
       const paymentPayload = {
         ...paymentData,
         amount: Number(paymentData.amount),
+        accountId: paymentData.accountId || undefined,
       };
       await recordPayment(orderId, paymentPayload);
       // Auto-confirm after payment
@@ -118,8 +131,6 @@ export default function OrderDetailPage() {
     try {
       setActionLoading(true);
       await verifyPayment(orderId, transactionId, true);
-      // Auto-confirm after verification
-      await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
       toast.success("Payment verified successfully");
@@ -201,19 +212,49 @@ export default function OrderDetailPage() {
           </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        if (order.pickupType === "DELIVERY") {
+        // If delivery has been requested, show Record Payment if balance outstanding
+        if (order.delivery) {
+          if (Number((order as any).balanceDue) > 0) {
+            return (
+              <AsyncButton
+                onClick={() => setShowPaymentModal(true)}
+                disabled={actionLoading}
+                className="px-6"
+              >
+                Record Payment
+              </AsyncButton>
+            );
+          }
           return null;
         }
-        // No delivery request - show picked by customer button
+        // No delivery requested yet — show Record Payment if balance outstanding, otherwise Picked by Customer
+        if (Number((order as any).balanceDue) > 0) {
+          return (
+            <div className="flex space-x-3">
+              <AsyncButton
+                onClick={() => setShowPaymentModal(true)}
+                disabled={actionLoading}
+                className="px-6"
+              >
+                Record Payment
+              </AsyncButton>
+              <button
+                onClick={handleMarkAsPickedByCustomer}
+                disabled={actionLoading}
+                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+              >
+                Picked by Customer
+              </button>
+            </div>
+          );
+        }
         return (
           <button
             onClick={handleMarkAsPickedByCustomer}
             disabled={actionLoading}
             className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
           >
             Picked by Customer
           </button>
@@ -699,7 +740,7 @@ export default function OrderDetailPage() {
       )}
 
       {/* Payment Modal */}
-      {showPaymentModal && (
+      {showPaymentModal && (order as any) && (
         <ActionModal
           title="Record Payment"
           onClose={() => {
@@ -708,6 +749,31 @@ export default function OrderDetailPage() {
           }}
         >
           <div className="space-y-4 mb-4">
+            {/* Order balance summary */}
+            <div
+              className="rounded-lg p-3 text-sm space-y-1"
+              style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}
+            >
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>Total Amount</span>
+                <span className="font-semibold" style={{ color: theme.text.primary }}>
+                  Rs. {Number((order as any).totalAmount || (order as any).bike?.actualSalePrice || 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>Already Paid</span>
+                <span className="font-semibold text-emerald-600">
+                  Rs. {Number((order as any).paidAmount || 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between border-t pt-1" style={{ borderColor: theme.borders.light }}>
+                <span style={{ color: theme.text.secondary }}>Remaining Balance</span>
+                <span className="font-semibold" style={{ color: theme.accents.error }}>
+                  Rs. {Number((order as any).balanceDue || (order as any).totalAmount || 0).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
                 Payment Method
@@ -727,6 +793,31 @@ export default function OrderDetailPage() {
                 <option value={PaymentMethod.ONLINE_TRANSFER}>Online Transfer</option>
               </select>
             </div>
+            {paymentData.method === PaymentMethod.ONLINE_TRANSFER && (
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                  Bank/E-Wallet Account
+                </label>
+                <select
+                  value={paymentData.accountId}
+                  onChange={(e) => setPaymentData({ ...paymentData, accountId: e.target.value })}
+                  disabled={actionLoading}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                >
+                  <option value="">Select an account</option>
+                  {paymentAccounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.subtype === "BANK" ? "🏦" : "💳"} {acc.name} {acc.accountNumber ? `(${acc.accountNumber})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
                 Amount
@@ -743,6 +834,16 @@ export default function OrderDetailPage() {
                   color: theme.text.primary,
                 }}
               />
+              {paymentData.amount > 0 && paymentData.amount < Number((order as any).balanceDue || (order as any).totalAmount || 0) && (
+                <p className="text-xs mt-1 font-medium" style={{ color: "#D97706" }}>
+                  Partial payment — Rs. {(Number((order as any).balanceDue || (order as any).totalAmount || 0) - paymentData.amount).toLocaleString()} will remain outstanding (receivable).
+                </p>
+              )}
+              {paymentData.amount >= Number((order as any).balanceDue || (order as any).totalAmount || 0) && (
+                <p className="text-xs mt-1 font-medium text-emerald-600">
+                  Full payment — no outstanding balance remaining.
+                </p>
+              )}
             </div>
             {paymentData.method !== PaymentMethod.CASH && (
               <div>
@@ -779,7 +880,7 @@ export default function OrderDetailPage() {
             </button>
             <AsyncButton
               onClick={handleRecordPayment}
-              disabled={paymentData.amount <= 0 || actionLoading}
+              disabled={paymentData.amount <= 0 || actionLoading || (paymentData.method === PaymentMethod.ONLINE_TRANSFER && !paymentData.accountId)}
               loading={actionLoading}
               loadingLabel="Recording..."
             >

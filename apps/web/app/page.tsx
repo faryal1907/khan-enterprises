@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { theme } from "@/lib/colors";
 import { NotificationPermissionBanner } from "@/components/notification-permission-banner";
+import { getPaymentAccounts, PaymentAccount, getCatalogBranches } from "@/lib/api/catalog";
 
 // ── Animation variants ──────────────────────────────────────────────
 const fadeUp = {
@@ -58,6 +60,13 @@ function AccentLine({ width = "4rem" }: { width?: string }) {
 }
 
 export default function Home() {
+  const [paymentAccounts, setPaymentAccounts] = useState<PaymentAccount[]>([]);
+  const [branches, setBranches] = useState<{ id: string; name: string; city: string; address: string; phoneNumber?: string | null }[]>([]);
+
+  useEffect(() => {
+    getPaymentAccounts().then(setPaymentAccounts).catch(() => {});
+    getCatalogBranches().then(setBranches).catch(() => {});
+  }, []);
   return (
     <div style={{ backgroundColor: theme.backgrounds.primary }} className="min-h-screen">
       <NotificationPermissionBanner />
@@ -206,7 +215,7 @@ export default function Home() {
                   color: theme.colors.white,
                 }}
               >
-                <p className="text-xs font-semibold">Live across 2 branches</p>
+                <p className="text-xs font-semibold">Live across {branches.length || 2} branches</p>
               </div>
             </motion.div>
 
@@ -328,14 +337,32 @@ export default function Home() {
             Multiple payment methods available for your convenience
           </motion.p>
 
+          {/* 50% Advance Notice */}
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+            className="mb-12 p-4 rounded-xl border max-w-3xl mx-auto"
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderColor: "#F59E0B",
+            }}
+          >
+            <p className="text-sm text-center" style={{ color: "#92400E" }}>
+              <strong>Online Transfer Orders:</strong> A minimum <strong>50% advance payment</strong> is required to confirm youur bike order. The calculated advance amount will be shown on the order page. Part orders must be paid in full.
+            </p>
+          </motion.div>
+
           <motion.div
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, amount: 0.2 }}
             variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {/* Card 1 — left-border style (kept) */}
+            {/* Static cash card */}
             <motion.div
               variants={fadeUp}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -347,63 +374,73 @@ export default function Home() {
                 borderLeftColor: theme.accents.primary,
               }}
             >
-              <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
-                Cash Payment
+              <div className="mb-3">
+                <span
+                  className="px-2 py-0.5 rounded text-xs font-bold"
+                  style={{ backgroundColor: "#FEF9C3", color: "#713F12" }}
+                >
+                  CASH
+                </span>
+              </div>
+              <h3 className="text-lg font-bold mb-1" style={{ color: theme.text.primary }}>
+                Cash on Delivery
               </h3>
               <p style={{ color: theme.text.secondary }} className="text-sm">
-                Direct payment with instant confirmation
+                Pay at the store during pickup
               </p>
             </motion.div>
 
-            {/* Card 2 — solid tinted background, no border at all */}
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="p-6 rounded-xl transition-all hover:shadow-md"
-              style={{ backgroundColor: theme.colors.limeSoft }}
-            >
-              <h3 className="text-lg font-bold mb-2" style={{ color: theme.colors.gray900 }}>
-                Bank Transfer
-              </h3>
-              <p style={{ color: theme.colors.gray700 }} className="text-sm">
-                Secure transfers with full tracking
-              </p>
-            </motion.div>
-
-            {/* Card 3 — full border all around, dark variant */}
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="p-6 rounded-xl transition-all hover:shadow-md"
-              style={{
-                backgroundColor: theme.accents.primary,
-              }}
-            >
-              <h3 className="text-lg font-bold mb-2" style={{ color: theme.colors.white }}>
-                Mobile Wallet
-              </h3>
-              <p style={{ color: theme.colors.white, opacity: 0.7 }} className="text-sm">
-                Easypaisa, Jazzcash, and other mobile wallets
-              </p>
-            </motion.div>
-
-            {/* Card 4 — outline only, top accent instead of left */}
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="p-6 rounded-xl border-2 transition-all hover:shadow-md relative overflow-hidden"
-              style={{
-                backgroundColor: theme.backgrounds.primary,
-                borderColor: theme.accents.secondary,
-              }}
-            >
-              <h3 className="text-lg font-bold mb-2" style={{ color: theme.text.primary }}>
-                JazzCash
-              </h3>
-              <p style={{ color: theme.text.secondary }} className="text-sm">
-                Mobile wallet for convenience
-              </p>
-            </motion.div>
+            {/* Dynamic bank / e-wallet cards pulled from DB */}
+            {paymentAccounts.map((acc, i) => {
+              const isBank = acc.subtype === "BANK";
+              return (
+                <motion.div
+                  key={acc.id}
+                  variants={fadeUp}
+                  transition={{ duration: 0.5, delay: (i + 1) * 0.05, ease: "easeOut" }}
+                  className="p-6 rounded-xl border transition-all hover:shadow-md"
+                  style={{
+                    backgroundColor: isBank ? theme.colors.limeSoft : theme.backgrounds.primary,
+                    borderColor: isBank ? "transparent" : theme.borders.light,
+                    borderLeftWidth: "4px",
+                    borderLeftColor: isBank ? theme.accents.secondary : theme.accents.primary,
+                  }}
+                >
+                  <div className="mb-3">
+                    <span
+                      className="px-2 py-0.5 rounded text-xs font-bold"
+                      style={{
+                        backgroundColor: isBank ? "#DBEAFE" : "#F0FDF4",
+                        color: isBank ? "#1D4ED8" : "#15803D",
+                      }}
+                    >
+                      {isBank ? "BANK" : "WALLET"}
+                    </span>
+                  </div>
+                  <h3
+                    className="text-lg font-bold mb-1"
+                    style={{ color: isBank ? theme.colors.gray900 : theme.text.primary }}
+                  >
+                    {acc.name}
+                  </h3>
+                  {acc.accountNumber ? (
+                    <p
+                      className="font-mono text-sm mt-1"
+                      style={{ color: isBank ? theme.colors.gray700 : theme.text.secondary }}
+                    >
+                      {acc.accountNumber}
+                    </p>
+                  ) : (
+                    <p
+                      className="text-sm"
+                      style={{ color: isBank ? theme.colors.gray700 : theme.text.secondary }}
+                    >
+                      {isBank ? "Bank transfer" : "Mobile wallet"}
+                    </p>
+                  )}
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </section>
@@ -431,32 +468,35 @@ export default function Home() {
             variants={staggerContainer}
             className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mt-12"
           >
-            {[
-              {
-                branch: "Islamabad Branch",
-                address: "Nogazi Shop, Fateh Jang Road, Near Faisal Town, Islamabad",
-              },
-              {
-                branch: "Tordher Branch",
-                address: "Near Byco Petrol Pump, Swabi, Jhangira Road, Tordher, District Swabi",
-              },
-            ].map((loc, idx) => (
+            {branches.map((branch, idx) => (
               <motion.div
-                key={idx}
-                variants={idx === 0 ? slideFromLeft : slideFromRight}
+                key={branch.id}
+                variants={idx % 2 === 0 ? slideFromLeft : slideFromRight}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="p-6 rounded-xl border"
                 style={{
                   backgroundColor: theme.backgrounds.secondary,
                   borderColor: theme.borders.light,
                   borderLeftWidth: "4px",
-                  borderLeftColor: idx === 0 ? theme.accents.primary : theme.accents.secondary,
+                  borderLeftColor: idx % 2 === 0 ? theme.accents.primary : theme.accents.secondary,
                 }}
               >
-                <h3 className="text-xl font-bold mb-2" style={{ color: theme.text.primary }}>
-                  {loc.branch}
+                <h3 className="text-xl font-bold mb-1" style={{ color: theme.text.primary }}>
+                  {branch.name}
                 </h3>
-                <p style={{ color: theme.text.secondary }}>{loc.address}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>
+                  {branch.city}
+                </p>
+                <p style={{ color: theme.text.secondary }}>{branch.address}</p>
+                {branch.phoneNumber && (
+                  <a
+                    href={`tel:${branch.phoneNumber}`}
+                    className="inline-block mt-3 text-sm font-medium hover:opacity-70 transition-opacity"
+                    style={{ color: theme.accents.primary }}
+                  >
+                    {branch.phoneNumber}
+                  </a>
+                )}
               </motion.div>
             ))}
           </motion.div>

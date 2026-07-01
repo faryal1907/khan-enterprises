@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsIn, IsOptional } from "class-validator";
+import { IsNumber, IsString, IsIn, IsOptional, IsUUID, ValidateIf } from "class-validator";
 import { PaymentMethod } from "@khan/prisma";
 
 export class RecordPaymentDto {
@@ -12,4 +12,9 @@ export class RecordPaymentDto {
   @IsString()
   @IsOptional()
   referenceNumber?: string;
+
+  @ValidateIf(o => o.accountId !== undefined && o.accountId !== "")
+  @IsUUID()
+  @IsOptional()
+  accountId?: string;
 }

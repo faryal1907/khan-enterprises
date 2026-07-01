@@ -6,6 +6,7 @@ import { theme } from "@/lib/colors";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/auth-store";
 import { createPartOrder } from "@/lib/api/part-orders";
+import { getPaymentAccounts, PaymentAccount } from "@/lib/api/catalog";
 
 const CameraIcon = () => (
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto", display: "block" }}>
@@ -41,6 +42,8 @@ export default function NewPartOrderPage() {
   const [proofUploaded, setProofUploaded] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [paymentAccounts, setPaymentAccounts] = useState<PaymentAccount[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   const basePrice = part ? part.sellingPrice : 0;
   const individualDiscount = inventory?.onlineDiscountPercent ? Number(inventory.onlineDiscountPercent) : 0;
@@ -49,6 +52,7 @@ export default function NewPartOrderPage() {
   const unitPrice = basePrice * (1 - discountPercent / 100);
   const discountAmount = basePrice - unitPrice;
   const totalPrice = unitPrice * (Number(quantity) || 0);
+
   useEffect(() => {
     if (!user) {
       router.push("/login");
@@ -60,6 +64,7 @@ export default function NewPartOrderPage() {
       return;
     }
     fetchPartAndInventory();
+    getPaymentAccounts().then(setPaymentAccounts).catch(() => {});
   }, [user, partId, inventoryId]);
 
   useEffect(() => {
@@ -82,44 +87,45 @@ export default function NewPartOrderPage() {
       setError("Failed to load part details");
     } finally {
       setLoading(false);
-    }
-  };
+}
+   };
 
-  const handleCreateOrder = async () => {
-    if (!partId || !inventoryId || !user || !paymentMethod) return;
+   const handleCreateOrder = async () => {
+     if (!partId || !inventoryId || !user || !paymentMethod) return;
 
-    if (!customerName || !customerPhone) {
-      setError("Please fill in your name and phone number");
-      return;
-    }
+     if (!customerName || !customerPhone) {
+       setError("Please fill in your name and phone number");
+       return;
+     }
 
-    try {
-      setSubmitting(true);
-      setError("");
+     try {
+       setSubmitting(true);
+       setError("");
 
-      const response = await createPartOrder({
-        partId,
-        partInventoryId: inventoryId,
-        customerName,
-        customerPhone,
-        quantity: Number(quantity) || 1,
-        paymentMethod,
-        paymentProofUrl: paymentMethod === "ONLINE_TRANSFER" ? paymentProofUrl || undefined : undefined,
-      });
+       const response = await createPartOrder({
+         partId,
+         partInventoryId: inventoryId,
+         customerName,
+         customerPhone,
+         quantity: Number(quantity) || 1,
+         paymentMethod,
+         paymentProofUrl: paymentMethod === "ONLINE_TRANSFER" ? paymentProofUrl || undefined : undefined,
+         paymentAccountId: paymentMethod === "ONLINE_TRANSFER" ? selectedAccountId || undefined : undefined,
+       });
 
-      setCreatedOrder(response.order);
-    } catch (err: any) {
-      const data = err.response?.data;
-      const msg = data?.message;
-      if (Array.isArray(msg)) {
-        setError(msg.join(", "));
-      } else {
-        setError(msg || "Failed to create order. Please try again.");
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
+       setCreatedOrder(response.order);
+     } catch (err: any) {
+       const data = err.response?.data;
+       const msg = data?.message;
+       if (Array.isArray(msg)) {
+         setError(msg.join(", "));
+       } else {
+         setError(msg || "Failed to create order. Please try again.");
+       }
+     } finally {
+       setSubmitting(false);
+     }
+   };
 
   const handleFileSelect = (file: File) => {
     if (!file) return;
@@ -261,7 +267,7 @@ export default function NewPartOrderPage() {
     );
   }
 
-  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded);
+  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded && !!selectedAccountId);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
@@ -371,9 +377,50 @@ export default function NewPartOrderPage() {
               </div>
               <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
                 <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
-                <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
-                  Transfer PKR {totalPrice.toLocaleString()} to our bank account and upload the payment screenshot below.
-                </p>
+
+              {/* Account selector */}
+              {paymentAccounts.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                    Transfer To <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <div className="space-y-2">
+                    {paymentAccounts.map((acc) => (
+                      <button
+                        key={acc.id}
+                        type="button"
+                        onClick={() => setSelectedAccountId(acc.id)}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all"
+                        style={{
+                          backgroundColor: selectedAccountId === acc.id ? theme.accents.primary + "15" : theme.backgrounds.primary,
+                          border: `2px solid ${selectedAccountId === acc.id ? theme.accents.primary : theme.borders.medium}`,
+                        }}
+                      >
+                        <span
+                          className="px-2 py-0.5 rounded text-xs font-bold shrink-0"
+                          style={{
+                            backgroundColor: acc.subtype === 'BANK' ? '#DBEAFE' : '#F0FDF4',
+                            color: acc.subtype === 'BANK' ? '#1D4ED8' : '#15803D',
+                          }}
+                        >
+                          {acc.subtype === 'BANK' ? 'BANK' : 'WALLET'}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm truncate" style={{ color: theme.text.primary }}>{acc.name}</p>
+                          {acc.accountNumber && (
+                            <p className="text-xs mt-0.5 font-mono" style={{ color: theme.text.secondary }}>{acc.accountNumber}</p>
+                          )}
+                        </div>
+                        {selectedAccountId === acc.id && (
+                          <svg className="w-5 h-5 shrink-0" fill="none" stroke={theme.accents.primary} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div
                 onDragOver={handleDragOver}

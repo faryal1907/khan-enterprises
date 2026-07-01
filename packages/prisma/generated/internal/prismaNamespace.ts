@@ -410,7 +410,8 @@ export const ModelName = {
   PurchaseOrder: 'PurchaseOrder',
   PurchaseOrderItem: 'PurchaseOrderItem',
   Payable: 'Payable',
-  PaymentAllocation: 'PaymentAllocation'
+  PaymentAllocation: 'PaymentAllocation',
+  ReceivablesAlert: 'ReceivablesAlert'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation"
+    modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "receivablesAlert"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2428,6 +2429,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ReceivablesAlert: {
+      payload: Prisma.$ReceivablesAlertPayload<ExtArgs>
+      fields: Prisma.ReceivablesAlertFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReceivablesAlertFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReceivablesAlertFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>
+        }
+        findFirst: {
+          args: Prisma.ReceivablesAlertFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReceivablesAlertFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>
+        }
+        findMany: {
+          args: Prisma.ReceivablesAlertFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>[]
+        }
+        create: {
+          args: Prisma.ReceivablesAlertCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>
+        }
+        createMany: {
+          args: Prisma.ReceivablesAlertCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReceivablesAlertCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>[]
+        }
+        delete: {
+          args: Prisma.ReceivablesAlertDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>
+        }
+        update: {
+          args: Prisma.ReceivablesAlertUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReceivablesAlertDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReceivablesAlertUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReceivablesAlertUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReceivablesAlertUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>
+        }
+        aggregate: {
+          args: Prisma.ReceivablesAlertAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReceivablesAlert>
+        }
+        groupBy: {
+          args: Prisma.ReceivablesAlertGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReceivablesAlertGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReceivablesAlertCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReceivablesAlertCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2631,6 +2706,7 @@ export const OrderScalarFieldEnum = {
   isOnlineOrder: 'isOnlineOrder',
   appliedDiscount: 'appliedDiscount',
   paymentMethod: 'paymentMethod',
+  paymentAccountId: 'paymentAccountId',
   status: 'status',
   paymentVerified: 'paymentVerified',
   orderType: 'orderType',
@@ -2676,6 +2752,7 @@ export const PartOrderScalarFieldEnum = {
   quantity: 'quantity',
   amount: 'amount',
   paymentMethod: 'paymentMethod',
+  paymentAccountId: 'paymentAccountId',
   status: 'status',
   paymentVerified: 'paymentVerified',
   orderType: 'orderType',
@@ -2912,6 +2989,21 @@ export const PaymentAllocationScalarFieldEnum = {
 } as const
 
 export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum]
+
+
+export const ReceivablesAlertScalarFieldEnum = {
+  id: 'id',
+  customerPhone: 'customerPhone',
+  customerName: 'customerName',
+  lastNotifiedAt: 'lastNotifiedAt',
+  notificationCount: 'notificationCount',
+  outstandingAmount: 'outstandingAmount',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReceivablesAlertScalarFieldEnum = (typeof ReceivablesAlertScalarFieldEnum)[keyof typeof ReceivablesAlertScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3454,6 +3546,7 @@ export type GlobalOmitConfig = {
   purchaseOrderItem?: Prisma.PurchaseOrderItemOmit
   payable?: Prisma.PayableOmit
   paymentAllocation?: Prisma.PaymentAllocationOmit
+  receivablesAlert?: Prisma.ReceivablesAlertOmit
 }
 
 /* Types for Logging */

@@ -254,4 +254,24 @@ export class CatalogService {
       orderBy: { name: 'asc' },
     });
   }
+
+  /**
+   * Get active BANK and EWALLET accounts for customer payment method selection.
+   * Public endpoint — returns only display-safe fields (no balances).
+   */
+  async getPaymentAccounts() {
+    return this.prisma.client.account.findMany({
+      where: {
+        subtype: { in: ['BANK', 'EWALLET'] },
+        isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        subtype: true,
+        accountNumber: true,
+      },
+      orderBy: [{ subtype: 'asc' }, { name: 'asc' }],
+    });
+  }
 }

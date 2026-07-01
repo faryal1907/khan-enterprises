@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { theme } from "@/lib/colors";
-import { getOrderByNumber } from "@/lib/api/orders";
+import { getOrderByNumber, markAsPickedByCustomer } from "@/lib/api/orders";
 import { getPartOrderByNumber } from "@/lib/api/part-orders";
 import { createDeliveryRequest } from "@/lib/api/deliveries";
 import { MapPicker } from "@/components/map-picker";
+import { toast } from "sonner";
 
 function CountdownTimer({ expiresAt }: { expiresAt: string }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -225,6 +226,25 @@ export default function OrderStatusPage() {
 
   // handleUploadPaymentProof removed as it was unused
 
+  const handleMarkAsPickedByCustomer = async () => {
+    if (!order) return;
+    try {
+      setSubmittingDelivery(true);
+      const { markPartOrderAsPickedByCustomer } = await import("@/lib/api/part-orders");
+      if (order.type === "PART") {
+        await markPartOrderAsPickedByCustomer(order.id);
+      } else {
+        await markAsPickedByCustomer(order.id);
+      }
+      await fetchOrder();
+    } catch (err: unknown) {
+      console.error("Failed to mark as picked:", err);
+      toast.error((err as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to mark as picked up");
+    } finally {
+      setSubmittingDelivery(false);
+    }
+  };
+
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
       case "PENDING_PAYMENT":
@@ -405,45 +425,41 @@ export default function OrderStatusPage() {
         )}
 
         {/* Delivery/Pickup Selection Section - for online orders after payment is confirmed */}
-        {canRequestDelivery && !showDeliveryForm && (
-          <div
-            className="rounded-xl p-6 mb-6"
-            style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
-          >
-            <div className="flex items-start gap-4 mb-6">
-              <div className="shrink-0">
-                <svg className="w-6 h-6" style={{ color: "#3730A3" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold mb-2" style={{ color: "#3730A3" }}>
-                  Would you like to request delivery for your {order.type === "BIKE" ? "bike" : "order"}?
-                </h2>
-                <p className="text-sm mb-4" style={{ color: "#3730A3" }}>
-                  Your order is confirmed! Please request delivery in case you want it to be delivered to your location, rather than picking it up from the branch yourself.
-                </p>
-              </div>
-            </div>
+{canRequestDelivery && !showDeliveryForm && (
+           <div
+             className="rounded-xl p-6 mb-6"
+             style={{ backgroundColor: "#E0E7FF", border: "1px solid #6366F1" }}
+           >
+             <div className="flex items-start gap-4 mb-6">
+               <div className="shrink-0">
+                 <svg className="w-6 h-6" style={{ color: "#3730A3" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                 </svg>
+               </div>
+               <div className="flex-1">
+                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#3730A3" }}>
+                   Would you like to request delivery for your {order.type === "BIKE" ? "bike" : "order"}?
+                 </h2>
+                 <p className="text-sm mb-4" style={{ color: "#3730A3" }}>
+                   Your order is confirmed! Please request delivery in case you want it to be delivered to your location, or pick up from the branch yourself.
+                 </p>
+               </div>
+             </div>
 
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Delivery Option */}
-              
-              
-                <button
-                  onClick={() => setShowDeliveryForm(true)}
-                  className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-                  style={{
-                    backgroundColor: "#6366F1",
-                    color: "white",
-                  }}
-                >
+             <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+               <button
+                 onClick={() => setShowDeliveryForm(true)}
+                 className="w-full px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                 style={{
+                   backgroundColor: "#6366F1",
+                   color: "white",
+                 }}
+>
                   Request Delivery
                 </button>
               </div>
-          </div>
-        )}
+           </div>
+         )}
 
         {/* Delivery Request Form */}
         {showDeliveryForm && (

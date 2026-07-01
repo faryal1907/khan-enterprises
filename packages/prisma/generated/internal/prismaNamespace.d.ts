@@ -184,6 +184,7 @@ export declare const ModelName: {
     readonly PurchaseOrderItem: "PurchaseOrderItem";
     readonly Payable: "Payable";
     readonly PaymentAllocation: "PaymentAllocation";
+    readonly ReceivablesAlert: "ReceivablesAlert";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -196,7 +197,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation";
+        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "receivablesAlert";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -2198,6 +2199,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        ReceivablesAlert: {
+            payload: Prisma.$ReceivablesAlertPayload<ExtArgs>;
+            fields: Prisma.ReceivablesAlertFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ReceivablesAlertFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ReceivablesAlertFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>;
+                };
+                findFirst: {
+                    args: Prisma.ReceivablesAlertFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ReceivablesAlertFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>;
+                };
+                findMany: {
+                    args: Prisma.ReceivablesAlertFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>[];
+                };
+                create: {
+                    args: Prisma.ReceivablesAlertCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>;
+                };
+                createMany: {
+                    args: Prisma.ReceivablesAlertCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.ReceivablesAlertCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>[];
+                };
+                delete: {
+                    args: Prisma.ReceivablesAlertDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>;
+                };
+                update: {
+                    args: Prisma.ReceivablesAlertUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ReceivablesAlertDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ReceivablesAlertUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.ReceivablesAlertUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>[];
+                };
+                upsert: {
+                    args: Prisma.ReceivablesAlertUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablesAlertPayload>;
+                };
+                aggregate: {
+                    args: Prisma.ReceivablesAlertAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateReceivablesAlert>;
+                };
+                groupBy: {
+                    args: Prisma.ReceivablesAlertGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivablesAlertGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ReceivablesAlertCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivablesAlertCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -2363,6 +2438,7 @@ export declare const OrderScalarFieldEnum: {
     readonly isOnlineOrder: "isOnlineOrder";
     readonly appliedDiscount: "appliedDiscount";
     readonly paymentMethod: "paymentMethod";
+    readonly paymentAccountId: "paymentAccountId";
     readonly status: "status";
     readonly paymentVerified: "paymentVerified";
     readonly orderType: "orderType";
@@ -2402,6 +2478,7 @@ export declare const PartOrderScalarFieldEnum: {
     readonly quantity: "quantity";
     readonly amount: "amount";
     readonly paymentMethod: "paymentMethod";
+    readonly paymentAccountId: "paymentAccountId";
     readonly status: "status";
     readonly paymentVerified: "paymentVerified";
     readonly orderType: "orderType";
@@ -2595,6 +2672,18 @@ export declare const PaymentAllocationScalarFieldEnum: {
     readonly partPaymentTransactionId: "partPaymentTransactionId";
 };
 export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum];
+export declare const ReceivablesAlertScalarFieldEnum: {
+    readonly id: "id";
+    readonly customerPhone: "customerPhone";
+    readonly customerName: "customerName";
+    readonly lastNotifiedAt: "lastNotifiedAt";
+    readonly notificationCount: "notificationCount";
+    readonly outstandingAmount: "outstandingAmount";
+    readonly status: "status";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type ReceivablesAlertScalarFieldEnum = (typeof ReceivablesAlertScalarFieldEnum)[keyof typeof ReceivablesAlertScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -2724,6 +2813,7 @@ export type GlobalOmitConfig = {
     purchaseOrderItem?: Prisma.PurchaseOrderItemOmit;
     payable?: Prisma.PayableOmit;
     paymentAllocation?: Prisma.PaymentAllocationOmit;
+    receivablesAlert?: Prisma.ReceivablesAlertOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

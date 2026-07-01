@@ -10,6 +10,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { ActionModal } from "@/components/action-modal";
 import { AsyncButton } from "@/components/async-button";
 import { OrderStatusBadge } from "@/components/order-status-badge";
+import { getPaymentAccounts } from "@/lib/api/accounting";
 
 export default function PartOrderDetailPage() {
   const params = useParams();
@@ -28,10 +29,12 @@ export default function PartOrderDetailPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [rejectPaymentReason, setRejectPaymentReason] = useState("");
+  const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
   const [paymentData, setPaymentData] = useState({
     method: PaymentMethod.CASH,
     amount: 0,
     referenceNumber: "",
+    accountId: "",
   });
 
   const fetchOrder = useCallback(async () => {
@@ -40,7 +43,7 @@ export default function PartOrderDetailPage() {
     try {
       const data = await getPartOrderById(orderId);
       setOrder(data);
-      setPaymentData((prev) => ({ ...prev, amount: data.amount || 0 }));
+      setPaymentData((prev) => ({ ...prev, amount: Number(data.balanceDue) > 0 ? Number(data.balanceDue) : Number(data.amount) || 0 }));
     } catch (fetchError: any) {
       setError(fetchError.response?.data?.message || "Failed to fetch part order");
       setOrder(null);
@@ -52,6 +55,12 @@ export default function PartOrderDetailPage() {
   useEffect(() => {
     fetchOrder();
   }, [fetchOrder]);
+
+  useEffect(() => {
+    if (showPaymentModal) {
+      getPaymentAccounts().then(setPaymentAccounts).catch(() => setPaymentAccounts([]));
+    }
+  }, [showPaymentModal]);
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
@@ -103,8 +112,7 @@ export default function PartOrderDetailPage() {
     try {
       setActionLoading(true);
       await verifyPartPayment(orderId, true);
-      // Auto-confirm after payment verified
-      await updatePartOrderStatus(orderId, OrderStatus.CONFIRMED);
+      // verifyPartPayment already sets the correct status (PAID or CONFIRMED based on balanceDue)
       const updatedOrder = await getPartOrderById(orderId);
       setOrder(updatedOrder);
       toast.success("Payment verified successfully");
@@ -139,10 +147,14 @@ export default function PartOrderDetailPage() {
       const paymentPayload = {
         ...paymentData,
         amount: Number(paymentData.amount),
+        accountId: paymentData.accountId || undefined,
       };
-      await recordPartOrderPayment(orderId, paymentPayload);
-      // Auto-confirm after payment
-      await updatePartOrderStatus(orderId, OrderStatus.CONFIRMED);
+      const result = await recordPartOrderPayment(orderId, paymentPayload);
+      // For cash payments, auto-confirm after recording (recordPartOrderPayment sets status to PAID for cash)
+      // For online transfers, payment stays in VERIFICATION_PENDING - admin must verify via Verify Payment button
+      if (paymentData.method === PaymentMethod.CASH) {
+        await updatePartOrderStatus(orderId, OrderStatus.CONFIRMED);
+      }
       const updatedOrder = await getPartOrderById(orderId);
       setOrder(updatedOrder);
       setShowPaymentModal(false);
@@ -207,10 +219,43 @@ export default function PartOrderDetailPage() {
           </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        if (order.pickupType === "DELIVERY") {
+        // If delivery has been requested, show Record Payment if balance outstanding
+        if (order.delivery) {
+          if (Number(order.balanceDue) > 0) {
+            return (
+              <AsyncButton
+                onClick={() => setShowPaymentModal(true)}
+                disabled={actionLoading}
+                className="px-6"
+              >
+                Record Payment
+              </AsyncButton>
+            );
+          }
           return null;
         }
-        // No delivery request - show picked by customer button
+        // No delivery requested yet — show Record Payment if balance outstanding, otherwise Picked by Customer
+        if (Number(order.balanceDue) > 0) {
+          return (
+            <div className="flex space-x-3">
+              <AsyncButton
+                onClick={() => setShowPaymentModal(true)}
+                disabled={actionLoading}
+                className="px-6"
+              >
+                Record Payment
+              </AsyncButton>
+              <button
+                onClick={handleMarkAsPickedByCustomer}
+                disabled={actionLoading}
+                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+              >
+                Picked by Customer
+              </button>
+            </div>
+          );
+        }
         return (
           <button
             onClick={handleMarkAsPickedByCustomer}
@@ -694,6 +739,31 @@ export default function PartOrderDetailPage() {
           }}
         >
           <div className="space-y-4 mb-4">
+            {/* Order balance summary */}
+            <div
+              className="rounded-lg p-3 text-sm space-y-1"
+              style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}
+            >
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>Total Amount</span>
+                <span className="font-semibold" style={{ color: theme.text.primary }}>
+                  Rs. {Number(order.amount || 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span style={{ color: theme.text.secondary }}>Already Paid</span>
+                <span className="font-semibold text-emerald-600">
+                  Rs. {Number(order.paidAmount || 0).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between border-t pt-1" style={{ borderColor: theme.borders.light }}>
+                <span style={{ color: theme.text.secondary }}>Remaining Balance</span>
+                <span className="font-semibold" style={{ color: theme.accents.error }}>
+                  Rs. {Number(order.balanceDue || order.amount || 0).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
                 Payment Method
@@ -713,6 +783,31 @@ export default function PartOrderDetailPage() {
                 <option value={PaymentMethod.ONLINE_TRANSFER}>Online Transfer</option>
               </select>
             </div>
+            {paymentData.method === PaymentMethod.ONLINE_TRANSFER && (
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                  Bank/E-Wallet Account
+                </label>
+                <select
+                  value={paymentData.accountId}
+                  onChange={(e) => setPaymentData({ ...paymentData, accountId: e.target.value })}
+                  disabled={actionLoading}
+                  className="w-full px-3 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                >
+                  <option value="">Select an account</option>
+                  {paymentAccounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.subtype === "BANK" ? "🏦" : "💳"} {acc.name} {acc.accountNumber ? `(${acc.accountNumber})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
                 Amount
@@ -729,6 +824,16 @@ export default function PartOrderDetailPage() {
                   color: theme.text.primary,
                 }}
               />
+              {paymentData.amount > 0 && paymentData.amount < Number(order.balanceDue || order.amount || 0) && (
+                <p className="text-xs mt-1 font-medium" style={{ color: "#D97706" }}>
+                  Partial payment — Rs. {(Number(order.balanceDue || order.amount || 0) - paymentData.amount).toLocaleString()} will remain outstanding (receivable).
+                </p>
+              )}
+              {paymentData.amount >= Number(order.balanceDue || order.amount || 0) && (
+                <p className="text-xs mt-1 font-medium text-emerald-600">
+                  Full payment — no outstanding balance remaining.
+                </p>
+              )}
             </div>
             {paymentData.method !== PaymentMethod.CASH && (
               <div>
@@ -765,7 +870,7 @@ export default function PartOrderDetailPage() {
             </button>
             <AsyncButton
               onClick={handleRecordPayment}
-              disabled={actionLoading}
+              disabled={paymentData.amount <= 0 || actionLoading || (paymentData.method === PaymentMethod.ONLINE_TRANSFER && !paymentData.accountId)}
               loading={actionLoading}
               loadingLabel="Recording..."
               style={{

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Request, 
 import { AccountingService } from "./accounting.service";
 import { PurchaseOrdersService } from "./purchase-orders.service";
 import { PayablesService } from "./payables.service";
+import { ReceivablesService } from "./receivables.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
@@ -14,6 +15,7 @@ export class AccountingController {
     private readonly accountingService: AccountingService,
     private readonly purchaseOrdersService: PurchaseOrdersService,
     private readonly payablesService: PayablesService,
+    private readonly receivablesService: ReceivablesService,
   ) {}
 
   @Get('accounts')
@@ -45,8 +47,8 @@ export class AccountingController {
 
   @Delete('accounts/:id')
   @Roles(UserRole.ADMIN)
-  async deleteAccount(@Param('id') id: string) {
-    return this.accountingService.deleteAccount(id);
+  async deleteAccount(@Param('id') id: string, @Body() body: { transferAccountId?: string }) {
+    return this.accountingService.deleteAccount(id, body?.transferAccountId);
   }
 
   @Get('accounts/:id/ledger')
@@ -143,5 +145,48 @@ export class AccountingController {
     @Request() req: any
   ) {
     return this.payablesService.payPayable(id, data.amount, data.paymentMethod, req.user.id);
+  }
+
+  // ─── Receivables ─────────────────────────────────────────────────────────
+
+  @Get('receivables')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getReceivables() {
+    return this.receivablesService.getReceivables();
+  }
+
+  @Get('receivables/payment-accounts')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getPaymentAccounts() {
+    return this.receivablesService.getPaymentAccounts();
+  }
+
+  @Get('receivables/:customerPhone/ledger')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getCustomerLedger(@Param('customerPhone') customerPhone: string) {
+    return this.receivablesService.getCustomerLedger(customerPhone);
+  }
+
+  @Get('receivables/:customerPhone/statement')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getCustomerStatement(@Param('customerPhone') customerPhone: string) {
+    return this.receivablesService.getCustomerStatement(customerPhone);
+  }
+
+  @Post('receivables/:customerPhone/collect')
+  @Roles(UserRole.ADMIN)
+  async collectReceivable(
+    @Param('customerPhone') customerPhone: string,
+    @Body() data: { amount: number; paymentMethod: string; notes?: string; accountId?: string },
+    @Request() req: any,
+  ) {
+    return this.receivablesService.collectPayment(
+      customerPhone,
+      data.amount,
+      data.paymentMethod,
+      req.user.id,
+      data.notes,
+      data.accountId,
+    );
   }
 }
