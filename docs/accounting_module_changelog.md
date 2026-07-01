@@ -74,7 +74,8 @@ This document summarizes all the architectural, backend, and frontend changes ma
 - The accounting hub now automatically refetches and refreshes all accounting data (accounts, journals, POs, payables) in real-time when push notifications (such as new or updated orders) arrive.
 
 ## [2026-06-29] Fix Part Order Record Payment JVs
-- Fixed an issue where the \ecordPartOrderPayment\ method in \part-orders.service.ts\ was missing Journal Entry (JV) creation logic entirely.
+- Fixed an issue where the \
+ecordPartOrderPayment\ method in \part-orders.service.ts\ was missing Journal Entry (JV) creation logic entirely.
 - Added logic to generate the Cash/Bank Receipt JV (Debit Cash/Bank, Credit AR) when an admin records a successful payment for a part order.
 
 ## [2026-06-29] Fix Purchase Order Payments Treated as Revenue
@@ -95,3 +96,220 @@ This document summarizes all the architectural, backend, and frontend changes ma
 ## [2026-06-29] Fix Bank Transfer for Payables
 - Changed the label from 'Online Transfer' to 'Bank Transfer' in the Pay Payable modal.
 - Updated PayablesService.payPayable to dynamically select the BANK account instead of hardcoding the CASH account when the payment method is ONLINE_TRANSFER.
+
+
+## Commit: Owner Equity and bank/wallet accounts logic
+
+### Schema Changes
+- **JournalEntry Model Enhancement**
+  - Added optional `notes` field (String?) to journal entries for additional documentation
+  - Updated all Prisma-generated types to include the new notes field in input/output types
+
+- **Account Subtype Expansion**
+  - Added `DRAWINGS` to the `AccountSubtype` enum to support owner withdrawal tracking
+
+### Account Structure Updates
+- **New System Accounts Added**
+  - **Owner Drawings** (Code: 3002)
+    - Category: EQUITY
+    - Subtype: DRAWINGS
+    - Purpose: Track owner withdrawals from business
+  - **Retained Earnings** (Code: 3003)
+    - Category: EQUITY
+    - Subtype: EQUITY
+    - Purpose: Track accumulated business earnings
+  - **Cash Adjustment Expense** (Code: 5004)
+    - Category: EXPENSE
+    - Subtype: EXPENSE
+    - Purpose: Track cash-related adjustments
+
+### Data Migration
+- Updated `migrate-accounting.ts` to include the three new accounts in migration scripts
+- Updated `seed.ts` to include the new accounts in database seeding
+
+---
+
+## Commit: Receivables module full workflow implemented
+
+### Payment Account Integration
+- **Order Model Enhancement**
+  - Added `paymentAccountId` (String?) field to link orders to specific payment accounts
+  - Added `paymentAccount` relation to Account model via "OrderPaymentAccount" relation
+
+- **PartOrder Model Enhancement**
+  - Added `paymentAccountId` (String?) field to link part orders to specific payment accounts
+  - Added `paymentAccount` relation to Account model via "PartOrderPaymentAccount" relation
+
+- **Account Model Relations**
+  - Added `orderPayments` relation to track all orders paid from this account
+  - Added `partOrderPayments` relation to track all part orders paid from this account
+
+### Receivables Alert Tracking System
+- **New ReceivablesAlert Model**
+  - **Core Fields**
+    - `id`: Unique identifier (UUID)
+    - `customerPhone`: Customer phone number (unique constraint)
+    - `customerName`: Customer name for identification
+    - `outstandingAmount`: Outstanding balance (Decimal 12,2)
+    - `status`: Payment state tracking
+  
+  - **Notification Tracking**
+    - `lastNotifiedAt`: Timestamp of last notification sent
+    - `notificationCount`: Counter for total notifications sent (default: 0)
+  
+  - **Audit Fields**
+    - `createdAt`: Record creation timestamp
+    - `updatedAt`: Last update timestamp
+  
+  - **Indexes & Constraints**
+    - Unique constraint on `customerPhone` to prevent duplicate alerts
+    - Index on `customerPhone` for query optimization
+
+### Receivables Service Implementation
+- **ReceivablesService** ([apps/api/src/modules/accounting/receivables.service.ts](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/accounting/receivables.service.ts:0:0-0:0))
+  - **getReceivables()**
+    - Aggregates outstanding balances per customer across both bike orders AND part orders
+    - Shows all payment-verified orders (including fully paid)
+    - Groups by customer phone number
+    - Calculates total billed, total paid, outstanding balance
+    - Determines customer status (DUE, PARTIAL, OVERDUE, PAID) with priority logic
+    - Fetches last payment dates from both payment transaction tables
+    - Returns order count, latest order date, and last payment date per customer
+
+  - **getCustomerLedger(customerPhone)**
+    - Fetches all orders and part orders for a specific customer
+    - Builds chronological ledger with running balance
+    - Includes bike details (brand, model, year) for bike orders
+    - Includes part details for part orders
+    - Shows all transactions (invoices and payments) with verification timestamps
+    - Returns summary statistics (total billed, total paid, outstanding)
+    - Provides drill-down capability to view individual orders
+
+  - **getPaymentAccounts()**
+    - Returns available payment accounts (Bank, E-Wallet, Cash)
+    - Filters for active accounts only
+    - Ordered by subtype and name for consistent UI display
+
+  - **collectPayment(customerPhone, amount, paymentMethod, userId, notes?, accountId?)**
+    - Allocates payment across outstanding orders using oldest-first strategy
+    - Supports both bike orders and part orders
+    - Handles advance payments (holds excess as credit)
+    - Creates payment transactions with verification
+    - Updates order payment states (PARTIAL → PAID)
+    - Generates journal entries for accounting
+    - Links to specific payment accounts for online transfers
+    - Returns allocation details and advance credit information
+
+  - **getCustomerStatement(customerPhone)**
+    - Generates customer statement from ledger data
+    - Separates invoices and payments into distinct tables
+    - Includes generation timestamp
+    - Provides summary statistics
+
+### Receivables Alert Service
+- **ReceivablesAlertService** ([apps/api/src/modules/accounting/receivables-alert.service.ts](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/accounting/receivables-alert.service.ts:0:0-0:0))
+  - **checkAndNotifyPartialPayments()**
+    - Scheduled job to identify customers in PARTIAL status for 48+ hours
+    - Checks against last payment date and last notification timestamp
+    - Sends notifications to admin users only
+    - Updates or creates receivables alert records
+    - Tracks notification count and outstanding amounts
+
+  - **getPartialPaymentCustomers()**
+    - Queries both bike orders and part orders with PARTIAL status
+    - Groups by customer phone number
+    - Aggregates outstanding balances and order counts
+    - Fetches last payment dates from transaction tables
+
+  - **shouldSendNotification()**
+    - Determines notification eligibility based on 48-hour intervals
+    - Handles first-time notifications (no previous alert)
+    - Handles repeat notifications (based on last notification time)
+
+  - **calculateDuration()**
+    - Calculates human-readable duration since last payment
+    - Returns days, hours, or "less than an hour"
+
+  - **resetCustomerAlert()**
+    - Clears alert tracking when customer status changes from PARTIAL
+    - Called automatically when payment is collected
+
+### UI Components
+- **CollectReceivableModal** ([apps/admin/app/accounts/collect-receivable-modal.tsx](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/app/accounts/collect-receivable-modal.tsx:0:0-0:0))
+  - Modal for collecting payments from customers
+  - Displays customer info and outstanding balance
+  - Supports amount input with number-to-words conversion
+  - Payment method selection (Cash / Bank Transfer)
+  - Bank account selection for online transfers
+  - Optional notes field for reference
+  - Handles overpayments with advance credit notification
+  - Validates required fields before submission
+
+- **CustomerLedgerModal** ([apps/admin/app/accounts/customer-ledger-modal.tsx](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/app/accounts/customer-ledger-modal.tsx:0:0-0:0))
+  - Displays full customer transaction history
+  - Summary cards showing total billed, paid, and outstanding
+  - Chronological table with date, type, reference, description
+  - Debit/credit/balance columns with running balance
+  - Payment state badges (PAID, PARTIAL, OVERDUE)
+  - Direct links to view individual orders
+  - Color-coded balance (red for outstanding, green for settled)
+
+- **CustomerStatementModal** ([apps/admin/app/accounts/customer-statement-modal.tsx](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/app/accounts/customer-statement-modal.tsx:0:0-0:0))
+  - Customer statement view with generation timestamp
+  - Summary statistics cards
+  - Separate invoice table with payment status
+  - Separate payment table with method descriptions
+  - Clean, printable format for customer communication
+
+### API Endpoints
+- **AccountingController** ([apps/api/src/modules/accounting/accounting.controller.ts](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/accounting/accounting.controller.ts:0:0-0:0))
+  - `GET /accounting/receivables` - Get all customer receivables
+  - `GET /accounting/receivables/payment-accounts` - Get available payment accounts
+  - `GET /accounting/receivables/:customerPhone/ledger` - Get customer ledger
+  - `GET /accounting/receivables/:customerPhone/statement` - Get customer statement
+  - `POST /accounting/receivables/:customerPhone/collect` - Collect payment from customer
+
+- **Client API Functions** ([apps/admin/lib/api/accounting.ts](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/lib/api/accounting.ts:0:0-0:0))
+  - [getReceivables()](cci:1://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/lib/api/accounting.ts:94:0-97:2) - Fetch receivables data
+  - [getCustomerLedger(customerPhone)](cci:1://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/lib/api/accounting.ts:99:0-102:2) - Fetch customer ledger
+  - [getCustomerStatement(customerPhone)](cci:1://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/lib/api/accounting.ts:104:0-107:2) - Fetch customer statement
+  - [collectReceivable(customerPhone, payload)](cci:1://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/lib/api/accounting.ts:109:0-115:2) - Submit payment collection
+
+### Scheduler Integration
+- **SchedulerService** ([apps/api/src/modules/scheduler/scheduler.service.ts](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/scheduler/scheduler.service.ts:0:0-0:0))
+  - Added [checkReceivablesPartialPayments()](cci:1://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/scheduler/scheduler.service.ts:53:2-72:3) cron job
+  - Runs every hour using `@Cron(CronExpression.EVERY_HOUR)`
+  - Prevents concurrent execution with flag checking
+  - Logs notification counts for monitoring
+  - Calls ReceivablesAlertService to process reminders
+
+### Order Alerts Integration
+- **OrderAlertsService** ([apps/api/src/modules/order-alerts/order-alerts.service.ts](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/order-alerts/order-alerts.service.ts:0:0-0:0))
+  - Added [createAlertsForReceivables()](cci:1://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/api/src/modules/order-alerts/order-alerts.service.ts:527:2-579:3) method
+  - Creates admin-only alerts for partial payment reminders
+  - Targets only ADMIN users (excludes MANAGER and SALES_STAFF)
+  - Sends push notifications with customer details
+  - Includes outstanding amount and duration since last payment
+  - Links directly to receivables tab in accounting hub
+  - Uses AlertType.RECEIVABLES_PARTIAL_REMINDER
+
+### Admin UI Integration
+- **Accounts Page** ([apps/admin/app/accounts/page.tsx](cci:7://file:///c:/Users/Laptop/Desktop/khan-enterprises/apps/admin/app/accounts/page.tsx:0:0-0:0))
+  - Added RECEIVABLES tab to accounting hub
+  - Displays customer list with aggregated balances
+  - Shows total invoiced, total paid, and outstanding per customer
+  - Last payment date column
+  - Status badges (PAID, PARTIAL, OVERDUE, DUE)
+  - Action buttons for collect payment and view ledger
+  - Summary badge showing total customers and outstanding amount
+  - Firebase push notification listener for real-time updates
+  - Integration with CollectReceivableModal and CustomerLedgerModal
+
+### Type Generation
+- Generated complete Prisma client types for ReceivablesAlert model including:
+  - Create, update, delete, and upsert operations
+  - Select and omit type definitions
+  - Where input filters for queries
+  - Field references for type-safe operations
+- Updated Order and PartOrder model types to include payment account relations
+- Updated Account model types to include payment relations
