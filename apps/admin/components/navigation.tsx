@@ -26,7 +26,6 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  Store,
 } from "lucide-react";
 
 const navLinks = [
@@ -46,7 +45,6 @@ const adminLinks = [
   { href: "/transactions", label: "Transactions", icon: CreditCard },
   { href: "/audit-logs", label: "Audit Logs", icon: ClipboardList },
   { href: "/accounts", label: "Accounts", icon: BookOpen },
-  { href: "/vendors", label: "Vendors", icon: Store },
   { href: "/users", label: "Users", icon: Users },
   { href: "/branches", label: "Branches", icon: Building2 },
 ];
@@ -85,7 +83,9 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
   const isStaff = user.role === UserRole.SALES_STAFF;
 
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+    href === "/" ? pathname === "/" :
+    href === "/accounts" ? pathname.startsWith("/accounts") || pathname.startsWith("/vendors") :
+    pathname.startsWith(href);
 
   const linkClass = (href: string, extra = "") =>
     `flex items-center rounded-lg text-sm font-medium transition-colors mb-1 ${extra}`;

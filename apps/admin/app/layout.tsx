@@ -13,8 +13,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Khan Admin",
-  description: "Ali & Khan's Admin Portal",
+  title: "Admin Portal",
+  description: "Ali & Khan's Green Wheels Admin Portal",
 };
 
 export default function RootLayout({

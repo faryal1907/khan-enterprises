@@ -128,11 +128,11 @@ export default function VendorDetailPage() {
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       {/* Back */}
       <Link
-        href="/vendors"
+        href="/accounts"
         className="inline-flex items-center gap-1 text-sm font-medium hover:opacity-70"
         style={{ color: theme.text.secondary }}
       >
-        ← Back to Vendors
+        ← Back to Accounts
       </Link>
 
       {/* Vendor card */}

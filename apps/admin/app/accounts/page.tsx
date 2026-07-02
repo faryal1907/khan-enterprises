@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { theme } from "@/lib/colors";
 import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
 import { getExpenses, getPayablesByPayee } from "@/lib/api/expenses";
-import { getVendors } from "@/lib/api/vendors";
+import { getVendors, createVendor, deleteVendor, getVendorLedger, updateVendor } from "@/lib/api/vendors";
 import { toast } from "sonner";
 import { getMessaging, onMessage, isSupported } from "firebase/messaging";
 import app from "@/lib/firebase";
@@ -20,11 +20,14 @@ import { InternalTransferModal } from "./internal-transfer-modal";
 import { CollectReceivableModal } from "./collect-receivable-modal";
 import { PartyLedgerModal } from "./party-ledger-modal";
 import { AddReceivableModal } from "./add-receivable-modal";
+import { VendorPaymentModal } from "@/app/vendors/vendor-payment-modal";
+import { AllocateInventoryModal } from "@/app/vendors/allocate-inventory-modal";
+import { ReturnDefectiveInventoryModal } from "@/app/vendors/return-defective-inventory-modal";
 import { getBranches } from "@/lib/api/inventory";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 
-type Tab = 'OVERVIEW' | 'JOURNALS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY';
+type Tab = 'OVERVIEW' | 'JOURNALS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY' | 'VENDORS';
 
 // ── Journal type detection ────────────────────────────────────────────────────
 type JournalTypeKey =
@@ -224,6 +227,24 @@ export default function AccountsPage() {
   // ── Expenses / Payables state ──────────────────────────────────────────────
   const [branches, setBranches] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
+
+  // ── Vendors & Inventory state ───────────────────────────────────────────────
+  const [vendorsList, setVendorsList] = useState<any[]>([]);
+  const [vendorsLoading, setVendorsLoading] = useState(false);
+  const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
+  const [vendorDetail, setVendorDetail] = useState<any>(null);
+  const [vendorDetailLoading, setVendorDetailLoading] = useState(false);
+  const [showCreateVendor, setShowCreateVendor] = useState(false);
+  const [vendorDeleteTarget, setVendorDeleteTarget] = useState<any>(null);
+  const [vendorDeleting, setVendorDeleting] = useState(false);
+  const [vendorSaving, setVendorSaving] = useState(false);
+  const [vendorForm, setVendorForm] = useState({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' });
+  const [vendorEditing, setVendorEditing] = useState(false);
+  const [vendorEditForm, setVendorEditForm] = useState({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' });
+  const [vendorEditSaving, setVendorEditSaving] = useState(false);
+  const [vendorPayOpen, setVendorPayOpen] = useState(false);
+  const [vendorAllocOpen, setVendorAllocOpen] = useState(false);
+  const [vendorReturnOpen, setVendorReturnOpen] = useState(false);
   const [payablesByPayee, setPayablesByPayee] = useState<any[]>([]);
   const [expensesLoading, setExpensesLoading] = useState(false);
   const [expensesError, setExpensesError] = useState('');
@@ -306,7 +327,106 @@ export default function AccountsPage() {
   // Fetch expenses when PAYABLES tab is active
   useEffect(() => {
     if (activeTab === 'PAYABLES') fetchExpenses();
+
+  // ── Vendor fetch helpers ────────────────────────────────────────────────────
   }, [activeTab, fetchExpenses]);
+
+  const fetchVendors = useCallback(async () => {
+    setVendorsLoading(true);
+    try {
+      const res = await getVendors();
+      setVendorsList(res.vendors ?? []);
+    } catch {
+      toast.error('Failed to load vendors');
+    } finally {
+      setVendorsLoading(false);
+    }
+  }, []);
+
+  const fetchVendorDetail = useCallback(async (id: string) => {
+    setVendorDetailLoading(true);
+    try {
+      const res = await getVendorLedger(id);
+      setVendorDetail(res);
+    } catch {
+      toast.error('Failed to load vendor details');
+    } finally {
+      setVendorDetailLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'VENDORS') fetchVendors();
+  }, [activeTab, fetchVendors]);
+
+  useEffect(() => {
+    if (selectedVendorId) fetchVendorDetail(selectedVendorId);
+  }, [selectedVendorId, fetchVendorDetail]);
+
+  const handleCreateVendor = async () => {
+    if (!vendorForm.name.trim()) return toast.error('Vendor name is required');
+    setVendorSaving(true);
+    try {
+      await createVendor({
+        name: vendorForm.name.trim(),
+        contactPerson: vendorForm.contactPerson.trim() || undefined,
+        phoneNumber: vendorForm.phoneNumber.trim() || undefined,
+        email: vendorForm.email.trim() || undefined,
+        address: vendorForm.address.trim() || undefined,
+      });
+      toast.success('Vendor created');
+      setShowCreateVendor(false);
+      setVendorForm({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' });
+      await fetchVendors();
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || 'Failed to create vendor');
+    } finally {
+      setVendorSaving(false);
+    }
+  };
+
+  const handleDeleteVendor = async () => {
+    if (!vendorDeleteTarget) return;
+    setVendorDeleting(true);
+    try {
+      await deleteVendor(vendorDeleteTarget.id);
+      toast.success(`${vendorDeleteTarget.name} deactivated`);
+      setVendorDeleteTarget(null);
+      await fetchVendors();
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || 'Failed to deactivate vendor');
+    } finally {
+      setVendorDeleting(false);
+    }
+  };
+
+  const handleSaveVendorEdit = async () => {
+    if (!selectedVendorId) return;
+    setVendorEditSaving(true);
+    try {
+      await updateVendor(selectedVendorId, {
+        name: vendorEditForm.name.trim() || undefined,
+        contactPerson: vendorEditForm.contactPerson.trim() || undefined,
+        phoneNumber: vendorEditForm.phoneNumber.trim() || undefined,
+        email: vendorEditForm.email.trim() || undefined,
+        address: vendorEditForm.address.trim() || undefined,
+      });
+      toast.success('Vendor updated');
+      setVendorEditing(false);
+      await fetchVendorDetail(selectedVendorId);
+      await fetchVendors();
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || 'Failed to update vendor');
+    } finally {
+      setVendorEditSaving(false);
+    }
+  };
+
+  const fmtCurrency = (n: number) =>
+    new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(n);
+
+  const fmtDate = (s: string) =>
+    new Date(s).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
 
   // Load branches once for the filter dropdown
   useEffect(() => {
@@ -446,21 +566,19 @@ export default function AccountsPage() {
       </div>
 
       <div className="flex space-x-2 border-b border-gray-200">
-        {(['OVERVIEW', 'JOURNALS', 'PAYABLES', 'RECEIVABLES', 'OWNER_EQUITY'] as Tab[]).map(tab => (
+        {(['OVERVIEW', 'JOURNALS', 'PAYABLES', 'RECEIVABLES', 'OWNER_EQUITY', 'VENDORS'] as Tab[]).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 font-medium text-sm transition-colors ${
-              activeTab === tab
-                ? 'border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+              activeTab === tab ? 'border-b-2' : 'text-gray-500 hover:text-gray-700'
             }`}
             style={{
               borderColor: activeTab === tab ? theme.accents.primary : 'transparent',
               color: activeTab === tab ? theme.accents.primary : undefined,
             }}
           >
-            {tab.replace('_', ' ')}
+            {tab === 'OWNER_EQUITY' ? 'OWNER EQUITY' : tab === 'VENDORS' ? 'VENDORS & INVENTORY' : tab}
           </button>
         ))}
       </div>
@@ -1366,6 +1484,320 @@ export default function AccountsPage() {
             </div>
           </div>
         )}
+
+        {activeTab === 'VENDORS' && (
+          <div>
+            {/* ── Vendor list view ── */}
+            {!selectedVendorId ? (
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Vendors &amp; Inventory</h2>
+                    <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>Manage vendor accounts, prepaid balances, and inventory allocations.</p>
+                  </div>
+                  {isAdmin && (
+                    <button onClick={() => setShowCreateVendor(true)}
+                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm"
+                      style={{ backgroundColor: theme.accents.primary }}>
+                      + Add Vendor
+                    </button>
+                  )}
+                </div>
+
+                {/* Summary strip */}
+                {!vendorsLoading && vendorsList.length > 0 && (() => {
+                  const totalBalance = vendorsList.reduce((s: number, v: any) => s + v.prepaidBalance, 0);
+                  const withBalance = vendorsList.filter((v: any) => v.prepaidBalance > 0).length;
+                  return (
+                    <div className="rounded-xl border p-4 flex items-center gap-6 mb-5"
+                      style={{ borderColor: theme.borders.light, backgroundColor: theme.backgrounds.secondary }}>
+                      <div>
+                        <p className="text-xs uppercase font-semibold" style={{ color: theme.text.muted }}>Total Prepaid Outstanding</p>
+                        <p className="text-xl font-bold" style={{ color: totalBalance > 0 ? theme.accents.primary : theme.text.secondary }}>
+                          {fmtCurrency(totalBalance)}
+                        </p>
+                      </div>
+                      <div className="h-8 w-px" style={{ backgroundColor: theme.borders.light }} />
+                      <div>
+                        <p className="text-xs uppercase font-semibold" style={{ color: theme.text.muted }}>Vendors with balance</p>
+                        <p className="text-xl font-bold" style={{ color: theme.text.primary }}>{withBalance}</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div className="rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: theme.borders.light }}>
+                  {vendorsLoading ? (
+                    <div className="p-12 text-center text-sm" style={{ color: theme.text.muted }}>Loading vendors...</div>
+                  ) : vendorsList.length === 0 ? (
+                    <div className="p-12 text-center text-sm" style={{ color: theme.text.muted }}>
+                      No vendors yet.{isAdmin && ' Click "+ Add Vendor" to get started.'}
+                    </div>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                          {['Vendor', 'Contact', 'Phone', 'Prepaid Balance', 'Actions'].map(h => (
+                            <th key={h} className={`p-3 font-semibold text-xs uppercase tracking-wider ${h === 'Prepaid Balance' ? 'text-right' : h === 'Actions' ? 'text-center' : 'text-left'}`} style={{ color: theme.text.secondary }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {vendorsList.map((v: any) => (
+                          <tr key={v.id} className="border-t hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
+                            <td className="p-3">
+                              <p className="font-semibold" style={{ color: theme.text.primary }}>{v.name}</p>
+                              {v.email && <p className="text-xs mt-0.5" style={{ color: theme.text.muted }}>{v.email}</p>}
+                            </td>
+                            <td className="p-3" style={{ color: theme.text.secondary }}>{v.contactPerson || <span style={{ color: theme.text.muted }}>—</span>}</td>
+                            <td className="p-3" style={{ color: theme.text.secondary }}>{v.phoneNumber || <span style={{ color: theme.text.muted }}>—</span>}</td>
+                            <td className="p-3 text-right">
+                              <span className="font-bold" style={{ color: v.prepaidBalance > 0 ? '#d97706' : theme.text.secondary }}>
+                                {fmtCurrency(v.prepaidBalance)}
+                              </span>
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center justify-center gap-2">
+                                <button onClick={() => { setSelectedVendorId(v.id); setVendorEditing(false); }}
+                                  className="px-3 py-1 rounded text-xs font-semibold border"
+                                  style={{ color: theme.text.primary, borderColor: theme.borders.medium }}>
+                                  View
+                                </button>
+                                {isAdmin && (
+                                  <button onClick={() => setVendorDeleteTarget(v)}
+                                    className="px-3 py-1 rounded text-xs font-semibold border text-red-600 border-red-200 hover:bg-red-50">
+                                    Deactivate
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* ── Vendor detail view ── */
+              <div className="space-y-6">
+                <button onClick={() => { setSelectedVendorId(null); setVendorDetail(null); setVendorEditing(false); }}
+                  className="inline-flex items-center gap-1 text-sm font-medium hover:opacity-70"
+                  style={{ color: theme.text.secondary }}>
+                  ← Back to Vendors
+                </button>
+
+                {vendorDetailLoading || !vendorDetail ? (
+                  <div className="p-12 text-center text-sm" style={{ color: theme.text.muted }}>Loading vendor...</div>
+                ) : (() => {
+                  const vendor = vendorDetail.vendor;
+                  const summary = vendorDetail.summary;
+                  const ledger: any[] = vendorDetail.ledger ?? [];
+                  return (
+                    <>
+                      {/* Vendor card */}
+                      <div className="rounded-xl border p-6 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            {vendorEditing ? (
+                              <div className="space-y-3">
+                                {[
+                                  { label: 'Name', key: 'name' }, { label: 'Contact Person', key: 'contactPerson' },
+                                  { label: 'Phone', key: 'phoneNumber' }, { label: 'Email', key: 'email' }, { label: 'Address', key: 'address' },
+                                ].map(({ label, key }) => (
+                                  <div key={key} className="flex items-center gap-3">
+                                    <span className="w-28 text-xs font-medium shrink-0" style={{ color: theme.text.muted }}>{label}</span>
+                                    <input type="text" className="flex-1 border rounded px-2 py-1.5 text-sm outline-none"
+                                      style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
+                                      value={(vendorEditForm as any)[key]}
+                                      onChange={(e) => setVendorEditForm(f => ({ ...f, [key]: e.target.value }))} />
+                                  </div>
+                                ))}
+                                <div className="flex gap-2 pt-1">
+                                  <AsyncButton loading={vendorEditSaving} onClick={handleSaveVendorEdit}
+                                    className="px-3 py-1.5 text-xs font-semibold text-white rounded"
+                                    style={{ backgroundColor: theme.accents.primary }}>Save</AsyncButton>
+                                  <button onClick={() => setVendorEditing(false)}
+                                    className="px-3 py-1.5 text-xs font-medium border rounded"
+                                    style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}>Cancel</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <h2 className="text-2xl font-bold" style={{ color: theme.text.primary }}>{vendor.name}</h2>
+                                <div className="mt-2 space-y-0.5 text-sm" style={{ color: theme.text.secondary }}>
+                                  {vendor.contactPerson && <p>Contact: {vendor.contactPerson}</p>}
+                                  {vendor.phoneNumber && <p>Phone: {vendor.phoneNumber}</p>}
+                                  {vendor.email && <p>Email: {vendor.email}</p>}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          {isAdmin && !vendorEditing && (
+                            <button onClick={() => {
+                              setVendorEditForm({ name: vendor.name ?? '', contactPerson: vendor.contactPerson ?? '', phoneNumber: vendor.phoneNumber ?? '', email: vendor.email ?? '', address: '' });
+                              setVendorEditing(true);
+                            }} className="px-3 py-1.5 text-xs font-medium border rounded"
+                              style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}>Edit</button>
+                          )}
+                        </div>
+
+                        {/* Balance summary */}
+                        <div className="grid grid-cols-3 gap-4 mt-6">
+                          {[
+                            { label: 'Total Paid', value: summary.totalPaid, color: '#059669' },
+                            { label: 'Total Allocated', value: summary.totalAllocated, color: theme.text.primary },
+                            { label: 'Outstanding Balance', value: summary.prepaidBalance, color: summary.prepaidBalance > 0 ? '#d97706' : theme.text.secondary },
+                          ].map(({ label, value, color }) => (
+                            <div key={label} className="rounded-xl border p-4 text-center"
+                              style={{ borderColor: theme.borders.light, backgroundColor: theme.backgrounds.secondary }}>
+                              <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: theme.text.muted }}>{label}</p>
+                              <p className="text-xl font-bold" style={{ color }}>{fmtCurrency(value)}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Action buttons */}
+                        {isAdmin && (
+                          <div className="flex gap-3 mt-5 flex-wrap">
+                            <button onClick={() => setVendorPayOpen(true)}
+                              className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm"
+                              style={{ backgroundColor: theme.accents.primary }}>Make Payment</button>
+                            <button onClick={() => setVendorAllocOpen(true)}
+                              disabled={summary.prepaidBalance <= 0}
+                              className="px-4 py-2 rounded-lg text-sm font-semibold border disabled:opacity-40"
+                              style={{ color: theme.accents.primary, borderColor: theme.accents.primary }}>Allocate Inventory</button>
+                            <button onClick={() => setVendorReturnOpen(true)}
+                              className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm bg-red-600 hover:bg-red-700">
+                              Return Defective Inventory</button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Ledger */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Transaction History</h3>
+                        {ledger.length === 0 ? (
+                          <div className="rounded-xl border p-10 text-center text-sm"
+                            style={{ borderColor: theme.borders.light, color: theme.text.muted }}>
+                            No transactions yet. Record a payment to get started.
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {[...ledger].reverse().map((entry: any) => (
+                              <div key={entry.id} className="rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: theme.borders.light }}>
+                                <div className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                                  <div className="flex items-center gap-3">
+                                    <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{
+                                      backgroundColor: entry.kind === 'PAYMENT' ? '#dcfce7' : entry.kind === 'DEFECTIVE_RETURN' ? '#fef2f2' : '#dbeafe',
+                                      color: entry.kind === 'PAYMENT' ? '#166534' : entry.kind === 'DEFECTIVE_RETURN' ? '#991b1b' : '#1e40af',
+                                    }}>
+                                      {entry.kind === 'PAYMENT' ? 'PAYMENT' : entry.kind === 'DEFECTIVE_RETURN' ? 'DEFECTIVE RETURN' : 'ALLOCATION'}
+                                    </span>
+                                    <span className="text-sm font-medium" style={{ color: theme.text.primary }}>{fmtDate(entry.date)}</span>
+                                    {entry.notes && <span className="text-xs" style={{ color: theme.text.muted }}>{entry.notes}</span>}
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <span className="text-sm font-bold" style={{ color: entry.kind === 'ALLOCATION' ? '#dc2626' : '#059669' }}>
+                                      {entry.kind === 'ALLOCATION' ? '−' : '+'}{fmtCurrency(entry.kind === 'PAYMENT' ? entry.amount : entry.totalAmount)}
+                                    </span>
+                                    <span className="text-xs" style={{ color: theme.text.muted }}>
+                                      Balance: <span className="font-semibold" style={{ color: theme.text.primary }}>{fmtCurrency(entry.balance)}</span>
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="px-4 py-3 text-xs space-y-1" style={{ color: theme.text.secondary }}>
+                                  {entry.kind === 'PAYMENT' ? (
+                                    <p>Paid from <span className="font-medium" style={{ color: theme.text.primary }}>{entry.fromAccount?.code} — {entry.fromAccount?.name}</span>
+                                      {entry.recordedBy && <> · by {entry.recordedBy.fullName}</>}</p>
+                                  ) : (
+                                    <>
+                                      {entry.bikes?.length > 0 && (
+                                        <p><span className="font-medium" style={{ color: theme.text.primary }}>Bikes: </span>
+                                          {entry.bikes.map((b: any) => `${b.model?.brand} ${b.model?.modelName} (${b.chassisNumber}) — ${fmtCurrency(b.unitCost ?? 0)}`).join(', ')}</p>
+                                      )}
+                                      {entry.partLines?.length > 0 && (
+                                        <p><span className="font-medium" style={{ color: theme.text.primary }}>Parts: </span>
+                                          {entry.partLines.map((pl: any) => `${pl.quantity}× ${pl.part?.name} @ ${fmtCurrency(pl.unitCost)} (${pl.branch?.name})`).join(', ')}</p>
+                                      )}
+                                      {entry.recordedBy && <p>Recorded by {entry.recordedBy.fullName}</p>}
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+
+            {/* ── Create Vendor Modal ── */}
+            {showCreateVendor && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6" style={{ border: `1px solid ${theme.borders.light}` }}>
+                  <h2 className="text-xl font-bold mb-5" style={{ color: theme.text.primary }}>Add Vendor</h2>
+                  <div className="space-y-4">
+                    {[
+                      { label: 'Name *', key: 'name', placeholder: 'e.g. Evee Pakistan' },
+                      { label: 'Contact Person', key: 'contactPerson', placeholder: 'e.g. Bilal Ahmed' },
+                      { label: 'Phone', key: 'phoneNumber', placeholder: '+92300...' },
+                      { label: 'Email', key: 'email', placeholder: 'info@vendor.com' },
+                      { label: 'Address', key: 'address', placeholder: 'Street, City' },
+                    ].map(({ label, key, placeholder }) => (
+                      <div key={key}>
+                        <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>{label}</label>
+                        <input type="text" className="w-full px-3 py-2 rounded-md text-sm border outline-none"
+                          style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
+                          placeholder={placeholder}
+                          value={(vendorForm as any)[key]}
+                          onChange={(e) => setVendorForm(f => ({ ...f, [key]: e.target.value }))} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end gap-3 mt-6 pt-5 border-t" style={{ borderColor: theme.borders.light }}>
+                    <button onClick={() => { setShowCreateVendor(false); setVendorForm({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' }); }}
+                      className="px-4 py-2 border rounded-md text-sm font-medium"
+                      style={{ color: theme.text.primary, borderColor: theme.borders.medium }}>Cancel</button>
+                    <AsyncButton loading={vendorSaving} onClick={handleCreateVendor}
+                      className="px-4 py-2 text-sm font-semibold text-white rounded-md"
+                      style={{ backgroundColor: theme.accents.primary }}>Create Vendor</AsyncButton>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Deactivate Confirm Modal ── */}
+            {vendorDeleteTarget && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6" style={{ border: `1px solid ${theme.borders.light}` }}>
+                  <h2 className="text-lg font-bold mb-3" style={{ color: theme.text.primary }}>Deactivate Vendor</h2>
+                  {vendorDeleteTarget.prepaidBalance > 0 ? (
+                    <div className="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                      <p className="text-sm font-semibold text-amber-800">Outstanding balance of {fmtCurrency(vendorDeleteTarget.prepaidBalance)}.</p>
+                      <p className="text-sm mt-1 text-amber-700">Allocate or adjust this balance before deactivating.</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                      Deactivate <strong>{vendorDeleteTarget.name}</strong>? Historical data will be preserved.
+                    </p>
+                  )}
+                  <div className="flex justify-end gap-3">
+                    <button onClick={() => setVendorDeleteTarget(null)}
+                      className="px-4 py-2 border rounded-md text-sm font-medium"
+                      style={{ color: theme.text.primary, borderColor: theme.borders.medium }}>Cancel</button>
+                    <AsyncButton loading={vendorDeleting} disabled={vendorDeleteTarget.prepaidBalance > 0} onClick={handleDeleteVendor}
+                      className="px-4 py-2 text-sm font-semibold text-white rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-40">
+                      Deactivate</AsyncButton>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <AddExpenseModal
@@ -1374,6 +1806,34 @@ export default function AccountsPage() {
         onSuccess={fetchExpenses}
         defaultBranchId={isBranchScoped ? user?.branchId : null}
       />
+
+      {selectedVendorId && vendorDetail && (
+        <>
+          <VendorPaymentModal
+            isOpen={vendorPayOpen}
+            onClose={() => setVendorPayOpen(false)}
+            onSuccess={() => fetchVendorDetail(selectedVendorId)}
+            vendorId={selectedVendorId}
+            vendorName={vendorDetail.vendor?.name ?? ''}
+            currentBalance={vendorDetail.summary?.prepaidBalance ?? 0}
+          />
+          <AllocateInventoryModal
+            isOpen={vendorAllocOpen}
+            onClose={() => setVendorAllocOpen(false)}
+            onSuccess={() => { fetchVendorDetail(selectedVendorId); fetchVendors(); }}
+            vendorId={selectedVendorId}
+            vendorName={vendorDetail.vendor?.name ?? ''}
+            currentBalance={vendorDetail.summary?.prepaidBalance ?? 0}
+          />
+          <ReturnDefectiveInventoryModal
+            isOpen={vendorReturnOpen}
+            onClose={() => setVendorReturnOpen(false)}
+            onSuccess={() => { fetchVendorDetail(selectedVendorId); fetchVendors(); }}
+            vendorId={selectedVendorId}
+            vendorName={vendorDetail.vendor?.name ?? ''}
+          />
+        </>
+      )}
 
       <PayeeLedgerModal
         isOpen={payeeLedgerModalData.isOpen}
