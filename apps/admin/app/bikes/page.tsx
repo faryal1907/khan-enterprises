@@ -200,13 +200,7 @@ export default function BikesListPage() {
           </div>
           {isAdmin && (
             <div className="flex gap-2">
-              <Link
-                href="/bikes/new"
-                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-              >
-                Add New Bike
-              </Link>
+              
             </div>
           )}
         </div>
