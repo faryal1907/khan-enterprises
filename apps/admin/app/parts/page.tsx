@@ -9,7 +9,6 @@ import { UserRole } from "@/lib/types";
 import {
   getParts,
   getBranches,
-  adjustStock,
   getLowStockItems,
   transferPart,
 } from "@/lib/api/inventory";
@@ -30,7 +29,6 @@ export default function PartsListPage() {
     category: "",
     search: "",
   });
-  const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
 
   // Data state
@@ -43,14 +41,10 @@ export default function PartsListPage() {
 
   // Modal state
   const [selectedPart, setSelectedPart] = useState<PartInventory | null>(null);
-  const [adjustQuantity, setAdjustQuantity] = useState("");
-  const [adjustMovementType, setAdjustMovementType] = useState("");
-  const [adjustReason, setAdjustReason] = useState("");
   const [transferFromBranch, setTransferFromBranch] = useState("");
   const [transferToBranch, setTransferToBranch] = useState("");
   const [transferQuantity, setTransferQuantity] = useState("");
-  
-  const [isAdjusting, setIsAdjusting] = useState(false);
+
   const [isTransferring, setIsTransferring] = useState(false);
 
   const effectiveBranch = !isGlobal && user?.branchId ? user.branchId : filters.branch;
@@ -95,54 +89,17 @@ export default function PartsListPage() {
   }, [effectiveBranch, filters.category, filters.search, lowStockOnly]);
 
   const handleFilterChange = (key: string, value: string) => {
-    // Prevent non-admins from changing branch filter
-    if (key === "branch" && !isGlobal) {
-      return;
-    }
+    if (key === "branch" && !isGlobal) return;
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleAdjustStock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedPart || !adjustQuantity || !adjustMovementType) return;
-
-    let qty = parseInt(adjustQuantity);
-    if (isNaN(qty)) return;
-
-    // Automatically enforce the correct math sign based on movement type
-    if (adjustMovementType === "STOCK_OUT") {
-      qty = -Math.abs(qty); // Always subtract
-    } else if (adjustMovementType === "STOCK_IN") {
-      qty = Math.abs(qty); // Always add
-    }
-    // For ADJUSTMENT, we respect the sign the user provided (+ or -)
-
-    setIsAdjusting(true);
-    try {
-      await adjustStock(selectedPart.id, {
-        quantity: qty,
-        movementType: adjustMovementType,
-        reason: adjustReason,
-      });
-      toast.success("Stock adjusted successfully");
-      setShowAdjustModal(false);
-      setAdjustQuantity("");
-      setAdjustMovementType("");
-      setAdjustReason("");
-      setSelectedPart(null);
-      // Refetch parts
-      const params: Record<string, string> = {};
-      if (effectiveBranch) params.branchId = effectiveBranch;
-      if (filters.category) params.category = filters.category;
-      if (filters.search) params.search = filters.search;
-      const response = await getParts(params);
-      setParts(response.parts);
-    } catch (error) {
-      console.error("Failed to adjust stock:", error);
-      toast.error("Failed to adjust stock");
-    } finally {
-      setIsAdjusting(false);
-    }
+  const refetchParts = async () => {
+    const params: Record<string, string> = {};
+    if (effectiveBranch) params.branchId = effectiveBranch;
+    if (filters.category) params.category = filters.category;
+    if (filters.search) params.search = filters.search;
+    const response = await getParts(params);
+    setParts(response.parts);
   };
 
   // Handle transfer stock
@@ -171,28 +128,13 @@ export default function PartsListPage() {
       setTransferToBranch("");
       setTransferQuantity("");
       setSelectedPart(null);
-      // Refetch parts
-      const params: Record<string, string> = {};
-      if (effectiveBranch) params.branchId = effectiveBranch;
-      if (filters.category) params.category = filters.category;
-      if (filters.search) params.search = filters.search;
-      const response = await getParts(params);
-      setParts(response.parts);
+      await refetchParts();
     } catch (error) {
       console.error("Failed to transfer stock:", error);
       toast.error(error instanceof Error ? error.message : "Failed to transfer stock");
     } finally {
       setIsTransferring(false);
     }
-  };
-
-  // Open adjust modal
-  const openAdjustModal = (part: PartInventory) => {
-    setSelectedPart(part);
-    setAdjustQuantity("");
-    setAdjustMovementType("");
-    setAdjustReason("");
-    setShowAdjustModal(true);
   };
 
   // Open transfer modal
@@ -208,6 +150,7 @@ export default function PartsListPage() {
   const totalParts = parts.length;
   const lowStockItems = lowStockCount;
   const outOfStockItems = parts.filter((p) => p.quantity - p.reservedQuantity === 0).length;
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -240,22 +183,10 @@ export default function PartsListPage() {
         )}
 
         <div className="flex items-center justify-between mb-6">
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: theme.text.primary }}
-          >
+          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
             Parts Inventory
           </h1>
-          {canManage && <Link
-            href="/parts/new"
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
-          >
-            Add New Part
-          </Link>}
+          
         </div>
 
         {/* Summary Cards */}
@@ -263,7 +194,6 @@ export default function PartsListPage() {
           <SummaryCard label="Total Parts" value={totalParts} />
           <SummaryCard label="Low Stock Items" value={lowStockItems} color={theme.accents.secondary} />
           <SummaryCard label="Out of Stock Items" value={outOfStockItems} color={theme.accents.primary} />
-          
         </div>
 
         {/* Filters */}
@@ -273,10 +203,7 @@ export default function PartsListPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Branch
               </label>
               <select
@@ -305,10 +232,7 @@ export default function PartsListPage() {
               )}
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Category
               </label>
               <select
@@ -328,10 +252,7 @@ export default function PartsListPage() {
               </select>
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                style={{ color: theme.text.secondary }}
-              >
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Search
               </label>
               <input
@@ -350,17 +271,15 @@ export default function PartsListPage() {
           </div>
         </div>
 
-        
         {/* Table */}
         <div
+          id="parts-table"
           className="rounded-lg overflow-hidden"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <table className="w-full">
             <thead>
-              <tr
-                style={{ backgroundColor: theme.backgrounds.secondary }}
-              >
+              <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                   Part
                 </th>
@@ -404,7 +323,10 @@ export default function PartsListPage() {
                     key={part.id}
                     style={{
                       borderBottom: `1px solid ${theme.borders.light}`,
-                      backgroundColor: (part.quantity - part.reservedQuantity) < part.reorderLevel ? "rgba(245, 158, 11, 0.1)" : undefined,
+                      backgroundColor:
+                        part.quantity - part.reservedQuantity < part.reorderLevel
+                          ? "rgba(245, 158, 11, 0.1)"
+                          : undefined,
                     }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -436,7 +358,7 @@ export default function PartsListPage() {
                             {part.reservedQuantity} reserved
                           </span>
                         )}
-                        {(part.quantity - part.reservedQuantity) < part.reorderLevel && (
+                        {part.quantity - part.reservedQuantity < part.reorderLevel && (
                           <span
                             className="px-2 py-1 text-xs font-medium rounded"
                             style={{
@@ -457,27 +379,15 @@ export default function PartsListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex space-x-2">
-                        {/* <a
-                          href={`/parts/${part.id}`}
-                          className="text-sm font-medium transition-colors hover:opacity-70"
-                          style={{ color: theme.text.secondary }}
-                        >
-                          History
-                        </a> */}
-                        {canManage && <button
-                          onClick={() => openAdjustModal(part)}
-                          className="text-sm font-medium transition-colors hover:opacity-70"
-                          style={{ color: theme.accents.primary }}
-                        >
-                          Adjust
-                        </button>}
-                        {canManage && <button
-                          onClick={() => openTransferModal(part)}
-                          className="text-sm font-medium transition-colors hover:opacity-70"
-                          style={{ color: theme.accents.secondary }}
-                        >
-                          Transfer
-                        </button>}
+                        {canManage && (
+                          <button
+                            onClick={() => openTransferModal(part)}
+                            className="text-sm font-medium transition-colors hover:opacity-70"
+                            style={{ color: theme.accents.secondary }}
+                          >
+                            Transfer
+                          </button>
+                        )}
                         <a
                           href={`/parts/${part.part.id}/edit`}
                           className="text-sm font-medium transition-colors hover:opacity-70"
@@ -494,134 +404,6 @@ export default function PartsListPage() {
           </table>
         </div>
 
-        {/* Adjust Stock Modal */}
-        {showAdjustModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          >
-            <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
-              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
-                Adjust Stock
-              </h3>
-              <form onSubmit={handleAdjustStock} className="space-y-4">
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Part
-                  </label>
-                  <p className="text-sm" style={{ color: theme.text.primary }}>
-                    {selectedPart?.part.name} ({selectedPart?.part.sku})
-                  </p>
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    {adjustMovementType === "ADJUSTMENT" ? "Quantity Change (+/-)" : "Quantity"}
-                  </label>
-                  <input
-                    type="number"
-                    min={adjustMovementType === "ADJUSTMENT" ? undefined : "0"}
-                    value={adjustQuantity}
-                    onChange={(e) => setAdjustQuantity(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter change"
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Movement Type
-                  </label>
-                  <select
-                    value={adjustMovementType}
-                    onChange={(e) => setAdjustMovementType(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                  >
-                    <option value="">Select type</option>
-                    <option value="STOCK_IN">Stock In (+)</option>
-                    <option value="STOCK_OUT">Stock Out (-)</option>
-                    <option value="ADJUSTMENT">Adjustment</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
-                    Reason
-                  </label>
-                  <input
-                    type="text"
-                    value={adjustReason}
-                    onChange={(e) => setAdjustReason(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      border: `1px solid ${theme.borders.medium}`,
-                      color: theme.text.primary,
-                    }}
-                    placeholder="Enter reason (optional)"
-                  />
-                </div>
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAdjustModal(false);
-                      setAdjustQuantity("");
-                      setAdjustMovementType("");
-                      setAdjustReason("");
-                      setSelectedPart(null);
-                    }}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                    style={{
-                      backgroundColor: theme.backgrounds.tertiary,
-                      color: theme.text.secondary,
-                      border: `1px solid ${theme.borders.medium}`,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isAdjusting}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      backgroundColor: theme.accents.primary,
-                      color: theme.text.inverse,
-                    }}
-                  >
-                    {isAdjusting ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
         {/* Transfer Stock Modal */}
         {showTransferModal && (
           <div
@@ -632,18 +414,12 @@ export default function PartsListPage() {
               className="rounded-lg p-6 max-w-md w-full mx-4"
               style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
             >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: theme.text.primary }}
-              >
+              <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
                 Transfer Stock
               </h3>
               <form onSubmit={handleTransferStock} className="space-y-4">
                 <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                     Part
                   </label>
                   <p className="text-sm" style={{ color: theme.text.primary }}>
@@ -651,15 +427,11 @@ export default function PartsListPage() {
                   </p>
                 </div>
                 <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                     From Branch
                   </label>
                   <select
                     value={transferFromBranch}
-                    onChange={(e) => setTransferFromBranch(e.target.value)}
                     disabled
                     className="w-full px-3 py-2 rounded text-sm opacity-70 cursor-not-allowed"
                     style={{
@@ -668,7 +440,6 @@ export default function PartsListPage() {
                       color: theme.text.primary,
                     }}
                   >
-                    <option value="">Select branch</option>
                     {branches.map((branch) => (
                       <option key={branch.id} value={branch.id}>
                         {branch.name}
@@ -677,10 +448,7 @@ export default function PartsListPage() {
                   </select>
                 </div>
                 <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                     To Branch
                   </label>
                   <select
@@ -694,18 +462,17 @@ export default function PartsListPage() {
                     }}
                   >
                     <option value="">Select branch</option>
-                    {branches.map((branch) => (
-                      <option key={branch.id} value={branch.id}>
-                        {branch.name}
-                      </option>
-                    ))}
+                    {branches
+                      .filter((b) => b.id !== transferFromBranch)
+                      .map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div>
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: theme.text.secondary }}
-                  >
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                     Quantity
                   </label>
                   <input

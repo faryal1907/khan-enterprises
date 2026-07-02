@@ -40,29 +40,47 @@ export class BranchService {
     }
   }
 
-  /** Return all branches with their manager info and staff count. */
+  /** Return all branches with their manager info, staff count, and actual inventory unit totals. */
   async getAllBranches(user?: any) {
     const where: any = {};
     this.applyBranchScope(where, user);
 
-    return this.prisma.client.branch.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        city: true,
-        address: true,
-        phoneNumber: true,
-        createdAt: true,
-        manager: {
-          select: { id: true, fullName: true, email: true, phoneNumber: true },
+    const [branches, partTotals] = await Promise.all([
+      this.prisma.client.branch.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          address: true,
+          phoneNumber: true,
+          createdAt: true,
+          manager: {
+            select: { id: true, fullName: true, email: true, phoneNumber: true },
+          },
+          _count: {
+            select: { users: true, bikeInventory: true },
+          },
         },
-        _count: {
-          select: { users: true, bikeInventory: true, partInventory: true },
-        },
+        orderBy: { name: "asc" },
+      }),
+      this.prisma.client.partInventory.groupBy({
+        by: ["branchId"],
+        _sum: { quantity: true },
+      }),
+    ]);
+
+    const partUnitsByBranch = new Map(
+      partTotals.map((row) => [row.branchId, row._sum.quantity ?? 0]),
+    );
+
+    return branches.map((branch) => ({
+      ...branch,
+      _count: {
+        ...branch._count,
+        partInventory: partUnitsByBranch.get(branch.id) ?? 0,
       },
-      orderBy: { name: "asc" },
-    });
+    }));
   }
 
   /** Return a single branch by ID with full detail. */
@@ -260,25 +278,32 @@ export class BranchService {
       throw new ForbiddenException("You can only view metrics for your own branch.");
     }
 
-    const branch = await this.prisma.client.branch.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        _count: {
-          select: {
-            bikeInventory: true,
-            partInventory: true,
-            orders: true,
-            users: true,
+    const [branch, partInventoryAgg] = await Promise.all([
+      this.prisma.client.branch.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              bikeInventory: true,
+              orders: true,
+              users: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.client.partInventory.aggregate({
+        where: { branchId: id },
+        _sum: { quantity: true },
+      }),
+    ]);
 
     if (!branch) {
       throw new NotFoundException(`Branch with id "${id}" not found.`);
     }
+
+    const totalPartUnits = partInventoryAgg._sum.quantity ?? 0;
 
     const orders = await this.prisma.client.order.findMany({
       where: { branchId: id },
@@ -306,7 +331,7 @@ export class BranchService {
       metrics: {
         inventory: {
           bikes: branch._count.bikeInventory,
-          parts: branch._count.partInventory,
+          parts: totalPartUnits,
         },
         staff: branch._count.users,
         orders: {
