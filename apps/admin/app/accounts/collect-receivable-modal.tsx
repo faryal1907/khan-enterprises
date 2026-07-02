@@ -26,7 +26,6 @@ export function CollectReceivableModal({
 }) {
   const [displayAmount, setDisplayAmount] = useState("");
   const [amount, setAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [notes, setNotes] = useState("");
   const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState("");
@@ -36,7 +35,6 @@ export function CollectReceivableModal({
     if (isOpen && customer) {
       setAmount(customer.totalOutstanding);
       setDisplayAmount(customer.totalOutstanding.toLocaleString());
-      setPaymentMethod("CASH");
       setNotes("");
       setSelectedAccountId("");
       getPaymentAccounts().then(setPaymentAccounts).catch(() => setPaymentAccounts([]));
@@ -59,6 +57,10 @@ export function CollectReceivableModal({
 
   const handleSubmit = async () => {
     if (amount <= 0) return toast.error("Amount must be greater than 0");
+    if (!selectedAccountId) return toast.error("Please select a payment account");
+
+    const selectedAccount = paymentAccounts.find((a) => a.id === selectedAccountId);
+    const paymentMethod = selectedAccount?.subtype === "CASH" ? "CASH" : "ONLINE_TRANSFER";
 
     setIsSubmitting(true);
     try {
@@ -66,6 +68,7 @@ export function CollectReceivableModal({
         amount,
         paymentMethod,
         notes: notes || undefined,
+        accountId: selectedAccountId,
       });
       toast.success(result.message || "Payment collected successfully!");
       if (result.isAdvance) {
@@ -144,39 +147,23 @@ export function CollectReceivableModal({
 
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
-              Payment Method
+              Collect Into Account
             </label>
             <select
               className="w-full border rounded-md p-2 outline-none bg-transparent"
               style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#e5e7eb" }}
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
+              value={selectedAccountId}
+              onChange={(e) => setSelectedAccountId(e.target.value)}
             >
-              <option value="CASH">Cash</option>
-              <option value="ONLINE_TRANSFER">Bank Transfer</option>
+              <option value="">Select account</option>
+              {paymentAccounts.map((acc) => (
+                <option key={acc.id} value={acc.id}>
+                  {acc.subtype === "CASH" ? "💵" : acc.subtype === "BANK" ? "🏦" : "💳"}{" "}
+                  {acc.name}{acc.accountNumber ? ` (${acc.accountNumber})` : ""}
+                </option>
+              ))}
             </select>
           </div>
-
-          {paymentMethod === "ONLINE_TRANSFER" && (
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
-                Bank/E-Wallet Account
-              </label>
-              <select
-                className="w-full border rounded-md p-2 outline-none bg-transparent"
-                style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#e5e7eb" }}
-                value={selectedAccountId}
-                onChange={(e) => setSelectedAccountId(e.target.value)}
-              >
-                <option value="">Select an account</option>
-                {paymentAccounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.subtype === "BANK" ? "🏦" : "💳"} {acc.name} {acc.accountNumber ? `(${acc.accountNumber})` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
@@ -207,8 +194,8 @@ export function CollectReceivableModal({
           <AsyncButton
             loading={isSubmitting}
             onClick={handleSubmit}
-            disabled={paymentMethod === "ONLINE_TRANSFER" && !selectedAccountId}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-md font-medium text-sm hover:bg-emerald-700 shadow-sm"
+            disabled={!selectedAccountId}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md font-medium text-sm hover:bg-emerald-700 shadow-sm disabled:opacity-50"
           >
             Confirm Collection
           </AsyncButton>

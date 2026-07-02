@@ -40,7 +40,7 @@ export const getPayables = async () => {
   return data;
 };
 
-export const payPayable = async (id: string, payload: { amount: number, paymentMethod: string }) => {
+export const payPayable = async (id: string, payload: { amount: number; paymentMethod: string; accountId?: string }) => {
   const { data } = await api.post(`/accounting/payables/${id}/pay`, payload);
   return data;
 };

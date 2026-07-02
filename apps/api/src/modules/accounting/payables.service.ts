@@ -6,7 +6,13 @@ import { PaymentState, JournalStatus, AccountSubtype } from "@khan/prisma";
 export class PayablesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async payPayable(payableId: string, amount: number, paymentMethod: any, userId: string) {
+  async payPayable(
+    payableId: string,
+    amount: number,
+    paymentMethod: any,
+    userId: string,
+    accountId?: string,
+  ) {
     return this.prisma.client.$transaction(async (tx) => {
       const payable = await tx.payable.findUnique({
         where: { id: payableId }
@@ -15,10 +21,6 @@ export class PayablesService {
       if (!payable) throw new NotFoundException('Payable not found');
       if (amount > Number(payable.remaining)) throw new BadRequestException('Amount exceeds remaining balance');
 
-      // Create Payment Transaction (outgoing)
-      // Since it's outgoing, we'll store it as a negative amount or use a different type, 
-      // but for now, we just link it via PaymentAllocation.
-      
       const newPaid = Number(payable.paid) + amount;
       const newRemaining = Number(payable.total) - newPaid;
       let newState: PaymentState = PaymentState.PARTIAL;
@@ -33,8 +35,15 @@ export class PayablesService {
         }
       });
 
-      const sourceSubtype = paymentMethod === 'ONLINE_TRANSFER' ? AccountSubtype.BANK : AccountSubtype.CASH;
-      const sourceAcc = await tx.account.findFirst({ where: { subtype: sourceSubtype } });
+      // Resolve source account: prefer explicit accountId, then fall back by method subtype
+      let sourceAcc: any = null;
+      if (accountId) {
+        sourceAcc = await tx.account.findUnique({ where: { id: accountId } });
+      } else {
+        const sourceSubtype = paymentMethod === 'ONLINE_TRANSFER' ? AccountSubtype.BANK : AccountSubtype.CASH;
+        sourceAcc = await tx.account.findFirst({ where: { subtype: sourceSubtype } });
+      }
+
       const apAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AP } });
 
       const txRecord = await tx.paymentTransaction.create({

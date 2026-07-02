@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query, UseGuards, Ip } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, Param, UseGuards, Ip } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -29,5 +29,10 @@ export class ExpensesController {
     @Query('dateTo') dateTo?: string,
   ) {
     return this.expensesService.findAll(user, { branchId, dateFrom, dateTo });
+  }
+
+  @Get(':id/payment-history')
+  async getPaymentHistory(@Param('id') id: string) {
+    return this.expensesService.getExpensePaymentHistory(id);
   }
 }

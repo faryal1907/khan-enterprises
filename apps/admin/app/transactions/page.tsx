@@ -11,9 +11,6 @@ import { downloadReceipt, getTransactions, type TransactionRecord } from "@/lib/
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { Branch, PaymentMethod, PaymentStatus, UserRole } from "@/lib/types";
-import { ExpensesTab } from "./expenses-tab";
-
-type Tab = "payments" | "expenses";
 
 type TransactionFilters = {
   status: string;
@@ -46,7 +43,6 @@ export default function TransactionsPage() {
   const { user } = useAuthStore();
   const isAdmin = user?.role === UserRole.ADMIN;
   const isBranchScoped = !isAdmin && Boolean(user?.branchId);
-  const [activeTab, setActiveTab] = useState<Tab>("payments");
 
   const [filters, setFilters] = useState<TransactionFilters>({
     status: "",
@@ -170,62 +166,27 @@ export default function TransactionsPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
-              Financials
+              Transactions
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
-              View payment transactions and business expenses.
+              View payment transactions.
             </p>
           </div>
-          {activeTab === "payments" && (
-            <button
-              onClick={handleExportCSV}
-              disabled={transactions.length === 0}
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.secondary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
-            >
-              Export CSV
-            </button>
-          )}
-        </div>
-
-        <div className="flex border-b mb-6" style={{ borderColor: theme.borders.light }}>
           <button
-            onClick={() => setActiveTab("payments")}
-            className={`px-6 py-3 text-sm font-medium transition-colors ${
-              activeTab === "payments"
-                ? "border-b-2"
-                : "opacity-60 hover:opacity-100"
-            }`}
+            onClick={handleExportCSV}
+            disabled={transactions.length === 0}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              borderColor: activeTab === "payments" ? theme.accents.primary : "transparent",
-              color: activeTab === "payments" ? theme.accents.primary : theme.text.primary,
+              backgroundColor: theme.backgrounds.tertiary,
+              color: theme.text.secondary,
+              border: `1px solid ${theme.borders.medium}`,
             }}
           >
-            Payments
-          </button>
-          <button
-            onClick={() => setActiveTab("expenses")}
-            className={`px-6 py-3 text-sm font-medium transition-colors ${
-              activeTab === "expenses"
-                ? "border-b-2"
-                : "opacity-60 hover:opacity-100"
-            }`}
-            style={{
-              borderColor: activeTab === "expenses" ? theme.accents.primary : "transparent",
-              color: activeTab === "expenses" ? theme.accents.primary : theme.text.primary,
-            }}
-          >
-            Expenses
+            Export CSV
           </button>
         </div>
 
-        {activeTab === "payments" ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <SummaryCard label="Total Revenue" value={`PKR ${summary.revenue.toLocaleString()}`} />
           <SummaryCard label="Successful" value={summary.successful} color="#22c55e" />
           <SummaryCard label="Pending" value={summary.pending} color="#f59e0b" />
@@ -449,10 +410,6 @@ export default function TransactionsPage() {
             </tbody>
           </table>
         </div>
-          </>
-        ) : (
-          <ExpensesTab branches={branches} />
-        )}
       </div>
     </div>
   );

@@ -18,9 +18,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor: re-throw API errors as plain Errors so they are
-// caught silently by component try/catch blocks without triggering the
-// Next.js dev overlay (which fires on unhandled Axios rejections).
+// Response interceptor: suppress the Next.js dev overlay for API errors
+// while keeping the Axios error shape intact so catch blocks can read
+// err.response?.data?.message as expected.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -31,13 +31,11 @@ api.interceptors.response.use(
       error?.message ||
       "Request failed";
 
-    // Use console.warn so Next.js dev overlay is NOT triggered
+    // Use console.warn so the Next.js dev overlay is NOT triggered
     console.warn(`[API ${status ?? "ERR"}]`, message);
 
-    // Re-throw as a plain Error to keep component catch blocks working
-    const plain = new Error(message);
-    (plain as any).status = status;
-    (plain as any).data = error?.response?.data;
-    return Promise.reject(plain);
+    // Re-throw the original Axios error unchanged so that
+    // err.response?.data?.message works in every catch block.
+    return Promise.reject(error);
   }
 );

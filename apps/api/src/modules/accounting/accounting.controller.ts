@@ -188,7 +188,7 @@ export class AccountingController {
   @Roles(UserRole.ADMIN)
   async payPayable(
     @Param("id") id: string,
-    @Body() data: { amount: number; paymentMethod: any },
+    @Body() data: { amount: number; paymentMethod: any; accountId?: string },
     @Request() req: any,
   ) {
     return this.payablesService.payPayable(
@@ -196,6 +196,7 @@ export class AccountingController {
       data.amount,
       data.paymentMethod,
       req.user.id,
+      data.accountId,
     );
   }
 

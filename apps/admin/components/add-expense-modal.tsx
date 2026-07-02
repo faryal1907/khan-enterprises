@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -18,8 +20,12 @@ const expenseSchema = z.object({
   category: z.nativeEnum(ExpenseCategory),
   description: z.string().optional(),
   branchId: z.string().min(1, "Branch is required"),
-  paymentAccountId: z.string().min(1, "Payment Account is required"),
-});
+  payNow: z.boolean(),
+  paymentAccountId: z.string().optional(),
+}).refine(
+  (data) => !data.payNow || (data.paymentAccountId && data.paymentAccountId.length > 0),
+  { message: "Payment account is required when paying now", path: ["paymentAccountId"] }
+);
 
 type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
@@ -40,8 +46,8 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
-    setValue,
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
@@ -50,26 +56,39 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
       category: ExpenseCategory.OTHER,
       description: "",
       branchId: defaultBranchId || "",
+      payNow: true,
       paymentAccountId: "",
     },
   });
+
+  const payNow = watch("payNow");
 
   useEffect(() => {
     if (isOpen) {
       getBranches()
         .then((data) => setBranches(data.branches || []))
         .catch(() => setBranches([]));
-      
+
       getAccounts()
-        .then((data) => setAccounts(data.filter((a: any) => a.category === 'ASSET' && ['CASH', 'BANK', 'EWALLET'].includes(a.subtype) && a.isActive)))
+        .then((data) =>
+          setAccounts(
+            data.filter(
+              (a: any) =>
+                a.category === "ASSET" &&
+                ["CASH", "BANK", "EWALLET"].includes(a.subtype) &&
+                a.isActive
+            )
+          )
+        )
         .catch(() => setAccounts([]));
-      
+
       reset({
         amount: 0,
         date: new Date().toISOString().split("T")[0],
         category: ExpenseCategory.OTHER,
         description: "",
         branchId: defaultBranchId || "",
+        payNow: true,
         paymentAccountId: "",
       });
     }
@@ -78,8 +97,13 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
   const onSubmit = async (data: ExpenseFormValues) => {
     try {
       await createExpense({
-        ...data,
+        amount: data.amount,
         date: new Date(data.date).toISOString(),
+        category: data.category,
+        description: data.description,
+        branchId: data.branchId,
+        payNow: data.payNow,
+        paymentAccountId: data.payNow ? data.paymentAccountId : undefined,
       });
       toast.success("Expense added successfully");
       onSuccess();
@@ -92,14 +116,12 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
   if (!isOpen) return null;
 
   return (
-    <ActionModal
-      onClose={onClose}
-      title="Add Expense"
-    >
+    <ActionModal onClose={onClose} title="Add Expense">
       <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
         Record a new business expense.
       </p>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Branch */}
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
             Branch
@@ -127,6 +149,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
           )}
         </div>
 
+        {/* Amount */}
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
             Amount (PKR)
@@ -149,6 +172,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
           )}
         </div>
 
+        {/* Date */}
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
             Date
@@ -170,6 +194,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
           )}
         </div>
 
+        {/* Category */}
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
             Category
@@ -196,13 +221,14 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
           )}
         </div>
 
+        {/* Description */}
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
             Description (Optional)
           </label>
           <textarea
             {...register("description")}
-            rows={3}
+            rows={2}
             className="w-full px-3 py-2 rounded text-sm"
             style={{
               backgroundColor: theme.backgrounds.tertiary,
@@ -211,39 +237,61 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
             }}
             placeholder="Details about this expense..."
           />
-          {errors.description && (
-            <p className="mt-1 text-xs" style={{ color: theme.accents.error }}>
-              {errors.description.message}
-            </p>
-          )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
-            Payment Account
+        {/* Pay now toggle */}
+        <div
+          className="rounded-lg p-3"
+          style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
+        >
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              {...register("payNow")}
+              className="w-4 h-4 rounded accent-emerald-600"
+            />
+            <div>
+              <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                Pay now
+              </span>
+              <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>
+                {payNow
+                  ? "Payment will be recorded immediately against your selected account."
+                  : "Expense will be recorded as unpaid. You can pay it later from the Expenses tab."}
+              </p>
+            </div>
           </label>
-          <select
-            {...register("paymentAccountId")}
-            className="w-full px-3 py-2 rounded text-sm"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              border: `1px solid ${errors.paymentAccountId ? theme.accents.error : theme.borders.medium}`,
-              color: theme.text.primary,
-            }}
-          >
-            <option value="">Select Account</option>
-            {accounts.map((acc) => (
-              <option key={acc.id} value={acc.id}>
-                {acc.name} ({acc.code})
-              </option>
-            ))}
-          </select>
-          {errors.paymentAccountId && (
-            <p className="mt-1 text-xs" style={{ color: theme.accents.error }}>
-              {errors.paymentAccountId.message}
-            </p>
-          )}
         </div>
+
+        {/* Payment Account — shown only when paying now */}
+        {payNow && (
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+              Payment Account
+            </label>
+            <select
+              {...register("paymentAccountId")}
+              className="w-full px-3 py-2 rounded text-sm"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                border: `1px solid ${errors.paymentAccountId ? theme.accents.error : theme.borders.medium}`,
+                color: theme.text.primary,
+              }}
+            >
+              <option value="">Select Account</option>
+              {accounts.map((acc) => (
+                <option key={acc.id} value={acc.id}>
+                  {acc.name} ({acc.code})
+                </option>
+              ))}
+            </select>
+            {errors.paymentAccountId && (
+              <p className="mt-1 text-xs" style={{ color: theme.accents.error }}>
+                {errors.paymentAccountId.message}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="flex justify-end gap-3 pt-4">
           <button
@@ -263,10 +311,7 @@ export function AddExpenseModal({ isOpen, onClose, onSuccess, defaultBranchId }:
             type="submit"
             loading={isSubmitting}
             loadingLabel="Adding..."
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: "#fff",
-            }}
+            style={{ backgroundColor: theme.accents.primary, color: "#fff" }}
           >
             Add Expense
           </AsyncButton>

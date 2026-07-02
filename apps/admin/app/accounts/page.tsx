@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { theme } from "@/lib/colors";
-import { getAccounts, getJournalEntries, getPayables, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
+import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
+import { getExpenses } from "@/lib/api/expenses";
 import { toast } from "sonner";
 import { getMessaging, onMessage, isSupported } from "firebase/messaging";
 import app from "@/lib/firebase";
 import { AsyncButton } from "@/components/async-button";
-import { PayPayableModal } from "./pay-payable-modal";
+import { SummaryCard } from "@/components/summary-card";
+import { AddExpenseModal } from "@/components/add-expense-modal";
+import { PayExpenseModal } from "./pay-expense-modal";
+import { ExpenseLedgerModal } from "./expense-ledger-modal";
 import { CreateJournalEntryModal } from "./create-journal-entry-modal";
 import { AccountLedgerModal } from "./account-ledger-modal";
 import { CapitalContributionModal } from "./capital-contribution-modal";
@@ -15,76 +19,131 @@ import { OwnerWithdrawalModal } from "./owner-withdrawal-modal";
 import { InternalTransferModal } from "./internal-transfer-modal";
 import { CollectReceivableModal } from "./collect-receivable-modal";
 import { CustomerLedgerModal } from "./customer-ledger-modal";
+import { getBranches } from "@/lib/api/inventory";
+import { useAuthStore } from "@/lib/auth-store";
+import { UserRole } from "@/lib/types";
 
 type Tab = 'OVERVIEW' | 'JOURNALS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY';
 
-const formatCurrency = (amount: number) => 
+const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR' }).format(amount);
 
+const paymentStateBadge = (state?: string) => {
+  switch (state) {
+    case "PAID":    return "bg-green-100 text-green-800";
+    case "PARTIAL": return "bg-orange-100 text-orange-800";
+    case "OVERDUE": return "bg-red-100 text-red-800";
+    case "DUE":     return "bg-yellow-100 text-yellow-800";
+    default:        return "bg-gray-100 text-gray-600";
+  }
+};
+
 export default function AccountsPage() {
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === UserRole.ADMIN;
+  const isManager = user?.role === UserRole.MANAGER;
+  const isBranchScoped = (!isAdmin && !isManager) ? true : (isManager && Boolean(user?.branchId));
+
   const [activeTab, setActiveTab] = useState<Tab>('OVERVIEW');
   const [accounts, setAccounts] = useState<any[]>([]);
   const [journals, setJournals] = useState<any[]>([]);
-  const [payables, setPayables] = useState<any[]>([]);
   const [receivables, setReceivables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
-  const [payModalData, setPayModalData] = useState<{ isOpen: boolean; payableId: string; amount: number }>({
-    isOpen: false,
-    payableId: "",
-    amount: 0
-  });
-  
+
   // Account management state
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [editingAccount, setEditingAccount] = useState<any>(null);
   const [isAddingAccount, setIsAddingAccount] = useState(false);
   const [newAccount, setNewAccount] = useState({ code: '', name: '', category: 'ASSET', subtype: 'BANK', accountNumber: '', openingBalance: 0 });
   const [ledgerModalData, setLedgerModalData] = useState<{ isOpen: boolean; accountId: string; code: string; name: string }>({
-    isOpen: false,
-    accountId: '',
-    code: '',
-    name: ''
+    isOpen: false, accountId: '', code: '', name: ''
   });
   const [deleteConfirmData, setDeleteConfirmData] = useState<{ isOpen: boolean; accountId: string; accountName: string; accountBalance: number; accountSubtype: string; transferAccountId: string }>({
-    isOpen: false,
-    accountId: '',
-    accountName: '',
-    accountBalance: 0,
-    accountSubtype: '',
-    transferAccountId: '',
+    isOpen: false, accountId: '', accountName: '', accountBalance: 0, accountSubtype: '', transferAccountId: '',
   });
-  const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
-  
+
   // Owner equity modals
   const [isCapitalContributionOpen, setIsCapitalContributionOpen] = useState(false);
   const [isOwnerWithdrawalOpen, setIsOwnerWithdrawalOpen] = useState(false);
   const [isInternalTransferOpen, setIsInternalTransferOpen] = useState(false);
 
-// Receivables modals
-   const [collectModalData, setCollectModalData] = useState<{
-     isOpen: boolean;
-     customer: { customerName: string; customerPhone: string; totalOutstanding: number } | null;
-   }>({ isOpen: false, customer: null });
-   const [ledgerModalReceivable, setLedgerModalReceivable] = useState<{
-     isOpen: boolean;
-     customerPhone: string;
-     customerName: string;
-   }>({ isOpen: false, customerPhone: '', customerName: '' });
+  // Receivables modals
+  const [collectModalData, setCollectModalData] = useState<{
+    isOpen: boolean;
+    customer: { customerName: string; customerPhone: string; totalOutstanding: number } | null;
+  }>({ isOpen: false, customer: null });
+  const [ledgerModalReceivable, setLedgerModalReceivable] = useState<{
+    isOpen: boolean; customerPhone: string; customerName: string;
+  }>({ isOpen: false, customerPhone: '', customerName: '' });
+
+  // ── Expenses / Payables state ──────────────────────────────────────────────
+  const [branches, setBranches] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [expensesLoading, setExpensesLoading] = useState(false);
+  const [expensesError, setExpensesError] = useState('');
+  const [expenseFilters, setExpenseFilters] = useState({
+    branch: isBranchScoped ? user?.branchId || '' : '',
+    dateFrom: '',
+    dateTo: '',
+  });
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [payExpenseModalData, setPayExpenseModalData] = useState<{
+    isOpen: boolean; payableId: string; remainingAmount: number; description: string;
+  }>({ isOpen: false, payableId: '', remainingAmount: 0, description: '' });
+  const [expenseLedgerModalData, setExpenseLedgerModalData] = useState<{
+    isOpen: boolean; expenseId: string;
+  }>({ isOpen: false, expenseId: '' });
+
+  const expenseRequestFilters = useMemo(() => ({
+    branchId: expenseFilters.branch || undefined,
+    dateFrom: expenseFilters.dateFrom || undefined,
+    dateTo: expenseFilters.dateTo || undefined,
+  }), [expenseFilters]);
+
+  const fetchExpenses = useCallback(async () => {
+    setExpensesLoading(true);
+    setExpensesError('');
+    try {
+      const data = await getExpenses(expenseRequestFilters);
+      setExpenses(data || []);
+    } catch (err: any) {
+      setExpensesError(err.response?.data?.message || 'Failed to load expenses');
+      setExpenses([]);
+    } finally {
+      setExpensesLoading(false);
+    }
+  }, [expenseRequestFilters]);
+
+  const expenseSummary = useMemo(() => ({
+    total: expenses.reduce((s, e) => s + Number(e.amount || 0), 0),
+    count: expenses.length,
+    unpaid: expenses
+      .filter((e) => e.payable && e.payable.status !== 'PAID')
+      .reduce((s, e) => s + Number(e.payable?.remaining || 0), 0),
+  }), [expenses]);
+
+  // Fetch expenses when PAYABLES tab is active
+  useEffect(() => {
+    if (activeTab === 'PAYABLES') fetchExpenses();
+  }, [activeTab, fetchExpenses]);
+
+  // Load branches once for the filter dropdown
+  useEffect(() => {
+    getBranches().then((d) => setBranches(d.branches || [])).catch(() => {});
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [accData, journalData, payableData, receivableData] = await Promise.all([
+      const [accData, journalData, receivableData] = await Promise.all([
         getAccounts(),
         getJournalEntries(),
-        getPayables(),
-        getReceivables()
+        getReceivables(),
       ]);
       setAccounts(accData);
       setJournals(journalData);
-      setPayables(payableData);
       setReceivables(receivableData);
     } catch (err) {
       console.error(err);
@@ -442,50 +501,154 @@ export default function AccountsPage() {
 
         {activeTab === 'PAYABLES' && (
           <div>
-            <h2 className="text-xl font-semibold mb-6" style={{ color: theme.text.primary }}>Accounts Payable</h2>
-            <div className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
-              <table className="w-full text-left text-sm">
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Expenses</h2>
+              {(isAdmin || isManager) && (
+                <button
+                  onClick={() => setIsAddExpenseOpen(true)}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white"
+                  style={{ backgroundColor: theme.accents.primary }}
+                >
+                  + Add Expense
+                </button>
+              )}
+            </div>
+
+            {/* Summary cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+              <SummaryCard label="Total Expenses" value={`PKR ${expenseSummary.total.toLocaleString()}`} color="#ef4444" />
+              <SummaryCard label="Outstanding" value={`PKR ${expenseSummary.unpaid.toLocaleString()}`} color="#f59e0b" />
+              <SummaryCard label="Records" value={expenseSummary.count} />
+            </div>
+
+            {/* Filters */}
+            <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Branch</label>
+                  <select
+                    value={expenseFilters.branch}
+                    onChange={(e) => { if (!isBranchScoped) setExpenseFilters(p => ({ ...p, branch: e.target.value })); }}
+                    disabled={isBranchScoped}
+                    className="w-full px-3 py-2 rounded text-sm disabled:opacity-60"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Branches</option>
+                    {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>From Date</label>
+                  <input type="date" value={expenseFilters.dateFrom}
+                    onChange={(e) => setExpenseFilters(p => ({ ...p, dateFrom: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>To Date</label>
+                  <input type="date" value={expenseFilters.dateTo}
+                    onChange={(e) => setExpenseFilters(p => ({ ...p, dateTo: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="rounded-xl border bg-white shadow-sm overflow-x-auto" style={{ borderColor: theme.borders.light }}>
+              <table className="w-full text-sm text-left">
                 <thead>
                   <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Reference</th>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Party</th>
-                    <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total</th>
-                    <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Remaining</th>
-                    <th className="p-3 text-center font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Status</th>
-                    <th className="p-3 text-center font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Action</th>
+                    {["Date", "Branch", "Category", "Amount", "Paid", "Remaining", "Status", "Description", "Recorded By", "Actions"].map((h) => (
+                      <th key={h} className="px-4 py-3 text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {payables.map(payable => (
-                    <tr key={payable.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
-                      <td className="p-3 font-medium" style={{ color: theme.text.primary }}>{payable.ref}</td>
-                      <td className="p-3" style={{ color: theme.text.primary }}>{payable.partyName}</td>
-                      <td className="p-3 text-right" style={{ color: theme.text.primary }}>{formatCurrency(payable.total)}</td>
-                      <td className="p-3 text-right font-semibold" style={{ color: theme.accents.error }}>
-                        {formatCurrency(payable.remaining)}
-                      </td>
-                      <td className="p-3 text-center">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          payable.status === 'PAID' ? 'bg-green-100 text-green-800' : 
-                          payable.status === 'PARTIAL' ? 'bg-orange-100 text-orange-800' : 
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {payable.status}
-                        </span>
-                      </td>
-                      <td className="p-3 text-center">
-                        {payable.status !== 'PAID' && (
-                          <button 
-                            onClick={() => setPayModalData({ isOpen: true, payableId: payable.id, amount: Number(payable.remaining) })}
-                            className="text-white px-3 py-1 rounded-md text-xs font-semibold shadow-sm"
-                            style={{ backgroundColor: theme.accents.primary }}
-                          >
-                            Pay
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {expensesLoading ? (
+                    <tr><td colSpan={10} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>Loading expenses...</td></tr>
+                  ) : expensesError ? (
+                    <tr><td colSpan={10} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                      <div className="flex flex-col items-center gap-3">
+                        <span>{expensesError}</span>
+                        <AsyncButton onClick={fetchExpenses}>Retry</AsyncButton>
+                      </div>
+                    </td></tr>
+                  ) : expenses.length === 0 ? (
+                    <tr><td colSpan={10} className="px-6 py-12 text-center" style={{ color: theme.text.muted }}>No expenses found</td></tr>
+                  ) : expenses.map((expense) => {
+                    const payable = expense.payable;
+                    const status = payable?.status ?? null;
+                    const remaining = Number(payable?.remaining ?? 0);
+                    const paid = Number(payable?.paid ?? 0);
+                    const isPaid = status === 'PAID';
+                    return (
+                      <tr key={expense.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
+                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.primary }}>
+                          {new Date(expense.date).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.primary }}>
+                          {expense.branch?.name || '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-1 text-xs font-medium rounded"
+                            style={{ backgroundColor: `${theme.accents.primary}20`, color: theme.accents.primary, border: `1px solid ${theme.accents.primary}` }}>
+                            {expense.category.replace(/_/g, ' ')}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium text-red-500">
+                          PKR {Number(expense.amount || 0).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium text-emerald-600">
+                          {payable ? `PKR ${paid.toLocaleString()}` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium" style={{ color: remaining > 0 ? '#ef4444' : '#22c55e' }}>
+                          {payable ? `PKR ${remaining.toLocaleString()}` : '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          {status
+                            ? <span className={`px-2 py-1 rounded-full text-xs font-semibold ${paymentStateBadge(status)}`}>{status}</span>
+                            : <span className="text-xs text-gray-400">—</span>}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.secondary }}>
+                          {expense.description || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.primary }}>
+                          {expense.recordedBy?.fullName || '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            {isAdmin && payable && !isPaid && (
+                              <button
+                                onClick={() => setPayExpenseModalData({
+                                  isOpen: true,
+                                  payableId: payable.id,
+                                  remainingAmount: remaining,
+                                  description: expense.description || expense.category.replace(/_/g, ' '),
+                                })}
+                                className="text-white px-3 py-1 rounded-md text-xs font-semibold shadow-sm"
+                                style={{ backgroundColor: theme.accents.primary }}
+                              >
+                                Pay
+                              </button>
+                            )}
+                            {payable && (
+                              <button
+                                onClick={() => setExpenseLedgerModalData({ isOpen: true, expenseId: expense.id })}
+                                className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
+                                style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}
+                              >
+                                History
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -834,12 +997,26 @@ export default function AccountsPage() {
         )}
       </div>
 
-      <PayPayableModal 
-        isOpen={payModalData.isOpen}
-        onClose={() => setPayModalData({ ...payModalData, isOpen: false })}
-        onSuccess={fetchData}
-        payableId={payModalData.payableId}
-        remainingAmount={payModalData.amount}
+      <AddExpenseModal
+        isOpen={isAddExpenseOpen}
+        onClose={() => setIsAddExpenseOpen(false)}
+        onSuccess={fetchExpenses}
+        defaultBranchId={isBranchScoped ? user?.branchId : null}
+      />
+
+      <PayExpenseModal
+        isOpen={payExpenseModalData.isOpen}
+        onClose={() => setPayExpenseModalData({ ...payExpenseModalData, isOpen: false })}
+        onSuccess={fetchExpenses}
+        payableId={payExpenseModalData.payableId}
+        remainingAmount={payExpenseModalData.remainingAmount}
+        expenseDescription={payExpenseModalData.description}
+      />
+
+      <ExpenseLedgerModal
+        isOpen={expenseLedgerModalData.isOpen}
+        onClose={() => setExpenseLedgerModalData({ ...expenseLedgerModalData, isOpen: false })}
+        expenseId={expenseLedgerModalData.expenseId}
       />
 
       <CreateJournalEntryModal

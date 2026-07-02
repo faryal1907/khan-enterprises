@@ -7,7 +7,10 @@ export interface CreateExpensePayload {
   category: string;
   description?: string;
   branchId: string;
-  paymentAccountId: string;
+  /** Payment account. Required when payNow is true. */
+  paymentAccountId?: string;
+  /** If true, record payment now. If false/omitted, record as unpaid (credit). */
+  payNow?: boolean;
 }
 
 export const createExpense = async (payload: CreateExpensePayload) => {
@@ -17,5 +20,10 @@ export const createExpense = async (payload: CreateExpensePayload) => {
 
 export const getExpenses = async (params?: { branchId?: string; dateFrom?: string; dateTo?: string }) => {
   const response = await api.get<Expense[]>("/expenses", { params });
+  return response.data;
+};
+
+export const getExpensePaymentHistory = async (expenseId: string) => {
+  const response = await api.get(`/expenses/${expenseId}/payment-history`);
   return response.data;
 };

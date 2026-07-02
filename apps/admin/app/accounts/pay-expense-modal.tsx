@@ -7,29 +7,35 @@ import { toast } from "sonner";
 import { AsyncButton } from "@/components/async-button";
 import { numberToWords } from "@repo/utils";
 
-export function PayPayableModal({
-  isOpen,
-  onClose,
-  onSuccess,
-  payableId,
-  remainingAmount,
-}: {
+interface PayExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   payableId: string;
   remainingAmount: number;
-}) {
+  expenseDescription: string;
+}
+
+export function PayExpenseModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  payableId,
+  remainingAmount,
+  expenseDescription,
+}: PayExpenseModalProps) {
   const [displayAmount, setDisplayAmount] = useState("");
   const [amount, setAmount] = useState(0);
-  const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setAmount(remainingAmount);
       setDisplayAmount(remainingAmount.toLocaleString());
+      setPaymentMethod("CASH");
       setSelectedAccountId("");
       getPaymentAccounts().then(setPaymentAccounts).catch(() => setPaymentAccounts([]));
     }
@@ -39,7 +45,11 @@ export function PayPayableModal({
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "");
-    if (!val) { setDisplayAmount(""); setAmount(0); return; }
+    if (!val) {
+      setDisplayAmount("");
+      setAmount(0);
+      return;
+    }
     const num = Number(val);
     if (num > remainingAmount) {
       setDisplayAmount(remainingAmount.toLocaleString());
@@ -50,21 +60,20 @@ export function PayPayableModal({
     }
   };
 
-  const selectedAccount = paymentAccounts.find((a) => a.id === selectedAccountId);
-
   const handleSubmit = async () => {
     if (amount <= 0) return toast.error("Amount must be greater than 0");
     if (amount > remainingAmount) return toast.error("Amount cannot exceed remaining balance");
-    if (!selectedAccountId) return toast.error("Please select a payment account");
+    if (paymentMethod === "ONLINE_TRANSFER" && !selectedAccountId)
+      return toast.error("Please select a bank/e-wallet account");
 
     setIsSubmitting(true);
     try {
       await payPayable(payableId, {
         amount,
-        paymentMethod: selectedAccount?.subtype === "CASH" ? "CASH" : "ONLINE_TRANSFER",
-        accountId: selectedAccountId,
+        paymentMethod,
+        accountId: paymentMethod === "ONLINE_TRANSFER" ? selectedAccountId : undefined,
       });
-      toast.success("Payment recorded!");
+      toast.success("Payment recorded successfully!");
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -77,15 +86,37 @@ export function PayPayableModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onMouseDown={(e) => { if (e.currentTarget === e.target) onClose(); }}
+      onMouseDown={(e) => {
+        if (e.currentTarget === e.target) onClose();
+      }}
     >
       <div
         className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative"
-        style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+        style={{
+          backgroundColor: theme.backgrounds.primary,
+          border: `1px solid ${theme.borders.light}`,
+        }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold" style={{ color: theme.text.primary }}>Record Payment</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+          <h2 className="text-xl font-bold" style={{ color: theme.text.primary }}>
+            Pay Expense
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+            ×
+          </button>
+        </div>
+
+        {/* Expense info */}
+        <div
+          className="rounded-lg p-3 mb-5"
+          style={{ backgroundColor: theme.backgrounds.secondary }}
+        >
+          <div className="text-sm font-semibold" style={{ color: theme.text.primary }}>
+            {expenseDescription}
+          </div>
+          <div className="text-xs mt-1 font-semibold text-red-600">
+            Remaining: Rs. {remainingAmount.toLocaleString()}
+          </div>
         </div>
 
         <div className="space-y-4 mb-6">
@@ -97,38 +128,61 @@ export function PayPayableModal({
             <input
               type="text"
               className="w-full border rounded-md p-2 outline-none bg-transparent"
-              style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#e5e7eb" }}
+              style={{
+                color: theme.text.primary,
+                borderColor: theme.borders?.medium || "#e5e7eb",
+              }}
               value={displayAmount}
               onChange={handleAmountChange}
             />
             {amount > 0 && (
-              <p className="text-xs mt-1 font-medium text-emerald-600">{numberToWords(amount)}</p>
+              <p className="text-xs mt-1 font-medium text-emerald-600">
+                {numberToWords(amount)}
+              </p>
             )}
             <p className="text-xs mt-1" style={{ color: theme.text.secondary }}>
               Remaining balance: Rs. {remainingAmount.toLocaleString()}
             </p>
           </div>
 
-          {/* Account selector — always shown */}
+          {/* Payment Method */}
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
-              Pay From Account
+              Payment Method
             </label>
             <select
               className="w-full border rounded-md p-2 outline-none bg-transparent"
               style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#e5e7eb" }}
-              value={selectedAccountId}
-              onChange={(e) => setSelectedAccountId(e.target.value)}
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
             >
-              <option value="">Select account</option>
-              {paymentAccounts.map((acc) => (
-                <option key={acc.id} value={acc.id}>
-                  {acc.subtype === "CASH" ? "💵" : acc.subtype === "BANK" ? "🏦" : "💳"}{" "}
-                  {acc.name}{acc.accountNumber ? ` (${acc.accountNumber})` : ""}
-                </option>
-              ))}
+              <option value="CASH">Cash</option>
+              <option value="ONLINE_TRANSFER">Bank Transfer</option>
             </select>
           </div>
+
+          {/* Bank/e-wallet account selector */}
+          {paymentMethod === "ONLINE_TRANSFER" && (
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                Bank / E-Wallet Account
+              </label>
+              <select
+                className="w-full border rounded-md p-2 outline-none bg-transparent"
+                style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#e5e7eb" }}
+                value={selectedAccountId}
+                onChange={(e) => setSelectedAccountId(e.target.value)}
+              >
+                <option value="">Select an account</option>
+                {paymentAccounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.subtype === "BANK" ? "🏦" : "💳"} {acc.name}{" "}
+                    {acc.accountNumber ? `(${acc.accountNumber})` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <div
@@ -145,8 +199,8 @@ export function PayPayableModal({
           <AsyncButton
             loading={isSubmitting}
             onClick={handleSubmit}
-            disabled={!selectedAccountId}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-md font-medium text-sm hover:bg-emerald-700 shadow-sm disabled:opacity-50"
+            disabled={paymentMethod === "ONLINE_TRANSFER" && !selectedAccountId}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md font-medium text-sm hover:bg-emerald-700 shadow-sm"
           >
             Confirm Payment
           </AsyncButton>

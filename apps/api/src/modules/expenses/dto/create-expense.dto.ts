@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsDateString, IsEnum, IsOptional, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsDateString, IsEnum, IsOptional, IsBoolean, Min } from 'class-validator';
 import { ExpenseCategory } from '@khan/prisma';
 
 export class CreateExpenseDto {
@@ -20,7 +20,19 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   branchId: string;
 
+  /**
+   * Payment account to debit if paying now. Optional — if omitted, expense is
+   * recorded as unpaid (DR Expense / CR Accounts Payable) and can be paid later.
+   */
   @IsString()
-  @IsNotEmpty()
-  paymentAccountId: string;
+  @IsOptional()
+  paymentAccountId?: string;
+
+  /**
+   * Whether to record an upfront payment at creation time.
+   * Defaults to true for backward compatibility.
+   */
+  @IsBoolean()
+  @IsOptional()
+  payNow?: boolean;
 }
