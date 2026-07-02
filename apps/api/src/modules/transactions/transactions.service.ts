@@ -119,59 +119,99 @@ export class TransactionsService {
   async getTransactions(query: QueryTransactionsDto) {
     const { status, method, branchId, dateFrom, dateTo } = query;
 
+    const dateFilter: any = {};
+    if (dateFrom) dateFilter.gte = new Date(dateFrom);
+    if (dateTo) dateFilter.lte = new Date(dateTo);
+    const hasDateFilter = Object.keys(dateFilter).length > 0;
+
+    // ── Bike order payments ────────────────────────────────────────────────
     const paymentWhere: any = { orderId: { not: null } };
+    if (status) paymentWhere.status = status;
+    if (method) paymentWhere.method = method;
+    if (branchId) paymentWhere.order = { branchId };
+    if (hasDateFilter) paymentWhere.createdAt = dateFilter;
+
+    // ── Part order payments ────────────────────────────────────────────────
     const partPaymentWhere: any = { partOrderId: { not: null } };
+    if (status) partPaymentWhere.status = status;
+    if (method) partPaymentWhere.method = method;
+    if (branchId) partPaymentWhere.partOrder = { branchId };
+    if (hasDateFilter) partPaymentWhere.createdAt = dateFilter;
 
-    if (status) {
-      paymentWhere.status = status;
-      partPaymentWhere.status = status;
-    }
+    // ── Payable payments (expense / PO payments — no orderId, but has payable allocation) ──
+    const payableTxWhere: any = {
+      orderId: null,
+      partOrderId: null,
+      allocations: { some: { payableId: { not: null } } },
+    };
+    if (status) payableTxWhere.status = status;
+    if (method) payableTxWhere.method = method;
+    if (hasDateFilter) payableTxWhere.createdAt = dateFilter;
+    // branchId filter not applicable for payable payments (they have no branch link)
 
-    if (method) {
-      paymentWhere.method = method;
-      partPaymentWhere.method = method;
-    }
+    // ── Receivable payments (manual ReceivableEntry collections) ──────────
+    const receivablePaymentWhere: any = {};
+    if (hasDateFilter) receivablePaymentWhere.createdAt = dateFilter;
+    if (method) receivablePaymentWhere.method = method;
+    // status filter: ReceivablePayments are always "SUCCESS" equivalent; skip if filtering for other statuses
+    const includeReceivablePayments = !status || status === "SUCCESS";
 
-    if (branchId) {
-      paymentWhere.order = { branchId };
-      partPaymentWhere.partOrder = { branchId };
-    }
+    // ── Vendor payments ────────────────────────────────────────────────────
+    const vendorPaymentWhere: any = {};
+    if (hasDateFilter) vendorPaymentWhere.createdAt = dateFilter;
+    // method filter: derive from fromAccount subtype — only apply if method specified
+    // branchId filter: not applicable (vendor payments have no branch link)
+    // status filter: vendor payments are always successful
+    const includeVendorPayments = !status || status === "SUCCESS";
 
-    if (dateFrom || dateTo) {
-      const dateFilter: any = {};
-      if (dateFrom) {
-        dateFilter.gte = new Date(dateFrom);
-      }
-      if (dateTo) {
-        dateFilter.lte = new Date(dateTo);
-      }
-      paymentWhere.createdAt = dateFilter;
-      partPaymentWhere.createdAt = dateFilter;
-    }
-
-    const [bikeTx, partTx] = await Promise.all([
+    const [bikeTx, partTx, payableTx, receivablePmts, vendorPmts] = await Promise.all([
       this.prisma.client.paymentTransaction.findMany({
         where: paymentWhere,
-        include: {
-          order: {
-            include: {
-              branch: true,
-            },
-          },
-        },
+        include: { order: { include: { branch: true } } },
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.client.partPaymentTransaction.findMany({
         where: partPaymentWhere,
+        include: { partOrder: { include: { branch: true } } },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.client.paymentTransaction.findMany({
+        where: payableTxWhere,
         include: {
-          partOrder: {
+          allocations: {
             include: {
-              branch: true,
+              payable: { select: { id: true, ref: true, partyName: true, type: true, description: true } },
             },
           },
         },
         orderBy: { createdAt: "desc" },
       }),
+      includeReceivablePayments
+        ? this.prisma.client.receivablePayment.findMany({
+            where: receivablePaymentWhere,
+            include: {
+              entry: {
+                select: {
+                  id: true,
+                  description: true,
+                  party: { select: { id: true, name: true, partyType: true, phone: true } },
+                },
+              },
+              account: { select: { id: true, name: true } },
+            },
+            orderBy: { createdAt: "desc" },
+          })
+        : Promise.resolve([]),
+      includeVendorPayments
+        ? this.prisma.client.vendorPayment.findMany({
+            where: vendorPaymentWhere,
+            include: {
+              vendor: { select: { id: true, name: true } },
+              fromAccount: { select: { id: true, name: true, subtype: true } },
+            },
+            orderBy: { createdAt: "desc" },
+          })
+        : Promise.resolve([]),
     ]);
 
     const formattedBikeTx = bikeTx.map((tx) => ({
@@ -220,7 +260,83 @@ export class TransactionsService {
       } : null,
     }));
 
-    const allTransactions = [...formattedBikeTx, ...formattedPartTx];
+    const formattedPayableTx = payableTx.map((tx) => {
+      const allocation = tx.allocations.find((a: any) => a.payable);
+      const payable = allocation?.payable;
+      return {
+        id: tx.id,
+        amount: Number(tx.amount),
+        method: tx.method,
+        status: tx.status,
+        gatewayReference: tx.gatewayReference,
+        failureReason: tx.failureReason,
+        createdAt: tx.createdAt.toISOString(),
+        updatedAt: tx.updatedAt.toISOString(),
+        type: "PAYABLE" as const,
+        party: payable ? {
+          name: payable.partyName,
+          ref: payable.ref,
+          description: payable.description ?? null,
+          payableType: payable.type,
+        } : null,
+      };
+    });
+
+    const formattedReceivablePmts = (receivablePmts as any[]).map((pmt) => ({
+      id: pmt.id,
+      amount: Number(pmt.amount),
+      method: pmt.method,
+      status: "SUCCESS" as const,
+      gatewayReference: null,
+      failureReason: null,
+      createdAt: pmt.createdAt.toISOString(),
+      updatedAt: pmt.createdAt.toISOString(),
+      type: "RECEIVABLE" as const,
+      party: pmt.entry ? {
+        name: pmt.entry.party?.name ?? "—",
+        partyType: pmt.entry.party?.partyType ?? null,
+        description: pmt.entry.description ?? null,
+        phone: pmt.entry.party?.phone ?? null,
+      } : null,
+    }));
+
+    const formattedVendorPmts = (vendorPmts as any[]).map((pmt) => {
+      // Derive a human-readable method from the source account subtype
+      const subtype: string = pmt.fromAccount?.subtype ?? "";
+      const derivedMethod = subtype === "CASH" ? "CASH" : "ONLINE_TRANSFER";
+      return {
+        id: pmt.id,
+        amount: Number(pmt.amount),
+        method: derivedMethod,
+        status: "SUCCESS" as const,
+        gatewayReference: null,
+        failureReason: null,
+        createdAt: pmt.createdAt.toISOString(),
+        updatedAt: pmt.updatedAt.toISOString(),
+        type: "VENDOR_PAYMENT" as const,
+        party: {
+          name: pmt.vendor?.name ?? "—",
+          ref: `VND-${pmt.id.substring(0, 8).toUpperCase()}`,
+          description: pmt.notes ?? null,
+          payableType: null,
+          partyType: "VENDOR",
+          phone: null,
+        },
+      };
+    });
+
+    // Apply method filter to vendor payments (post-fetch, since no method field on the model)
+    const filteredVendorPmts = method
+      ? formattedVendorPmts.filter((p) => p.method === method)
+      : formattedVendorPmts;
+
+    const allTransactions = [
+      ...formattedBikeTx,
+      ...formattedPartTx,
+      ...formattedPayableTx,
+      ...formattedReceivablePmts,
+      ...filteredVendorPmts,
+    ];
     allTransactions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return {

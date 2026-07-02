@@ -8,6 +8,16 @@ export type TransactionFilters = {
   dateTo?: string;
 };
 
+/** Shared party info for payable/receivable transactions */
+export type TransactionParty = {
+  name: string;
+  ref?: string | null;
+  description?: string | null;
+  payableType?: string | null;
+  partyType?: string | null;
+  phone?: string | null;
+};
+
 export type TransactionRecord = {
   id: string;
   amount: number;
@@ -17,7 +27,8 @@ export type TransactionRecord = {
   failureReason?: string | null;
   createdAt: string;
   updatedAt: string;
-  type: "BIKE" | "PART";
+  type: "BIKE" | "PART" | "PAYABLE" | "RECEIVABLE" | "VENDOR_PAYMENT";
+  /** Present for BIKE and PART transactions */
   order?: {
     id: string;
     orderNumber: string;
@@ -29,6 +40,8 @@ export type TransactionRecord = {
       city?: string;
     };
   } | null;
+  /** Present for PAYABLE, RECEIVABLE, and VENDOR_PAYMENT transactions */
+  party?: TransactionParty | null;
 };
 
 export async function getTransactions(filters: TransactionFilters = {}) {

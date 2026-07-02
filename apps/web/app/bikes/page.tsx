@@ -66,11 +66,11 @@ export default function BikesPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Page Header */}
-        <div className="mb-12">
+        <div className="mb-6 sm:mb-12">
           <h1
-            className="text-5xl font-bold mb-4"
+            className="text-3xl sm:text-5xl font-bold mb-2 sm:mb-4"
             style={{ color: theme.text.primary }}
           >
             Bikes Inventory
@@ -82,9 +82,123 @@ export default function BikesPage() {
           </p>
         </div>
 
-        <div className="flex gap-8">
+        {/* Mobile Filter Dropdown */}
+        <div className="mb-4 sm:hidden">
+          <details className="rounded-xl" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+            <summary className="p-4 cursor-pointer text-sm font-medium" style={{ color: theme.text.primary }}>
+              Show Filters
+            </summary>
+            <div className="p-4 border-t" style={{ borderColor: theme.borders.light }}>
+              <div className="space-y-4">
+                {/* Model */}
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={{ color: theme.text.secondary }}>
+                    Model
+                  </label>
+                  <select
+                    value={filters.modelId}
+                    onChange={(e) => setFilters({ ...filters, modelId: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                    }}
+                  >
+                    <option value="">All Models</option>
+                    {models.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.modelName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price Range */}
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={{ color: theme.text.secondary }}>
+                    Price Range (PKR)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      value={filters.priceMin}
+                      onChange={(e) => setFilters({ ...filters, priceMin: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                      style={{
+                        backgroundColor: theme.backgrounds.tertiary,
+                        border: `1px solid ${theme.borders.medium}`,
+                        color: theme.text.primary,
+                      }}
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      value={filters.priceMax}
+                      onChange={(e) => setFilters({ ...filters, priceMax: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                      style={{
+                        backgroundColor: theme.backgrounds.tertiary,
+                        border: `1px solid ${theme.borders.medium}`,
+                        color: theme.text.primary,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Branch */}
+                <div style={{
+                  backgroundColor: theme.accents.primary + '10',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  border: `1.5px solid ${theme.accents.primary}30`,
+                }}>
+                  <label className="block text-xs font-semibold mb-2 flex items-center gap-2" style={{ color: theme.accents.primary }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Branch
+                  </label>
+                  <select
+                    value={filters.branchId}
+                    onChange={(e) => setFilters({ ...filters, branchId: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                    style={{
+                      backgroundColor: theme.backgrounds.tertiary,
+                      border: `1px solid ${theme.borders.medium}`,
+                      color: theme.text.primary,
+                      fontWeight: 500,
+                    }}
+                  >
+                    <option value="">All Branches</option>
+                    {branches.map((branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.name} — {branch.city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => setFilters({ modelId: "", priceMin: "", priceMax: "", branchId: "", availability: "AVAILABLE" })}
+                  className="w-full px-4 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                  style={{
+                    backgroundColor: theme.accents.secondary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:gap-8">
           {/* Filter Sidebar */}
-          <aside className="w-64 flex-shrink-0">
+          <aside className="hidden sm:block w-64 flex-shrink-0">
             <div
               className="rounded-xl p-6 sticky top-24"
               style={{
@@ -225,15 +339,15 @@ export default function BikesPage() {
           {/* Bike Grid */}
           <div className="flex-1">
             {loading ? (
-              <div className="flex items-center justify-center py-20" style={{ backgroundColor: theme.backgrounds.primary }}>
+              <div className="flex items-center justify-center py-12 sm:py-20" style={{ backgroundColor: theme.backgrounds.primary }}>
                 <div
-                  className="animate-spin rounded-full h-12 w-12 border-b-2"
+                  className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2"
                   style={{ borderColor: theme.accents.primary }}
                 />
               </div>
             ) : bikes.length === 0 ? (
               <div
-                className="rounded-xl p-12 text-center"
+                className="rounded-xl p-8 sm:p-12 text-center"
                 style={{
                   backgroundColor: theme.backgrounds.secondary,
                   border: `1px solid ${theme.borders.light}`,
@@ -244,7 +358,7 @@ export default function BikesPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {bikes.map((bike) => (
                   <Link
                     key={bike.id}
@@ -267,35 +381,35 @@ export default function BikesPage() {
                         )
                       )}
                     </div>
-                    <div className="p-6">
+                    <div className="p-4 sm:p-6">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm" style={{ color: theme.text.muted }}>
+                        <span className="text-xs sm:text-sm" style={{ color: theme.text.muted }}>
                           {bike.model?.year}
                         </span>
                       </div>
                       <h3
-                        className="text-lg font-semibold mb-2"
+                        className="text-base sm:text-lg font-semibold mb-2"
                         style={{ color: theme.text.primary }}
                       >
                         {bike.model?.modelName}
                       </h3>
-                      <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                      <p className="text-xs sm:text-sm mb-2" style={{ color: theme.text.secondary }}>
                         {bike.model?.brand}
                       </p>
-                      <p className="text-sm mb-4" style={{ color: theme.text.muted }}>
+                      <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{ color: theme.text.muted }}>
                         {bike.model?.engineCapacity || "N/A"}
                       </p>
-                      <div style={{ backgroundColor: theme.accents.primary + '15', borderRadius: '8px', padding: '8px 12px', marginBottom: '12px' }}>
+                      <div style={{ backgroundColor: theme.accents.primary + '15', borderRadius: '8px', padding: '6px 10px', marginBottom: '8px' }}>
                         <div className="flex items-center gap-1.5 mb-0.5">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.accents.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg width="12" height="12" className="sm:w-[14px] sm:h-[14px]" viewBox="0 0 24 24" fill="none" stroke={theme.accents.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                             <circle cx="12" cy="10" r="3"/>
                           </svg>
-                          <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                          <span className="text-xs font-medium" style={{ color: theme.text.primary }}>
                             {bike.branch?.name}
                           </span>
                         </div>
-                        <span className="text-xs" style={{ color: theme.text.secondary }}>
+                        <span className="text-[10px] sm:text-xs" style={{ color: theme.text.secondary }}>
                           {bike.branch?.city}{bike.branch?.city && bike.branch?.address ? ', ' : ''}{bike.branch?.address || ''}
                         </span>
                       </div>
@@ -310,18 +424,18 @@ export default function BikesPage() {
                           return (
                             <>
                               {effectiveDiscountPercent > 0 && (
-                                <span className="text-sm line-through mb-1" style={{ color: theme.text.muted }}>
+                                <span className="text-xs sm:text-sm line-through mb-1" style={{ color: theme.text.muted }}>
                                   PKR {base?.toLocaleString()}
                                 </span>
                               )}
                               <span
-                                className="text-2xl font-bold"
+                                className="text-xl sm:text-2xl font-bold"
                                 style={{ color: theme.text.primary }}
                               >
                                 PKR {effectiveDiscountPercent > 0 ? onlinePrice.toLocaleString() : base?.toLocaleString()}
                               </span>
                               {effectiveDiscountPercent > 0 && (
-                                <span className="text-xs font-medium mt-1" style={{ color: theme.accents.primary }}>
+                                <span className="text-[10px] sm:text-xs font-medium mt-1" style={{ color: theme.accents.primary }}>
                                   {effectiveDiscountPercent}% OFF Online
                                 </span>
                               )}
