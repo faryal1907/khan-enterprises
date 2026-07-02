@@ -122,7 +122,7 @@ export default function DeliveryDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }} />
@@ -134,16 +134,16 @@ export default function DeliveryDetailPage() {
 
   if (error || !delivery) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           <div
-            className="rounded-lg p-8 text-center"
+            className="rounded-lg p-6 md:p-8 text-center"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
-            <p style={{ color: theme.text.secondary }}>{error || "Delivery not found"}</p>
+            <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>{error || "Delivery not found"}</p>
             <button
               onClick={() => router.push("/deliveries")}
-              className="mt-4 px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+              className="mt-3 md:mt-4 px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
               style={{
                 backgroundColor: theme.accents.primary,
                 color: theme.text.inverse,
@@ -158,32 +158,32 @@ export default function DeliveryDetailPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-4 md:mb-6">
           <h1
-            className="text-3xl font-bold mb-2"
+            className="text-2xl md:text-3xl font-bold mb-1 md:mb-2"
             style={{ color: theme.text.primary }}
           >
             Delivery Details
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
             View delivery request and manage delivery status
           </p>
         </div>
 
         {/* Order Information */}
         <div
-          className="rounded-lg p-6 mb-6"
+          className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <h3
-            className="text-lg font-semibold mb-4"
+            className="text-lg font-semibold mb-3 md:mb-4"
             style={{ color: theme.text.primary }}
           >
             Order Information
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div>
               <label
                 className="block text-xs font-medium uppercase tracking-wider mb-1"
@@ -230,16 +230,16 @@ export default function DeliveryDetailPage() {
 
         {/* Customer Information */}
         <div
-          className="rounded-lg p-6 mb-6"
+          className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <h3
-            className="text-lg font-semibold mb-4"
+            className="text-lg font-semibold mb-3 md:mb-4"
             style={{ color: theme.text.primary }}
           >
             Customer Information
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div>
               <label
                 className="block text-xs font-medium uppercase tracking-wider mb-1"
@@ -278,16 +278,16 @@ export default function DeliveryDetailPage() {
 
         {/* Delivery Information */}
         <div
-          className="rounded-lg p-6 mb-6"
+          className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <h3
-            className="text-lg font-semibold mb-4"
+            className="text-lg font-semibold mb-3 md:mb-4"
             style={{ color: theme.text.primary }}
           >
             Delivery Information
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div>
               <label
                 className="block text-xs font-medium uppercase tracking-wider mb-1"
@@ -422,22 +422,22 @@ export default function DeliveryDetailPage() {
         {/* Actions Section */}
         {delivery.status !== "DELIVERED" && getNextStatuses(delivery.status).length > 0 && (
           <div
-            className="rounded-lg p-6 mb-6"
+            className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Update Status
             </h3>
-            <div className="flex gap-4 flex-wrap">
+            <div className="flex flex-col-reverse sm:flex-row sm:flex-wrap gap-2 sm:gap-3">
               {getNextStatuses(delivery.status).map((nextStatus) => (
                 <button
                   key={nextStatus}
                   onClick={() => handleStatusUpdate(nextStatus)}
                   disabled={updating}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 w-full sm:w-auto text-center"
                   style={{
                     backgroundColor: theme.accents.primary,
                     color: theme.text.inverse,
@@ -459,7 +459,7 @@ export default function DeliveryDetailPage() {
               onClick={() => setShowNotesModal(false)}
             />
             <div
-              className="relative rounded-lg p-6 w-full max-w-md"
+              className="relative rounded-lg p-4 md:p-6 w-full max-w-sm sm:max-w-md mx-4"
               style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
             >
               <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
@@ -473,7 +473,7 @@ export default function DeliveryDetailPage() {
                   type="number"
                   value={deliveryCost}
                   onChange={(e) => setDeliveryCost(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg text-sm"
+                  className="w-full px-3 py-2 rounded-lg text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
@@ -482,7 +482,7 @@ export default function DeliveryDetailPage() {
                   placeholder="e.g. 500"
                 />
               </div>
-              <div className="mb-4">
+              <div className="mb-4 md:mb-6">
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
                   Notes (Optional)
                 </label>
@@ -490,7 +490,7 @@ export default function DeliveryDetailPage() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 rounded-lg text-sm"
+                  className="w-full px-3 py-2 rounded-lg text-sm"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     border: `1px solid ${theme.borders.medium}`,
@@ -499,10 +499,10 @@ export default function DeliveryDetailPage() {
                   placeholder="Add any notes about this status change..."
                 />
               </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowNotesModal(false)}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     color: theme.text.secondary,
@@ -514,7 +514,7 @@ export default function DeliveryDetailPage() {
                 <button
                   onClick={confirmStatusUpdate}
                   disabled={updating}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                   style={{
                     backgroundColor: theme.accents.primary,
                     color: theme.text.inverse,
@@ -527,10 +527,10 @@ export default function DeliveryDetailPage() {
           </div>
         )}
 
-        <div className="flex justify-end space-x-4 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 md:mt-6">
           <button
             onClick={() => router.push("/deliveries")}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 text-center"
             style={{
               backgroundColor: theme.backgrounds.primary,
               color: theme.text.secondary,
@@ -545,7 +545,7 @@ export default function DeliveryDetailPage() {
               else if (delivery.partOrder?.id) router.push(`/part-orders/${delivery.partOrder.id}`);
             }}
             disabled={!delivery.order?.id && !delivery.partOrder?.id}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,

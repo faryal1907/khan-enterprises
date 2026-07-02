@@ -183,9 +183,9 @@ export default function BranchDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading branch details...</p>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>Loading branch details...</p>
         </div>
       </div>
     );
@@ -193,16 +193,16 @@ export default function BranchDetailPage() {
 
   if (error || !branch) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
-          <p className="mb-4" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
+          <p className="mb-4 text-sm md:text-base" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
             {error || "Branch not found"}
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
             <AsyncButton onClick={fetchData}>Retry</AsyncButton>
             <Link
               href="/branches"
-              className="px-4 py-2 text-sm font-medium rounded"
+              className="px-4 py-2 text-sm font-medium rounded text-center"
               style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
             >
               Back to Branches
@@ -214,11 +214,11 @@ export default function BranchDetailPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-4 md:mb-6">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
               Branch Details
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
@@ -228,7 +228,7 @@ export default function BranchDetailPage() {
 
           <Link
             href="/branches"
-            className="px-4 py-2 text-sm font-medium rounded"
+            className="px-4 py-2 text-sm font-medium rounded text-center"
             style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
           >
             Back
@@ -236,10 +236,10 @@ export default function BranchDetailPage() {
         </div>
 
         <div
-          className="rounded-lg p-6 mb-6"
+          className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
             <h2 className="text-lg font-semibold" style={{ color: theme.text.primary }}>
               Branch Information
             </h2>
@@ -316,7 +316,7 @@ export default function BranchDetailPage() {
                   </select>
                 </FormField>
               </div>
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
                 <AsyncButton type="submit" loading={updating} loadingLabel="Saving...">
                   Save Changes
                 </AsyncButton>
@@ -349,7 +349,7 @@ export default function BranchDetailPage() {
         </div>
 
         {metrics && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
             <SummaryCard label="Inventory" value={`${metrics.metrics.inventory.bikes} bikes / ${metrics.metrics.inventory.parts} parts`} />
             <SummaryCard label="Staff" value={metrics.metrics.staff} />
             <SummaryCard label="Orders" value={metrics.metrics.orders.total} />
@@ -357,7 +357,7 @@ export default function BranchDetailPage() {
           </div>
         )}
 
-        <div className="rounded-lg p-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+        <div className="rounded-lg p-4 md:p-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
           <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
             Staff Members
           </h2>
@@ -369,9 +369,9 @@ export default function BranchDetailPage() {
           ) : (
             <div className="space-y-2">
               {branch.users.map((staff) => (
-                <div key={staff.id} className="flex justify-between border-b pb-2" style={{ borderColor: theme.borders.light }}>
-                  <span style={{ color: theme.text.primary }}>{staff.fullName}</span>
-                  <span style={{ color: theme.text.secondary }}>
+                <div key={staff.id} className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 gap-1 sm:gap-0" style={{ borderColor: theme.borders.light }}>
+                  <span className="font-medium text-sm" style={{ color: theme.text.primary }}>{staff.fullName}</span>
+                  <span className="text-xs sm:text-sm" style={{ color: theme.text.secondary }}>
                     {staff.role} - {staff.status}
                   </span>
                 </div>

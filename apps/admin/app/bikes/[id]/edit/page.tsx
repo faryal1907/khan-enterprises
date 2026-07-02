@@ -358,26 +358,26 @@ export default function EditBikePage() {
   if (user && user.role !== UserRole.ADMIN) return null;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-4 md:mb-6">
           <h1
-            className="text-3xl font-bold mb-2"
+            className="text-2xl md:text-3xl font-bold mb-1 md:mb-2"
             style={{ color: theme.text.primary }}
           >
             Edit Bike
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Update the details for this bike unit
           </p>
         </div>
 
         <div
-          className="rounded-lg p-6"
+          className="rounded-lg p-4 md:p-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <label
                   className="block text-sm font-medium mb-1"
@@ -419,10 +419,7 @@ export default function EditBikePage() {
                 />
               </div>
             </div>
-
-
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <label
                   className="block text-sm font-medium mb-1"
@@ -484,7 +481,7 @@ export default function EditBikePage() {
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <label
                   className="block text-sm font-medium mb-1"
@@ -635,10 +632,10 @@ export default function EditBikePage() {
                 )}
               </div>
               
-              {media.length > 0 && (
-                <div className="flex flex-wrap gap-4 mt-4">
-                  {media.map((url, i) => (
-                    <div key={i} className="relative w-24 h-24 rounded border overflow-hidden" style={{ borderColor: theme.borders.medium }}>
+               {media.length > 0 && (
+                 <div className="flex flex-wrap gap-3 md:gap-4 mt-3 md:mt-4">
+                   {media.map((url, i) => (
+                     <div key={i} className="relative w-20 h-20 md:w-24 md:h-24 rounded border overflow-hidden" style={{ borderColor: theme.borders.medium }}>
                       {url.match(/\.(mp4|webm|ogg)$/i) ? (
                         <video src={url} className="w-full h-full object-cover" />
                       ) : (
@@ -709,11 +706,11 @@ export default function EditBikePage() {
               </div>
             </div>
 
-            <div className="flex justify-between space-x-4 pt-6">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 sm:gap-3 pt-4 md:pt-6">
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(true)}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
                 style={{
                   backgroundColor: "red",
                   color: "white",
@@ -721,11 +718,11 @@ export default function EditBikePage() {
               >
                 Delete Bike
               </button>
-              <div className="flex space-x-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => router.push("/bikes")}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                  className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     color: theme.text.secondary,
@@ -737,7 +734,7 @@ export default function EditBikePage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
                   style={{
                     backgroundColor: theme.accents.primary,
                     color: theme.text.inverse,
@@ -757,7 +754,7 @@ export default function EditBikePage() {
             style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           >
             <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
+              className="rounded-lg p-4 md:p-6 max-w-md w-full mx-4"
               style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
             >
               <h3
@@ -766,35 +763,35 @@ export default function EditBikePage() {
               >
                 Delete Bike Unit
               </h3>
-              <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
-                Are you sure you want to delete this bike unit (Chassis: <strong>{chassisNumber}</strong>)? This action cannot be undone.
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={deleting}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    color: theme.text.secondary,
-                    border: `1px solid ${theme.borders.medium}`,
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                  style={{
-                    backgroundColor: "red",
-                    color: "white",
-                  }}
-                >
-                  {deleting ? "Deleting..." : "Delete"}
-                </button>
-              </div>
+               <p className="text-sm mb-4 md:mb-6" style={{ color: theme.text.secondary }}>
+                 Are you sure you want to delete this bike unit (Chassis: <strong>{chassisNumber}</strong>)? This action cannot be undone.
+               </p>
+               <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+                 <button
+                   type="button"
+                   onClick={() => setShowDeleteModal(false)}
+                   disabled={deleting}
+                   className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                   style={{
+                     backgroundColor: theme.backgrounds.tertiary,
+                     color: theme.text.secondary,
+                     border: `1px solid ${theme.borders.medium}`,
+                   }}
+                 >
+                   Cancel
+                 </button>
+                 <button
+                   onClick={handleDelete}
+                   disabled={deleting}
+                   className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                   style={{
+                     backgroundColor: "red",
+                     color: "white",
+                   }}
+                 >
+                   {deleting ? "Deleting..." : "Delete"}
+                 </button>
+               </div>
             </div>
           </div>
         )}

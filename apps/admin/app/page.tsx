@@ -50,10 +50,10 @@ export default function Dashboard() {
       : "All branches (Global)";
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         <h1
-          className="text-3xl font-bold mb-6"
+          className="text-2xl md:text-3xl font-bold mb-4 md:mb-6"
           style={{ color: theme.text.primary }}
         >
           {user.role === UserRole.ADMIN
@@ -64,7 +64,7 @@ export default function Dashboard() {
         </h1>
 
         <div
-          className="rounded-lg p-6 mb-8"
+          className="rounded-lg p-4 md:p-6 mb-6 md:mb-8"
           style={{
             backgroundColor: theme.backgrounds.primary,
             border: `1px solid ${theme.borders.light}`,
@@ -84,18 +84,18 @@ export default function Dashboard() {
 
         {error && (
           <div
-            className="rounded-lg p-4 mb-6 flex items-center justify-between gap-4"
+            className="rounded-lg p-3 md:p-4 mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
             style={{
               backgroundColor: theme.backgrounds.secondary,
               border: `1px solid ${theme.accents.secondary}`,
               color: theme.text.primary,
             }}
           >
-            <p>{error}</p>
+            <p className="text-sm md:text-base">{error}</p>
             <button
               type="button"
               onClick={fetchStats}
-              className="px-4 py-2 rounded font-medium"
+              className="px-4 py-2 rounded font-medium text-sm md:text-base self-start sm:self-auto"
               style={{
                 backgroundColor: theme.accents.primary,
                 color: theme.text.inverse,
@@ -339,18 +339,18 @@ function GlobalSettings() {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
-          <div
-            className="rounded-lg shadow-lg p-6 max-w-md w-full mx-4"
-            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
-          >
-            <h3
-              className="text-xl font-bold mb-4"
-              style={{ color: theme.text.primary }}
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
+            <div
+              className="rounded-lg shadow-lg p-4 sm:p-6 max-w-sm sm:max-w-md w-full mx-4"
+              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
             >
-              Edit Global Discounts
-            </h3>
+              <h3
+                className="text-lg sm:text-xl font-bold mb-4"
+                style={{ color: theme.text.primary }}
+              >
+                Edit Global Discounts
+              </h3>
             
             <div className="space-y-4 mb-6">
               <div>
@@ -393,7 +393,7 @@ function GlobalSettings() {
               </div>
             </div>
 
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-4">
               <button
                 onClick={() => setIsModalOpen(false)}
                 disabled={saving}

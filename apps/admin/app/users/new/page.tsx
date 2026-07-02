@@ -82,19 +82,19 @@ export default function CreateUserPage() {
   if (user && user.role !== UserRole.ADMIN) return null;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
             Create Staff Account
           </h1>
-          <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
+          <p className="mt-1 text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Add a staff member and choose whether they are global or branch-scoped.
           </p>
         </div>
 
         <div
-          className="rounded-lg p-6"
+          className="rounded-lg p-4 md:p-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           {error && (
@@ -204,13 +204,13 @@ export default function CreateUserPage() {
               )}
             </div>
 
-            <div className="mt-6 flex gap-3">
-              <AsyncButton type="submit" loading={submitting} loadingLabel="Creating...">
+            <div className="mt-4 md:mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+              <AsyncButton type="submit" loading={submitting} loadingLabel="Creating..." className="px-4 md:px-6 w-full sm:w-auto">
                 Create User
               </AsyncButton>
               <Link
                 href="/users"
-                className="px-4 py-2 text-sm font-medium rounded"
+                className="px-4 py-2 text-sm font-medium rounded text-center"
                 style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
               >
                 Cancel

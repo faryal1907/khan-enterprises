@@ -291,41 +291,41 @@ export default function ManualOrderPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>Register Sale</h1>
-          <p style={{ color: theme.text.secondary }}>Manual sale entry with auto-generated documents</p>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>Register Sale</h1>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>Manual sale entry with auto-generated documents</p>
         </div>
 
         {/* Sale Type */}
-        <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Sale Type</h3>
-          <div className="flex gap-4">
-            {(["BIKE", "PART"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setSaleType(t)}
-                disabled={isSubmitting}
-                className="px-6 py-3 text-sm font-medium rounded transition-colors"
-                style={{
-                  backgroundColor: saleType === t ? theme.accents.primary : theme.backgrounds.tertiary,
-                  color: saleType === t ? theme.text.inverse : theme.text.primary,
-                  border: `1px solid ${saleType === t ? theme.accents.primary : theme.borders.medium}`,
-                  opacity: isSubmitting ? 0.6 : 1,
-                }}
-              >
-                {t === "BIKE" ? "Bike" : "Part"}
-              </button>
-            ))}
+        <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Sale Type</h3>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+             {(["BIKE", "PART"] as const).map((t) => (
+               <button
+                 key={t}
+                 onClick={() => setSaleType(t)}
+                 disabled={isSubmitting}
+                 className="px-4 py-2.5 text-sm font-medium rounded transition-colors w-full sm:w-auto"
+                 style={{
+                   backgroundColor: saleType === t ? theme.accents.primary : theme.backgrounds.tertiary,
+                   color: saleType === t ? theme.text.inverse : theme.text.primary,
+                   border: `1px solid ${saleType === t ? theme.accents.primary : theme.borders.medium}`,
+                   opacity: isSubmitting ? 0.6 : 1,
+                 }}
+               >
+                 {t === "BIKE" ? "Bike" : "Part"}
+               </button>
+             ))}
           </div>
         </div>
 
         {/* Bike Information */}
         {saleType === "BIKE" && (
-          <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Bike Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+            <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Bike Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Chassis Number *</label>
                 <div className="flex gap-2">
@@ -347,9 +347,9 @@ export default function ManualOrderPage() {
 
         {/* Part Information */}
         {saleType === "PART" && (
-          <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Part Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+            <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Part Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <div className="relative">
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Part *</label>
                 <input type="text" value={partSearchTerm} onChange={(e) => { setPartSearchTerm(e.target.value); if (formData.partId) { ["partInventoryId","partId","partName","partPrice","partMaxQuantity"].forEach(k => handleInputChange(k, "")); } setShowPartDropdown(true); }} onFocus={() => setShowPartDropdown(true)} onBlur={() => setTimeout(() => setShowPartDropdown(false), 200)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Search for a part..." />
@@ -383,9 +383,9 @@ export default function ManualOrderPage() {
         )}
 
         {/* Customer Information */}
-        <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Customer Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Customer Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Customer Name *</label>
               <input type="text" value={formData.customerName} onChange={(e) => handleInputChange("customerName", e.target.value)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Customer name" />
@@ -406,8 +406,8 @@ export default function ManualOrderPage() {
         </div>
 
         {/* Sale Details */}
-        <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Sale Details</h3>
+        <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Sale Details</h3>
           <div className="mb-6">
             <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Sale Price *</label>
             <input
@@ -425,11 +425,11 @@ export default function ManualOrderPage() {
           </div>
 
           {/* Partial payment toggle */}
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3 md:mb-4">
             <button
               type="button"
               onClick={() => { setIsPartial(!isPartial); if (!isPartial) setInitialPaymentDisplay(""); }}
-              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0"
               style={{ backgroundColor: isPartial ? theme.accents.primary : theme.borders.medium }}
             >
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isPartial ? "translate-x-6" : "translate-x-1"}`} />
@@ -439,7 +439,7 @@ export default function ManualOrderPage() {
           </div>
 
           {isPartial && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-lg mb-4" style={{ backgroundColor: theme.backgrounds.secondary }}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-3 md:p-4 rounded-lg mb-3 md:mb-4" style={{ backgroundColor: theme.backgrounds.secondary }}>
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Amount Paid Now *</label>
                 <input
@@ -516,11 +516,11 @@ export default function ManualOrderPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-4 mt-6">
-          <a href="/sales" className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70" style={{ backgroundColor: theme.backgrounds.primary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 md:mt-6">
+          <a href="/sales" className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 text-center" style={{ backgroundColor: theme.backgrounds.primary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}>
             Cancel
           </a>
-          <AsyncButton onClick={handleRegisterSale} loading={isSubmitting} loadingLabel="Registering..." className="px-6">
+          <AsyncButton onClick={handleRegisterSale} loading={isSubmitting} loadingLabel="Registering..." className="px-4 md:px-6 w-full sm:w-auto">
             Register Sale
           </AsyncButton>
         </div>

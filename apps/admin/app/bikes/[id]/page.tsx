@@ -122,7 +122,7 @@ export default function BikeDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }}></div>
@@ -134,9 +134,9 @@ export default function BikeDetailPage() {
 
   if (!bike) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
-          <p className="text-center" style={{ color: theme.text.secondary }}>
+          <p className="text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Bike not found
           </p>
         </div>
@@ -145,25 +145,25 @@ export default function BikeDetailPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-4 md:mb-6">
           <h1
-            className="text-3xl font-bold mb-2"
+            className="text-2xl md:text-3xl font-bold mb-1 md:mb-2"
             style={{ color: theme.text.primary }}
           >
             Bike Details
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
             View bike information and documents
           </p>
         </div>
 
         <div
-          className="rounded-lg p-6 mb-6"
+          className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div>
               <label
                 className="block text-xs font-medium uppercase tracking-wider mb-1"
@@ -278,26 +278,26 @@ export default function BikeDetailPage() {
         </div>
 
         <div
-          className="rounded-lg p-6"
+          className="rounded-lg p-4 md:p-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <h3
-            className="text-lg font-semibold mb-4"
+            className="text-lg md:text-xl font-semibold mb-3 md:mb-4"
             style={{ color: theme.text.primary }}
           >
             Documents
           </h3>
 
           {bike.documents.length === 0 ? (
-            <p className="text-sm" style={{ color: theme.text.secondary }}>
+            <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
               No documents attached
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               {bike.documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-3 rounded"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded gap-2 sm:gap-3"
                   style={{ backgroundColor: theme.backgrounds.tertiary }}
                 >
                   <div>
@@ -312,7 +312,7 @@ export default function BikeDetailPage() {
                     href={doc.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium transition-colors hover:opacity-70"
+                    className="text-sm font-medium transition-colors hover:opacity-70 w-full sm:w-auto text-center sm:text-left"
                     style={{ color: theme.accents.primary }}
                   >
                     Download
@@ -323,10 +323,10 @@ export default function BikeDetailPage() {
           )}
         </div>
 
-        <div className="flex justify-end space-x-4 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 md:mt-6">
           <a
             href="/bikes"
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 text-center"
             style={{
               backgroundColor: theme.backgrounds.primary,
               color: theme.text.secondary,
@@ -337,7 +337,7 @@ export default function BikeDetailPage() {
           </a>
           <button
             onClick={openStatusModal}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
             style={{
               backgroundColor: theme.accents.secondary,
               color: theme.text.inverse,
@@ -347,7 +347,7 @@ export default function BikeDetailPage() {
           </button>
           <a
             href={`/bikes/${bike.id}/edit`}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
             style={{
               backgroundColor: theme.accents.primary,
               color: theme.text.inverse,
@@ -364,11 +364,11 @@ export default function BikeDetailPage() {
             style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           >
             <div
-              className="rounded-lg p-6 max-w-md w-full mx-4"
+              className="rounded-lg p-4 md:p-6 max-w-md w-full mx-4"
               style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
             >
               <h3
-                className="text-lg font-semibold mb-4"
+                className="text-lg md:text-xl font-semibold mb-4"
                 style={{ color: theme.text.primary }}
               >
                 Change Status
@@ -397,7 +397,7 @@ export default function BikeDetailPage() {
                     <option value="IN_DELIVERY">In Delivery</option>
                   </select>
                 </div>
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setShowStatusModal(false)}
@@ -430,16 +430,16 @@ export default function BikeDetailPage() {
         {showDiscountModal && bike && (
           <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
             <div
-              className="rounded-lg shadow-lg p-6 max-w-md w-full mx-4"
+              className="rounded-lg shadow-lg p-4 md:p-6 max-w-sm sm:max-w-md w-full mx-4"
               style={{ backgroundColor: theme.backgrounds.primary }}
             >
               <h3
-                className="text-xl font-bold mb-4"
+                className="text-lg md:text-xl font-bold mb-4"
                 style={{ color: theme.text.primary }}
               >
                 Update Discount
               </h3>
-              
+
               <div className="mb-4">
                 <p className="text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                   Global Discount Implemented: {globalBikeDiscount}%
@@ -448,12 +448,12 @@ export default function BikeDetailPage() {
                   * Note: The individual discount you apply here will be in addition to the global discount.
                 </p>
               </div>
-              
+
               {(() => {
                 const currentPrice = bike.price ?? bike.model.basePrice ?? 0;
                 return (
                   <>
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="mb-4 md:mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                     Discount Amount (Rs)
@@ -511,23 +511,23 @@ export default function BikeDetailPage() {
                   />
                 </div>
               </div>
-              
-              <div className="mb-6 p-4 rounded bg-gray-50 border border-gray-200">
+
+              <div className="mb-4 md:mb-6 p-3 md:p-4 rounded bg-gray-50 border border-gray-200">
                  <p className="text-sm font-medium text-gray-700">Price Breakdown</p>
                  <div className="mt-2 space-y-1 text-sm text-gray-600">
-                   <div className="flex justify-between">
+                   <div className="flex justify-between gap-2">
                      <span>Original Price:</span>
                      <span>Rs {currentPrice.toLocaleString() || "N/A"}</span>
                    </div>
-                   <div className="flex justify-between text-red-600">
+                   <div className="flex justify-between gap-2 text-red-600">
                      <span>Global Discount ({globalBikeDiscount}%):</span>
                      <span>- Rs {(currentPrice * (globalBikeDiscount / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                    </div>
-                   <div className="flex justify-between text-red-600">
+                   <div className="flex justify-between gap-2 text-red-600">
                      <span>Individual Discount ({parseFloat(newDiscount || "0")}%):</span>
                      <span>- Rs {(currentPrice * (parseFloat(newDiscount || "0") / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                    </div>
-                   <div className="flex justify-between font-bold pt-2 border-t border-gray-200 text-gray-900">
+                   <div className="flex justify-between gap-2 font-bold pt-2 border-t border-gray-200 text-gray-900">
                      <span>Final Price:</span>
                      <span>Rs {(currentPrice * (1 - (globalBikeDiscount + parseFloat(newDiscount || "0")) / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                    </div>
@@ -537,7 +537,7 @@ export default function BikeDetailPage() {
                 );
               })()}
 
-              <div className="flex justify-end space-x-4">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowDiscountModal(false)}
                   disabled={savingDiscount}
@@ -570,7 +570,7 @@ export default function BikeDetailPage() {
         {errorModalMsg && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-sm bg-black/20">
             <div
-              className="rounded-lg shadow-lg p-6 max-w-sm w-full mx-4"
+              className="rounded-lg shadow-lg p-4 md:p-6 max-w-sm w-full mx-4"
               style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
             >
               <h3

@@ -176,9 +176,9 @@ export default function UserDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading user details...</p>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>Loading user details...</p>
         </div>
       </div>
     );
@@ -186,16 +186,16 @@ export default function UserDetailPage() {
 
   if (error || !staffUser) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
-          <p className="mb-4" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
+          <p className="mb-4 text-sm md:text-base" style={{ color: error ? theme.accents.secondary : theme.text.secondary }}>
             {error || "User not found"}
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <AsyncButton onClick={fetchUser}>Retry</AsyncButton>
             <Link
               href="/users"
-              className="px-4 py-2 text-sm font-medium rounded"
+              className="px-4 py-2 text-sm font-medium rounded text-center"
               style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
             >
               Back to Users
@@ -210,22 +210,22 @@ export default function UserDetailPage() {
   const canToggleStatus = !isCurrentUser;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
+        <div className="mb-4 md:mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
               User Details
             </h1>
-            <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
+            <p className="mt-1 text-sm md:text-base" style={{ color: theme.text.secondary }}>
               Review account access, branch scope, and staff status.
             </p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
             <Link
               href="/users"
-              className="px-4 py-2 text-sm font-medium rounded"
+              className="px-4 py-2 text-sm font-medium rounded text-center"
               style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
             >
               Back
@@ -245,10 +245,10 @@ export default function UserDetailPage() {
         </div>
 
         <div
-          className="rounded-lg p-6 mb-6"
+          className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-2">
             <h2 className="text-lg font-semibold" style={{ color: theme.text.primary }}>
               User Information
             </h2>
@@ -258,7 +258,7 @@ export default function UserDetailPage() {
                 setIsEditing(!isEditing);
               }}
               disabled={actionLoading === "save"}
-              className="text-sm font-medium disabled:opacity-50"
+              className="text-sm font-medium disabled:opacity-50 w-full sm:w-auto text-center sm:text-left"
               style={{ color: theme.accents.primary }}
             >
               {isEditing ? "Cancel" : "Edit"}
@@ -336,7 +336,7 @@ export default function UserDetailPage() {
                   </div>
                 )}
               </div>
-              <div className="mt-4 flex gap-2">
+              <div className="mt-3 md:mt-4 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
                 <AsyncButton type="submit" loading={actionLoading === "save"} loadingLabel="Saving...">
                   Save Changes
                 </AsyncButton>
@@ -355,7 +355,7 @@ export default function UserDetailPage() {
               </div>
             </form>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <Info label="User ID" value={staffUser.id} />
               <Info label="Email" value={staffUser.email} />
               <Info label="Full Name" value={staffUser.fullName} />
@@ -382,12 +382,12 @@ export default function UserDetailPage() {
             if (!actionLoading) setPendingAction(null);
           }}
         >
-          <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+          <p className="text-sm mb-4 md:mb-6" style={{ color: theme.text.secondary }}>
             {pendingAction === "activate"
               ? `Activate ${staffUser.fullName}? They will regain access based on their role.`
               : `Deactivate ${staffUser.fullName}? They will immediately lose access to the system.`}
           </p>
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
             <button
               onClick={() => setPendingAction(null)}
               disabled={Boolean(actionLoading)}

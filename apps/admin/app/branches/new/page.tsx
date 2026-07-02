@@ -81,10 +81,10 @@ export default function CreateBranchPage() {
   if (user && user.role !== UserRole.ADMIN) return null;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
             Add New Branch
           </h1>
           <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
@@ -92,7 +92,7 @@ export default function CreateBranchPage() {
           </p>
         </div>
 
-        <div className="rounded-lg p-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+        <div className="rounded-lg p-4 md:p-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
           {error && (
             <div className="mb-4 p-3 rounded text-sm" style={{ backgroundColor: theme.accents.secondary + "20", color: theme.accents.secondary }}>
               {error}
@@ -165,13 +165,13 @@ export default function CreateBranchPage() {
               </FormField>
             </div>
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-4 md:mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
               <AsyncButton type="submit" loading={submitting} loadingLabel="Creating...">
                 Create Branch
               </AsyncButton>
               <Link
                 href="/branches"
-                className="px-4 py-2 text-sm font-medium rounded"
+                className="px-4 py-2 text-sm font-medium rounded text-center"
                 style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.secondary, border: `1px solid ${theme.borders.medium}` }}
               >
                 Cancel

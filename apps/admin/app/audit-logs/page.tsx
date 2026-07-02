@@ -194,26 +194,28 @@ export default function AuditLogsPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
           <div>
             <Link href="/" className="inline-flex items-center gap-2 text-sm mb-3 hover:opacity-70" style={{ color: theme.text.secondary }}>
               <ArrowLeft size={16} />
               Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>Audit Logs</h1>
-            <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>Audit Logs</h1>
+            <p className="mt-1 text-sm md:text-base" style={{ color: theme.text.secondary }}>
               Track system activity and critical changes. Showing {auditLogs.length} of {totalCount} records.
             </p>
           </div>
 
-          <AsyncButton onClick={handleExportCSV} loading={exporting} loadingLabel="Exporting..." disabled={loading || auditLogs.length === 0}>
-            Export CSV
-          </AsyncButton>
+          <div className="w-full sm:w-auto">
+            <AsyncButton onClick={handleExportCSV} loading={exporting} loadingLabel="Exporting..." disabled={loading || auditLogs.length === 0} className="w-full sm:w-auto">
+              Export CSV
+            </AsyncButton>
+          </div>
         </div>
 
-        <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+        <div className="rounded-lg p-4 md:p-5 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>User</label>
@@ -289,12 +291,12 @@ export default function AuditLogsPage() {
           </div>
         </div>
 
-        <div className="rounded-lg overflow-hidden" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
-          <table className="w-full">
+        <div className="rounded-lg overflow-x-auto" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                 {["Timestamp", "User", "Role", "Action", "Entity", "Entity ID", "IP Address", "Details"].map((header) => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th key={header} className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
                 ))}
@@ -302,27 +304,27 @@ export default function AuditLogsPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>Loading audit logs...</td></tr>
+                <tr><td colSpan={8} className="px-3 md:px-6 py-8 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>Loading audit logs...</td></tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                    <p className="mb-4">{error}</p>
+                  <td colSpan={8} className="px-3 md:px-6 py-8 md:py-12 text-center">
+                    <p className="mb-4 text-sm md:text-base" style={{ color: theme.text.secondary }}>{error}</p>
                     <AsyncButton onClick={fetchAuditLogs}>Retry</AsyncButton>
                   </td>
                 </tr>
               ) : auditLogs.length === 0 ? (
-                <tr><td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>No audit logs found</td></tr>
+                <tr><td colSpan={8} className="px-3 md:px-6 py-8 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>No audit logs found</td></tr>
               ) : (
                 auditLogs.map((log) => (
                   <tr key={log.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{formatDate(log.createdAt || log.timestamp)}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{getUserLabel(log)}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{getRoleLabel(log)}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{log.action}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{log.entityType || EMPTY}</td>
-                    <td className="px-6 py-4 text-sm font-mono" style={{ color: theme.text.primary }}>{log.entityId || EMPTY}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{log.ipAddress || EMPTY}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{formatDate(log.createdAt || log.timestamp)}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{getUserLabel(log)}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{getRoleLabel(log)}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{log.action}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{log.entityType || EMPTY}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm font-mono" style={{ color: theme.text.primary }}>{log.entityId || EMPTY}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{log.ipAddress || EMPTY}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm">
                       <button
                         onClick={() => handleViewDetails(log.id)}
                         disabled={detailsLoading && selectedLogId === log.id}
@@ -342,11 +344,11 @@ export default function AuditLogsPage() {
 
       {selectedLogId && (
         <ActionModal title="Audit Log Details" onClose={closeDetails} className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          {detailsLoading ? (
-            <p className="text-center py-8" style={{ color: theme.text.secondary }}>Loading details...</p>
-          ) : logDetails ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+           {detailsLoading ? (
+             <p className="text-center py-6 md:py-8 text-sm md:text-base" style={{ color: theme.text.secondary }}>Loading details...</p>
+           ) : logDetails ? (
+             <div className="space-y-4 md:space-y-6">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 {[
                   ["Timestamp", formatDate(logDetails.timestamp || logDetails.createdAt)],
                   ["User", `${getUserLabel(logDetails)} (${getRoleLabel(logDetails)})`],
@@ -361,52 +363,52 @@ export default function AuditLogsPage() {
                 ))}
               </div>
 
-              <div>
-                <h4 className="text-sm font-semibold mb-2" style={{ color: theme.text.primary }}>Changes</h4>
-                {logDetails.changes && logDetails.changes.length > 0 ? (
-                  <div className="rounded border overflow-hidden" style={{ borderColor: theme.borders.light }}>
-                    <table className="w-full text-sm">
-                      <thead style={{ backgroundColor: theme.backgrounds.secondary }}>
-                        <tr>
-                          {["Field", "Old Value", "New Value"].map((header) => (
-                            <th key={header} className="px-4 py-2 text-left font-medium" style={{ color: theme.text.secondary }}>{header}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {logDetails.changes.map((change) => (
-                          <tr key={change.field} style={{ borderTop: `1px solid ${theme.borders.light}` }}>
-                            <td className="px-4 py-2 font-mono text-xs align-top" style={{ color: theme.text.primary }}>{change.field}</td>
-                            <td className="px-4 py-2 align-top" style={{ color: theme.text.secondary }}>
-                              <pre className="whitespace-pre-wrap font-sans max-h-32 overflow-y-auto">{change.oldValue}</pre>
-                            </td>
-                            <td className="px-4 py-2 align-top" style={{ color: theme.text.primary }}>
-                              <pre className="whitespace-pre-wrap font-sans max-h-32 overflow-y-auto">{change.newValue}</pre>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-sm italic" style={{ color: theme.text.secondary }}>No state changes recorded.</p>
-                )}
-              </div>
+               <div>
+                 <h4 className="text-sm font-semibold mb-2" style={{ color: theme.text.primary }}>Changes</h4>
+                 {logDetails.changes && logDetails.changes.length > 0 ? (
+                   <div className="rounded border overflow-x-auto" style={{ borderColor: theme.borders.light }}>
+                     <table className="w-full text-sm min-w-[640px]">
+                       <thead style={{ backgroundColor: theme.backgrounds.secondary }}>
+                         <tr>
+                           {["Field", "Old Value", "New Value"].map((header) => (
+                             <th key={header} className="px-3 md:px-4 py-2 text-left font-medium" style={{ color: theme.text.secondary }}>{header}</th>
+                           ))}
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {logDetails.changes.map((change) => (
+                           <tr key={change.field} style={{ borderTop: `1px solid ${theme.borders.light}` }}>
+                             <td className="px-3 md:px-4 py-2 font-mono text-xs align-top" style={{ color: theme.text.primary }}>{change.field}</td>
+                             <td className="px-3 md:px-4 py-2 align-top" style={{ color: theme.text.secondary }}>
+                               <pre className="whitespace-pre-wrap font-sans max-h-32 overflow-y-auto">{change.oldValue}</pre>
+                             </td>
+                             <td className="px-3 md:px-4 py-2 align-top" style={{ color: theme.text.primary }}>
+                               <pre className="whitespace-pre-wrap font-sans max-h-32 overflow-y-auto">{change.newValue}</pre>
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   </div>
+                 ) : (
+                   <p className="text-sm italic" style={{ color: theme.text.secondary }}>No state changes recorded.</p>
+                 )}
+               </div>
             </div>
-          ) : (
-            <p className="text-center py-8 text-red-500">Failed to load details.</p>
-          )}
+           ) : (
+             <p className="text-center py-6 md:py-8 text-sm md:text-base text-red-500">Failed to load details.</p>
+           )}
 
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={closeDetails}
-              disabled={detailsLoading}
-              className="px-4 py-2 rounded font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
-              style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.primary, border: `1px solid ${theme.borders.medium}` }}
-            >
-              Close
-            </button>
-          </div>
+           <div className="mt-4 md:mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+             <button
+               onClick={closeDetails}
+               disabled={detailsLoading}
+               className="px-4 py-2 rounded font-medium transition-opacity hover:opacity-80 disabled:opacity-50 w-full sm:w-auto"
+               style={{ backgroundColor: theme.backgrounds.tertiary, color: theme.text.primary, border: `1px solid ${theme.borders.medium}` }}
+             >
+               Close
+             </button>
+           </div>
         </ActionModal>
       )}
     </div>

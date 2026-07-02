@@ -128,23 +128,23 @@ export default function DeliveryQueuePage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-4 md:mb-6">
           <h1
-            className="text-3xl font-bold"
+            className="text-2xl md:text-3xl font-bold"
             style={{ color: theme.text.primary }}
           >
             Delivery Queue
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Manage delivery requests and track delivery status
           </p>
         </div>
 
         {/* Filters */}
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,7 +208,7 @@ export default function DeliveryQueuePage() {
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
             <div
               className="rounded-lg p-4"
               style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
@@ -249,41 +249,41 @@ export default function DeliveryQueuePage() {
 
         {/* Table */}
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           {loading ? (
-            <div className="p-8 text-center">
+            <div className="p-6 md:p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.accents.primary }} />
             </div>
           ) : error ? (
-            <div className="p-8 text-center">
-              <p style={{ color: theme.text.secondary }}>{error}</p>
+            <div className="p-6 md:p-8 text-center">
+              <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>{error}</p>
             </div>
           ) : deliveries.length === 0 ? (
-            <div className="p-8 text-center">
-              <p style={{ color: theme.text.secondary }}>No delivery requests found</p>
+            <div className="p-6 md:p-8 text-center">
+              <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>No delivery requests found</p>
             </div>
           ) : (
-            <table className="w-full">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Order Number
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Delivery Address
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Branch
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Requested Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     Status
                   </th>
                 </tr>
@@ -302,7 +302,7 @@ export default function DeliveryQueuePage() {
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                    <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
                       <Link 
                         href={`/deliveries/${delivery.id}`}
                         onClick={(e) => e.stopPropagation()}
@@ -311,20 +311,20 @@ export default function DeliveryQueuePage() {
                         {delivery.order?.orderNumber || delivery.partOrder?.orderNumber || "N/A"}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {delivery.order?.customerName || delivery.partOrder?.customerName || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-sm max-w-xs truncate" style={{ color: theme.text.primary }}>
+                    <td className="px-4 md:px-6 py-3 md:py-4 text-sm max-w-xs truncate" style={{ color: theme.text.primary }}>
                       {delivery.deliveryAddress}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {delivery.order?.branch ? `${delivery.order.branch.name}, ${delivery.order.branch.city}` :
                        delivery.partOrder?.branch ? `${delivery.partOrder.branch.name}, ${delivery.partOrder.branch.city}` : "N/A"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {new Date(delivery.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
                       <span
                         className="inline-block px-2 py-1 text-xs font-medium rounded"
                         style={getDeliveryStatusStyle(delivery.status)}

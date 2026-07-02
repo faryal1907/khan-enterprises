@@ -62,18 +62,18 @@ export default function NewBikeModelPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
           <h1
-            className="text-3xl font-bold"
+            className="text-2xl md:text-3xl font-bold"
             style={{ color: theme.text.primary }}
           >
             Add New Bike Model
           </h1>
           <Link
             href="/models"
-            className="text-sm font-medium transition-colors hover:opacity-70"
+            className="text-sm font-medium transition-colors hover:opacity-70 w-full sm:w-auto text-center"
             style={{ color: theme.text.secondary }}
           >
             &larr; Back to Models
@@ -81,11 +81,11 @@ export default function NewBikeModelPage() {
         </div>
 
         <div
-          className="rounded-lg p-6"
+          className="rounded-lg p-4 md:p-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Brand */}
               <div>
                 <label
@@ -292,7 +292,7 @@ export default function NewBikeModelPage() {
               />
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4">
               <AsyncButton
                 type="submit"
                 loading={loading}

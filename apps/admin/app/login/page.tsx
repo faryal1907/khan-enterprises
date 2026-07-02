@@ -40,23 +40,23 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
+      className="min-h-screen flex items-center justify-center px-4 py-6 md:py-8"
       style={{ backgroundColor: theme.backgrounds.tertiary }}
     >
       <div
-        className="w-full max-w-md rounded-xl shadow-md p-8"
+        className="w-full max-w-md rounded-xl shadow-md p-5 md:p-8"
         style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
       >
-        <div className="mb-8 text-center">
+        <div className="mb-6 md:mb-8 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.svg"
             alt="Ali & Khan's Green Wheels"
-            className="mx-auto h-24 w-auto object-contain"
+            className="mx-auto h-14 md:h-24 w-auto object-contain"
           />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-5">
           <div>
             <label
               className="block text-sm font-medium mb-1"

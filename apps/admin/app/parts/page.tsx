@@ -152,20 +152,20 @@ export default function PartsListPage() {
   const outOfStockItems = parts.filter((p) => p.quantity - p.reservedQuantity === 0).length;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Low Stock Alert Banner */}
         {lowStockItems > 0 && (
           <div
-            className="rounded-lg p-4 mb-6 flex items-center justify-between"
+            className="rounded-lg p-3 md:p-4 mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3"
             style={{
               backgroundColor: "rgba(245, 158, 11, 0.1)",
               border: `1px solid ${theme.accents.secondary}`,
             }}
           >
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 md:space-x-3">
               <div
-                className="w-2 h-2 rounded-full"
+                className="w-2 h-2 rounded-full shrink-0"
                 style={{ backgroundColor: theme.accents.secondary }}
               ></div>
               <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
@@ -174,7 +174,7 @@ export default function PartsListPage() {
             </div>
             <a
               href="#parts-table"
-              className="text-sm font-medium transition-colors hover:opacity-70"
+              className="text-sm font-medium transition-colors hover:opacity-70 self-start sm:self-auto"
               style={{ color: theme.accents.secondary }}
             >
               View Details
@@ -182,15 +182,14 @@ export default function PartsListPage() {
           </div>
         )}
 
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
+          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
             Parts Inventory
           </h1>
-          
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
           <SummaryCard label="Total Parts" value={totalParts} />
           <SummaryCard label="Low Stock Items" value={lowStockItems} color={theme.accents.secondary} />
           <SummaryCard label="Out of Stock Items" value={outOfStockItems} color={theme.accents.primary} />
@@ -198,7 +197,7 @@ export default function PartsListPage() {
 
         {/* Filters */}
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -274,10 +273,10 @@ export default function PartsListPage() {
         {/* Table */}
         <div
           id="parts-table"
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="w-full">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
@@ -489,7 +488,7 @@ export default function PartsListPage() {
                     placeholder="Enter quantity"
                   />
                 </div>
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => {

@@ -161,21 +161,21 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
               Transactions
             </h1>
-            <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
+            <p className="mt-1 text-sm md:text-base" style={{ color: theme.text.secondary }}>
               View payment transactions.
             </p>
           </div>
           <button
             onClick={handleExportCSV}
             disabled={transactions.length === 0}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
             style={{
               backgroundColor: theme.backgrounds.tertiary,
               color: theme.text.secondary,
@@ -186,14 +186,14 @@ export default function TransactionsPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
           <SummaryCard label="Total Revenue" value={`PKR ${summary.revenue.toLocaleString()}`} />
           <SummaryCard label="Successful" value={summary.successful} color="#22c55e" />
           <SummaryCard label="Pending" value={summary.pending} color="#f59e0b" />
         </div>
 
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{
             backgroundColor: theme.backgrounds.primary,
             border: `1px solid ${theme.borders.light}`,
@@ -312,11 +312,11 @@ export default function TransactionsPage() {
             border: `1px solid ${theme.borders.light}`,
           }}
         >
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                 {["Transaction ID", "Order", "Customer", "Branch", "Amount", "Method", "Status", "Date", "Actions"].map((header) => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th key={header} className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
                 ))}
@@ -325,13 +325,13 @@ export default function TransactionsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     Loading transactions...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     <div className="flex flex-col items-center gap-3">
                       <span>{error}</span>
                       <AsyncButton onClick={fetchTransactions}>Retry</AsyncButton>
@@ -340,7 +340,7 @@ export default function TransactionsPage() {
                 </tr>
               ) : transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     No transactions found
                   </td>
                 </tr>
@@ -350,10 +350,10 @@ export default function TransactionsPage() {
 
                 return (
                   <tr key={`${transaction.type}-${transaction.id}`} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
-                    <td className="px-6 py-4 text-sm font-medium" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm font-medium" style={{ color: theme.text.primary }}>
                       {transaction.id}
                     </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       {href ? (
                         <Link href={href} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
                           {transaction.order?.orderNumber}
@@ -363,19 +363,19 @@ export default function TransactionsPage() {
                         {transaction.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       {transaction.order?.customerName || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       {transaction.order?.branch?.name || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       PKR {Number(transaction.amount || 0).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       {transaction.method.replace(/_/g, " ")}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm">
                       <span
                         className="px-2 py-1 text-xs font-medium rounded"
                         style={{
@@ -387,11 +387,11 @@ export default function TransactionsPage() {
                         {transaction.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       {new Date(transaction.createdAt).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex gap-3 whitespace-nowrap">
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm">
+                      <div className="flex gap-2 md:gap-3 whitespace-nowrap">
                         {transaction.status === PaymentStatus.SUCCESS && (
                           <AsyncButton
                             onClick={() => handleDownloadReceipt(transaction)}

@@ -241,24 +241,26 @@ export default function SalesRecordsPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
               Sales Records
             </h1>
-            <p style={{ color: theme.text.secondary }}>
+            <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
               View completed bike and part sales from orders and part orders
             </p>
           </div>
-          <AsyncButton onClick={() => router.push("/sales/new")}>
-            Register Sale
-          </AsyncButton>
+          <div className="w-full sm:w-auto">
+            <AsyncButton onClick={() => router.push("/sales/new")} className="w-full sm:w-auto">
+              Register Sale
+            </AsyncButton>
+          </div>
         </div>
 
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -356,11 +358,11 @@ export default function SalesRecordsPage() {
           className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                 {["Order Number", "Customer", "Items", "Total", "Source", "Status", "Staff", "Date", "Actions"].map((header) => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th key={header} className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
                 ))}
@@ -369,13 +371,13 @@ export default function SalesRecordsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     Loading sales records...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     <div className="flex flex-col items-center gap-3">
                       <span>{error}</span>
                       <AsyncButton onClick={fetchSales}>Retry</AsyncButton>
@@ -384,7 +386,7 @@ export default function SalesRecordsPage() {
                 </tr>
               ) : sales.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8" style={{ color: theme.text.secondary }}>
+                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     No completed sales found
                   </td>
                 </tr>
@@ -398,7 +400,7 @@ export default function SalesRecordsPage() {
                     className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                     style={{ borderBottom: `1px solid ${theme.borders.light}` }}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
                       <Link 
                         href={sale.type === "PART" ? `/part-orders/${sale.id}` : `/orders/${sale.id}`}
                         onClick={(e) => e.stopPropagation()}
@@ -407,16 +409,16 @@ export default function SalesRecordsPage() {
                         {sale.orderNumber}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {sale.customerName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {getSaleItemLabel(sale)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       Rs. {getSaleAmount(sale).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
                       <span
                         className="inline-block px-2 py-1 text-xs font-medium rounded"
                         style={{
@@ -428,7 +430,7 @@ export default function SalesRecordsPage() {
                         {sale.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
                       <span
                         className="inline-block px-2 py-1 text-xs font-medium rounded uppercase"
                         style={{
@@ -440,14 +442,14 @@ export default function SalesRecordsPage() {
                         {sale.status.replace(/_/g, " ")}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {sale.processedBy?.fullName || "-"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       {new Date(sale.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex items-center gap-3">
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-2 md:gap-3">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -475,11 +477,11 @@ export default function SalesRecordsPage() {
           </table>
         </div>
 
-        <div className="flex justify-end mt-4">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end mt-3 md:mt-4">
           <button
             onClick={handleExportCSV}
             disabled={sales.length === 0}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
             style={{
               backgroundColor: theme.backgrounds.tertiary,
               color: theme.text.secondary,

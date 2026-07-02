@@ -158,18 +158,18 @@ export default function OrdersListPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
             Orders
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Manage bike and part customer orders.
           </p>
         </div>
 
-        <div className="flex space-x-6 mb-6 border-b" style={{ borderColor: theme.borders.light }}>
+        <div className="flex space-x-4 md:space-x-6 mb-4 md:mb-6 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: theme.borders.light }}>
           {(["BIKE", "PART"] as OrderKind[]).map((tab) => {
             const pendingCount = tab === "BIKE" ? stats?.bikeOrdersWaitingPayment : stats?.partOrdersWaitingPayment;
             return (
@@ -194,10 +194,10 @@ export default function OrdersListPage() {
         </div>
 
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
                 Status
@@ -340,14 +340,14 @@ export default function OrdersListPage() {
         </div>
 
         <div
-          className="rounded-lg overflow-hidden overflow-x-auto"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                 {["Order Number", "Type", "Pickup", "Customer", "Item", "Branch", "Amount", "Payment Method", "Status", "Created Date"].map((header) => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                  <th key={header} className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
                 ))}
@@ -356,13 +356,13 @@ export default function OrdersListPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                  <td colSpan={10} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     Loading orders...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                  <td colSpan={10} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     <div className="flex flex-col items-center gap-3">
                       <span>{error}</span>
                       <AsyncButton onClick={fetchOrders}>Retry</AsyncButton>
@@ -371,7 +371,7 @@ export default function OrdersListPage() {
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+                  <td colSpan={10} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     No orders found
                   </td>
                 </tr>
@@ -382,7 +382,7 @@ export default function OrdersListPage() {
                   onClick={() => router.push(order.type === "BIKE" ? `/orders/${order.id}` : `/part-orders/${order.id}`)}
                   className="hover:opacity-80"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-medium" style={{ color: theme.text.primary }}>
                     <div className="flex items-center gap-2">
                       <Link 
                         href={order.type === "BIKE" ? `/orders/${order.id}` : `/part-orders/${order.id}`}
@@ -398,31 +398,31 @@ export default function OrdersListPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.orderType === "ONLINE" ? "Online" : "Onsite"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.pickupType === "DELIVERY" ? "Delivery" : "Pickup"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.customerName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {getOrderItemLabel(order)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.branch?.name || "-"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     Rs. {getOrderAmount(order).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {order.paymentMethod?.replace(/_/g, " ") || "-"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
                     <OrderStatusBadge status={order.status} />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -431,11 +431,11 @@ export default function OrdersListPage() {
           </table>
         </div>
 
-        <div className="flex justify-end mt-4">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end mt-3 md:mt-4">
           <button
             onClick={handleExportCSV}
             disabled={orders.length === 0}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
             style={{
               backgroundColor: theme.backgrounds.tertiary,
               color: theme.text.secondary,

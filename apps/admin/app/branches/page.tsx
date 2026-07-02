@@ -105,11 +105,11 @@ export default function BranchesPage() {
   if (user && user.role === UserRole.SALES_STAFF) return null;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-4 md:mb-6">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
               {isAdmin ? "Branch Management" : "My Branch"}
             </h1>
             <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
@@ -129,7 +129,7 @@ export default function BranchesPage() {
         </div>
 
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
@@ -145,80 +145,82 @@ export default function BranchesPage() {
         </div>
 
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          {loading ? (
-            <div className="p-8 text-center" style={{ color: theme.text.secondary }}>
-              Loading branches...
-            </div>
-          ) : error ? (
-            <div className="p-8 text-center">
-              <p className="mb-4" style={{ color: theme.accents.secondary }}>{error}</p>
-              <AsyncButton onClick={fetchBranches}>Retry</AsyncButton>
-            </div>
-          ) : (
-            <table className="min-w-full">
-              <thead>
-                <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                  {["Name", "Location", "Manager", "Staff", "Inventory", "Actions"].map((header) => (
-                    <th
-                      key={header}
-                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                      style={{ color: theme.text.secondary }}
-                    >
-                      {header}
-                    </th>
-                  ))}
+          <table className="w-full min-w-[640px]">
+            <thead>
+              <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                {["Name", "Location", "Manager", "Staff", "Inventory", "Actions"].map((header) => (
+                  <th
+                    key={header}
+                    className="px-4 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-4 md:px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                    Loading branches...
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {visibleBranches.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                      No branches found
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} className="px-4 md:px-6 py-12 text-center">
+                    <p className="mb-4 text-sm" style={{ color: theme.accents.secondary }}>{error}</p>
+                    <AsyncButton onClick={fetchBranches}>Retry</AsyncButton>
+                  </td>
+                </tr>
+              ) : visibleBranches.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 md:px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                    No branches found
+                  </td>
+                </tr>
+              ) : (
+                visibleBranches.map((branch) => (
+                  <tr key={branch.id} className="border-b" style={{ borderColor: theme.borders.light }}>
+                    <td className="px-4 md:px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                      <div className="font-medium">{branch.name}</div>
+                      <div className="text-xs" style={{ color: theme.text.secondary }}>{branch.phoneNumber || "-"}</div>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                      <div>{branch.city}</div>
+                      <div className="text-xs" style={{ color: theme.text.secondary }}>{branch.address}</div>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                      {branch.manager ? branch.manager.fullName : "-"}
+                    </td>
+                    <td className="px-4 md:px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{branch._count.users}</td>
+                    <td className="px-4 md:px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
+                      {branch._count.bikeInventory} bikes, {branch._count.partInventory} parts
+                    </td>
+                    <td className="px-4 md:px-6 py-4 text-sm">
+                      <div className="flex gap-2 md:gap-3">
+                        <Link href={`/branches/${branch.id}`} className="font-medium hover:opacity-70 text-sm" style={{ color: theme.accents.primary }}>
+                          View
+                        </Link>
+                        {isAdmin && (
+                          <button
+                            onClick={() => setBranchToDelete(branch)}
+                            className="font-medium hover:opacity-70 text-sm"
+                            style={{ color: theme.accents.secondary }}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  visibleBranches.map((branch) => (
-                    <tr key={branch.id} className="border-b" style={{ borderColor: theme.borders.light }}>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                        <div className="font-medium">{branch.name}</div>
-                        <div className="text-xs" style={{ color: theme.text.secondary }}>{branch.phoneNumber || "-"}</div>
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                        <div>{branch.city}</div>
-                        <div className="text-xs" style={{ color: theme.text.secondary }}>{branch.address}</div>
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                        {branch.manager ? branch.manager.fullName : "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{branch._count.users}</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                        {branch._count.bikeInventory} bikes, {branch._count.partInventory} parts
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <div className="flex gap-3">
-                          <Link href={`/branches/${branch.id}`} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
-                            View
-                          </Link>
-                          {isAdmin && (
-                            <button
-                              onClick={() => setBranchToDelete(branch)}
-                              className="font-medium hover:opacity-70"
-                              style={{ color: theme.accents.secondary }}
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

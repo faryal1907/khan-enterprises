@@ -128,14 +128,14 @@ export default function UsersPage() {
   if (currentUser && currentUser.role !== UserRole.ADMIN) return null;
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
+        <div className="mb-4 md:mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
               User Management
             </h1>
-            <p className="mt-1 text-sm" style={{ color: theme.text.secondary }}>
+            <p className="mt-1 text-sm md:text-base" style={{ color: theme.text.secondary }}>
               Manage staff accounts, roles, branch scope, and access status.
             </p>
           </div>
@@ -150,7 +150,7 @@ export default function UsersPage() {
         </div>
 
         <div
-          className="rounded-lg p-4 mb-6"
+          className="rounded-lg p-4 md:p-5 mb-4 md:mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -220,93 +220,82 @@ export default function UsersPage() {
         </div>
 
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          {loading ? (
-            <div className="p-8 text-center" style={{ color: theme.text.secondary }}>
-              Loading users...
-            </div>
-          ) : error ? (
-            <div className="p-8 text-center">
-              <p className="mb-4" style={{ color: theme.accents.secondary }}>{error}</p>
-              <AsyncButton onClick={fetchUsers}>Retry</AsyncButton>
-            </div>
-          ) : (
-            <table className="min-w-full">
-              <thead>
-                <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                  {["Name", "Email", "Role", "Scope", "Vendor", "Status", "Created", "Actions"].map((header) => (
-                    <th
-                      key={header}
-                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                      style={{ color: theme.text.secondary }}
-                    >
-                      {header}
-                    </th>
-                  ))}
+          <table className="w-full min-w-[800px]">
+            <thead>
+              <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+                {["Name", "Email", "Role", "Scope", "Vendor", "Status", "Created", "Actions"].map((header) => (
+                  <th
+                    key={header}
+                    className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: theme.text.secondary }}
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                    No users found
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {users.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
-                      No users found
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id} className="border-b" style={{ borderColor: theme.borders.light }}>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
+                      <div className="font-medium">{user.fullName}</div>
+                      <div className="text-xs" style={{ color: theme.text.secondary }}>{user.phoneNumber || "-"}</div>
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{user.email}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{user.role}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>{getBranchLabel(user)}</td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
+                      {user.role === "SALES_STAFF" ? user.vendor?.name || "-" : "-"}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm">
+                      <UserStatusBadge status={user.status} />
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.secondary }}>
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm">
+                      <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                        <Link href={`/users/${user.id}`} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
+                          View
+                        </Link>
+                        {user.id === currentUser?.id ? (
+                          <span className="text-xs italic" style={{ color: theme.text.muted }}>
+                            Current User
+                          </span>
+                        ) : user.status === "ACTIVE" ? (
+                          <button
+                            onClick={() => setPendingAction({ type: "deactivate", user })}
+                            className="font-medium hover:opacity-70"
+                            style={{ color: theme.accents.secondary }}
+                          >
+                            Deactivate
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setPendingAction({ type: "activate", user })}
+                            className="font-medium hover:opacity-70"
+                            style={{ color: theme.accents.tertiary }}
+                          >
+                            Activate
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  users.map((user) => (
-                    <tr key={user.id} className="border-b" style={{ borderColor: theme.borders.light }}>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                        <div className="font-medium">{user.fullName}</div>
-                        <div className="text-xs" style={{ color: theme.text.secondary }}>{user.phoneNumber || "-"}</div>
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{user.email}</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{user.role}</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>{getBranchLabel(user)}</td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.primary }}>
-                        {user.role === "SALES_STAFF" ? user.vendor?.name || "-" : "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <UserStatusBadge status={user.status} />
-                      </td>
-                      <td className="px-6 py-4 text-sm" style={{ color: theme.text.secondary }}>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <div className="flex gap-3">
-                          <Link href={`/users/${user.id}`} className="font-medium hover:opacity-70" style={{ color: theme.accents.primary }}>
-                            View
-                          </Link>
-                          {user.id === currentUser?.id ? (
-                            <span className="text-xs italic" style={{ color: theme.text.muted }}>
-                              Current User
-                            </span>
-                          ) : user.status === "ACTIVE" ? (
-                            <button
-                              onClick={() => setPendingAction({ type: "deactivate", user })}
-                              className="font-medium hover:opacity-70"
-                              style={{ color: theme.accents.secondary }}
-                            >
-                              Deactivate
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => setPendingAction({ type: "activate", user })}
-                              className="font-medium hover:opacity-70"
-                              style={{ color: theme.accents.tertiary }}
-                            >
-                              Activate
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -317,12 +306,12 @@ export default function UsersPage() {
             if (!processingAction) setPendingAction(null);
           }}
         >
-          <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
+          <p className="text-sm mb-4 md:mb-6" style={{ color: theme.text.secondary }}>
             {pendingAction.type === "activate"
               ? `Activate ${pendingAction.user.fullName}? They will regain access based on their role.`
               : `Deactivate ${pendingAction.user.fullName}? They will immediately lose access to the system.`}
           </p>
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
             <button
               onClick={() => setPendingAction(null)}
               disabled={Boolean(processingAction)}

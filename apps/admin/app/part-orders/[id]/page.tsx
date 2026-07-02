@@ -176,18 +176,18 @@ export default function PartOrderDetailPage() {
       case OrderStatus.PENDING_PAYMENT:
         if (pendingVerificationTx && canManageLifecycle) {
           return (
-            <div className="flex space-x-3">
+            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               <AsyncButton
                 onClick={() => handleVerifyPayment()}
                 loading={actionLoading}
-                className="px-6"
+                className="px-4 md:px-6 w-full sm:w-auto"
               >
                 Verify Payment
               </AsyncButton>
               <button
                 onClick={() => setShowRejectPaymentModal(true)}
                 disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 w-full sm:w-auto text-center"
                 style={{
                   backgroundColor: theme.accents.secondary,
                   color: theme.text.inverse,
@@ -202,7 +202,7 @@ export default function PartOrderDetailPage() {
           <AsyncButton
             onClick={() => setShowPaymentModal(true)}
             disabled={actionLoading || !!pendingVerificationTx}
-            className="px-6"
+            className="px-4 md:px-6 w-full sm:w-auto"
           >
             {pendingVerificationTx ? "Verification Pending" : "Record Payment"}
           </AsyncButton>
@@ -213,20 +213,19 @@ export default function PartOrderDetailPage() {
           <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.CONFIRMED)}
             loading={actionLoading}
-            className="px-6"
+            className="px-4 md:px-6 w-full sm:w-auto"
           >
             Confirm Order
           </AsyncButton>
         );
       case OrderStatus.CONFIRMED:
-        // If delivery has been requested, show Record Payment if balance outstanding
         if (order.delivery) {
           if (Number(order.balanceDue) > 0) {
             return (
               <AsyncButton
                 onClick={() => setShowPaymentModal(true)}
                 disabled={actionLoading}
-                className="px-6"
+                className="px-4 md:px-6 w-full sm:w-auto"
               >
                 Record Payment
               </AsyncButton>
@@ -234,21 +233,20 @@ export default function PartOrderDetailPage() {
           }
           return null;
         }
-        // No delivery requested yet — show Record Payment if balance outstanding, otherwise Picked by Customer
         if (Number(order.balanceDue) > 0) {
           return (
-            <div className="flex space-x-3">
+            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               <AsyncButton
                 onClick={() => setShowPaymentModal(true)}
                 disabled={actionLoading}
-                className="px-6"
+                className="px-4 md:px-6 w-full sm:w-auto"
               >
                 Record Payment
               </AsyncButton>
               <button
                 onClick={handleMarkAsPickedByCustomer}
                 disabled={actionLoading}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 w-full sm:w-auto text-center"
                 style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
               >
                 Picked by Customer
@@ -260,11 +258,8 @@ export default function PartOrderDetailPage() {
           <button
             onClick={handleMarkAsPickedByCustomer}
             disabled={actionLoading}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{
-              backgroundColor: theme.accents.primary,
-              color: theme.text.inverse,
-            }}
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 w-full sm:w-auto text-center"
+            style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
           >
             Picked by Customer
           </button>
@@ -275,7 +270,7 @@ export default function PartOrderDetailPage() {
           <AsyncButton
             onClick={() => handleStatusUpdate(OrderStatus.DELIVERED)}
             loading={actionLoading}
-            className="px-6"
+            className="px-4 md:px-6 w-full sm:w-auto"
           >
             Mark Delivered
           </AsyncButton>
@@ -299,9 +294,9 @@ export default function PartOrderDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
-          <p style={{ color: theme.text.secondary }}>Loading...</p>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>Loading...</p>
         </div>
       </div>
     );
@@ -309,10 +304,10 @@ export default function PartOrderDetailPage() {
 
   if (!order) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col items-start gap-3">
-            <p style={{ color: theme.text.secondary }}>{error || "Part order not found"}</p>
+            <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>{error || "Part order not found"}</p>
             <AsyncButton onClick={fetchOrder}>Retry</AsyncButton>
           </div>
         </div>
@@ -323,24 +318,24 @@ export default function PartOrderDetailPage() {
   const latestTxWithProof = order.transactions?.slice().reverse().find((tx: any) => tx.paymentProofUrl);
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
           <div>
             <h1
-              className="text-3xl font-bold mb-2"
+              className="text-2xl md:text-3xl font-bold mb-1 md:mb-2"
               style={{ color: theme.text.primary }}
             >
               Part Order Details
             </h1>
-            <p style={{ color: theme.text.secondary }}>
+            <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
               Order #{order.orderNumber}
             </p>
           </div>
           <button
             onClick={handleDownloadInvoice}
             disabled={invoiceLoading}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 w-full sm:w-auto text-center"
             style={{
               backgroundColor: theme.accents.secondary,
               color: theme.text.inverse,
@@ -351,14 +346,14 @@ export default function PartOrderDetailPage() {
         </div>
 
         {/* Info Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
           {/* Customer Info Card */}
           <div
-            className="rounded-lg p-6"
+            className="rounded-lg p-4 md:p-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Customer Information
@@ -393,11 +388,11 @@ export default function PartOrderDetailPage() {
 
           {/* Part Details Card */}
           <div
-            className="rounded-lg p-6"
+            className="rounded-lg p-4 md:p-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Part Details
@@ -440,11 +435,11 @@ export default function PartOrderDetailPage() {
 
           {/* Payment Status Card */}
           <div
-            className="rounded-lg p-6"
+            className="rounded-lg p-4 md:p-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Payment Status
@@ -494,11 +489,11 @@ export default function PartOrderDetailPage() {
 
           {/* Fulfillment Details Card */}
           <div
-            className="rounded-lg p-6"
+            className="rounded-lg p-4 md:p-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Fulfillment Details
@@ -563,17 +558,17 @@ export default function PartOrderDetailPage() {
         {/* Payment Transactions Table */}
         {order.transactions && order.transactions.length > 0 && (
           <div
-            className="rounded-lg p-6 mb-6"
+            className="rounded-lg p-4 md:p-6 mb-4 md:mb-6 overflow-x-auto"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Payment Transactions
             </h3>
             <div
-              className="rounded-lg overflow-hidden"
+              className="rounded-lg overflow-hidden min-w-[640px]"
               style={{ backgroundColor: theme.backgrounds.tertiary }}
             >
               <table className="w-full">
@@ -625,22 +620,22 @@ export default function PartOrderDetailPage() {
         {/* Status Action Bar */}
         {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
           <div
-            className="rounded-lg p-6 mb-6"
+            className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
             <h3
-              className="text-lg font-semibold mb-4"
+              className="text-lg font-semibold mb-3 md:mb-4"
               style={{ color: theme.text.primary }}
             >
               Actions
             </h3>
-            <div className="flex space-x-4">
+            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               {getActionButton()}
               {canManageLifecycle && (
                 <button
                   onClick={() => setShowCancelModal(true)}
                   disabled={actionLoading}
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 w-full sm:w-auto text-center"
                   style={{
                     backgroundColor: theme.accents.secondary,
                     color: theme.text.inverse,
@@ -653,15 +648,10 @@ export default function PartOrderDetailPage() {
           </div>
         )}
 
-        <div className="flex justify-end space-x-4 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 md:mt-6">
           <button
             onClick={() => router.back()}
-            className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-            style={{
-              backgroundColor: theme.backgrounds.primary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
+            className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-opacity opacity-70 hover:opacity-90 text-center"
           >
             Go Back
           </button>
@@ -699,33 +689,33 @@ export default function PartOrderDetailPage() {
               disabled={actionLoading}
             />
           </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              onClick={() => {
-                setShowRejectPaymentModal(false);
-                setRejectPaymentReason("");
-              }}
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.secondary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
-            >
-              Cancel
-            </button>
-            <AsyncButton
-              onClick={handleRejectPayment}
-              disabled={!rejectPaymentReason.trim() || actionLoading}
-              loading={actionLoading}
-              loadingLabel="Rejecting..."
-              style={{
-                backgroundColor: theme.accents.secondary,
-              }}
-            >
-              Reject Payment
-            </AsyncButton>
-          </div>
+           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+             <button
+               onClick={() => {
+                 setShowRejectPaymentModal(false);
+                 setRejectPaymentReason("");
+               }}
+               className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+               style={{
+                 backgroundColor: theme.backgrounds.tertiary,
+                 color: theme.text.secondary,
+                 border: `1px solid ${theme.borders.medium}`,
+               }}
+             >
+               Cancel
+             </button>
+             <AsyncButton
+               onClick={handleRejectPayment}
+               disabled={!rejectPaymentReason.trim() || actionLoading}
+               loading={actionLoading}
+               loadingLabel="Rejecting..."
+               style={{
+                 backgroundColor: theme.accents.secondary,
+               }}
+             >
+               Reject Payment
+             </AsyncButton>
+           </div>
         </ActionModal>
       )}
 
@@ -856,30 +846,30 @@ export default function PartOrderDetailPage() {
               </div>
             )}
           </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              onClick={() => setShowPaymentModal(false)}
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.secondary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
-            >
-              Cancel
-            </button>
-            <AsyncButton
-              onClick={handleRecordPayment}
-              disabled={paymentData.amount <= 0 || actionLoading || (paymentData.method === PaymentMethod.ONLINE_TRANSFER && !paymentData.accountId)}
-              loading={actionLoading}
-              loadingLabel="Recording..."
-              style={{
-                backgroundColor: theme.accents.primary,
-              }}
-            >
-              Record Payment
-            </AsyncButton>
-          </div>
+           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+             <button
+               onClick={() => setShowPaymentModal(false)}
+               className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+               style={{
+                 backgroundColor: theme.backgrounds.tertiary,
+                 color: theme.text.secondary,
+                 border: `1px solid ${theme.borders.medium}`,
+               }}
+             >
+               Cancel
+             </button>
+             <AsyncButton
+               onClick={handleRecordPayment}
+               disabled={paymentData.amount <= 0 || actionLoading || (paymentData.method === PaymentMethod.ONLINE_TRANSFER && !paymentData.accountId)}
+               loading={actionLoading}
+               loadingLabel="Recording..."
+               style={{
+                 backgroundColor: theme.accents.primary,
+               }}
+             >
+               Record Payment
+             </AsyncButton>
+           </div>
         </ActionModal>
       )}
 
@@ -914,34 +904,34 @@ export default function PartOrderDetailPage() {
               disabled={actionLoading}
             />
           </div>
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              onClick={() => {
-                setShowCancelModal(false);
-                setCancelReason("");
-              }}
-              disabled={actionLoading}
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-              style={{
-                backgroundColor: theme.backgrounds.tertiary,
-                color: theme.text.secondary,
-                border: `1px solid ${theme.borders.medium}`,
-              }}
-            >
-              Go Back
-            </button>
-            <AsyncButton
-              onClick={handleCancelOrder}
-              disabled={!cancelReason.trim() || actionLoading}
-              loading={actionLoading}
-              loadingLabel="Cancelling..."
-              style={{
-                backgroundColor: theme.accents.secondary,
-              }}
-            >
-              Confirm Cancellation
-            </AsyncButton>
-          </div>
+           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-4 md:mt-6">
+             <button
+               onClick={() => {
+                 setShowCancelModal(false);
+                 setCancelReason("");
+               }}
+               disabled={actionLoading}
+               className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+               style={{
+                 backgroundColor: theme.backgrounds.tertiary,
+                 color: theme.text.secondary,
+                 border: `1px solid ${theme.borders.medium}`,
+               }}
+             >
+               Go Back
+             </button>
+             <AsyncButton
+               onClick={handleCancelOrder}
+               disabled={!cancelReason.trim() || actionLoading}
+               loading={actionLoading}
+               loadingLabel="Cancelling..."
+               style={{
+                 backgroundColor: theme.accents.secondary,
+               }}
+             >
+               Confirm Cancellation
+             </AsyncButton>
+           </div>
         </ActionModal>
       )}
 

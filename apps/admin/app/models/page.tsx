@@ -78,18 +78,18 @@ export default function ModelsListPage() {
 
   if (!isAdmin && !isManager) {
     return (
-      <div className="p-8 text-center text-red-500">
+      <div className="px-4 py-6 md:p-8 text-center text-red-500 text-sm md:text-base">
         You do not have permission to view this page.
       </div>
     );
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
           <h1
-            className="text-3xl font-bold"
+            className="text-2xl md:text-3xl font-bold"
             style={{ color: theme.text.primary }}
           >
             Bike Models
@@ -97,7 +97,7 @@ export default function ModelsListPage() {
           {isAdmin && (
             <Link
               href="/models/new"
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 w-full sm:w-auto text-center"
               style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
             >
               Add New Model
@@ -107,10 +107,10 @@ export default function ModelsListPage() {
 
         {/* Table */}
         <div
-          className="rounded-lg overflow-hidden"
+          className="rounded-lg overflow-x-auto"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <table className="w-full">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr
                 style={{ backgroundColor: theme.backgrounds.secondary }}
@@ -209,7 +209,7 @@ export default function ModelsListPage() {
                 Are you sure you want to delete the model <strong>{selectedModel?.brand} {selectedModel?.modelName}</strong>? This action cannot be undone. 
                 If this model is associated with any bikes, the deletion will be rejected.
               </p>
-              <div className="flex justify-end space-x-3">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setShowDeleteModal(false)}
@@ -249,31 +249,31 @@ export default function ModelsListPage() {
               <p className="text-sm mb-6" style={{ color: theme.text.secondary }}>
                 {errorModalInfo.message}
               </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setErrorModalInfo({ show: false, message: "" })}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    color: theme.text.secondary,
-                    border: `1px solid ${theme.borders.medium}`,
-                  }}
-                >
-                  Close
-                </button>
-                <Link
-                  href={`/bikes${errorModalInfo.modelId ? `?model=${errorModalInfo.modelId}` : ""}`}
-                  onClick={() => setErrorModalInfo({ show: false, message: "" })}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                  style={{
-                    backgroundColor: theme.accents.primary,
-                    color: theme.text.inverse,
-                  }}
-                >
-                  View Assigned Bikes
-                </Link>
-              </div>
+               <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+                 <button
+                   type="button"
+                   onClick={() => setErrorModalInfo({ show: false, message: "" })}
+                   className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                   style={{
+                     backgroundColor: theme.backgrounds.tertiary,
+                     color: theme.text.secondary,
+                     border: `1px solid ${theme.borders.medium}`,
+                   }}
+                 >
+                   Close
+                 </button>
+                 <Link
+                   href={`/bikes${errorModalInfo.modelId ? `?model=${errorModalInfo.modelId}` : ""}`}
+                   onClick={() => setErrorModalInfo({ show: false, message: "" })}
+                   className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-center"
+                   style={{
+                     backgroundColor: theme.accents.primary,
+                     color: theme.text.inverse,
+                   }}
+                 >
+                   View Assigned Bikes
+                 </Link>
+               </div>
             </div>
           </div>
         )}

@@ -133,36 +133,32 @@ export default function EditPartPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }}></div>
-          </div>
-        </div>
+      <div className="px-4 py-6 md:p-8 flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accents.primary }}></div>
       </div>
     );
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 md:p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-4 md:mb-6">
           <h1
-            className="text-3xl font-bold mb-2"
+            className="text-2xl md:text-3xl font-bold mb-1 md:mb-2"
             style={{ color: theme.text.primary }}
           >
             Edit Part
           </h1>
-          <p style={{ color: theme.text.secondary }}>
+          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Update the part information
           </p>
         </div>
 
         <div
-          className="rounded-lg p-6"
+          className="rounded-lg p-4 md:p-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {/* Basic Info */}
             <div>
               <h3
@@ -314,11 +310,11 @@ export default function EditPartPage() {
               </div>
             )}
 
-            <div className="flex justify-between items-center pt-6">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 sm:gap-3 pt-4 md:pt-6">
               {isAdmin && <button
                 type="button"
                 onClick={handleDelete}
-                className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
                 style={{
                   backgroundColor: "#ef4444",
                   color: "#ffffff",
@@ -326,10 +322,10 @@ export default function EditPartPage() {
               >
                 Delete Part
               </button>}
-              <div className="flex space-x-4">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
                 <a
                   href="/parts"
-                  className="px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+                  className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
                   style={{
                     backgroundColor: theme.backgrounds.tertiary,
                     color: theme.text.secondary,
@@ -342,7 +338,7 @@ export default function EditPartPage() {
                   type="submit"
                   loading={submitting}
                   loadingLabel="Saving..."
-                  className="px-6"
+                  className="px-4 md:px-6"
                 >
                   Save Changes
                 </AsyncButton>
@@ -356,7 +352,7 @@ export default function EditPartPage() {
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
           <div
-            className="rounded-lg shadow-lg p-6 max-w-md w-full mx-4"
+            className="rounded-lg shadow-lg p-4 md:p-6 max-w-sm sm:max-w-md w-full mx-4"
             style={{ backgroundColor: theme.backgrounds.primary }}
           >
             <h3
@@ -377,7 +373,7 @@ export default function EditPartPage() {
                 Are you sure you want to delete this part? This action cannot be undone. All current stock level tracking for this part will also be permanently removed.
               </p>
             )}
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
               {deleteError ? (
                 <button
                   onClick={() => setShowDeleteModal(false)}

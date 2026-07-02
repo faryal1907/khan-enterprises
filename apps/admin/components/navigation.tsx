@@ -101,23 +101,24 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
     <>
       {/* Mobile toggle */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg shadow-lg"
+        className={`md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg shadow-lg transition-opacity ${
+          sidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
         style={{
           backgroundColor: theme.backgrounds.secondary,
           color: theme.text.primary,
         }}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
+        <Menu size={22} />
       </button>
 
       {/* Sidebar */}
       <aside
         className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        } md:translate-x-0 w-[280px] ${collapsed ? "md:w-[80px]" : "md:w-[260px]"}`}
         style={{
-          width: collapsed ? "80px" : "260px",
           backgroundColor: theme.backgrounds.secondary,
           borderRight: `1px solid ${theme.borders.light}`,
         }}
@@ -126,15 +127,15 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
 
           {/* Brand */}
           <div
-            className={`border-b flex items-center ${
-              collapsed ? "flex-col justify-center gap-2 p-3" : "justify-between p-6"
+            className={`border-b flex items-center justify-between p-4 md:p-6 ${
+              collapsed ? "md:flex-col md:justify-center md:gap-2 md:p-3" : "md:justify-between"
             }`}
             style={{ borderColor: theme.borders.light }}
           >
             <Link
               href="/"
-              className={`flex items-center ${
-                collapsed ? "justify-center" : "min-w-0 flex-col items-start"
+              className={`flex items-center min-w-0 ${
+                collapsed ? "md:justify-center" : "md:flex-col md:items-start"
               }`}
               aria-label="Ali & Khan's Green Wheels admin home"
             >
@@ -142,20 +143,31 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
               <img
                 src="/logo.svg"
                 alt="Ali & Khan's Green Wheels"
-                className={collapsed ? "h-9 w-auto object-contain" : "h-16 w-auto object-contain"}
+                className={`w-auto object-contain ${collapsed ? "md:h-9 h-14" : "md:h-16 h-12"}`}
               />
-              {!collapsed}
             </Link>
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg"
-              style={{
-                backgroundColor: theme.backgrounds.primary,
-                color: theme.text.secondary,
-              }}
-            >
-              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg"
+                style={{
+                  backgroundColor: theme.backgrounds.primary,
+                  color: theme.text.secondary,
+                }}
+              >
+                <X size={18} />
+              </button>
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg"
+                style={{
+                  backgroundColor: theme.backgrounds.primary,
+                  color: theme.text.secondary,
+                }}
+              >
+                {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              </button>
+            </div>
           </div>
 
           {/* Nav links */}
@@ -163,40 +175,26 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
 
             {/* Main */}
             <div>
-              {!collapsed && (
-                <p
-                  className="text-xs font-semibold uppercase mb-3 px-3"
-                  style={{ color: theme.text.muted }}
-                >
-                  Main
-                </p>
-              )}
               {navLinks.map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
                   className={linkClass(
                     href,
-                    collapsed ? "justify-center px-2 py-3" : "space-x-3 px-3 py-2"
+                    collapsed
+                      ? "md:justify-center md:px-2 md:py-3 md:space-x-0 space-x-3 px-3 py-3"
+                      : "md:space-x-3 md:px-3 md:py-2 space-x-3 px-3 py-3"
                   )}
                   style={linkStyle(href)}
                 >
                   <Icon size={18} />
-                  {!collapsed && <span>{label}</span>}
+                  <span className={collapsed ? "md:hidden" : ""}>{label}</span>
                 </Link>
               ))}
             </div>
 
             {/* Operations */}
             <div>
-              {!collapsed && (
-                <p
-                  className="text-xs font-semibold uppercase mb-3 px-3"
-                  style={{ color: theme.text.muted }}
-                >
-                  Operations
-                </p>
-              )}
               {operationLinks.map(({ href, label, icon: Icon }) => {
                 if (href === "/models" && isStaff) return null;
                 return (
@@ -206,28 +204,24 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
                     className={linkClass(
                       href,
                       collapsed
-                        ? "justify-center px-2 py-3"
-                        : "space-x-3 px-3 py-2"
+                        ? "md:justify-center md:px-2 md:py-3 md:space-x-0 space-x-3 px-3 py-3"
+                        : "md:space-x-3 md:px-3 md:py-2 space-x-3 px-3 py-3"
                     )}
                     style={linkStyle(href)}
                   >
                     <Icon size={18} />
-                    {!collapsed && (
-                      <>
-                        <span className="flex-1">{label}</span>
-                        {href === "/parts" && lowStockCount > 0 && (
-                          <span
-                            className="w-5 h-5 rounded-full flex items-center justify-center font-bold"
-                            style={{
-                              backgroundColor: theme.accents.secondary,
-                              color: theme.text.inverse,
-                              fontSize: "10px",
-                            }}
-                          >
-                            {lowStockCount > 9 ? "9+" : lowStockCount}
-                          </span>
-                        )}
-                      </>
+                    <span className={`${collapsed ? "md:hidden" : ""} flex-1`}>{label}</span>
+                    {href === "/parts" && lowStockCount > 0 && (
+                      <span
+                        className={`${collapsed ? "md:hidden" : ""} w-5 h-5 rounded-full flex items-center justify-center font-bold`}
+                        style={{
+                          backgroundColor: theme.accents.secondary,
+                          color: theme.text.inverse,
+                          fontSize: "10px",
+                        }}
+                      >
+                        {lowStockCount > 9 ? "9+" : lowStockCount}
+                      </span>
                     )}
                   </Link>
                 );
@@ -237,14 +231,6 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
             {/* Admin only */}
             {isAdmin && (
               <div>
-                {!collapsed && (
-                  <p
-                    className="text-xs font-semibold uppercase mb-3 px-3"
-                    style={{ color: theme.text.muted }}
-                  >
-                    Administration
-                  </p>
-                )}
                 {adminLinks.map(({ href, label, icon: Icon }) => (
                   <Link
                     key={href}
@@ -252,13 +238,13 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
                     className={linkClass(
                       href,
                       collapsed
-                        ? "justify-center px-2 py-3"
-                        : "space-x-3 px-3 py-2"
+                        ? "md:justify-center md:px-2 md:py-3 md:space-x-0 space-x-3 px-3 py-3"
+                        : "md:space-x-3 md:px-3 md:py-2 space-x-3 px-3 py-3"
                     )}
                     style={linkStyle(href)}
                   >
                     <Icon size={18} />
-                    {!collapsed && <span>{label}</span>}
+                    <span className={collapsed ? "md:hidden" : ""}>{label}</span>
                   </Link>
                 ))}
               </div>
@@ -267,26 +253,18 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
             {/* Manager only */}
             {isManager && (
               <div>
-                {!collapsed && (
-                  <p
-                    className="text-xs font-semibold uppercase mb-3 px-3"
-                    style={{ color: theme.text.muted }}
-                  >
-                    Management
-                  </p>
-                )}
                 <Link
                   href="/branches"
                   className={linkClass(
                     "/branches",
                     collapsed
-                      ? "justify-center px-2 py-3"
-                      : "space-x-3 px-3 py-2"
+                      ? "md:justify-center md:px-2 md:py-3 md:space-x-0 space-x-3 px-3 py-3"
+                      : "md:space-x-3 md:px-3 md:py-2 space-x-3 px-3 py-3"
                   )}
                   style={linkStyle("/branches")}
                 >
                   <Building2 size={18} />
-                  {!collapsed && <span>My Branch</span>}
+                  <span className={collapsed ? "md:hidden" : ""}>My Branch</span>
                 </Link>
               </div>
             )}
@@ -294,26 +272,24 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
 
           {/* User info + logout */}
           <div className="p-4 border-t" style={{ borderColor: theme.borders.light }}>
-            {!collapsed && (
-              <div className="mb-3">
-                <p className="text-xs" style={{ color: theme.text.muted }}>
-                  Logged in as
-                </p>
-                <p
-                  className="text-sm font-medium truncate"
-                  style={{ color: theme.text.primary }}
-                >
-                  {user.email}
-                </p>
-              </div>
-            )}
+            <div className={`mb-3 ${collapsed ? "md:hidden" : ""}`}>
+              <p className="text-xs" style={{ color: theme.text.muted }}>
+                Logged in as
+              </p>
+              <p
+                className="text-sm font-medium truncate"
+                style={{ color: theme.text.primary }}
+              >
+                {user.email}
+              </p>
+            </div>
             <button
               onClick={() => {
                 logout();
                 router.push("/login");
               }}
-              className={`w-full py-2 rounded-lg text-sm font-medium hover:opacity-90 flex items-center justify-center ${
-                collapsed ? "px-2" : "space-x-2 px-4"
+              className={`w-full rounded-lg text-sm font-medium hover:opacity-90 flex items-center justify-center space-x-2 px-4 py-3 ${
+                collapsed ? "md:px-2 md:py-2" : "md:space-x-2 md:px-4 md:py-2"
               }`}
               style={{
                 backgroundColor: theme.accents.secondary,
@@ -321,7 +297,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
               }}
             >
               <LogOut size={16} />
-              {!collapsed && <span>Logout</span>}
+              <span className={collapsed ? "md:hidden" : ""}>Logout</span>
             </button>
           </div>
 
@@ -331,18 +307,19 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="md:hidden fixed inset-0 z-30"
+          style={{ backgroundColor: theme.backgrounds.primary }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main Content Wrapper */}
-      <div 
+      <div
         className={`transition-all duration-300 ease-in-out flex-1 flex flex-col ${
-          sidebarOpen ? (collapsed ? "ml-[80px]" : "ml-[260px]") : "ml-0"
+          sidebarOpen ? "ml-[280px]" : "ml-0"
         } ${collapsed ? 'md:ml-[80px]' : 'md:ml-[260px]'}`}
       >
-        <div className="md:hidden" style={{ height: "64px" }} /> {/* Spacer for mobile menu button */}
+        <div className="md:hidden" style={{ height: "56px" }} /> {/* Spacer for mobile menu button */}
         {children}
       </div>
     </>

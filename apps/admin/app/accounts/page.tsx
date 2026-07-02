@@ -551,21 +551,21 @@ export default function AccountsPage() {
   };
 
   if (isInitialLoad) {
-    return <div className="p-8 text-center text-gray-500">Loading accounting data...</div>;
+    return <div className="p-6 md:p-8 text-center text-gray-500">Loading accounting data...</div>;
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-6">
+    <div className="px-4 py-6 md:p-8 max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold" style={{ color: theme.text.primary }}>
+        <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
           Accounting Hub
         </h1>
-        <p className="mt-2 text-sm" style={{ color: theme.text.secondary }}>
+        <p className="mt-1 md:mt-2 text-sm" style={{ color: theme.text.secondary }}>
           Manage your general ledger, purchase orders, and supplier payables.
         </p>
       </div>
 
-      <div className="flex space-x-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b border-gray-200 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
         {(['OVERVIEW', 'JOURNALS', 'PAYABLES', 'RECEIVABLES', 'OWNER_EQUITY', 'VENDORS'] as Tab[]).map(tab => (
           <button
             key={tab}
@@ -583,21 +583,21 @@ export default function AccountsPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 overflow-x-auto relative">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-x-auto relative">
         {loading && (
           <div className="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-10 rounded-xl">
             <span className="text-sm text-gray-500">Refreshing...</span>
           </div>
         )}
-        {activeTab === 'OVERVIEW' && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Chart of Accounts</h2>
-            </div>
+            {activeTab === 'OVERVIEW' && (
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
+                  <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Chart of Accounts</h2>
+                </div>
 
             {isAddingAccount && (
-              <div className="mb-4 p-5 rounded-xl border bg-white shadow-sm" style={{ borderColor: theme.borders.light }}>
-                <div className="grid grid-cols-4 gap-3 mb-3">
+              <div className="mb-4 p-4 md:p-5 rounded-xl border bg-white shadow-sm" style={{ borderColor: theme.borders.light }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                   <input
                     type="text"
                     placeholder="Code"
@@ -651,8 +651,8 @@ export default function AccountsPage() {
               </div>
             )}
 
-            <div className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
-              <table className="w-full text-left text-sm">
+            <div className="rounded-xl border bg-white shadow-sm overflow-x-auto" style={{ borderColor: theme.borders.light }}>
+              <table className="w-full text-left text-sm min-w-[640px]">
                 <thead>
                   <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                     <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Code</th>
@@ -754,11 +754,11 @@ export default function AccountsPage() {
         {activeTab === 'JOURNALS' && (
           <div>
             {/* Header */}
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Journal Entries</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
+              <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Journal Entries</h2>
               <button
                 onClick={() => setIsJournalModalOpen(true)}
-                className="text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors"
+                className="text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors w-full sm:w-auto"
                 style={{ backgroundColor: theme.accents.primary }}
               >
                 + Create Journal Entry
@@ -790,7 +790,7 @@ export default function AccountsPage() {
                   </button>
                 </div>
                 {journalFilters.quickDate === 'custom' && (
-                  <div className="flex gap-3 mt-2">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
                     <input
                       type="date"
                       value={journalFilters.dateFrom}
@@ -798,7 +798,8 @@ export default function AccountsPage() {
                       className="px-3 py-2 rounded text-sm"
                       style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
                     />
-                    <span className="self-center text-sm" style={{ color: theme.text.secondary }}>to</span>
+                    <span className="self-center text-sm hidden sm:inline" style={{ color: theme.text.secondary }}>to</span>
+                    <span className="text-sm sm:hidden text-center" style={{ color: theme.text.secondary }}>To date</span>
                     <input
                       type="date"
                       value={journalFilters.dateTo}
@@ -944,9 +945,9 @@ export default function AccountsPage() {
         {activeTab === 'PAYABLES' && (
           <div>
             {/* Header row */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
               <div>
-                <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Payables</h2>
+                <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Payables</h2>
                 <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>
                   Money owed to vendors, employees, landlords, and other payees.
                 </p>
@@ -954,7 +955,7 @@ export default function AccountsPage() {
               {(isAdmin || isManager) && (
                 <button
                   onClick={() => setIsAddExpenseOpen(true)}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white"
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white w-full sm:w-auto"
                   style={{ backgroundColor: theme.accents.primary }}
                 >
                   + Add Expense
@@ -1121,18 +1122,18 @@ export default function AccountsPage() {
 
         {activeTab === 'RECEIVABLES' && (
           <div>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
               <div>
-                <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Receivables</h2>
+                <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Receivables</h2>
                 <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>
                   Outstanding balances grouped by party. Updates automatically on every collection.
                 </p>
               </div>
-            <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 {isAdmin && (
                   <button
                     onClick={() => setIsAddReceivableOpen(true)}
-                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white"
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white w-full sm:w-auto"
                     style={{ backgroundColor: theme.accents.primary }}>
                     + Add Receivable
                   </button>
@@ -1204,7 +1205,7 @@ export default function AccountsPage() {
                 No receivables yet.
               </div>
             ) : (
-              <div className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
+              <div className="rounded-xl border bg-white shadow-sm overflow-x-auto" style={{ borderColor: theme.borders.light }}>
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
@@ -1275,23 +1276,23 @@ export default function AccountsPage() {
         )}
 
         {activeTab === 'OWNER_EQUITY' && (          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Owner Equity</h2>
-              <span className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ backgroundColor: theme.backgrounds.secondary, color: theme.text.secondary }}>Overview</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
+              <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Owner Equity</h2>
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full w-fit" style={{ backgroundColor: theme.backgrounds.secondary, color: theme.text.secondary }}>Overview</span>
             </div>
 
             {(() => {
               const ownerCapital = accounts.find((a) => a.code === '3001')?.balance || 0;
               const ownerDrawings = accounts.find((a) => a.code === '3002')?.balance || 0;
-              const totalRevenue = accounts.filter((a) => a.category === 'REVENUE').reduce((s: number, a: any) => s + (a.balance || 0), 0);
-              const totalExpenses = accounts.filter((a) => a.category === 'EXPENSE').reduce((s: number, a: any) => s + (a.balance || 0), 0);
+              const totalRevenue = accounts.filter((a: any) => a.category === 'REVENUE').reduce((s: number, a: any) => s + (a.balance || 0), 0);
+              const totalExpenses = accounts.filter((a: any) => a.category === 'EXPENSE').reduce((s: number, a: any) => s + (a.balance || 0), 0);
               const netProfit = totalRevenue - totalExpenses;
               const netEquity = ownerCapital - ownerDrawings + netProfit;
 
               return (
                 <>
                   {/* Summary cards */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4">
                     <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
                       <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Owner Capital</div>
                       <div className="text-xl font-bold" style={{ color: theme.text.primary }}>{formatCurrency(ownerCapital)}</div>
@@ -1329,9 +1330,9 @@ export default function AccountsPage() {
               );
             })()}
 
-            <div className="rounded-xl border bg-white p-5 shadow-sm mb-6" style={{ borderColor: theme.borders.light }}>
+            <div className="rounded-xl border bg-white p-4 md:p-5 shadow-sm mb-6" style={{ borderColor: theme.borders.light }}>
               <div className="text-xs font-medium uppercase tracking-wider mb-3" style={{ color: theme.text.secondary }}>Actions</div>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={() => setIsCapitalContributionOpen(true)}
                   className="flex-1 min-w-[160px] px-4 py-2.5 rounded-lg text-sm font-semibold text-center transition-all text-white shadow-sm hover:shadow"
@@ -1356,10 +1357,10 @@ export default function AccountsPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+            <div className="rounded-xl border bg-white p-4 md:p-5 shadow-sm overflow-x-auto" style={{ borderColor: theme.borders.light }}>
               {isAddingAccount && (
-                <div className="mb-4 p-5 rounded-xl border bg-white shadow-sm" style={{ borderColor: theme.borders.light }}>
-                  <div className="grid grid-cols-4 gap-3 mb-3">
+                <div className="mb-4 p-4 md:p-5 rounded-xl border bg-white shadow-sm" style={{ borderColor: theme.borders.light }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                     <input
                       type="text"
                       placeholder="Code"
@@ -1412,17 +1413,17 @@ export default function AccountsPage() {
                   </div>
                 </div>
               )}
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
                 <div className="text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>Cash, Bank & E-Wallets</div>
                 <button
                   onClick={() => setIsAddingAccount(true)}
-                  className="px-3 py-1.5 rounded-md text-xs font-semibold shadow-sm transition-colors text-white"
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold shadow-sm transition-colors text-white w-full sm:w-auto"
                   style={{ backgroundColor: theme.accents.primary }}
                 >
                   Add Bank/Wallet
                 </button>
               </div>
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm min-w-[640px]">
                 <thead className="border-b" style={{ backgroundColor: theme.backgrounds.secondary }}>
                   <tr>
                     <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Code</th>
@@ -1490,14 +1491,14 @@ export default function AccountsPage() {
             {/* ── Vendor list view ── */}
             {!selectedVendorId ? (
               <div>
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
                   <div>
-                    <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Vendors &amp; Inventory</h2>
+                    <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Vendors &amp; Inventory</h2>
                     <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>Manage vendor accounts, prepaid balances, and inventory allocations.</p>
                   </div>
                   {isAdmin && (
                     <button onClick={() => setShowCreateVendor(true)}
-                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm"
+                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm w-full sm:w-auto"
                       style={{ backgroundColor: theme.accents.primary }}>
                       + Add Vendor
                     </button>
@@ -1509,7 +1510,7 @@ export default function AccountsPage() {
                   const totalBalance = vendorsList.reduce((s: number, v: any) => s + v.prepaidBalance, 0);
                   const withBalance = vendorsList.filter((v: any) => v.prepaidBalance > 0).length;
                   return (
-                    <div className="rounded-xl border p-4 flex items-center gap-6 mb-5"
+                    <div className="rounded-xl border p-4 flex flex-wrap items-center gap-4 md:gap-6 mb-5"
                       style={{ borderColor: theme.borders.light, backgroundColor: theme.backgrounds.secondary }}>
                       <div>
                         <p className="text-xs uppercase font-semibold" style={{ color: theme.text.muted }}>Total Prepaid Outstanding</p>
@@ -1517,7 +1518,7 @@ export default function AccountsPage() {
                           {fmtCurrency(totalBalance)}
                         </p>
                       </div>
-                      <div className="h-8 w-px" style={{ backgroundColor: theme.borders.light }} />
+                      <div className="hidden md:block h-8 w-px" style={{ backgroundColor: theme.borders.light }} />
                       <div>
                         <p className="text-xs uppercase font-semibold" style={{ color: theme.text.muted }}>Vendors with balance</p>
                         <p className="text-xl font-bold" style={{ color: theme.text.primary }}>{withBalance}</p>
@@ -1526,7 +1527,7 @@ export default function AccountsPage() {
                   );
                 })()}
 
-                <div className="rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: theme.borders.light }}>
+                <div className="rounded-xl border overflow-x-auto shadow-sm" style={{ borderColor: theme.borders.light }}>
                   {vendorsLoading ? (
                     <div className="p-12 text-center text-sm" style={{ color: theme.text.muted }}>Loading vendors...</div>
                   ) : vendorsList.length === 0 ? (
@@ -1581,11 +1582,11 @@ export default function AccountsPage() {
             ) : (
               /* ── Vendor detail view ── */
               <div className="space-y-6">
-                <button onClick={() => { setSelectedVendorId(null); setVendorDetail(null); setVendorEditing(false); }}
-                  className="inline-flex items-center gap-1 text-sm font-medium hover:opacity-70"
-                  style={{ color: theme.text.secondary }}>
-                  ← Back to Vendors
-                </button>
+                 <button onClick={() => { setSelectedVendorId(null); setVendorDetail(null); setVendorEditing(false); }}
+                   className="inline-flex items-center gap-1 text-sm font-medium hover:opacity-70 mb-4"
+                   style={{ color: theme.text.secondary }}>
+                   ← Back to Vendors
+                 </button>
 
                 {vendorDetailLoading || !vendorDetail ? (
                   <div className="p-12 text-center text-sm" style={{ color: theme.text.muted }}>Loading vendor...</div>
@@ -1595,10 +1596,10 @@ export default function AccountsPage() {
                   const ledger: any[] = vendorDetail.ledger ?? [];
                   return (
                     <>
-                      {/* Vendor card */}
-                      <div className="rounded-xl border p-6 shadow-sm" style={{ borderColor: theme.borders.light }}>
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
+                       {/* Vendor card */}
+                       <div className="rounded-xl border p-4 md:p-6 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                           <div className="flex-1 min-w-0">
                             {vendorEditing ? (
                               <div className="space-y-3">
                                 {[
@@ -1606,7 +1607,7 @@ export default function AccountsPage() {
                                   { label: 'Phone', key: 'phoneNumber' }, { label: 'Email', key: 'email' }, { label: 'Address', key: 'address' },
                                 ].map(({ label, key }) => (
                                   <div key={key} className="flex items-center gap-3">
-                                    <span className="w-28 text-xs font-medium shrink-0" style={{ color: theme.text.muted }}>{label}</span>
+                                     <span className="w-20 sm:w-28 text-xs font-medium shrink-0" style={{ color: theme.text.muted }}>{label}</span>
                                     <input type="text" className="flex-1 border rounded px-2 py-1.5 text-sm outline-none"
                                       style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
                                       value={(vendorEditForm as any)[key]}
@@ -1624,7 +1625,7 @@ export default function AccountsPage() {
                               </div>
                             ) : (
                               <>
-                                <h2 className="text-2xl font-bold" style={{ color: theme.text.primary }}>{vendor.name}</h2>
+                                 <h2 className="text-xl md:text-2xl font-bold" style={{ color: theme.text.primary }}>{vendor.name}</h2>
                                 <div className="mt-2 space-y-0.5 text-sm" style={{ color: theme.text.secondary }}>
                                   {vendor.contactPerson && <p>Contact: {vendor.contactPerson}</p>}
                                   {vendor.phoneNumber && <p>Phone: {vendor.phoneNumber}</p>}
@@ -1643,7 +1644,7 @@ export default function AccountsPage() {
                         </div>
 
                         {/* Balance summary */}
-                        <div className="grid grid-cols-3 gap-4 mt-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
                           {[
                             { label: 'Total Paid', value: summary.totalPaid, color: '#059669' },
                             { label: 'Total Allocated', value: summary.totalAllocated, color: theme.text.primary },
@@ -1659,7 +1660,7 @@ export default function AccountsPage() {
 
                         {/* Action buttons */}
                         {isAdmin && (
-                          <div className="flex gap-3 mt-5 flex-wrap">
+                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 md:mt-5">
                             <button onClick={() => setVendorPayOpen(true)}
                               className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm"
                               style={{ backgroundColor: theme.accents.primary }}>Make Payment</button>
@@ -1686,8 +1687,8 @@ export default function AccountsPage() {
                           <div className="space-y-3">
                             {[...ledger].reverse().map((entry: any) => (
                               <div key={entry.id} className="rounded-xl border overflow-hidden shadow-sm" style={{ borderColor: theme.borders.light }}>
-                                <div className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: theme.backgrounds.secondary }}>
-                                  <div className="flex items-center gap-3">
+                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 py-3 gap-2" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                                   <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                                     <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{
                                       backgroundColor: entry.kind === 'PAYMENT' ? '#dcfce7' : entry.kind === 'DEFECTIVE_RETURN' ? '#fef2f2' : '#dbeafe',
                                       color: entry.kind === 'PAYMENT' ? '#166534' : entry.kind === 'DEFECTIVE_RETURN' ? '#991b1b' : '#1e40af',
@@ -1958,7 +1959,7 @@ export default function AccountsPage() {
               </p>
             )}
 
-            <div className="flex justify-end space-x-3 mt-6">
+             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 mt-6">
               <button
                 onClick={() => setDeleteConfirmData({ isOpen: false, accountId: '', accountName: '', accountBalance: 0, accountSubtype: '', transferAccountId: '' })}
                 className="px-4 py-2 rounded-md text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-gray-800"
