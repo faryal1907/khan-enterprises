@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = require("dotenv");
 const path_1 = require("path");
 // Load root .env — seed runs standalone outside NestJS so env vars aren't pre-loaded
-(0, dotenv_1.config)({ path: path_1.default.resolve(process.cwd(), "../../.env") });
-(0, dotenv_1.config)({ path: path_1.default.resolve(process.cwd(), ".env") });
+(0, dotenv_1.config)({ path: path_1.resolve(process.cwd(), "../../.env") });
+(0, dotenv_1.config)({ path: path_1.resolve(process.cwd(), ".env") });
 const bcrypt_1 = require("bcrypt");
 async function main() {
     const { prisma } = await Promise.resolve().then(() => require("./index"));
@@ -28,6 +28,14 @@ async function main() {
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "RefreshToken" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "User" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "Branch" CASCADE;');
+    // Accounting tables
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "PaymentAllocation" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "Payable" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "PurchaseOrderItem" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "PurchaseOrder" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "JournalEntryLine" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "JournalEntry" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "Account" CASCADE;');
     console.log("✨ Database is now sparkling clean.");
     // ============================================================================
     // 1. BRANCHES
@@ -530,6 +538,32 @@ async function main() {
         },
     });
     console.log("✅ Seeded sample audit log.");
+    // ============================================================================
+    // 10. CHART OF ACCOUNTS (system accounts required for accounting features)
+    // ============================================================================
+    console.log("📊 Seeding Chart of Accounts...");
+    const defaultAccounts = [
+        { code: '1001', name: 'Cash', category: 'ASSET', subtype: 'CASH', isSystem: true },
+        { code: '1002', name: 'Bank - Main', category: 'ASSET', subtype: 'BANK', isSystem: true },
+        { code: '1003', name: 'Inventory', category: 'ASSET', subtype: 'INVENTORY', isSystem: true },
+        { code: '1004', name: 'Accounts Receivable', category: 'ASSET', subtype: 'AR', isSystem: true },
+        { code: '2001', name: 'Accounts Payable', category: 'LIABILITY', subtype: 'AP', isSystem: true },
+        { code: '3001', name: 'Owner Capital', category: 'EQUITY', subtype: 'EQUITY', isSystem: true },
+        { code: '3002', name: 'Owner Drawings', category: 'EQUITY', subtype: 'DRAWINGS', isSystem: true },
+        { code: '3003', name: 'Retained Earnings', category: 'EQUITY', subtype: 'EQUITY', isSystem: true },
+        { code: '4001', name: 'Sales Revenue', category: 'REVENUE', subtype: 'REVENUE', isSystem: true },
+        { code: '5001', name: 'Cost of Goods Sold', category: 'EXPENSE', subtype: 'COGS', isSystem: true },
+        { code: '5002', name: 'Salary Expense', category: 'EXPENSE', subtype: 'SALARY', isSystem: true },
+        { code: '5003', name: 'General Expense', category: 'EXPENSE', subtype: 'EXPENSE', isSystem: true },
+    ];
+    for (const acc of defaultAccounts) {
+        await prisma.account.upsert({
+            where: { code: acc.code },
+            update: {},
+            create: acc,
+        });
+    }
+    console.log("✅ Seeded 12 system accounts (Chart of Accounts).");
     console.log("🚀 Seeding complete! Khan Enterprises database is fully stocked.");
 }
 main()

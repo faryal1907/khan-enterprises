@@ -91,6 +91,8 @@ export class InventoryService {
           reservedUntil: true,
           soldAt: true,
           createdAt: true,
+          vendorAllocationId: true,
+          purchaseCost: true,
           model: {
             select: {
               id: true,
@@ -196,6 +198,7 @@ export class InventoryService {
           serialNumber: dto.serialNumber,
           status: "AVAILABLE",
           price: finalPrice,
+          purchaseCost: dto.purchaseCost ?? null,
           color: dto.color,
           media: dto.media || [],
         },

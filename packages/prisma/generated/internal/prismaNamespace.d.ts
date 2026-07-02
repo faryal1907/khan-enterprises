@@ -184,6 +184,9 @@ export declare const ModelName: {
     readonly PurchaseOrderItem: "PurchaseOrderItem";
     readonly Payable: "Payable";
     readonly PaymentAllocation: "PaymentAllocation";
+    readonly VendorPayment: "VendorPayment";
+    readonly VendorAllocation: "VendorAllocation";
+    readonly VendorAllocationPartLine: "VendorAllocationPartLine";
     readonly ReceivablesAlert: "ReceivablesAlert";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -197,7 +200,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "receivablesAlert";
+        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "vendorPayment" | "vendorAllocation" | "vendorAllocationPartLine" | "receivablesAlert";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -2199,6 +2202,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        VendorPayment: {
+            payload: Prisma.$VendorPaymentPayload<ExtArgs>;
+            fields: Prisma.VendorPaymentFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.VendorPaymentFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.VendorPaymentFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>;
+                };
+                findFirst: {
+                    args: Prisma.VendorPaymentFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.VendorPaymentFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>;
+                };
+                findMany: {
+                    args: Prisma.VendorPaymentFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>[];
+                };
+                create: {
+                    args: Prisma.VendorPaymentCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>;
+                };
+                createMany: {
+                    args: Prisma.VendorPaymentCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.VendorPaymentCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>[];
+                };
+                delete: {
+                    args: Prisma.VendorPaymentDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>;
+                };
+                update: {
+                    args: Prisma.VendorPaymentUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.VendorPaymentDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.VendorPaymentUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.VendorPaymentUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>[];
+                };
+                upsert: {
+                    args: Prisma.VendorPaymentUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorPaymentPayload>;
+                };
+                aggregate: {
+                    args: Prisma.VendorPaymentAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateVendorPayment>;
+                };
+                groupBy: {
+                    args: Prisma.VendorPaymentGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorPaymentGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.VendorPaymentCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorPaymentCountAggregateOutputType> | number;
+                };
+            };
+        };
+        VendorAllocation: {
+            payload: Prisma.$VendorAllocationPayload<ExtArgs>;
+            fields: Prisma.VendorAllocationFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.VendorAllocationFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.VendorAllocationFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>;
+                };
+                findFirst: {
+                    args: Prisma.VendorAllocationFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.VendorAllocationFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>;
+                };
+                findMany: {
+                    args: Prisma.VendorAllocationFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>[];
+                };
+                create: {
+                    args: Prisma.VendorAllocationCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>;
+                };
+                createMany: {
+                    args: Prisma.VendorAllocationCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.VendorAllocationCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>[];
+                };
+                delete: {
+                    args: Prisma.VendorAllocationDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>;
+                };
+                update: {
+                    args: Prisma.VendorAllocationUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.VendorAllocationDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.VendorAllocationUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.VendorAllocationUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>[];
+                };
+                upsert: {
+                    args: Prisma.VendorAllocationUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPayload>;
+                };
+                aggregate: {
+                    args: Prisma.VendorAllocationAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateVendorAllocation>;
+                };
+                groupBy: {
+                    args: Prisma.VendorAllocationGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorAllocationGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.VendorAllocationCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorAllocationCountAggregateOutputType> | number;
+                };
+            };
+        };
+        VendorAllocationPartLine: {
+            payload: Prisma.$VendorAllocationPartLinePayload<ExtArgs>;
+            fields: Prisma.VendorAllocationPartLineFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.VendorAllocationPartLineFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.VendorAllocationPartLineFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>;
+                };
+                findFirst: {
+                    args: Prisma.VendorAllocationPartLineFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.VendorAllocationPartLineFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>;
+                };
+                findMany: {
+                    args: Prisma.VendorAllocationPartLineFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>[];
+                };
+                create: {
+                    args: Prisma.VendorAllocationPartLineCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>;
+                };
+                createMany: {
+                    args: Prisma.VendorAllocationPartLineCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.VendorAllocationPartLineCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>[];
+                };
+                delete: {
+                    args: Prisma.VendorAllocationPartLineDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>;
+                };
+                update: {
+                    args: Prisma.VendorAllocationPartLineUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.VendorAllocationPartLineDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.VendorAllocationPartLineUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.VendorAllocationPartLineUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>[];
+                };
+                upsert: {
+                    args: Prisma.VendorAllocationPartLineUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorAllocationPartLinePayload>;
+                };
+                aggregate: {
+                    args: Prisma.VendorAllocationPartLineAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateVendorAllocationPartLine>;
+                };
+                groupBy: {
+                    args: Prisma.VendorAllocationPartLineGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorAllocationPartLineGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.VendorAllocationPartLineCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorAllocationPartLineCountAggregateOutputType> | number;
+                };
+            };
+        };
         ReceivablesAlert: {
             payload: Prisma.$ReceivablesAlertPayload<ExtArgs>;
             fields: Prisma.ReceivablesAlertFieldRefs;
@@ -2356,6 +2581,7 @@ export declare const VendorScalarFieldEnum: {
     readonly phoneNumber: "phoneNumber";
     readonly email: "email";
     readonly address: "address";
+    readonly isActive: "isActive";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -2384,12 +2610,14 @@ export declare const BikeUnitScalarFieldEnum: {
     readonly status: "status";
     readonly price: "price";
     readonly purchasePrice: "purchasePrice";
+    readonly purchaseCost: "purchaseCost";
     readonly color: "color";
     readonly media: "media";
     readonly onlineDiscountPercent: "onlineDiscountPercent";
     readonly actualSalePrice: "actualSalePrice";
     readonly reservedUntil: "reservedUntil";
     readonly soldAt: "soldAt";
+    readonly vendorAllocationId: "vendorAllocationId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -2672,6 +2900,41 @@ export declare const PaymentAllocationScalarFieldEnum: {
     readonly partPaymentTransactionId: "partPaymentTransactionId";
 };
 export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum];
+export declare const VendorPaymentScalarFieldEnum: {
+    readonly id: "id";
+    readonly vendorId: "vendorId";
+    readonly fromAccountId: "fromAccountId";
+    readonly amount: "amount";
+    readonly date: "date";
+    readonly notes: "notes";
+    readonly journalEntryId: "journalEntryId";
+    readonly recordedById: "recordedById";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type VendorPaymentScalarFieldEnum = (typeof VendorPaymentScalarFieldEnum)[keyof typeof VendorPaymentScalarFieldEnum];
+export declare const VendorAllocationScalarFieldEnum: {
+    readonly id: "id";
+    readonly vendorId: "vendorId";
+    readonly totalAmount: "totalAmount";
+    readonly date: "date";
+    readonly notes: "notes";
+    readonly journalEntryId: "journalEntryId";
+    readonly recordedById: "recordedById";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type VendorAllocationScalarFieldEnum = (typeof VendorAllocationScalarFieldEnum)[keyof typeof VendorAllocationScalarFieldEnum];
+export declare const VendorAllocationPartLineScalarFieldEnum: {
+    readonly id: "id";
+    readonly allocationId: "allocationId";
+    readonly partId: "partId";
+    readonly branchId: "branchId";
+    readonly quantity: "quantity";
+    readonly unitCost: "unitCost";
+    readonly totalCost: "totalCost";
+};
+export type VendorAllocationPartLineScalarFieldEnum = (typeof VendorAllocationPartLineScalarFieldEnum)[keyof typeof VendorAllocationPartLineScalarFieldEnum];
 export declare const ReceivablesAlertScalarFieldEnum: {
     readonly id: "id";
     readonly customerPhone: "customerPhone";
@@ -2720,6 +2983,7 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>;
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>;
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>;
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>;
@@ -2728,7 +2992,6 @@ export type EnumBikeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
 export type ListEnumBikeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BikeStatus[]'>;
 export type EnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryMovementType'>;
 export type ListEnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryMovementType[]'>;
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>;
 export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>;
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>;
@@ -2813,6 +3076,9 @@ export type GlobalOmitConfig = {
     purchaseOrderItem?: Prisma.PurchaseOrderItemOmit;
     payable?: Prisma.PayableOmit;
     paymentAllocation?: Prisma.PaymentAllocationOmit;
+    vendorPayment?: Prisma.VendorPaymentOmit;
+    vendorAllocation?: Prisma.VendorAllocationOmit;
+    vendorAllocationPartLine?: Prisma.VendorAllocationPartLineOmit;
     receivablesAlert?: Prisma.ReceivablesAlertOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';

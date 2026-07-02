@@ -267,6 +267,7 @@ export type BranchWhereInput = {
   orders?: Prisma.OrderListRelationFilter
   partOrders?: Prisma.PartOrderListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
+  allocationPartLines?: Prisma.VendorAllocationPartLineListRelationFilter
 }
 
 export type BranchOrderByWithRelationInput = {
@@ -287,6 +288,7 @@ export type BranchOrderByWithRelationInput = {
   orders?: Prisma.OrderOrderByRelationAggregateInput
   partOrders?: Prisma.PartOrderOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineOrderByRelationAggregateInput
 }
 
 export type BranchWhereUniqueInput = Prisma.AtLeast<{
@@ -311,6 +313,7 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
   orders?: Prisma.OrderListRelationFilter
   partOrders?: Prisma.PartOrderListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
+  allocationPartLines?: Prisma.VendorAllocationPartLineListRelationFilter
 }, "id" | "name_city">
 
 export type BranchOrderByWithAggregationInput = {
@@ -364,6 +367,7 @@ export type BranchCreateInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateInput = {
@@ -383,6 +387,7 @@ export type BranchUncheckedCreateInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUpdateInput = {
@@ -402,6 +407,7 @@ export type BranchUpdateInput = {
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateInput = {
@@ -421,6 +427,7 @@ export type BranchUncheckedUpdateInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateManyInput = {
@@ -671,6 +678,20 @@ export type BranchUpdateOneRequiredWithoutExpensesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutExpensesInput, Prisma.BranchUpdateWithoutExpensesInput>, Prisma.BranchUncheckedUpdateWithoutExpensesInput>
 }
 
+export type BranchCreateNestedOneWithoutAllocationPartLinesInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutAllocationPartLinesInput, Prisma.BranchUncheckedCreateWithoutAllocationPartLinesInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutAllocationPartLinesInput
+  connect?: Prisma.BranchWhereUniqueInput
+}
+
+export type BranchUpdateOneRequiredWithoutAllocationPartLinesNestedInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutAllocationPartLinesInput, Prisma.BranchUncheckedCreateWithoutAllocationPartLinesInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutAllocationPartLinesInput
+  upsert?: Prisma.BranchUpsertWithoutAllocationPartLinesInput
+  connect?: Prisma.BranchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutAllocationPartLinesInput, Prisma.BranchUpdateWithoutAllocationPartLinesInput>, Prisma.BranchUncheckedUpdateWithoutAllocationPartLinesInput>
+}
+
 export type BranchCreateWithoutUsersInput = {
   id?: string
   name: string
@@ -687,6 +708,7 @@ export type BranchCreateWithoutUsersInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutUsersInput = {
@@ -705,6 +727,7 @@ export type BranchUncheckedCreateWithoutUsersInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutUsersInput = {
@@ -728,6 +751,7 @@ export type BranchCreateWithoutManagerInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutManagerInput = {
@@ -746,6 +770,7 @@ export type BranchUncheckedCreateWithoutManagerInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutManagerInput = {
@@ -785,6 +810,7 @@ export type BranchUpdateWithoutUsersInput = {
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutUsersInput = {
@@ -803,6 +829,7 @@ export type BranchUncheckedUpdateWithoutUsersInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUpsertWithWhereUniqueWithoutManagerInput = {
@@ -853,6 +880,7 @@ export type BranchCreateWithoutBikeInventoryInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutBikeInventoryInput = {
@@ -871,6 +899,7 @@ export type BranchUncheckedCreateWithoutBikeInventoryInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutBikeInventoryInput = {
@@ -905,6 +934,7 @@ export type BranchUpdateWithoutBikeInventoryInput = {
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
@@ -923,6 +953,7 @@ export type BranchUncheckedUpdateWithoutBikeInventoryInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateWithoutPartInventoryInput = {
@@ -941,6 +972,7 @@ export type BranchCreateWithoutPartInventoryInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutPartInventoryInput = {
@@ -959,6 +991,7 @@ export type BranchUncheckedCreateWithoutPartInventoryInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutPartInventoryInput = {
@@ -993,6 +1026,7 @@ export type BranchUpdateWithoutPartInventoryInput = {
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutPartInventoryInput = {
@@ -1011,6 +1045,7 @@ export type BranchUncheckedUpdateWithoutPartInventoryInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateWithoutOrdersInput = {
@@ -1029,6 +1064,7 @@ export type BranchCreateWithoutOrdersInput = {
   partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutOrdersInput = {
@@ -1047,6 +1083,7 @@ export type BranchUncheckedCreateWithoutOrdersInput = {
   partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutOrdersInput = {
@@ -1081,6 +1118,7 @@ export type BranchUpdateWithoutOrdersInput = {
   partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutOrdersInput = {
@@ -1099,6 +1137,7 @@ export type BranchUncheckedUpdateWithoutOrdersInput = {
   partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateWithoutPartOrdersInput = {
@@ -1117,6 +1156,7 @@ export type BranchCreateWithoutPartOrdersInput = {
   partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutPartOrdersInput = {
@@ -1135,6 +1175,7 @@ export type BranchUncheckedCreateWithoutPartOrdersInput = {
   partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutPartOrdersInput = {
@@ -1169,6 +1210,7 @@ export type BranchUpdateWithoutPartOrdersInput = {
   partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutPartOrdersInput = {
@@ -1187,6 +1229,7 @@ export type BranchUncheckedUpdateWithoutPartOrdersInput = {
   partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateWithoutExpensesInput = {
@@ -1205,6 +1248,7 @@ export type BranchCreateWithoutExpensesInput = {
   partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutExpensesInput = {
@@ -1223,6 +1267,7 @@ export type BranchUncheckedCreateWithoutExpensesInput = {
   partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutExpensesInput = {
@@ -1257,6 +1302,7 @@ export type BranchUpdateWithoutExpensesInput = {
   partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutExpensesInput = {
@@ -1275,6 +1321,99 @@ export type BranchUncheckedUpdateWithoutExpensesInput = {
   partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchCreateWithoutAllocationPartLinesInput = {
+  id?: string
+  name: string
+  city: string
+  address: string
+  phoneNumber?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  manager?: Prisma.UserCreateNestedOneWithoutManagedBranchesInput
+  users?: Prisma.UserCreateNestedManyWithoutBranchInput
+  bikeInventory?: Prisma.BikeUnitCreateNestedManyWithoutBranchInput
+  partInventory?: Prisma.PartInventoryCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  partOrders?: Prisma.PartOrderCreateNestedManyWithoutBranchInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutBranchInput
+}
+
+export type BranchUncheckedCreateWithoutAllocationPartLinesInput = {
+  id?: string
+  name: string
+  city: string
+  address: string
+  phoneNumber?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  managerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutBranchInput
+  bikeInventory?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutBranchInput
+  partInventory?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutBranchInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutBranchInput
+}
+
+export type BranchCreateOrConnectWithoutAllocationPartLinesInput = {
+  where: Prisma.BranchWhereUniqueInput
+  create: Prisma.XOR<Prisma.BranchCreateWithoutAllocationPartLinesInput, Prisma.BranchUncheckedCreateWithoutAllocationPartLinesInput>
+}
+
+export type BranchUpsertWithoutAllocationPartLinesInput = {
+  update: Prisma.XOR<Prisma.BranchUpdateWithoutAllocationPartLinesInput, Prisma.BranchUncheckedUpdateWithoutAllocationPartLinesInput>
+  create: Prisma.XOR<Prisma.BranchCreateWithoutAllocationPartLinesInput, Prisma.BranchUncheckedCreateWithoutAllocationPartLinesInput>
+  where?: Prisma.BranchWhereInput
+}
+
+export type BranchUpdateToOneWithWhereWithoutAllocationPartLinesInput = {
+  where?: Prisma.BranchWhereInput
+  data: Prisma.XOR<Prisma.BranchUpdateWithoutAllocationPartLinesInput, Prisma.BranchUncheckedUpdateWithoutAllocationPartLinesInput>
+}
+
+export type BranchUpdateWithoutAllocationPartLinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  manager?: Prisma.UserUpdateOneWithoutManagedBranchesNestedInput
+  users?: Prisma.UserUpdateManyWithoutBranchNestedInput
+  bikeInventory?: Prisma.BikeUnitUpdateManyWithoutBranchNestedInput
+  partInventory?: Prisma.PartInventoryUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchUncheckedUpdateWithoutAllocationPartLinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutBranchNestedInput
+  bikeInventory?: Prisma.BikeUnitUncheckedUpdateManyWithoutBranchNestedInput
+  partInventory?: Prisma.PartInventoryUncheckedUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateManyManagerInput = {
@@ -1305,6 +1444,7 @@ export type BranchUpdateWithoutManagerInput = {
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutManagerInput = {
@@ -1323,6 +1463,7 @@ export type BranchUncheckedUpdateWithoutManagerInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutBranchNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutBranchNestedInput
+  allocationPartLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateManyWithoutManagerInput = {
@@ -1349,6 +1490,7 @@ export type BranchCountOutputType = {
   orders: number
   partOrders: number
   expenses: number
+  allocationPartLines: number
 }
 
 export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1358,6 +1500,7 @@ export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   orders?: boolean | BranchCountOutputTypeCountOrdersArgs
   partOrders?: boolean | BranchCountOutputTypeCountPartOrdersArgs
   expenses?: boolean | BranchCountOutputTypeCountExpensesArgs
+  allocationPartLines?: boolean | BranchCountOutputTypeCountAllocationPartLinesArgs
 }
 
 /**
@@ -1412,6 +1555,13 @@ export type BranchCountOutputTypeCountExpensesArgs<ExtArgs extends runtime.Types
   where?: Prisma.ExpenseWhereInput
 }
 
+/**
+ * BranchCountOutputType without action
+ */
+export type BranchCountOutputTypeCountAllocationPartLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorAllocationPartLineWhereInput
+}
+
 
 export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1431,6 +1581,7 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>
   partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>
   expenses?: boolean | Prisma.Branch$expensesArgs<ExtArgs>
+  allocationPartLines?: boolean | Prisma.Branch$allocationPartLinesArgs<ExtArgs>
   _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["branch"]>
 
@@ -1484,6 +1635,7 @@ export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>
   partOrders?: boolean | Prisma.Branch$partOrdersArgs<ExtArgs>
   expenses?: boolean | Prisma.Branch$expensesArgs<ExtArgs>
+  allocationPartLines?: boolean | Prisma.Branch$allocationPartLinesArgs<ExtArgs>
   _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BranchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1503,6 +1655,7 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     orders: Prisma.$OrderPayload<ExtArgs>[]
     partOrders: Prisma.$PartOrderPayload<ExtArgs>[]
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
+    allocationPartLines: Prisma.$VendorAllocationPartLinePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1916,6 +2069,7 @@ export interface Prisma__BranchClient<T, Null = never, ExtArgs extends runtime.T
   orders<T extends Prisma.Branch$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   partOrders<T extends Prisma.Branch$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenses<T extends Prisma.Branch$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  allocationPartLines<T extends Prisma.Branch$allocationPartLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$allocationPartLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPartLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2516,6 +2670,30 @@ export type Branch$expensesArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[]
+}
+
+/**
+ * Branch.allocationPartLines
+ */
+export type Branch$allocationPartLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorAllocationPartLine
+   */
+  select?: Prisma.VendorAllocationPartLineSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorAllocationPartLine
+   */
+  omit?: Prisma.VendorAllocationPartLineOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorAllocationPartLineInclude<ExtArgs> | null
+  where?: Prisma.VendorAllocationPartLineWhereInput
+  orderBy?: Prisma.VendorAllocationPartLineOrderByWithRelationInput | Prisma.VendorAllocationPartLineOrderByWithRelationInput[]
+  cursor?: Prisma.VendorAllocationPartLineWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorAllocationPartLineScalarFieldEnum | Prisma.VendorAllocationPartLineScalarFieldEnum[]
 }
 
 /**

@@ -944,9 +944,6 @@ export type OrderUncheckedUpdateManyWithoutBikeNestedInput = {
     updateMany?: Prisma.OrderUpdateManyWithWhereWithoutBikeInput | Prisma.OrderUpdateManyWithWhereWithoutBikeInput[];
     deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[];
 };
-export type BoolFieldUpdateOperationsInput = {
-    set?: boolean;
-};
 export type EnumPaymentMethodFieldUpdateOperationsInput = {
     set?: $Enums.PaymentMethod;
 };

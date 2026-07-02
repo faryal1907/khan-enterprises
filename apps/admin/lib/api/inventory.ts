@@ -31,6 +31,7 @@ export async function createBike(data: {
   vendorId: string;
   branchId: string;
   price?: number;
+  purchaseCost?: number;
   color?: string;
   media?: string[];
 }) {

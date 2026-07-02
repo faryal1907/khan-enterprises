@@ -219,6 +219,33 @@ export default function BikesListPage() {
           <SummaryCard label="In Delivery" value={result.summary.inDelivery} color={theme.accents.primary} />
         </div>
 
+        {/* Pending Setup alert banner */}
+        {(() => {
+          const pendingCount = result.bikes.filter(
+            (b) => b.status === BikeStatus.PENDING_SETUP,
+          ).length;
+          if (pendingCount === 0) return null;
+          return (
+            <div
+              className="rounded-lg p-4 mb-6 flex items-center justify-between"
+              style={{ backgroundColor: "#fffbeb", border: "1px solid #fcd34d" }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-amber-400" />
+                <p className="text-sm font-medium text-amber-800">
+                  {pendingCount} bike unit{pendingCount !== 1 ? "s" : ""} require setup — enter chassis and engine numbers to make them available for sale.
+                </p>
+              </div>
+              <button
+                onClick={() => updateFilter("status", BikeStatus.PENDING_SETUP)}
+                className="text-xs font-semibold text-amber-700 hover:text-amber-900"
+              >
+                Show only
+              </button>
+            </div>
+          );
+        })()}
+
         <div
           className="rounded-lg p-4 mb-6"
           style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -482,12 +509,28 @@ function BikeTable({
             </tr>
           ) : (
             bikes.map((bike) => (
-              <tr key={bike.id} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+              <tr
+                key={bike.id}
+                style={{
+                  borderBottom: `1px solid ${theme.borders.light}`,
+                  backgroundColor: bike.status === BikeStatus.PENDING_SETUP ? "#fffbeb" : undefined,
+                }}
+              >
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  {bike.chassisNumber}
+                  {bike.status === BikeStatus.PENDING_SETUP && bike.chassisNumber.startsWith("PENDING-") ? (
+                    <span className="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">
+                      Not entered yet
+                    </span>
+                  ) : (
+                    bike.chassisNumber
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                  {bike.engineNumber}
+                  {bike.status === BikeStatus.PENDING_SETUP && bike.engineNumber.startsWith("PENDING-") ? (
+                    <span className="text-xs" style={{ color: theme.text.muted }}>—</span>
+                  ) : (
+                    bike.engineNumber
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                   {bike.model.brand} {bike.model.modelName}

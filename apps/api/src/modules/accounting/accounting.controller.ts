@@ -1,6 +1,16 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Request, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Request,
+  Query,
+} from "@nestjs/common";
 import { AccountingService } from "./accounting.service";
-import { PurchaseOrdersService } from "./purchase-orders.service";
 import { PayablesService } from "./payables.service";
 import { ReceivablesService } from "./receivables.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -8,176 +18,228 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { UserRole, AccountCategory, AccountSubtype } from "@khan/prisma";
 
-@Controller('accounting')
+@Controller("accounting")
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AccountingController {
   constructor(
     private readonly accountingService: AccountingService,
-    private readonly purchaseOrdersService: PurchaseOrdersService,
     private readonly payablesService: PayablesService,
     private readonly receivablesService: ReceivablesService,
   ) {}
 
-  @Get('accounts')
+  // ─── Chart of Accounts ───────────────────────────────────────────────────
+
+  @Get("accounts")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getAccounts() {
     return this.accountingService.getAccounts();
   }
 
-  @Post('accounts')
+  @Post("accounts")
   @Roles(UserRole.ADMIN)
-  async createAccount(@Body() data: { code: string; name: string; category: string; subtype: string; accountNumber?: string; openingBalance?: number }) {
+  async createAccount(
+    @Body()
+    data: {
+      code: string;
+      name: string;
+      category: string;
+      subtype: string;
+      accountNumber?: string;
+      openingBalance?: number;
+    },
+  ) {
     return this.accountingService.createAccount({
       ...data,
       category: data.category as AccountCategory,
-      subtype: data.subtype as AccountSubtype
+      subtype: data.subtype as AccountSubtype,
     });
   }
 
-  @Patch('accounts/:id')
+  @Patch("accounts/:id")
   @Roles(UserRole.ADMIN)
-  async updateAccount(@Param('id') id: string, @Body() data: { name?: string; code?: string; category?: string; subtype?: string }) {
+  async updateAccount(
+    @Param("id") id: string,
+    @Body()
+    data: { name?: string; code?: string; category?: string; subtype?: string },
+  ) {
     return this.accountingService.updateAccount(id, {
       name: data.name,
       code: data.code,
       category: data.category as AccountCategory | undefined,
-      subtype: data.subtype as AccountSubtype | undefined
+      subtype: data.subtype as AccountSubtype | undefined,
     });
   }
 
-  @Delete('accounts/:id')
+  @Delete("accounts/:id")
   @Roles(UserRole.ADMIN)
-  async deleteAccount(@Param('id') id: string, @Body() body: { transferAccountId?: string }) {
+  async deleteAccount(
+    @Param("id") id: string,
+    @Body() body: { transferAccountId?: string },
+  ) {
     return this.accountingService.deleteAccount(id, body?.transferAccountId);
   }
 
-  @Get('accounts/:id/ledger')
+  @Get("accounts/:id/ledger")
   @Roles(UserRole.ADMIN)
-  async getAccountLedger(@Param('id') id: string, @Query('page') page?: string, @Query('limit') limit?: string) {
+  async getAccountLedger(
+    @Param("id") id: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
     return this.accountingService.getAccountLedger(
       id,
       page ? parseInt(page) : 1,
-      limit ? parseInt(limit) : 50
+      limit ? parseInt(limit) : 50,
     );
   }
 
-  @Get('accounts/:id/balance')
+  @Get("accounts/:id/balance")
   @Roles(UserRole.ADMIN)
-  async getAccountBalance(@Param('id') id: string) {
+  async getAccountBalance(@Param("id") id: string) {
     return this.accountingService.getAccountBalance(id);
   }
 
-  @Post('capital-contribution')
+  // ─── Owner Equity ─────────────────────────────────────────────────────────
+
+  @Post("capital-contribution")
   @Roles(UserRole.ADMIN)
-  async recordCapitalContribution(@Body() data: { destinationAccountId: string; amount: number; date: string; source?: string; reference?: string; notes?: string }) {
+  async recordCapitalContribution(
+    @Body()
+    data: {
+      destinationAccountId: string;
+      amount: number;
+      date: string;
+      source?: string;
+      reference?: string;
+      notes?: string;
+    },
+  ) {
     return this.accountingService.recordCapitalContribution({
       ...data,
-      date: this.parseDateLocal(data.date)
+      date: this.parseDateLocal(data.date),
     });
   }
 
-  @Post('owner-withdrawal')
+  @Post("owner-withdrawal")
   @Roles(UserRole.ADMIN)
-  async recordOwnerWithdrawal(@Body() data: { sourceAccountId: string; amount: number; date: string; reason?: string; notes?: string }) {
+  async recordOwnerWithdrawal(
+    @Body()
+    data: {
+      sourceAccountId: string;
+      amount: number;
+      date: string;
+      reason?: string;
+      notes?: string;
+    },
+  ) {
     return this.accountingService.recordOwnerWithdrawal({
       ...data,
-      date: this.parseDateLocal(data.date)
+      date: this.parseDateLocal(data.date),
     });
   }
 
-  @Post('internal-transfer')
+  @Post("internal-transfer")
   @Roles(UserRole.ADMIN)
-  async recordInternalTransfer(@Body() data: { fromAccountId: string; toAccountId: string; amount: number; date: string; notes?: string }) {
+  async recordInternalTransfer(
+    @Body()
+    data: {
+      fromAccountId: string;
+      toAccountId: string;
+      amount: number;
+      date: string;
+      notes?: string;
+    },
+  ) {
     return this.accountingService.recordInternalTransfer({
       ...data,
-      date: this.parseDateLocal(data.date)
+      date: this.parseDateLocal(data.date),
     });
   }
 
-  /** Parse a YYYY-MM-DD date string as noon UTC to avoid timezone-day-shift issues */
-  private parseDateLocal(dateStr: string): Date {
-    // Append T12:00:00Z so the date is stored as noon UTC — this way it
-    // displays as the correct calendar day in any timezone (UTC+14 to UTC-12)
-    return new Date(`${dateStr}T12:00:00Z`);
-  }
+  // ─── Journal Entries ──────────────────────────────────────────────────────
 
-  @Get('journals')
+  @Get("journals")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getJournals() {
     return this.accountingService.getJournalEntries();
   }
 
-  @Post('journals')
+  @Post("journals")
   @Roles(UserRole.ADMIN)
-  async createJournalEntry(@Body() data: { description: string, lines: { accountId: string, debit: number, credit: number }[] }) {
+  async createJournalEntry(
+    @Body()
+    data: {
+      description: string;
+      lines: { accountId: string; debit: number; credit: number }[];
+    },
+  ) {
     return this.accountingService.createJournalEntry(data);
   }
 
-  @Get('purchase-orders')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getPurchaseOrders() {
-    return this.accountingService.getPurchaseOrders();
-  }
+  // ─── Payables (non-vendor: expenses, salary, loans) ──────────────────────
 
-  @Post('purchase-orders')
-  @Roles(UserRole.ADMIN)
-  async createPurchaseOrder(@Body() data: { vendorId: string; type: string; totalCost: number; items: any[] }) {
-    return this.purchaseOrdersService.createPurchaseOrder(data);
-  }
-
-  @Post('purchase-orders/:id/receive')
-  @Roles(UserRole.ADMIN)
-  async receivePurchaseOrder(@Param('id') id: string, @Request() req: any) {
-    return this.purchaseOrdersService.markAsReceived(id, req.user.id);
-  }
-
-  @Get('payables')
+  @Get("payables")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getPayables() {
     return this.accountingService.getPayables();
   }
 
-  @Post('payables/:id/pay')
+  @Post("payables/:id/pay")
   @Roles(UserRole.ADMIN)
   async payPayable(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() data: { amount: number; paymentMethod: any },
-    @Request() req: any
+    @Request() req: any,
   ) {
-    return this.payablesService.payPayable(id, data.amount, data.paymentMethod, req.user.id);
+    return this.payablesService.payPayable(
+      id,
+      data.amount,
+      data.paymentMethod,
+      req.user.id,
+    );
   }
 
-  // ─── Receivables ─────────────────────────────────────────────────────────
+  // ─── Receivables ──────────────────────────────────────────────────────────
 
-  @Get('receivables')
+  @Get("receivables")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getReceivables() {
     return this.receivablesService.getReceivables();
   }
 
-  @Get('receivables/payment-accounts')
+  @Get("receivables/payment-accounts")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getPaymentAccounts() {
     return this.receivablesService.getPaymentAccounts();
   }
 
-  @Get('receivables/:customerPhone/ledger')
+  @Get("receivables/:customerPhone/ledger")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getCustomerLedger(@Param('customerPhone') customerPhone: string) {
+  async getCustomerLedger(
+    @Param("customerPhone") customerPhone: string,
+  ) {
     return this.receivablesService.getCustomerLedger(customerPhone);
   }
 
-  @Get('receivables/:customerPhone/statement')
+  @Get("receivables/:customerPhone/statement")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getCustomerStatement(@Param('customerPhone') customerPhone: string) {
+  async getCustomerStatement(
+    @Param("customerPhone") customerPhone: string,
+  ) {
     return this.receivablesService.getCustomerStatement(customerPhone);
   }
 
-  @Post('receivables/:customerPhone/collect')
+  @Post("receivables/:customerPhone/collect")
   @Roles(UserRole.ADMIN)
   async collectReceivable(
-    @Param('customerPhone') customerPhone: string,
-    @Body() data: { amount: number; paymentMethod: string; notes?: string; accountId?: string },
+    @Param("customerPhone") customerPhone: string,
+    @Body()
+    data: {
+      amount: number;
+      paymentMethod: string;
+      notes?: string;
+      accountId?: string;
+    },
     @Request() req: any,
   ) {
     return this.receivablesService.collectPayment(
@@ -188,5 +250,12 @@ export class AccountingController {
       data.notes,
       data.accountId,
     );
+  }
+
+  // ─── Private helpers ──────────────────────────────────────────────────────
+
+  /** Parse a YYYY-MM-DD string as noon UTC to avoid timezone day-shift issues */
+  private parseDateLocal(dateStr: string): Date {
+    return new Date(`${dateStr}T12:00:00Z`);
   }
 }

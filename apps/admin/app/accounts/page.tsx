@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { theme } from "@/lib/colors";
-import { getAccounts, getJournalEntries, getPurchaseOrders, getPayables, payPayable, receivePurchaseOrder, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
+import { getAccounts, getJournalEntries, getPayables, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
 import { toast } from "sonner";
 import { getMessaging, onMessage, isSupported } from "firebase/messaging";
 import app from "@/lib/firebase";
 import { AsyncButton } from "@/components/async-button";
-import { CreatePOModal } from "./create-po-modal";
 import { PayPayableModal } from "./pay-payable-modal";
 import { CreateJournalEntryModal } from "./create-journal-entry-modal";
 import { AccountLedgerModal } from "./account-ledger-modal";
@@ -17,7 +16,7 @@ import { InternalTransferModal } from "./internal-transfer-modal";
 import { CollectReceivableModal } from "./collect-receivable-modal";
 import { CustomerLedgerModal } from "./customer-ledger-modal";
 
-type Tab = 'OVERVIEW' | 'JOURNALS' | 'PURCHASE_ORDERS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY';
+type Tab = 'OVERVIEW' | 'JOURNALS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY';
 
 const formatCurrency = (amount: number) => 
   new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR' }).format(amount);
@@ -26,12 +25,10 @@ export default function AccountsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('OVERVIEW');
   const [accounts, setAccounts] = useState<any[]>([]);
   const [journals, setJournals] = useState<any[]>([]);
-  const [purchaseOrders, setPurchaseOrders] = useState<any[]>([]);
   const [payables, setPayables] = useState<any[]>([]);
   const [receivables, setReceivables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [isPOModalOpen, setIsPOModalOpen] = useState(false);
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
   const [payModalData, setPayModalData] = useState<{ isOpen: boolean; payableId: string; amount: number }>({
     isOpen: false,
@@ -79,16 +76,14 @@ export default function AccountsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [accData, journalData, poData, payableData, receivableData] = await Promise.all([
+      const [accData, journalData, payableData, receivableData] = await Promise.all([
         getAccounts(),
         getJournalEntries(),
-        getPurchaseOrders(),
         getPayables(),
         getReceivables()
       ]);
       setAccounts(accData);
       setJournals(journalData);
-      setPurchaseOrders(poData);
       setPayables(payableData);
       setReceivables(receivableData);
     } catch (err) {
@@ -132,16 +127,6 @@ export default function AccountsPage() {
       }
     };
   }, []);
-
-  const handleReceivePO = async (id: string) => {
-    try {
-      await receivePurchaseOrder(id);
-      toast.success("PO marked as received! Payable generated.");
-      await fetchData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to receive PO");
-    }
-  };
 
   const handleStartEdit = (account: any) => {
     setEditingAccountId(account.id);
@@ -217,7 +202,7 @@ export default function AccountsPage() {
       </div>
 
       <div className="flex space-x-2 border-b border-gray-200">
-        {(['OVERVIEW', 'JOURNALS', 'PURCHASE_ORDERS', 'PAYABLES', 'RECEIVABLES', 'OWNER_EQUITY'] as Tab[]).map(tab => (
+        {(['OVERVIEW', 'JOURNALS', 'PAYABLES', 'RECEIVABLES', 'OWNER_EQUITY'] as Tab[]).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -451,61 +436,6 @@ export default function AccountsPage() {
                   </table>
                 </div>
               ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'PURCHASE_ORDERS' && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Purchase Orders</h2>
-              <button 
-                onClick={() => setIsPOModalOpen(true)}
-                className="text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors"
-                style={{ backgroundColor: theme.accents.primary }}
-              >
-                + Create PO
-              </button>
-            </div>
-            <div className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>PO Number</th>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Vendor</th>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Cost</th>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Status</th>
-                    <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {purchaseOrders.map(po => (
-                    <tr key={po.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
-                      <td className="p-3 font-medium" style={{ color: theme.text.primary }}>{po.poNumber}</td>
-                      <td className="p-3" style={{ color: theme.text.primary }}>{po.vendor?.name}</td>
-                      <td className="p-3" style={{ color: theme.text.primary }}>{formatCurrency(po.totalCost)}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          po.status === 'RECEIVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {po.status}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        {po.status === 'PENDING' && (
-                          <AsyncButton 
-                            onClick={() => handleReceivePO(po.id)}
-                            className="text-white px-3 py-1 rounded-md text-xs font-semibold shadow-sm"
-                            style={{ backgroundColor: theme.accents.primary }}
-                          >
-                            Mark Received
-                          </AsyncButton>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         )}
@@ -903,12 +833,6 @@ export default function AccountsPage() {
           </div>
         )}
       </div>
-
-      <CreatePOModal 
-        isOpen={isPOModalOpen}
-        onClose={() => setIsPOModalOpen(false)}
-        onSuccess={fetchData}
-      />
 
       <PayPayableModal 
         isOpen={payModalData.isOpen}

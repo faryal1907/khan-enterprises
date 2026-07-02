@@ -111,6 +111,15 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get paymentAllocation(): Prisma.PaymentAllocationDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get vendorPayment(): Prisma.VendorPaymentDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get vendorAllocation(): Prisma.VendorAllocationDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get vendorAllocationPartLine(): Prisma.VendorAllocationPartLineDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get receivablesAlert(): Prisma.ReceivablesAlertDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;

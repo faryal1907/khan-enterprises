@@ -107,6 +107,7 @@ exports.AccountSubtype = {
     EQUITY: 'EQUITY',
     DRAWINGS: 'DRAWINGS',
     REVENUE: 'REVENUE',
+    VENDOR_PREPAID: 'VENDOR_PREPAID',
     OTHER: 'OTHER'
 };
 exports.JournalStatus = {

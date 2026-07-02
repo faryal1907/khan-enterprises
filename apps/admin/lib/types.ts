@@ -62,6 +62,8 @@ export interface BikeUnit {
   serialNumber: string;
   status: BikeStatus;
   price?: number | null;
+  purchaseCost?: number | null;
+  vendorAllocationId?: string | null;
   actualSalePrice?: number | null;
   onlineDiscountPercent?: number | null;
   reservedUntil?: string | null;

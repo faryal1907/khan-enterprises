@@ -242,6 +242,7 @@ export type PartWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   inventories?: Prisma.PartInventoryListRelationFilter
   partOrders?: Prisma.PartOrderListRelationFilter
+  allocationLines?: Prisma.VendorAllocationPartLineListRelationFilter
 }
 
 export type PartOrderByWithRelationInput = {
@@ -255,6 +256,7 @@ export type PartOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   inventories?: Prisma.PartInventoryOrderByRelationAggregateInput
   partOrders?: Prisma.PartOrderOrderByRelationAggregateInput
+  allocationLines?: Prisma.VendorAllocationPartLineOrderByRelationAggregateInput
 }
 
 export type PartWhereUniqueInput = Prisma.AtLeast<{
@@ -271,6 +273,7 @@ export type PartWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   inventories?: Prisma.PartInventoryListRelationFilter
   partOrders?: Prisma.PartOrderListRelationFilter
+  allocationLines?: Prisma.VendorAllocationPartLineListRelationFilter
 }, "id" | "sku">
 
 export type PartOrderByWithAggregationInput = {
@@ -314,6 +317,7 @@ export type PartCreateInput = {
   updatedAt?: Date | string
   inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
+  allocationLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutPartInput
 }
 
 export type PartUncheckedCreateInput = {
@@ -327,6 +331,7 @@ export type PartUncheckedCreateInput = {
   updatedAt?: Date | string
   inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
+  allocationLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutPartInput
 }
 
 export type PartUpdateInput = {
@@ -340,6 +345,7 @@ export type PartUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
+  allocationLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutPartNestedInput
 }
 
 export type PartUncheckedUpdateInput = {
@@ -353,6 +359,7 @@ export type PartUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
+  allocationLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutPartNestedInput
 }
 
 export type PartCreateManyInput = {
@@ -462,6 +469,20 @@ export type PartUpdateOneRequiredWithoutPartOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartUpdateToOneWithWhereWithoutPartOrdersInput, Prisma.PartUpdateWithoutPartOrdersInput>, Prisma.PartUncheckedUpdateWithoutPartOrdersInput>
 }
 
+export type PartCreateNestedOneWithoutAllocationLinesInput = {
+  create?: Prisma.XOR<Prisma.PartCreateWithoutAllocationLinesInput, Prisma.PartUncheckedCreateWithoutAllocationLinesInput>
+  connectOrCreate?: Prisma.PartCreateOrConnectWithoutAllocationLinesInput
+  connect?: Prisma.PartWhereUniqueInput
+}
+
+export type PartUpdateOneRequiredWithoutAllocationLinesNestedInput = {
+  create?: Prisma.XOR<Prisma.PartCreateWithoutAllocationLinesInput, Prisma.PartUncheckedCreateWithoutAllocationLinesInput>
+  connectOrCreate?: Prisma.PartCreateOrConnectWithoutAllocationLinesInput
+  upsert?: Prisma.PartUpsertWithoutAllocationLinesInput
+  connect?: Prisma.PartWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartUpdateToOneWithWhereWithoutAllocationLinesInput, Prisma.PartUpdateWithoutAllocationLinesInput>, Prisma.PartUncheckedUpdateWithoutAllocationLinesInput>
+}
+
 export type PartCreateWithoutInventoriesInput = {
   id?: string
   name: string
@@ -472,6 +493,7 @@ export type PartCreateWithoutInventoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
+  allocationLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutPartInput
 }
 
 export type PartUncheckedCreateWithoutInventoriesInput = {
@@ -484,6 +506,7 @@ export type PartUncheckedCreateWithoutInventoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
+  allocationLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutPartInput
 }
 
 export type PartCreateOrConnectWithoutInventoriesInput = {
@@ -512,6 +535,7 @@ export type PartUpdateWithoutInventoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
+  allocationLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutPartNestedInput
 }
 
 export type PartUncheckedUpdateWithoutInventoriesInput = {
@@ -524,6 +548,7 @@ export type PartUncheckedUpdateWithoutInventoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
+  allocationLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutPartNestedInput
 }
 
 export type PartCreateWithoutPartOrdersInput = {
@@ -536,6 +561,7 @@ export type PartCreateWithoutPartOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
+  allocationLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutPartInput
 }
 
 export type PartUncheckedCreateWithoutPartOrdersInput = {
@@ -548,6 +574,7 @@ export type PartUncheckedCreateWithoutPartOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
+  allocationLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutPartInput
 }
 
 export type PartCreateOrConnectWithoutPartOrdersInput = {
@@ -576,6 +603,7 @@ export type PartUpdateWithoutPartOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
+  allocationLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutPartNestedInput
 }
 
 export type PartUncheckedUpdateWithoutPartOrdersInput = {
@@ -588,6 +616,75 @@ export type PartUncheckedUpdateWithoutPartOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
+  allocationLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutPartNestedInput
+}
+
+export type PartCreateWithoutAllocationLinesInput = {
+  id?: string
+  name: string
+  sku: string
+  category: string
+  description?: string | null
+  sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
+  partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
+}
+
+export type PartUncheckedCreateWithoutAllocationLinesInput = {
+  id?: string
+  name: string
+  sku: string
+  category: string
+  description?: string | null
+  sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
+  partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
+}
+
+export type PartCreateOrConnectWithoutAllocationLinesInput = {
+  where: Prisma.PartWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartCreateWithoutAllocationLinesInput, Prisma.PartUncheckedCreateWithoutAllocationLinesInput>
+}
+
+export type PartUpsertWithoutAllocationLinesInput = {
+  update: Prisma.XOR<Prisma.PartUpdateWithoutAllocationLinesInput, Prisma.PartUncheckedUpdateWithoutAllocationLinesInput>
+  create: Prisma.XOR<Prisma.PartCreateWithoutAllocationLinesInput, Prisma.PartUncheckedCreateWithoutAllocationLinesInput>
+  where?: Prisma.PartWhereInput
+}
+
+export type PartUpdateToOneWithWhereWithoutAllocationLinesInput = {
+  where?: Prisma.PartWhereInput
+  data: Prisma.XOR<Prisma.PartUpdateWithoutAllocationLinesInput, Prisma.PartUncheckedUpdateWithoutAllocationLinesInput>
+}
+
+export type PartUpdateWithoutAllocationLinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
+  partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
+}
+
+export type PartUncheckedUpdateWithoutAllocationLinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
+  partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
 }
 
 
@@ -598,11 +695,13 @@ export type PartUncheckedUpdateWithoutPartOrdersInput = {
 export type PartCountOutputType = {
   inventories: number
   partOrders: number
+  allocationLines: number
 }
 
 export type PartCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inventories?: boolean | PartCountOutputTypeCountInventoriesArgs
   partOrders?: boolean | PartCountOutputTypeCountPartOrdersArgs
+  allocationLines?: boolean | PartCountOutputTypeCountAllocationLinesArgs
 }
 
 /**
@@ -629,6 +728,13 @@ export type PartCountOutputTypeCountPartOrdersArgs<ExtArgs extends runtime.Types
   where?: Prisma.PartOrderWhereInput
 }
 
+/**
+ * PartCountOutputType without action
+ */
+export type PartCountOutputTypeCountAllocationLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorAllocationPartLineWhereInput
+}
+
 
 export type PartSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -641,6 +747,7 @@ export type PartSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   inventories?: boolean | Prisma.Part$inventoriesArgs<ExtArgs>
   partOrders?: boolean | Prisma.Part$partOrdersArgs<ExtArgs>
+  allocationLines?: boolean | Prisma.Part$allocationLinesArgs<ExtArgs>
   _count?: boolean | Prisma.PartCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["part"]>
 
@@ -681,6 +788,7 @@ export type PartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type PartInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inventories?: boolean | Prisma.Part$inventoriesArgs<ExtArgs>
   partOrders?: boolean | Prisma.Part$partOrdersArgs<ExtArgs>
+  allocationLines?: boolean | Prisma.Part$allocationLinesArgs<ExtArgs>
   _count?: boolean | Prisma.PartCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -691,6 +799,7 @@ export type $PartPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     inventories: Prisma.$PartInventoryPayload<ExtArgs>[]
     partOrders: Prisma.$PartOrderPayload<ExtArgs>[]
+    allocationLines: Prisma.$VendorAllocationPartLinePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1097,6 +1206,7 @@ export interface Prisma__PartClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   inventories<T extends Prisma.Part$inventoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Part$inventoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   partOrders<T extends Prisma.Part$partOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Part$partOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  allocationLines<T extends Prisma.Part$allocationLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Part$allocationLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPartLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1572,6 +1682,30 @@ export type Part$partOrdersArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PartOrderScalarFieldEnum | Prisma.PartOrderScalarFieldEnum[]
+}
+
+/**
+ * Part.allocationLines
+ */
+export type Part$allocationLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorAllocationPartLine
+   */
+  select?: Prisma.VendorAllocationPartLineSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorAllocationPartLine
+   */
+  omit?: Prisma.VendorAllocationPartLineOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorAllocationPartLineInclude<ExtArgs> | null
+  where?: Prisma.VendorAllocationPartLineWhereInput
+  orderBy?: Prisma.VendorAllocationPartLineOrderByWithRelationInput | Prisma.VendorAllocationPartLineOrderByWithRelationInput[]
+  cursor?: Prisma.VendorAllocationPartLineWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorAllocationPartLineScalarFieldEnum | Prisma.VendorAllocationPartLineScalarFieldEnum[]
 }
 
 /**

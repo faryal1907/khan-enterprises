@@ -78,6 +78,9 @@ export const ModelName = {
   PurchaseOrderItem: 'PurchaseOrderItem',
   Payable: 'Payable',
   PaymentAllocation: 'PaymentAllocation',
+  VendorPayment: 'VendorPayment',
+  VendorAllocation: 'VendorAllocation',
+  VendorAllocationPartLine: 'VendorAllocationPartLine',
   ReceivablesAlert: 'ReceivablesAlert'
 } as const
 
@@ -161,6 +164,7 @@ export const VendorScalarFieldEnum = {
   phoneNumber: 'phoneNumber',
   email: 'email',
   address: 'address',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -195,12 +199,14 @@ export const BikeUnitScalarFieldEnum = {
   status: 'status',
   price: 'price',
   purchasePrice: 'purchasePrice',
+  purchaseCost: 'purchaseCost',
   color: 'color',
   media: 'media',
   onlineDiscountPercent: 'onlineDiscountPercent',
   actualSalePrice: 'actualSalePrice',
   reservedUntil: 'reservedUntil',
   soldAt: 'soldAt',
+  vendorAllocationId: 'vendorAllocationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -544,6 +550,50 @@ export const PaymentAllocationScalarFieldEnum = {
 } as const
 
 export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum]
+
+
+export const VendorPaymentScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  fromAccountId: 'fromAccountId',
+  amount: 'amount',
+  date: 'date',
+  notes: 'notes',
+  journalEntryId: 'journalEntryId',
+  recordedById: 'recordedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorPaymentScalarFieldEnum = (typeof VendorPaymentScalarFieldEnum)[keyof typeof VendorPaymentScalarFieldEnum]
+
+
+export const VendorAllocationScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  totalAmount: 'totalAmount',
+  date: 'date',
+  notes: 'notes',
+  journalEntryId: 'journalEntryId',
+  recordedById: 'recordedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorAllocationScalarFieldEnum = (typeof VendorAllocationScalarFieldEnum)[keyof typeof VendorAllocationScalarFieldEnum]
+
+
+export const VendorAllocationPartLineScalarFieldEnum = {
+  id: 'id',
+  allocationId: 'allocationId',
+  partId: 'partId',
+  branchId: 'branchId',
+  quantity: 'quantity',
+  unitCost: 'unitCost',
+  totalCost: 'totalCost'
+} as const
+
+export type VendorAllocationPartLineScalarFieldEnum = (typeof VendorAllocationPartLineScalarFieldEnum)[keyof typeof VendorAllocationPartLineScalarFieldEnum]
 
 
 export const ReceivablesAlertScalarFieldEnum = {

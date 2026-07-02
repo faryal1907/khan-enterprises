@@ -164,6 +164,7 @@ export default function AddBikePage() {
 
   // New fields
   const [price, setPrice] = useState("");
+  const [purchaseCost, setPurchaseCost] = useState("");
   const [color, setColor] = useState("");
   const [media, setMedia] = useState<string[]>([]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
@@ -262,6 +263,7 @@ export default function AddBikePage() {
         vendorId,
         branchId,
         price: price ? parseFloat(price) : undefined,
+        purchaseCost: purchaseCost ? parseFloat(purchaseCost) : undefined,
         color: color || undefined,
         media,
       });
@@ -498,6 +500,31 @@ export default function AddBikePage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium mb-1"
+                style={{ color: theme.text.secondary }}
+              >
+                Purchase Cost (PKR)
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                placeholder="What was paid to the vendor for this unit"
+                value={purchaseCost}
+                onChange={(e) => setPurchaseCost(e.target.value)}
+              />
+              <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                Optional. Used when allocating this bike against a vendor prepaid balance.
+              </p>
             </div>
 
             <div>

@@ -29,6 +29,10 @@ export class CreateBikeUnitDto {
   @IsOptional()
   price?: number;
 
+  @IsNumber()
+  @IsOptional()
+  purchaseCost?: number;
+
   @IsString()
   @IsOptional()
   color?: string;

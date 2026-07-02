@@ -118,6 +118,7 @@ export declare const AccountSubtype: {
     readonly EQUITY: "EQUITY";
     readonly DRAWINGS: "DRAWINGS";
     readonly REVENUE: "REVENUE";
+    readonly VENDOR_PREPAID: "VENDOR_PREPAID";
     readonly OTHER: "OTHER";
 };
 export type AccountSubtype = (typeof AccountSubtype)[keyof typeof AccountSubtype];

@@ -248,6 +248,8 @@ export type UserWhereInput = {
   documents?: Prisma.DocumentListRelationFilter
   orderAlerts?: Prisma.OrderAlertListRelationFilter
   recordedExpenses?: Prisma.ExpenseListRelationFilter
+  vendorPaymentsRecorded?: Prisma.VendorPaymentListRelationFilter
+  vendorAllocationsRecorded?: Prisma.VendorAllocationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -277,6 +279,8 @@ export type UserOrderByWithRelationInput = {
   documents?: Prisma.DocumentOrderByRelationAggregateInput
   orderAlerts?: Prisma.OrderAlertOrderByRelationAggregateInput
   recordedExpenses?: Prisma.ExpenseOrderByRelationAggregateInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentOrderByRelationAggregateInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -309,6 +313,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   documents?: Prisma.DocumentListRelationFilter
   orderAlerts?: Prisma.OrderAlertListRelationFilter
   recordedExpenses?: Prisma.ExpenseListRelationFilter
+  vendorPaymentsRecorded?: Prisma.VendorPaymentListRelationFilter
+  vendorAllocationsRecorded?: Prisma.VendorAllocationListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -372,6 +378,8 @@ export type UserCreateInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -399,6 +407,8 @@ export type UserUncheckedCreateInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUpdateInput = {
@@ -426,6 +436,8 @@ export type UserUpdateInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -453,6 +465,8 @@ export type UserUncheckedUpdateInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -866,6 +880,38 @@ export type UserUpdateOneWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutVendorPaymentsRecordedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorPaymentsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorPaymentsRecordedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorPaymentsRecordedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutVendorPaymentsRecordedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorPaymentsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorPaymentsRecordedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorPaymentsRecordedInput
+  upsert?: Prisma.UserUpsertWithoutVendorPaymentsRecordedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVendorPaymentsRecordedInput, Prisma.UserUpdateWithoutVendorPaymentsRecordedInput>, Prisma.UserUncheckedUpdateWithoutVendorPaymentsRecordedInput>
+}
+
+export type UserCreateNestedOneWithoutVendorAllocationsRecordedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorAllocationsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorAllocationsRecordedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorAllocationsRecordedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutVendorAllocationsRecordedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVendorAllocationsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorAllocationsRecordedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVendorAllocationsRecordedInput
+  upsert?: Prisma.UserUpsertWithoutVendorAllocationsRecordedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVendorAllocationsRecordedInput, Prisma.UserUpdateWithoutVendorAllocationsRecordedInput>, Prisma.UserUncheckedUpdateWithoutVendorAllocationsRecordedInput>
+}
+
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
@@ -890,6 +936,8 @@ export type UserCreateWithoutRefreshTokensInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -916,6 +964,8 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -958,6 +1008,8 @@ export type UserUpdateWithoutRefreshTokensInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -984,6 +1036,8 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutPasswordResetTokensInput = {
@@ -1010,6 +1064,8 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -1036,6 +1092,8 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -1078,6 +1136,8 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -1104,6 +1164,8 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutManagedBranchesInput = {
@@ -1130,6 +1192,8 @@ export type UserCreateWithoutManagedBranchesInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutManagedBranchesInput = {
@@ -1156,6 +1220,8 @@ export type UserUncheckedCreateWithoutManagedBranchesInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutManagedBranchesInput = {
@@ -1187,6 +1253,8 @@ export type UserCreateWithoutBranchInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutBranchInput = {
@@ -1213,6 +1281,8 @@ export type UserUncheckedCreateWithoutBranchInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutBranchInput = {
@@ -1260,6 +1330,8 @@ export type UserUpdateWithoutManagedBranchesInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedBranchesInput = {
@@ -1286,6 +1358,8 @@ export type UserUncheckedUpdateWithoutManagedBranchesInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutBranchInput = {
@@ -1346,6 +1420,8 @@ export type UserCreateWithoutVendorInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutVendorInput = {
@@ -1372,6 +1448,8 @@ export type UserUncheckedCreateWithoutVendorInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutVendorInput = {
@@ -1424,6 +1502,8 @@ export type UserCreateWithoutStockMovementsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutStockMovementsInput = {
@@ -1450,6 +1530,8 @@ export type UserUncheckedCreateWithoutStockMovementsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutStockMovementsInput = {
@@ -1492,6 +1574,8 @@ export type UserUpdateWithoutStockMovementsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStockMovementsInput = {
@@ -1518,6 +1602,8 @@ export type UserUncheckedUpdateWithoutStockMovementsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutProcessedOrdersInput = {
@@ -1544,6 +1630,8 @@ export type UserCreateWithoutProcessedOrdersInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutProcessedOrdersInput = {
@@ -1570,6 +1658,8 @@ export type UserUncheckedCreateWithoutProcessedOrdersInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutProcessedOrdersInput = {
@@ -1601,6 +1691,8 @@ export type UserCreateWithoutCustomerOrdersInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutCustomerOrdersInput = {
@@ -1627,6 +1719,8 @@ export type UserUncheckedCreateWithoutCustomerOrdersInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutCustomerOrdersInput = {
@@ -1669,6 +1763,8 @@ export type UserUpdateWithoutProcessedOrdersInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProcessedOrdersInput = {
@@ -1695,6 +1791,8 @@ export type UserUncheckedUpdateWithoutProcessedOrdersInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUpsertWithoutCustomerOrdersInput = {
@@ -1732,6 +1830,8 @@ export type UserUpdateWithoutCustomerOrdersInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCustomerOrdersInput = {
@@ -1758,6 +1858,8 @@ export type UserUncheckedUpdateWithoutCustomerOrdersInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutOrderAlertsInput = {
@@ -1784,6 +1886,8 @@ export type UserCreateWithoutOrderAlertsInput = {
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutOrderAlertsInput = {
@@ -1810,6 +1914,8 @@ export type UserUncheckedCreateWithoutOrderAlertsInput = {
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutOrderAlertsInput = {
@@ -1852,6 +1958,8 @@ export type UserUpdateWithoutOrderAlertsInput = {
   stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderAlertsInput = {
@@ -1878,6 +1986,8 @@ export type UserUncheckedUpdateWithoutOrderAlertsInput = {
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutProcessedPartOrdersInput = {
@@ -1904,6 +2014,8 @@ export type UserCreateWithoutProcessedPartOrdersInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutProcessedPartOrdersInput = {
@@ -1930,6 +2042,8 @@ export type UserUncheckedCreateWithoutProcessedPartOrdersInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutProcessedPartOrdersInput = {
@@ -1961,6 +2075,8 @@ export type UserCreateWithoutCustomerPartOrdersInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutCustomerPartOrdersInput = {
@@ -1987,6 +2103,8 @@ export type UserUncheckedCreateWithoutCustomerPartOrdersInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutCustomerPartOrdersInput = {
@@ -2029,6 +2147,8 @@ export type UserUpdateWithoutProcessedPartOrdersInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProcessedPartOrdersInput = {
@@ -2055,6 +2175,8 @@ export type UserUncheckedUpdateWithoutProcessedPartOrdersInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUpsertWithoutCustomerPartOrdersInput = {
@@ -2092,6 +2214,8 @@ export type UserUpdateWithoutCustomerPartOrdersInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCustomerPartOrdersInput = {
@@ -2118,6 +2242,8 @@ export type UserUncheckedUpdateWithoutCustomerPartOrdersInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutRecordedExpensesInput = {
@@ -2144,6 +2270,8 @@ export type UserCreateWithoutRecordedExpensesInput = {
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutRecordedExpensesInput = {
@@ -2170,6 +2298,8 @@ export type UserUncheckedCreateWithoutRecordedExpensesInput = {
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutRecordedExpensesInput = {
@@ -2212,6 +2342,8 @@ export type UserUpdateWithoutRecordedExpensesInput = {
   stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecordedExpensesInput = {
@@ -2238,6 +2370,8 @@ export type UserUncheckedUpdateWithoutRecordedExpensesInput = {
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutDocumentsInput = {
@@ -2264,6 +2398,8 @@ export type UserCreateWithoutDocumentsInput = {
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutDocumentsInput = {
@@ -2290,6 +2426,8 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutDocumentsInput = {
@@ -2332,6 +2470,8 @@ export type UserUpdateWithoutDocumentsInput = {
   stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDocumentsInput = {
@@ -2358,6 +2498,8 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -2384,6 +2526,8 @@ export type UserCreateWithoutAuditLogsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -2410,6 +2554,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
   orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
   recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -2452,6 +2598,8 @@ export type UserUpdateWithoutAuditLogsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -2478,6 +2626,264 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
+}
+
+export type UserCreateWithoutVendorPaymentsRecordedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput
+  customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput
+  processedPartOrders?: Prisma.PartOrderCreateNestedManyWithoutProcessedByInput
+  customerPartOrders?: Prisma.PartOrderCreateNestedManyWithoutCustomerInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
+  orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
+  recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationCreateNestedManyWithoutRecordedByInput
+}
+
+export type UserUncheckedCreateWithoutVendorPaymentsRecordedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  branchId?: string | null
+  vendorId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput
+  customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput
+  processedPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutProcessedByInput
+  customerPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutCustomerInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
+  orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
+  recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutRecordedByInput
+}
+
+export type UserCreateOrConnectWithoutVendorPaymentsRecordedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVendorPaymentsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorPaymentsRecordedInput>
+}
+
+export type UserUpsertWithoutVendorPaymentsRecordedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVendorPaymentsRecordedInput, Prisma.UserUncheckedUpdateWithoutVendorPaymentsRecordedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVendorPaymentsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorPaymentsRecordedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVendorPaymentsRecordedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVendorPaymentsRecordedInput, Prisma.UserUncheckedUpdateWithoutVendorPaymentsRecordedInput>
+}
+
+export type UserUpdateWithoutVendorPaymentsRecordedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput
+  customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput
+  processedPartOrders?: Prisma.PartOrderUpdateManyWithoutProcessedByNestedInput
+  customerPartOrders?: Prisma.PartOrderUpdateManyWithoutCustomerNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
+  orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
+  recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVendorPaymentsRecordedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput
+  customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput
+  processedPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput
+  customerPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutCustomerNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
+  orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
+  recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
+}
+
+export type UserCreateWithoutVendorAllocationsRecordedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  branch?: Prisma.BranchCreateNestedOneWithoutUsersInput
+  vendor?: Prisma.VendorCreateNestedOneWithoutStaffInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  processedOrders?: Prisma.OrderCreateNestedManyWithoutProcessedByInput
+  customerOrders?: Prisma.OrderCreateNestedManyWithoutCustomerInput
+  processedPartOrders?: Prisma.PartOrderCreateNestedManyWithoutProcessedByInput
+  customerPartOrders?: Prisma.PartOrderCreateNestedManyWithoutCustomerInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutUploadedByInput
+  orderAlerts?: Prisma.OrderAlertCreateNestedManyWithoutUserInput
+  recordedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentCreateNestedManyWithoutRecordedByInput
+}
+
+export type UserUncheckedCreateWithoutVendorAllocationsRecordedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phoneNumber?: string | null
+  role: $Enums.UserRole
+  status?: $Enums.UserStatus
+  branchId?: string | null
+  vendorId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  processedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutProcessedByInput
+  customerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput
+  processedPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutProcessedByInput
+  customerPartOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutCustomerInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploadedByInput
+  orderAlerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutUserInput
+  recordedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRecordedByInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutRecordedByInput
+}
+
+export type UserCreateOrConnectWithoutVendorAllocationsRecordedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVendorAllocationsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorAllocationsRecordedInput>
+}
+
+export type UserUpsertWithoutVendorAllocationsRecordedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVendorAllocationsRecordedInput, Prisma.UserUncheckedUpdateWithoutVendorAllocationsRecordedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVendorAllocationsRecordedInput, Prisma.UserUncheckedCreateWithoutVendorAllocationsRecordedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVendorAllocationsRecordedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVendorAllocationsRecordedInput, Prisma.UserUncheckedUpdateWithoutVendorAllocationsRecordedInput>
+}
+
+export type UserUpdateWithoutVendorAllocationsRecordedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  branch?: Prisma.BranchUpdateOneWithoutUsersNestedInput
+  vendor?: Prisma.VendorUpdateOneWithoutStaffNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  processedOrders?: Prisma.OrderUpdateManyWithoutProcessedByNestedInput
+  customerOrders?: Prisma.OrderUpdateManyWithoutCustomerNestedInput
+  processedPartOrders?: Prisma.PartOrderUpdateManyWithoutProcessedByNestedInput
+  customerPartOrders?: Prisma.PartOrderUpdateManyWithoutCustomerNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
+  orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
+  recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVendorAllocationsRecordedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  processedOrders?: Prisma.OrderUncheckedUpdateManyWithoutProcessedByNestedInput
+  customerOrders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput
+  processedPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput
+  customerPartOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutCustomerNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
+  orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
+  recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserCreateManyBranchInput = {
@@ -2518,6 +2924,8 @@ export type UserUpdateWithoutBranchInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBranchInput = {
@@ -2544,6 +2952,8 @@ export type UserUncheckedUpdateWithoutBranchInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutBranchInput = {
@@ -2598,6 +3008,8 @@ export type UserUpdateWithoutVendorInput = {
   documents?: Prisma.DocumentUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVendorInput = {
@@ -2624,6 +3036,8 @@ export type UserUncheckedUpdateWithoutVendorInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutUploadedByNestedInput
   orderAlerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutUserNestedInput
   recordedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorPaymentsRecorded?: Prisma.VendorPaymentUncheckedUpdateManyWithoutRecordedByNestedInput
+  vendorAllocationsRecorded?: Prisma.VendorAllocationUncheckedUpdateManyWithoutRecordedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutVendorInput = {
@@ -2658,6 +3072,8 @@ export type UserCountOutputType = {
   documents: number
   orderAlerts: number
   recordedExpenses: number
+  vendorPaymentsRecorded: number
+  vendorAllocationsRecorded: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2673,6 +3089,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   documents?: boolean | UserCountOutputTypeCountDocumentsArgs
   orderAlerts?: boolean | UserCountOutputTypeCountOrderAlertsArgs
   recordedExpenses?: boolean | UserCountOutputTypeCountRecordedExpensesArgs
+  vendorPaymentsRecorded?: boolean | UserCountOutputTypeCountVendorPaymentsRecordedArgs
+  vendorAllocationsRecorded?: boolean | UserCountOutputTypeCountVendorAllocationsRecordedArgs
 }
 
 /**
@@ -2769,6 +3187,20 @@ export type UserCountOutputTypeCountRecordedExpensesArgs<ExtArgs extends runtime
   where?: Prisma.ExpenseWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVendorPaymentsRecordedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorPaymentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVendorAllocationsRecordedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VendorAllocationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2797,6 +3229,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
   orderAlerts?: boolean | Prisma.User$orderAlertsArgs<ExtArgs>
   recordedExpenses?: boolean | Prisma.User$recordedExpensesArgs<ExtArgs>
+  vendorPaymentsRecorded?: boolean | Prisma.User$vendorPaymentsRecordedArgs<ExtArgs>
+  vendorAllocationsRecorded?: boolean | Prisma.User$vendorAllocationsRecordedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2865,6 +3299,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
   orderAlerts?: boolean | Prisma.User$orderAlertsArgs<ExtArgs>
   recordedExpenses?: boolean | Prisma.User$recordedExpensesArgs<ExtArgs>
+  vendorPaymentsRecorded?: boolean | Prisma.User$vendorPaymentsRecordedArgs<ExtArgs>
+  vendorAllocationsRecorded?: boolean | Prisma.User$vendorAllocationsRecordedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2893,6 +3329,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     documents: Prisma.$DocumentPayload<ExtArgs>[]
     orderAlerts: Prisma.$OrderAlertPayload<ExtArgs>[]
     recordedExpenses: Prisma.$ExpensePayload<ExtArgs>[]
+    vendorPaymentsRecorded: Prisma.$VendorPaymentPayload<ExtArgs>[]
+    vendorAllocationsRecorded: Prisma.$VendorAllocationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3315,6 +3753,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   documents<T extends Prisma.User$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orderAlerts<T extends Prisma.User$orderAlertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$orderAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recordedExpenses<T extends Prisma.User$recordedExpensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$recordedExpensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vendorPaymentsRecorded<T extends Prisma.User$vendorPaymentsRecordedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vendorPaymentsRecordedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vendorAllocationsRecorded<T extends Prisma.User$vendorAllocationsRecordedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$vendorAllocationsRecordedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4080,6 +4520,54 @@ export type User$recordedExpensesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[]
+}
+
+/**
+ * User.vendorPaymentsRecorded
+ */
+export type User$vendorPaymentsRecordedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorPayment
+   */
+  select?: Prisma.VendorPaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorPayment
+   */
+  omit?: Prisma.VendorPaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorPaymentInclude<ExtArgs> | null
+  where?: Prisma.VendorPaymentWhereInput
+  orderBy?: Prisma.VendorPaymentOrderByWithRelationInput | Prisma.VendorPaymentOrderByWithRelationInput[]
+  cursor?: Prisma.VendorPaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorPaymentScalarFieldEnum | Prisma.VendorPaymentScalarFieldEnum[]
+}
+
+/**
+ * User.vendorAllocationsRecorded
+ */
+export type User$vendorAllocationsRecordedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VendorAllocation
+   */
+  select?: Prisma.VendorAllocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VendorAllocation
+   */
+  omit?: Prisma.VendorAllocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VendorAllocationInclude<ExtArgs> | null
+  where?: Prisma.VendorAllocationWhereInput
+  orderBy?: Prisma.VendorAllocationOrderByWithRelationInput | Prisma.VendorAllocationOrderByWithRelationInput[]
+  cursor?: Prisma.VendorAllocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VendorAllocationScalarFieldEnum | Prisma.VendorAllocationScalarFieldEnum[]
 }
 
 /**

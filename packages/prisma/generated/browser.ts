@@ -153,6 +153,22 @@ export type Payable = Prisma.PayableModel
  */
 export type PaymentAllocation = Prisma.PaymentAllocationModel
 /**
+ * Model VendorPayment
+ * Records a cash payment made TO a vendor (money out, vendor prepaid balance increases).
+ */
+export type VendorPayment = Prisma.VendorPaymentModel
+/**
+ * Model VendorAllocation
+ * Records the allocation of received inventory against a vendor's prepaid balance.
+ * One allocation event can cover multiple bikes and/or parts in a single delivery.
+ */
+export type VendorAllocation = Prisma.VendorAllocationModel
+/**
+ * Model VendorAllocationPartLine
+ * A single part line inside a VendorAllocation (e.g. 10x spark plugs @ Rs. 450 each).
+ */
+export type VendorAllocationPartLine = Prisma.VendorAllocationPartLineModel
+/**
  * Model ReceivablesAlert
  * 
  */

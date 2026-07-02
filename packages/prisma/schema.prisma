@@ -138,6 +138,7 @@ enum AccountSubtype {
   EQUITY
   DRAWINGS
   REVENUE
+  VENDOR_PREPAID
   OTHER
 }
 
@@ -207,6 +208,9 @@ model User {
 
   fcmTokens String[] @default([])
 
+  vendorPaymentsRecorded    VendorPayment[]    @relation("VendorPaymentRecordedBy")
+  vendorAllocationsRecorded VendorAllocation[] @relation("VendorAllocationRecordedBy")
+
   @@index([email])
   @@index([role])
   @@index([branchId])
@@ -266,6 +270,8 @@ model Branch {
   partOrders PartOrder[]
   expenses   Expense[]
 
+  allocationPartLines VendorAllocationPartLine[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -279,13 +285,16 @@ model Vendor {
   phoneNumber   String?
   email         String?
   address       String?
+  isActive      Boolean @default(true)
 
-  suppliedBikes BikeUnit[]
-  staff         User[]
-
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  suppliedBikes  BikeUnit[]
+  staff          User[]
   purchaseOrders PurchaseOrder[]
+  payments       VendorPayment[]
+  allocations    VendorAllocation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ============================================================================
@@ -333,6 +342,8 @@ model BikeUnit {
 
   price         Decimal? @db.Decimal(12, 2)
   purchasePrice Decimal? @db.Decimal(12, 2)
+  // Cost recorded at the time of vendor allocation (what was charged against vendor balance)
+  purchaseCost  Decimal? @db.Decimal(12, 2)
   color         String?
   media         String[] @default([])
 
@@ -342,9 +353,12 @@ model BikeUnit {
   reservedUntil DateTime?
   soldAt        DateTime?
 
-  documents Document[]
+  // Link to the vendor allocation event that received this bike
+  vendorAllocationId String?
+  vendorAllocation   VendorAllocation? @relation(fields: [vendorAllocationId], references: [id])
 
-  orders Order[]
+  documents Document[]
+  orders    Order[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -354,6 +368,7 @@ model BikeUnit {
   @@index([modelId])
   @@index([vendorId])
   @@index([reservedUntil])
+  @@index([vendorAllocationId])
 }
 
 // ============================================================================
@@ -372,6 +387,7 @@ model Part {
 
   inventories PartInventory[]
   partOrders  PartOrder[]
+  allocationLines VendorAllocationPartLine[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -803,8 +819,9 @@ model Account {
   lines                   JournalEntryLine[]
   payments                PaymentTransaction[]
   partPaymentTransactions PartPaymentTransaction[]
-  orderPayments           Order[]    @relation("OrderPaymentAccount")
-  partOrderPayments       PartOrder[] @relation("PartOrderPaymentAccount")
+  orderPayments           Order[]                  @relation("OrderPaymentAccount")
+  partOrderPayments       PartOrder[]              @relation("PartOrderPaymentAccount")
+  vendorPayments          VendorPayment[]          @relation("VendorPaymentFromAccount")
 }
 
 model JournalEntry {
@@ -817,7 +834,9 @@ model JournalEntry {
   status      JournalStatus @default(POSTED)
   isManual    Boolean       @default(false)
 
-  lines JournalEntryLine[]
+  lines            JournalEntryLine[]
+  vendorPayment    VendorPayment?
+  vendorAllocation VendorAllocation?
 }
 
 model JournalEntryLine {
@@ -894,6 +913,93 @@ model PaymentAllocation {
   allocatedAmount          Decimal                 @db.Decimal(12, 2)
   partPaymentTransaction   PartPaymentTransaction? @relation(fields: [partPaymentTransactionId], references: [id])
   partPaymentTransactionId String?
+}
+
+// ============================================================================
+// VENDOR ACCOUNT SYSTEM
+// ============================================================================
+
+/// Records a cash payment made TO a vendor (money out, vendor prepaid balance increases).
+model VendorPayment {
+  id String @id @default(uuid())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  /// The account funds were drawn from (Cash, Bank, Owner Capital, etc.)
+  fromAccountId String
+  fromAccount   Account @relation("VendorPaymentFromAccount", fields: [fromAccountId], references: [id])
+
+  amount  Decimal  @db.Decimal(12, 2)
+  date    DateTime @default(now())
+  notes   String?
+
+  /// The auto-posted journal entry for this payment (DR Vendor Prepaid / CR fromAccount)
+  journalEntryId String?       @unique
+  journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
+
+  recordedById String?
+  recordedBy   User?   @relation("VendorPaymentRecordedBy", fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vendorId])
+  @@index([date])
+}
+
+/// Records the allocation of received inventory against a vendor's prepaid balance.
+/// One allocation event can cover multiple bikes and/or parts in a single delivery.
+model VendorAllocation {
+  id String @id @default(uuid())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  /// Total cost of all inventory in this allocation event
+  totalAmount Decimal  @db.Decimal(12, 2)
+  date        DateTime @default(now())
+  notes       String?
+
+  /// The auto-posted journal entry (DR Inventory / CR Vendor Prepaid)
+  journalEntryId String?       @unique
+  journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
+
+  /// Bikes included in this allocation
+  bikes BikeUnit[]
+
+  /// Part line items included in this allocation
+  partLines VendorAllocationPartLine[]
+
+  recordedById String?
+  recordedBy   User?   @relation("VendorAllocationRecordedBy", fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vendorId])
+  @@index([date])
+}
+
+/// A single part line inside a VendorAllocation (e.g. 10x spark plugs @ Rs. 450 each).
+model VendorAllocationPartLine {
+  id String @id @default(uuid())
+
+  allocationId String
+  allocation   VendorAllocation @relation(fields: [allocationId], references: [id], onDelete: Cascade)
+
+  partId String
+  part   Part   @relation(fields: [partId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  quantity  Int
+  unitCost  Decimal @db.Decimal(12, 2)
+  totalCost Decimal @db.Decimal(12, 2)
+
+  @@index([allocationId])
+  @@index([partId])
 }
 
 // ============================================================================
