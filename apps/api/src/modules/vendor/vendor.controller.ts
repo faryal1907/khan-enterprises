@@ -126,4 +126,31 @@ export class VendorController {
   ) {
     return this.vendorService.allocateInventory(id, data, req.user.id);
   }
+
+  // ─── Return defective inventory to vendor ───────────────────────────────
+  // CR Inventory / DR Vendor Prepaid (increases vendor balance)
+  @Post(":id/return-defective")
+  @Roles(UserRole.ADMIN)
+  async returnDefective(
+    @Param("id") id: string,
+    @Body()
+    data: {
+      bikeIds: string[];
+      partReturns: { partInventoryId: string; quantity: number }[];
+      date: string;
+      notes?: string;
+    },
+    @Request() req: any,
+  ) {
+    return this.vendorService.returnDefectiveInventory(id, data, req.user.id);
+  }
+
+  // ─── Get vendor-allocated inventory eligible for return ───────────────────────
+  // Bikes that were allocated from this vendor and are currently AVAILABLE
+  // Parts that were allocated from this vendor and have stock > 0
+  @Get(":id/returnable-inventory")
+  @Roles(UserRole.ADMIN)
+  async getReturnableInventory(@Param("id") id: string) {
+    return this.vendorService.getReturnableInventory(id);
+  }
 }

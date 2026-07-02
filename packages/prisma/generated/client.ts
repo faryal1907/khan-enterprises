@@ -191,6 +191,21 @@ export type VendorAllocation = Prisma.VendorAllocationModel
  */
 export type VendorAllocationPartLine = Prisma.VendorAllocationPartLineModel
 /**
+ * Model VendorDefectiveReturn
+ * Records a return of defective inventory to a vendor.
+ */
+export type VendorDefectiveReturn = Prisma.VendorDefectiveReturnModel
+/**
+ * Model VendorDefectiveReturnBike
+ * A single bike unit referenced in a defective return.
+ */
+export type VendorDefectiveReturnBike = Prisma.VendorDefectiveReturnBikeModel
+/**
+ * Model VendorDefectiveReturnPartLine
+ * A single part line inside a VendorDefectiveReturn.
+ */
+export type VendorDefectiveReturnPartLine = Prisma.VendorDefectiveReturnPartLineModel
+/**
  * Model ReceivablesAlert
  * 
  */

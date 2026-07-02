@@ -28,5 +28,8 @@ export type * from './models/PaymentAllocation.ts';
 export type * from './models/VendorPayment.ts';
 export type * from './models/VendorAllocation.ts';
 export type * from './models/VendorAllocationPartLine.ts';
+export type * from './models/VendorDefectiveReturn.ts';
+export type * from './models/VendorDefectiveReturnBike.ts';
+export type * from './models/VendorDefectiveReturnPartLine.ts';
 export type * from './models/ReceivablesAlert.ts';
 export type * from './commonInputTypes.ts';

@@ -81,6 +81,9 @@ export const ModelName = {
   VendorPayment: 'VendorPayment',
   VendorAllocation: 'VendorAllocation',
   VendorAllocationPartLine: 'VendorAllocationPartLine',
+  VendorDefectiveReturn: 'VendorDefectiveReturn',
+  VendorDefectiveReturnBike: 'VendorDefectiveReturnBike',
+  VendorDefectiveReturnPartLine: 'VendorDefectiveReturnPartLine',
   ReceivablesAlert: 'ReceivablesAlert'
 } as const
 
@@ -594,6 +597,45 @@ export const VendorAllocationPartLineScalarFieldEnum = {
 } as const
 
 export type VendorAllocationPartLineScalarFieldEnum = (typeof VendorAllocationPartLineScalarFieldEnum)[keyof typeof VendorAllocationPartLineScalarFieldEnum]
+
+
+export const VendorDefectiveReturnScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  totalAmount: 'totalAmount',
+  date: 'date',
+  notes: 'notes',
+  journalEntryId: 'journalEntryId',
+  recordedById: 'recordedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VendorDefectiveReturnScalarFieldEnum = (typeof VendorDefectiveReturnScalarFieldEnum)[keyof typeof VendorDefectiveReturnScalarFieldEnum]
+
+
+export const VendorDefectiveReturnBikeScalarFieldEnum = {
+  id: 'id',
+  returnId: 'returnId',
+  chassisNumber: 'chassisNumber',
+  modelBrand: 'modelBrand',
+  modelName: 'modelName',
+  unitCost: 'unitCost'
+} as const
+
+export type VendorDefectiveReturnBikeScalarFieldEnum = (typeof VendorDefectiveReturnBikeScalarFieldEnum)[keyof typeof VendorDefectiveReturnBikeScalarFieldEnum]
+
+
+export const VendorDefectiveReturnPartLineScalarFieldEnum = {
+  id: 'id',
+  returnId: 'returnId',
+  partInventoryId: 'partInventoryId',
+  quantity: 'quantity',
+  unitCost: 'unitCost',
+  totalCost: 'totalCost'
+} as const
+
+export type VendorDefectiveReturnPartLineScalarFieldEnum = (typeof VendorDefectiveReturnPartLineScalarFieldEnum)[keyof typeof VendorDefectiveReturnPartLineScalarFieldEnum]
 
 
 export const ReceivablesAlertScalarFieldEnum = {

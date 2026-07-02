@@ -88,6 +88,7 @@ enum AuditAction {
   APPROVE
   REJECT
   PAYMENT
+  DEFECTIVE_RETURN
 }
 
 enum InventoryMovementType {
@@ -210,6 +211,7 @@ model User {
 
   vendorPaymentsRecorded    VendorPayment[]    @relation("VendorPaymentRecordedBy")
   vendorAllocationsRecorded VendorAllocation[] @relation("VendorAllocationRecordedBy")
+  vendorDefectiveReturnsRecorded VendorDefectiveReturn[] @relation("VendorDefectiveReturnRecordedBy")
 
   @@index([email])
   @@index([role])
@@ -292,6 +294,7 @@ model Vendor {
   purchaseOrders PurchaseOrder[]
   payments       VendorPayment[]
   allocations    VendorAllocation[]
+  defectiveReturns VendorDefectiveReturn[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -412,6 +415,7 @@ model PartInventory {
 
   stockMovements StockMovement[]
   partOrders     PartOrder[]
+  defectiveReturnLines VendorDefectiveReturnPartLine[]
 
   updatedAt DateTime @updatedAt
 
@@ -837,6 +841,8 @@ model JournalEntry {
   lines            JournalEntryLine[]
   vendorPayment    VendorPayment?
   vendorAllocation VendorAllocation?
+  vendorDefectiveReturn VendorDefectiveReturn?
+
 }
 
 model JournalEntryLine {
@@ -1000,6 +1006,72 @@ model VendorAllocationPartLine {
 
   @@index([allocationId])
   @@index([partId])
+}
+
+/// Records a return of defective inventory to a vendor.
+model VendorDefectiveReturn {
+  id String @id @default(uuid())
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  /// Total value of returned items
+  totalAmount Decimal  @db.Decimal(12, 2)
+  date        DateTime @default(now())
+  notes       String?
+
+  /// The bike units being returned
+  bikes VendorDefectiveReturnBike[]
+
+  /// Part line items being returned
+  partLines VendorDefectiveReturnPartLine[]
+
+  /// The auto-posted journal entry (CR Inventory / DR Vendor Prepaid)
+  journalEntryId String?       @unique
+  journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
+
+  recordedById String?
+  recordedBy   User?   @relation("VendorDefectiveReturnRecordedBy", fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vendorId])
+  @@index([date])
+}
+
+/// A single bike unit referenced in a defective return.
+model VendorDefectiveReturnBike {
+  id String @id @default(uuid())
+
+  returnId String
+  return   VendorDefectiveReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
+
+  // Store bike details since the bike will be deleted
+  chassisNumber String
+  modelBrand String
+  modelName String
+  unitCost Decimal @db.Decimal(12, 2)
+
+  @@index([returnId])
+}
+
+/// A single part line inside a VendorDefectiveReturn.
+model VendorDefectiveReturnPartLine {
+  id String @id @default(uuid())
+
+  returnId String
+  return   VendorDefectiveReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
+
+  partInventoryId String
+  partInventory   PartInventory @relation(fields: [partInventoryId], references: [id])
+
+  quantity  Int
+  unitCost  Decimal @db.Decimal(12, 2)
+  totalCost Decimal @db.Decimal(12, 2)
+
+  @@index([returnId])
+  @@index([partInventoryId])
 }
 
 // ============================================================================

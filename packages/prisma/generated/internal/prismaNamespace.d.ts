@@ -187,6 +187,9 @@ export declare const ModelName: {
     readonly VendorPayment: "VendorPayment";
     readonly VendorAllocation: "VendorAllocation";
     readonly VendorAllocationPartLine: "VendorAllocationPartLine";
+    readonly VendorDefectiveReturn: "VendorDefectiveReturn";
+    readonly VendorDefectiveReturnBike: "VendorDefectiveReturnBike";
+    readonly VendorDefectiveReturnPartLine: "VendorDefectiveReturnPartLine";
     readonly ReceivablesAlert: "ReceivablesAlert";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -200,7 +203,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "vendorPayment" | "vendorAllocation" | "vendorAllocationPartLine" | "receivablesAlert";
+        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "vendorPayment" | "vendorAllocation" | "vendorAllocationPartLine" | "vendorDefectiveReturn" | "vendorDefectiveReturnBike" | "vendorDefectiveReturnPartLine" | "receivablesAlert";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -2424,6 +2427,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        VendorDefectiveReturn: {
+            payload: Prisma.$VendorDefectiveReturnPayload<ExtArgs>;
+            fields: Prisma.VendorDefectiveReturnFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.VendorDefectiveReturnFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.VendorDefectiveReturnFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>;
+                };
+                findFirst: {
+                    args: Prisma.VendorDefectiveReturnFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.VendorDefectiveReturnFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>;
+                };
+                findMany: {
+                    args: Prisma.VendorDefectiveReturnFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>[];
+                };
+                create: {
+                    args: Prisma.VendorDefectiveReturnCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>;
+                };
+                createMany: {
+                    args: Prisma.VendorDefectiveReturnCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.VendorDefectiveReturnCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>[];
+                };
+                delete: {
+                    args: Prisma.VendorDefectiveReturnDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>;
+                };
+                update: {
+                    args: Prisma.VendorDefectiveReturnUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.VendorDefectiveReturnDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.VendorDefectiveReturnUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.VendorDefectiveReturnUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>[];
+                };
+                upsert: {
+                    args: Prisma.VendorDefectiveReturnUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPayload>;
+                };
+                aggregate: {
+                    args: Prisma.VendorDefectiveReturnAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateVendorDefectiveReturn>;
+                };
+                groupBy: {
+                    args: Prisma.VendorDefectiveReturnGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorDefectiveReturnGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.VendorDefectiveReturnCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorDefectiveReturnCountAggregateOutputType> | number;
+                };
+            };
+        };
+        VendorDefectiveReturnBike: {
+            payload: Prisma.$VendorDefectiveReturnBikePayload<ExtArgs>;
+            fields: Prisma.VendorDefectiveReturnBikeFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.VendorDefectiveReturnBikeFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.VendorDefectiveReturnBikeFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>;
+                };
+                findFirst: {
+                    args: Prisma.VendorDefectiveReturnBikeFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.VendorDefectiveReturnBikeFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>;
+                };
+                findMany: {
+                    args: Prisma.VendorDefectiveReturnBikeFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>[];
+                };
+                create: {
+                    args: Prisma.VendorDefectiveReturnBikeCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>;
+                };
+                createMany: {
+                    args: Prisma.VendorDefectiveReturnBikeCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.VendorDefectiveReturnBikeCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>[];
+                };
+                delete: {
+                    args: Prisma.VendorDefectiveReturnBikeDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>;
+                };
+                update: {
+                    args: Prisma.VendorDefectiveReturnBikeUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.VendorDefectiveReturnBikeDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.VendorDefectiveReturnBikeUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.VendorDefectiveReturnBikeUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>[];
+                };
+                upsert: {
+                    args: Prisma.VendorDefectiveReturnBikeUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnBikePayload>;
+                };
+                aggregate: {
+                    args: Prisma.VendorDefectiveReturnBikeAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateVendorDefectiveReturnBike>;
+                };
+                groupBy: {
+                    args: Prisma.VendorDefectiveReturnBikeGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorDefectiveReturnBikeGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.VendorDefectiveReturnBikeCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorDefectiveReturnBikeCountAggregateOutputType> | number;
+                };
+            };
+        };
+        VendorDefectiveReturnPartLine: {
+            payload: Prisma.$VendorDefectiveReturnPartLinePayload<ExtArgs>;
+            fields: Prisma.VendorDefectiveReturnPartLineFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.VendorDefectiveReturnPartLineFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.VendorDefectiveReturnPartLineFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>;
+                };
+                findFirst: {
+                    args: Prisma.VendorDefectiveReturnPartLineFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.VendorDefectiveReturnPartLineFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>;
+                };
+                findMany: {
+                    args: Prisma.VendorDefectiveReturnPartLineFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>[];
+                };
+                create: {
+                    args: Prisma.VendorDefectiveReturnPartLineCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>;
+                };
+                createMany: {
+                    args: Prisma.VendorDefectiveReturnPartLineCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.VendorDefectiveReturnPartLineCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>[];
+                };
+                delete: {
+                    args: Prisma.VendorDefectiveReturnPartLineDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>;
+                };
+                update: {
+                    args: Prisma.VendorDefectiveReturnPartLineUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.VendorDefectiveReturnPartLineDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.VendorDefectiveReturnPartLineUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.VendorDefectiveReturnPartLineUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>[];
+                };
+                upsert: {
+                    args: Prisma.VendorDefectiveReturnPartLineUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$VendorDefectiveReturnPartLinePayload>;
+                };
+                aggregate: {
+                    args: Prisma.VendorDefectiveReturnPartLineAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateVendorDefectiveReturnPartLine>;
+                };
+                groupBy: {
+                    args: Prisma.VendorDefectiveReturnPartLineGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorDefectiveReturnPartLineGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.VendorDefectiveReturnPartLineCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.VendorDefectiveReturnPartLineCountAggregateOutputType> | number;
+                };
+            };
+        };
         ReceivablesAlert: {
             payload: Prisma.$ReceivablesAlertPayload<ExtArgs>;
             fields: Prisma.ReceivablesAlertFieldRefs;
@@ -2935,6 +3160,36 @@ export declare const VendorAllocationPartLineScalarFieldEnum: {
     readonly totalCost: "totalCost";
 };
 export type VendorAllocationPartLineScalarFieldEnum = (typeof VendorAllocationPartLineScalarFieldEnum)[keyof typeof VendorAllocationPartLineScalarFieldEnum];
+export declare const VendorDefectiveReturnScalarFieldEnum: {
+    readonly id: "id";
+    readonly vendorId: "vendorId";
+    readonly totalAmount: "totalAmount";
+    readonly date: "date";
+    readonly notes: "notes";
+    readonly journalEntryId: "journalEntryId";
+    readonly recordedById: "recordedById";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type VendorDefectiveReturnScalarFieldEnum = (typeof VendorDefectiveReturnScalarFieldEnum)[keyof typeof VendorDefectiveReturnScalarFieldEnum];
+export declare const VendorDefectiveReturnBikeScalarFieldEnum: {
+    readonly id: "id";
+    readonly returnId: "returnId";
+    readonly chassisNumber: "chassisNumber";
+    readonly modelBrand: "modelBrand";
+    readonly modelName: "modelName";
+    readonly unitCost: "unitCost";
+};
+export type VendorDefectiveReturnBikeScalarFieldEnum = (typeof VendorDefectiveReturnBikeScalarFieldEnum)[keyof typeof VendorDefectiveReturnBikeScalarFieldEnum];
+export declare const VendorDefectiveReturnPartLineScalarFieldEnum: {
+    readonly id: "id";
+    readonly returnId: "returnId";
+    readonly partInventoryId: "partInventoryId";
+    readonly quantity: "quantity";
+    readonly unitCost: "unitCost";
+    readonly totalCost: "totalCost";
+};
+export type VendorDefectiveReturnPartLineScalarFieldEnum = (typeof VendorDefectiveReturnPartLineScalarFieldEnum)[keyof typeof VendorDefectiveReturnPartLineScalarFieldEnum];
 export declare const ReceivablesAlertScalarFieldEnum: {
     readonly id: "id";
     readonly customerPhone: "customerPhone";
@@ -3079,6 +3334,9 @@ export type GlobalOmitConfig = {
     vendorPayment?: Prisma.VendorPaymentOmit;
     vendorAllocation?: Prisma.VendorAllocationOmit;
     vendorAllocationPartLine?: Prisma.VendorAllocationPartLineOmit;
+    vendorDefectiveReturn?: Prisma.VendorDefectiveReturnOmit;
+    vendorDefectiveReturnBike?: Prisma.VendorDefectiveReturnBikeOmit;
+    vendorDefectiveReturnPartLine?: Prisma.VendorDefectiveReturnPartLineOmit;
     receivablesAlert?: Prisma.ReceivablesAlertOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';

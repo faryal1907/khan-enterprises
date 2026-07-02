@@ -80,3 +80,21 @@ export const allocateVendorInventory = async (
   const { data } = await api.post(`/vendors/${vendorId}/allocate`, payload);
   return data; // { allocation, journalEntry, bikesCreated, partsProcessed, totalAllocated, newPrepaidBalance }
 };
+
+export const returnDefectiveInventory = async (
+  vendorId: string,
+  payload: {
+    bikeIds: string[];
+    partReturns: { partInventoryId: string; quantity: number }[];
+    date: string;
+    notes?: string;
+  },
+) => {
+  const { data } = await api.post(`/vendors/${vendorId}/return-defective`, payload);
+  return data; // { return, journalEntry, bikesRemoved, partsProcessed, totalReturned, newPrepaidBalance }
+};
+
+export const getVendorReturnableInventory = async (vendorId: string) => {
+  const { data } = await api.get(`/vendors/${vendorId}/returnable-inventory`);
+  return data; // { bikes: [], parts: [] }
+};

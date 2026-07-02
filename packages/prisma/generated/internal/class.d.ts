@@ -120,6 +120,15 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get vendorAllocationPartLine(): Prisma.VendorAllocationPartLineDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get vendorDefectiveReturn(): Prisma.VendorDefectiveReturnDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get vendorDefectiveReturnBike(): Prisma.VendorDefectiveReturnBikeDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get vendorDefectiveReturnPartLine(): Prisma.VendorDefectiveReturnPartLineDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get receivablesAlert(): Prisma.ReceivablesAlertDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;

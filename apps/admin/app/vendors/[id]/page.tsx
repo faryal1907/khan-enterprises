@@ -10,6 +10,7 @@ import { UserRole } from "@/lib/types";
 import { getVendorLedger, updateVendor } from "@/lib/api/vendors";
 import { VendorPaymentModal } from "../vendor-payment-modal";
 import { AllocateInventoryModal } from "../allocate-inventory-modal";
+import { ReturnDefectiveInventoryModal } from "../return-defective-inventory-modal";
 import { AsyncButton } from "@/components/async-button";
 
 type LedgerEntry =
@@ -29,13 +30,24 @@ type LedgerEntry =
       date: string;
       totalAmount: number;
       notes: string | null;
-      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; purchaseCost: number | null }[];
+      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; unitCost: number | null }[];
+      partLines: { id: string; quantity: number; unitCost: number; totalCost: number; part: { name: string; sku: string }; branch: { name: string } }[];
+      recordedBy: { fullName: string } | null;
+      balance: number;
+    }
+  | {
+      kind: "DEFECTIVE_RETURN";
+      id: string;
+      date: string;
+      totalAmount: number;
+      notes: string | null;
+      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; unitCost: number }[];
       partLines: { id: string; quantity: number; unitCost: number; totalCost: number; part: { name: string; sku: string }; branch: { name: string } }[];
       recordedBy: { fullName: string } | null;
       balance: number;
     };
 
-type Summary = { totalPaid: number; totalAllocated: number; prepaidBalance: number };
+type Summary = { totalPaid: number; totalAllocated: number; totalDefectiveReturned?: number; prepaidBalance: number };
 type Vendor = { id: string; name: string; contactPerson: string | null; phoneNumber: string | null; email: string | null };
 
 const fmt = (n: number) =>
@@ -58,6 +70,7 @@ export default function VendorDetailPage() {
   // Modals
   const [payOpen, setPayOpen] = useState(false);
   const [allocOpen, setAllocOpen] = useState(false);
+  const [returnOpen, setReturnOpen] = useState(false);
 
   // Edit
   const [editing, setEditing] = useState(false);
@@ -230,6 +243,13 @@ export default function VendorDetailPage() {
             >
               Allocate Inventory
             </button>
+            <button
+              onClick={() => setReturnOpen(true)}
+              className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-sm"
+              style={{ backgroundColor: "#dc2626" }}
+            >
+              Return Defective Inventory
+            </button>
             {summary.prepaidBalance <= 0 && (
               <p className="text-xs self-center" style={{ color: theme.text.muted }}>
                 No balance to allocate against.
@@ -269,11 +289,25 @@ export default function VendorDetailPage() {
                     <span
                       className="px-2 py-0.5 rounded-full text-xs font-bold"
                       style={{
-                        backgroundColor: entry.kind === "PAYMENT" ? "#dcfce7" : "#dbeafe",
-                        color: entry.kind === "PAYMENT" ? "#166534" : "#1e40af",
+                        backgroundColor:
+                          entry.kind === "PAYMENT"
+                            ? "#dcfce7"
+                            : entry.kind === "DEFECTIVE_RETURN"
+                              ? "#fef2f2"
+                              : "#dbeafe",
+                        color:
+                          entry.kind === "PAYMENT"
+                            ? "#166534"
+                            : entry.kind === "DEFECTIVE_RETURN"
+                              ? "#991b1b"
+                              : "#1e40af",
                       }}
                     >
-                      {entry.kind === "PAYMENT" ? "PAYMENT" : "ALLOCATION"}
+                      {entry.kind === "PAYMENT"
+                        ? "PAYMENT"
+                        : entry.kind === "DEFECTIVE_RETURN"
+                          ? "DEFECTIVE RETURN"
+                          : "ALLOCATION"}
                     </span>
                     <span className="text-sm font-medium" style={{ color: theme.text.primary }}>
                       {fmtDate(entry.date)}
@@ -285,9 +319,20 @@ export default function VendorDetailPage() {
                   <div className="flex items-center gap-4">
                     <span
                       className="text-sm font-bold"
-                      style={{ color: entry.kind === "PAYMENT" ? "#059669" : "#dc2626" }}
+                      style={{
+                        color:
+                          entry.kind === "PAYMENT"
+                            ? "#059669"
+                            : entry.kind === "DEFECTIVE_RETURN"
+                              ? "#059669"
+                              : "#dc2626",
+                      }}
                     >
-                      {entry.kind === "PAYMENT" ? "+" : "−"}{fmt(entry.kind === "PAYMENT" ? entry.amount : entry.totalAmount)}
+                      {entry.kind === "PAYMENT"
+                        ? "+"
+                        : entry.kind === "DEFECTIVE_RETURN"
+                          ? "+"
+                          : "−"}{fmt(entry.kind === "PAYMENT" ? entry.amount : entry.totalAmount)}
                     </span>
                     <span className="text-xs" style={{ color: theme.text.muted }}>
                       Balance: <span className="font-semibold" style={{ color: theme.text.primary }}>{fmt(entry.balance)}</span>
@@ -309,7 +354,7 @@ export default function VendorDetailPage() {
                           <span className="font-medium" style={{ color: theme.text.primary }}>Bikes: </span>
                           {entry.bikes.map((b) => (
                             <span key={b.id} className="mr-2">
-                              {b.model.brand} {b.model.modelName} ({b.chassisNumber}){b.purchaseCost ? ` — ${fmt(b.purchaseCost)}` : ""}
+                              {b.model.brand} {b.model.modelName} ({b.chassisNumber}) — {fmt(b.unitCost ?? 0)}
                             </span>
                           ))}
                         </div>
@@ -323,6 +368,9 @@ export default function VendorDetailPage() {
                             </span>
                           ))}
                         </div>
+                      )}
+                      {entry.kind === "DEFECTIVE_RETURN" && entry.notes && (
+                        <p>Reason: {entry.notes}</p>
                       )}
                       {entry.recordedBy && (
                         <p>Recorded by {entry.recordedBy.fullName}</p>
@@ -352,6 +400,13 @@ export default function VendorDetailPage() {
         vendorId={id}
         vendorName={vendor.name}
         currentBalance={summary.prepaidBalance}
+      />
+      <ReturnDefectiveInventoryModal
+        isOpen={returnOpen}
+        onClose={() => setReturnOpen(false)}
+        onSuccess={load}
+        vendorId={id}
+        vendorName={vendor.name}
       />
     </div>
   );

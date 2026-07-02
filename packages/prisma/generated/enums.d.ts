@@ -68,6 +68,7 @@ export declare const AuditAction: {
     readonly APPROVE: "APPROVE";
     readonly REJECT: "REJECT";
     readonly PAYMENT: "PAYMENT";
+    readonly DEFECTIVE_RETURN: "DEFECTIVE_RETURN";
 };
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export declare const InventoryMovementType: {

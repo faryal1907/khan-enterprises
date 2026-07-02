@@ -108,7 +108,7 @@ export class VendorService {
   // ─── Balance ───────────────────────────────────────────────────────────────
 
   async getVendorBalance(vendorId: string): Promise<number> {
-    const [paid, allocated] = await Promise.all([
+    const [paid, allocated, defectiveReturned] = await Promise.all([
       this.prisma.client.vendorPayment.aggregate({
         where: { vendorId },
         _sum: { amount: true },
@@ -117,11 +117,19 @@ export class VendorService {
         where: { vendorId },
         _sum: { totalAmount: true },
       }),
+      this.prisma.client.vendorDefectiveReturn.aggregate({
+        where: { vendorId },
+        _sum: { totalAmount: true },
+      }),
     ]);
 
-    return (
-      Number(paid._sum.amount ?? 0) - Number(allocated._sum.totalAmount ?? 0)
-    );
+    const totalPaid = Number(paid._sum.amount ?? 0);
+    const totalAllocated = Number(allocated._sum.totalAmount ?? 0);
+    const totalDefectiveReturned = Number(defectiveReturned._sum.totalAmount ?? 0);
+    // Current allocated value still in stock = total allocations - returns
+    const currentAllocated = totalAllocated - totalDefectiveReturned;
+
+    return totalPaid - currentAllocated;
   }
 
   // ─── Ledger ────────────────────────────────────────────────────────────────
@@ -163,11 +171,45 @@ export class VendorService {
       orderBy: { date: "asc" },
     });
 
-    type LedgerEntry =
-      | { kind: "PAYMENT"; date: Date; id: string; amount: number; notes: string | null; fromAccount: { code: string; name: string }; recordedBy: { fullName: string } | null }
-      | { kind: "ALLOCATION"; date: Date; id: string; totalAmount: number; notes: string | null; bikes: any[]; partLines: any[]; recordedBy: { fullName: string } | null };
+    const defectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
+      where: { vendorId },
+      include: {
+        bikes: {
+          select: {
+            id: true,
+            chassisNumber: true,
+            modelBrand: true,
+            modelName: true,
+            unitCost: true,
+          },
+        },
+        partLines: {
+          include: {
+            partInventory: {
+              include: {
+                part: { select: { id: true, name: true, sku: true } },
+                branch: { select: { id: true, name: true } },
+              },
+            },
+          },
+        },
+        recordedBy: { select: { id: true, fullName: true } },
+      },
+      orderBy: { date: "asc" },
+    });
 
-    const entries: LedgerEntry[] = [
+    const entries: {
+      kind: "PAYMENT" | "ALLOCATION" | "DEFECTIVE_RETURN";
+      date: Date;
+      id: string;
+      amount?: number;
+      totalAmount?: number;
+      notes: string | null;
+      fromAccount?: { code: string; name: string };
+      bikes: any[];
+      partLines: any[];
+      recordedBy: { fullName: string } | null;
+    }[] = [
       ...payments.map((p) => ({
         kind: "PAYMENT" as const,
         date: p.date,
@@ -176,6 +218,8 @@ export class VendorService {
         notes: p.notes,
         fromAccount: p.fromAccount,
         recordedBy: p.recordedBy,
+        bikes: [],
+        partLines: [],
       })),
       ...allocations.map((a) => ({
         kind: "ALLOCATION" as const,
@@ -187,21 +231,51 @@ export class VendorService {
         partLines: a.partLines,
         recordedBy: a.recordedBy,
       })),
+      ...defectiveReturns.map((r) => ({
+        kind: "DEFECTIVE_RETURN" as const,
+        date: r.date,
+        id: r.id,
+        totalAmount: Number(r.totalAmount),
+        notes: r.notes,
+        bikes: r.bikes.map((rb) => ({
+          id: rb.id,
+          chassisNumber: rb.chassisNumber,
+          model: { brand: rb.modelBrand, modelName: rb.modelName },
+          unitCost: Number(rb.unitCost),
+        })),
+        partLines: r.partLines.map((pl) => ({
+          id: pl.id,
+          quantity: pl.quantity,
+          unitCost: Number(pl.unitCost),
+          totalCost: Number(pl.totalCost),
+          part: pl.partInventory.part,
+          branch: pl.partInventory.branch,
+        })),
+        recordedBy: r.recordedBy,
+      })),
     ].sort((a, b) => a.date.getTime() - b.date.getTime());
 
     let runningBalance = 0;
     const ledger = entries.map((entry) => {
       if (entry.kind === "PAYMENT") {
-        runningBalance += entry.amount;
+        runningBalance += (entry.amount as number);
+        return { ...entry, balance: runningBalance };
+      } else if (entry.kind === "DEFECTIVE_RETURN") {
+        // Returns increase the balance (we get value back)
+        runningBalance += (entry.totalAmount as number);
         return { ...entry, balance: runningBalance };
       } else {
-        runningBalance -= entry.totalAmount;
+        runningBalance -= (entry.totalAmount as number);
         return { ...entry, balance: runningBalance };
       }
     });
 
     const totalPaid = payments.reduce((s, p) => s + Number(p.amount), 0);
     const totalAllocated = allocations.reduce((s, a) => s + Number(a.totalAmount), 0);
+    const totalDefectiveReturned = defectiveReturns.reduce((s, r) => s + Number(r.totalAmount), 0);
+    // Current allocated value still in stock = total allocations - returns
+    const currentAllocated = totalAllocated - totalDefectiveReturned;
+    const prepaidBalance = totalPaid - currentAllocated;
 
     return {
       vendor: {
@@ -211,8 +285,86 @@ export class VendorService {
         phoneNumber: vendor.phoneNumber,
         email: vendor.email,
       },
-      summary: { totalPaid, totalAllocated, prepaidBalance: totalPaid - totalAllocated },
+      summary: {
+        totalPaid,
+        totalAllocated: currentAllocated,
+        totalDefectiveReturned,
+        prepaidBalance,
+      },
       ledger,
+    };
+  }
+
+  // ─── Get vendor-allocated inventory eligible for return ───────────────────────
+  // Returns bikes (with their original allocation cost) and parts that can be returned
+  async getReturnableInventory(vendorId: string) {
+    const vendor = await this.prisma.client.vendor.findUnique({
+      where: { id: vendorId },
+    });
+    if (!vendor) throw new NotFoundException("Vendor not found");
+
+    // Get available bikes that were allocated from this vendor
+    const returnableBikes = await this.prisma.client.bikeUnit.findMany({
+      where: {
+        vendorId,
+        status: "AVAILABLE",
+      },
+      include: {
+        model: { select: { brand: true, modelName: true } },
+      },
+      orderBy: { model: { brand: "asc" } },
+    });
+
+    // Get part inventories with their original allocation costs
+    const returnableParts = await this.prisma.client.partInventory.findMany({
+      where: {
+        quantity: { gt: 0 },
+        part: {
+          allocationLines: {
+            some: {
+              allocation: { vendorId },
+            },
+          },
+        },
+      },
+      include: {
+        part: { select: { id: true, name: true, sku: true, sellingPrice: true } },
+        branch: { select: { id: true, name: true } },
+      },
+      orderBy: { part: { name: "asc" } },
+    });
+
+    // Fetch original unit costs for parts from most recent vendor allocation
+    const partsWithCosts = await Promise.all(
+      returnableParts.map(async (inv) => {
+        const originalLine = await this.prisma.client.vendorAllocationPartLine.findFirst({
+          where: {
+            partId: inv.partId,
+            allocation: { vendorId },
+          },
+          orderBy: { allocation: { date: "desc" } },
+        });
+        return {
+          ...inv,
+          unitCost: originalLine ? Number(originalLine.unitCost) : Number(inv.part.sellingPrice) || 0,
+        };
+      }),
+    );
+
+    return {
+      bikes: returnableBikes.map((b) => ({
+        id: b.id,
+        chassisNumber: b.chassisNumber,
+        model: { brand: b.model.brand, modelName: b.model.modelName },
+        unitCost: Number(b.purchaseCost || 0),
+      })),
+      parts: partsWithCosts.map((p) => ({
+        id: p.id,
+        quantity: p.quantity,
+        part: p.part,
+        branch: p.branch,
+        unitCost: p.unitCost,
+      })),
     };
   }
 
@@ -475,6 +627,207 @@ export class VendorService {
         bikesCreated: createdBikeIds.length,
         partsProcessed: data.parts.length,
         totalAllocated: totalAmount,
+        newPrepaidBalance: newBalance,
+      };
+    });
+  }
+
+  // ─── Return Defective Inventory ────────────────────────────────────────────────
+  // CR Inventory / DR Vendor Prepaid (reverses an allocation)
+  async returnDefectiveInventory(
+    vendorId: string,
+    data: {
+      bikeIds: string[];
+      partReturns: { partInventoryId: string; quantity: number }[];
+      date: string;
+      notes?: string;
+    },
+    userId: string,
+  ) {
+    const vendor = await this.prisma.client.vendor.findUnique({ where: { id: vendorId } });
+    if (!vendor) throw new NotFoundException("Vendor not found");
+
+    if (data.bikeIds.length === 0 && data.partReturns.length === 0) {
+      throw new BadRequestException("At least one bike or part must be returned");
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // Validate and fetch bikes to return
+      const bikesToReturn = await tx.bikeUnit.findMany({
+        where: {
+          id: { in: data.bikeIds },
+          vendorId,
+          status: "AVAILABLE",
+        },
+        include: { model: true },
+      });
+
+      if (bikesToReturn.length !== data.bikeIds.length) {
+        throw new BadRequestException("Some bikes are not available or not allocated to this vendor");
+      }
+
+      // Validate and fetch part inventories to return
+      const partInventoryChecks = await Promise.all(
+        data.partReturns.map(async (pr) => {
+          const inv = await tx.partInventory.findUnique({
+            where: { id: pr.partInventoryId },
+            include: { part: true, branch: true },
+          });
+          if (!inv) throw new NotFoundException(`Part inventory ${pr.partInventoryId} not found`);
+          if (inv.quantity < pr.quantity) {
+            throw new BadRequestException(
+              `Insufficient stock for ${inv.part.name}. Available: ${inv.quantity}`,
+            );
+          }
+          // Check that part was originally allocated from this vendor
+          const originalAllocation = await tx.vendorAllocationPartLine.findFirst({
+            where: {
+              partId: inv.partId,
+              allocation: { vendorId },
+            },
+            orderBy: { allocation: { date: "desc" } },
+          });
+          if (!originalAllocation) {
+            throw new BadRequestException(
+              `Part ${inv.part.name} was not allocated from this vendor`,
+            );
+          }
+          return { ...pr, partInventory: inv };
+        }),
+      );
+
+      // Calculate total return value
+      const bikeTotal = bikesToReturn.reduce((s, b) => s + Number(b.purchaseCost || 0), 0);
+
+      // Fetch unit costs from original allocation for parts
+      const partTotalsWithCosts = await Promise.all(
+        partInventoryChecks.map(async (pr) => {
+          const originalLine = await tx.vendorAllocationPartLine.findFirst({
+            where: {
+              partId: pr.partInventory.partId,
+              allocation: { vendorId },
+            },
+            orderBy: { allocation: { date: "desc" } },
+          });
+          const unitCost = originalLine ? Number(originalLine.unitCost) : Number(pr.partInventory.part.sellingPrice) || 0;
+          return {
+            partInventoryId: pr.partInventoryId,
+            quantity: pr.quantity,
+            unitCost,
+            totalCost: pr.quantity * unitCost,
+          };
+        }),
+      );
+
+      const partTotal = partTotalsWithCosts.reduce((s, p) => s + p.totalCost, 0);
+      const totalAmount = bikeTotal + partTotal;
+
+      if (totalAmount <= 0) {
+        throw new BadRequestException("Return value must be greater than 0");
+      }
+
+      const inventoryAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.INVENTORY } });
+      const prepaidAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.VENDOR_PREPAID } });
+      if (!inventoryAcc || !prepaidAcc) {
+        throw new NotFoundException("Inventory or Vendor Prepaid account not found in Chart of Accounts");
+      }
+
+      const returnDate = new Date(`${data.date}T12:00:00Z`);
+      const entryNo = `JV-DR-${Date.now()}`;
+
+      // Create journal entry: CR Inventory / DR Vendor Prepaid
+      const journalEntry = await tx.journalEntry.create({
+        data: {
+          entryNo,
+          date: returnDate,
+          description: `Defective inventory returned to ${vendor.name}`,
+          notes: data.notes,
+          status: JournalStatus.POSTED,
+          lines: {
+            create: [
+              { accountId: inventoryAcc.id, debit: 0, credit: totalAmount },
+              { accountId: prepaidAcc.id, debit: totalAmount, credit: 0 },
+            ],
+          },
+        },
+      });
+
+      // Create defective return record
+      const defectiveReturn = await tx.vendorDefectiveReturn.create({
+        data: {
+          vendorId,
+          totalAmount,
+          date: returnDate,
+          notes: data.notes ?? null,
+          journalEntryId: journalEntry.id,
+          recordedById: userId,
+        },
+      });
+
+      // Create bike return lines and delete bikes (remove from inventory)
+      for (const bike of bikesToReturn) {
+        await tx.vendorDefectiveReturnBike.create({
+          data: {
+            returnId: defectiveReturn.id,
+            chassisNumber: bike.chassisNumber,
+            modelBrand: bike.model.brand,
+            modelName: bike.model.modelName,
+            unitCost: bike.purchaseCost ?? 0,
+          },
+        });
+
+        await tx.bikeUnit.delete({ where: { id: bike.id } });
+      }
+
+      // Create part return lines and adjust stock
+      for (const pt of partTotalsWithCosts) {
+        await tx.vendorDefectiveReturnPartLine.create({
+          data: {
+            returnId: defectiveReturn.id,
+            partInventoryId: pt.partInventoryId,
+            quantity: pt.quantity,
+            unitCost: pt.unitCost,
+            totalCost: pt.totalCost,
+          },
+        });
+
+        // Create stock movement record for the return
+        await tx.stockMovement.create({
+          data: {
+            inventoryId: pt.partInventoryId,
+            movementType: "STOCK_OUT" as any,
+            quantity: pt.quantity,
+            reason: "Defective return to vendor",
+            performedById: userId,
+          },
+        });
+
+        await tx.partInventory.update({
+          where: { id: pt.partInventoryId },
+          data: { quantity: { decrement: pt.quantity } },
+        });
+      }
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          userId,
+          userRole: "ADMIN" as any,
+          action: "DEFECTIVE_RETURN" as any,
+          entityType: "VendorDefectiveReturn",
+          entityId: defectiveReturn.id,
+          ipAddress: "system",
+        },
+      });
+
+      const newBalance = await this.getVendorBalance(vendorId);
+
+      return {
+        return: { id: defectiveReturn.id },
+        journalEntry: { id: journalEntry.id, entryNo: journalEntry.entryNo },
+        bikesRemoved: bikesToReturn.length,
+        partsProcessed: partTotalsWithCosts.length,
+        totalReturned: totalAmount,
         newPrepaidBalance: newBalance,
       };
     });

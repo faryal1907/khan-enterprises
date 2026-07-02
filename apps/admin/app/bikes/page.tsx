@@ -478,7 +478,7 @@ function BikeTable({
       <table className="w-full">
         <thead>
           <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-            {["Chassis No.", "Engine No.", "Model", "Branch", "Vendor", "Status", "Actions"].map((heading) => (
+            {["Chassis No.", "Motor No.", "Model", "Branch", "Vendor", "Status", "Actions"].map((heading) => (
               <th
                 key={heading}
                 className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"

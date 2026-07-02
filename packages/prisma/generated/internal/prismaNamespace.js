@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReceivablesAlertScalarFieldEnum = exports.VendorAllocationPartLineScalarFieldEnum = exports.VendorAllocationScalarFieldEnum = exports.VendorPaymentScalarFieldEnum = exports.PaymentAllocationScalarFieldEnum = exports.PayableScalarFieldEnum = exports.PurchaseOrderItemScalarFieldEnum = exports.PurchaseOrderScalarFieldEnum = exports.JournalEntryLineScalarFieldEnum = exports.JournalEntryScalarFieldEnum = exports.AccountScalarFieldEnum = exports.SystemSettingScalarFieldEnum = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.ExpenseScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.PasswordResetTokenScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
-exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = void 0;
+exports.VendorDefectiveReturnScalarFieldEnum = exports.VendorAllocationPartLineScalarFieldEnum = exports.VendorAllocationScalarFieldEnum = exports.VendorPaymentScalarFieldEnum = exports.PaymentAllocationScalarFieldEnum = exports.PayableScalarFieldEnum = exports.PurchaseOrderItemScalarFieldEnum = exports.PurchaseOrderScalarFieldEnum = exports.JournalEntryLineScalarFieldEnum = exports.JournalEntryScalarFieldEnum = exports.AccountScalarFieldEnum = exports.SystemSettingScalarFieldEnum = exports.AuditLogScalarFieldEnum = exports.DocumentScalarFieldEnum = exports.DeliveryRequestScalarFieldEnum = exports.ExpenseScalarFieldEnum = exports.PartPaymentTransactionScalarFieldEnum = exports.PaymentTransactionScalarFieldEnum = exports.PartOrderScalarFieldEnum = exports.OrderAlertScalarFieldEnum = exports.OrderScalarFieldEnum = exports.StockMovementScalarFieldEnum = exports.PartInventoryScalarFieldEnum = exports.PartScalarFieldEnum = exports.BikeUnitScalarFieldEnum = exports.BikeModelScalarFieldEnum = exports.VendorScalarFieldEnum = exports.BranchScalarFieldEnum = exports.PasswordResetTokenScalarFieldEnum = exports.RefreshTokenScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.JsonNullValueFilter = exports.NullsOrder = exports.QueryMode = exports.NullableJsonNullValueInput = exports.SortOrder = exports.ReceivablesAlertScalarFieldEnum = exports.VendorDefectiveReturnPartLineScalarFieldEnum = exports.VendorDefectiveReturnBikeScalarFieldEnum = void 0;
 const runtime = require("@prisma/client/runtime/client");
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -58,6 +58,9 @@ exports.ModelName = {
     VendorPayment: 'VendorPayment',
     VendorAllocation: 'VendorAllocation',
     VendorAllocationPartLine: 'VendorAllocationPartLine',
+    VendorDefectiveReturn: 'VendorDefectiveReturn',
+    VendorDefectiveReturnBike: 'VendorDefectiveReturnBike',
+    VendorDefectiveReturnPartLine: 'VendorDefectiveReturnPartLine',
     ReceivablesAlert: 'ReceivablesAlert'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
@@ -438,6 +441,33 @@ exports.VendorAllocationPartLineScalarFieldEnum = {
     allocationId: 'allocationId',
     partId: 'partId',
     branchId: 'branchId',
+    quantity: 'quantity',
+    unitCost: 'unitCost',
+    totalCost: 'totalCost'
+};
+exports.VendorDefectiveReturnScalarFieldEnum = {
+    id: 'id',
+    vendorId: 'vendorId',
+    totalAmount: 'totalAmount',
+    date: 'date',
+    notes: 'notes',
+    journalEntryId: 'journalEntryId',
+    recordedById: 'recordedById',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.VendorDefectiveReturnBikeScalarFieldEnum = {
+    id: 'id',
+    returnId: 'returnId',
+    chassisNumber: 'chassisNumber',
+    modelBrand: 'modelBrand',
+    modelName: 'modelName',
+    unitCost: 'unitCost'
+};
+exports.VendorDefectiveReturnPartLineScalarFieldEnum = {
+    id: 'id',
+    returnId: 'returnId',
+    partInventoryId: 'partInventoryId',
     quantity: 'quantity',
     unitCost: 'unitCost',
     totalCost: 'totalCost'

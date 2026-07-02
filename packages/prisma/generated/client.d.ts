@@ -36,4 +36,7 @@ export type PaymentAllocation = Prisma.PaymentAllocationModel;
 export type VendorPayment = Prisma.VendorPaymentModel;
 export type VendorAllocation = Prisma.VendorAllocationModel;
 export type VendorAllocationPartLine = Prisma.VendorAllocationPartLineModel;
+export type VendorDefectiveReturn = Prisma.VendorDefectiveReturnModel;
+export type VendorDefectiveReturnBike = Prisma.VendorDefectiveReturnBikeModel;
+export type VendorDefectiveReturnPartLine = Prisma.VendorDefectiveReturnPartLineModel;
 export type ReceivablesAlert = Prisma.ReceivablesAlertModel;
