@@ -219,6 +219,7 @@ export default function AccountsPage() {
     isOpen: boolean; partyId: string; partyName: string; partyType: string;
   }>({ isOpen: false, partyId: '', partyName: '', partyType: '' });
   const [isAddReceivableOpen, setIsAddReceivableOpen] = useState(false);
+  const [receivableFilters, setReceivableFilters] = useState({ partySearch: '', partyType: '' });
 
   // ── Expenses / Payables state ──────────────────────────────────────────────
   const [branches, setBranches] = useState<any[]>([]);
@@ -230,6 +231,8 @@ export default function AccountsPage() {
     branch: isBranchScoped ? user?.branchId || '' : '',
     dateFrom: '',
     dateTo: '',
+    payeeType: '',
+    payeeSearch: '',
   });
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [payeeLedgerModalData, setPayeeLedgerModalData] = useState<{
@@ -269,12 +272,36 @@ export default function AccountsPage() {
     }
   }, [expenseFilters]);
 
+  const filteredReceivables = useMemo(() => {
+    let result = receivables;
+    if (receivableFilters.partyType) {
+      result = result.filter((r: any) => r.partyType === receivableFilters.partyType);
+    }
+    if (receivableFilters.partySearch.trim()) {
+      const q = receivableFilters.partySearch.trim().toLowerCase();
+      result = result.filter((r: any) => r.partyName?.toLowerCase().includes(q));
+    }
+    return result;
+  }, [receivables, receivableFilters.partyType, receivableFilters.partySearch]);
+
   const expenseSummary = useMemo(() => ({
     total: payablesByPayee.reduce((s, g) => s + g.totalExpenses, 0),
     count: payablesByPayee.reduce((s, g) => s + g.expenseCount, 0),
     unpaid: payablesByPayee.reduce((s, g) => s + g.totalOutstanding, 0),
     payeeCount: payablesByPayee.length,
   }), [payablesByPayee]);
+
+  const filteredPayablesByPayee = useMemo(() => {
+    let result = payablesByPayee;
+    if (expenseFilters.payeeType) {
+      result = result.filter((g) => g.payeeType === expenseFilters.payeeType);
+    }
+    if (expenseFilters.payeeSearch.trim()) {
+      const q = expenseFilters.payeeSearch.trim().toLowerCase();
+      result = result.filter((g) => g.payeeName.toLowerCase().includes(q));
+    }
+    return result;
+  }, [payablesByPayee, expenseFilters.payeeType, expenseFilters.payeeSearch]);
 
   // Fetch expenses when PAYABLES tab is active
   useEffect(() => {
@@ -827,7 +854,36 @@ export default function AccountsPage() {
 
             {/* Filters */}
             <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Payee Name</label>
+                  <input
+                    type="text"
+                    placeholder="Search payee..."
+                    value={expenseFilters.payeeSearch}
+                    onChange={(e) => setExpenseFilters(p => ({ ...p, payeeSearch: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Payee Type</label>
+                  <select
+                    value={expenseFilters.payeeType}
+                    onChange={(e) => setExpenseFilters(p => ({ ...p, payeeType: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Types</option>
+                    <option value="VENDOR">Vendor</option>
+                    <option value="EMPLOYEE">Employee</option>
+                    <option value="SUPPLIER">Supplier</option>
+                    <option value="LANDLORD">Landlord</option>
+                    <option value="UTILITY_COMPANY">Utility Company</option>
+                    <option value="CONTRACTOR">Contractor</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Branch</label>
                   <select
@@ -858,6 +914,20 @@ export default function AccountsPage() {
                   />
                 </div>
               </div>
+              {(expenseFilters.payeeSearch || expenseFilters.payeeType) && (
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs" style={{ color: theme.text.secondary }}>
+                    {filteredPayablesByPayee.length} of {payablesByPayee.length} payee{payablesByPayee.length !== 1 ? 's' : ''}
+                  </span>
+                  <button
+                    onClick={() => setExpenseFilters(p => ({ ...p, payeeSearch: '', payeeType: '' }))}
+                    className="text-xs font-semibold px-3 py-1 rounded border hover:bg-gray-50"
+                    style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Payee-grouped table */}
@@ -880,11 +950,11 @@ export default function AccountsPage() {
                         <AsyncButton onClick={fetchExpenses}>Retry</AsyncButton>
                       </div>
                     </td></tr>
-                  ) : payablesByPayee.length === 0 ? (
+                  ) : filteredPayablesByPayee.length === 0 ? (
                     <tr><td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.muted }}>
-                      No payables found. Add an expense to get started.
+                      {payablesByPayee.length === 0 ? 'No payables found. Add an expense to get started.' : 'No payees match the current filters.'}
                     </td></tr>
-                  ) : payablesByPayee.map((group) => {
+                  ) : filteredPayablesByPayee.map((group) => {
                     const outstanding = Number(group.totalOutstanding);
                     const status = outstanding <= 0 ? 'PAID' : group.totalOutstanding < group.totalExpenses ? 'PARTIAL' : 'DUE';
                     return (
@@ -961,6 +1031,56 @@ export default function AccountsPage() {
               </div>
             </div>
 
+            {/* Filters */}
+            <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Party Name</label>
+                  <input
+                    type="text"
+                    placeholder="Search by name..."
+                    value={receivableFilters.partySearch}
+                    onChange={(e) => setReceivableFilters(p => ({ ...p, partySearch: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Party Type</label>
+                  <select
+                    value={receivableFilters.partyType}
+                    onChange={(e) => setReceivableFilters(p => ({ ...p, partyType: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Types</option>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="VENDOR">Vendor</option>
+                    <option value="EMPLOYEE">Employee</option>
+                    <option value="SUPPLIER">Supplier</option>
+                    <option value="LANDLORD">Landlord</option>
+                    <option value="UTILITY_COMPANY">Utility Company</option>
+                    <option value="BUSINESS_PARTNER">Business Partner</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+              </div>
+              {(receivableFilters.partySearch || receivableFilters.partyType) && (
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs" style={{ color: theme.text.secondary }}>
+                    {filteredReceivables.length} of {receivables.length} part{receivables.length !== 1 ? 'ies' : 'y'}
+                  </span>
+                  <button
+                    onClick={() => setReceivableFilters({ partySearch: '', partyType: '' })}
+                    className="text-xs font-semibold px-3 py-1 rounded border hover:bg-gray-50"
+                    style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
+            </div>
+
             {receivables.length === 0 ? (
               <div className="rounded-xl border bg-white p-8 text-center" style={{ borderColor: theme.borders.light, color: theme.text.muted }}>
                 No receivables yet.
@@ -980,7 +1100,11 @@ export default function AccountsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {receivables.map((r: any) => {
+                    {filteredReceivables.length === 0 ? (
+                      <tr><td colSpan={7} className="px-6 py-10 text-center" style={{ color: theme.text.muted }}>
+                        No parties match the current filters.
+                      </td></tr>
+                    ) : filteredReceivables.map((r: any) => {
                       const outstanding = Number(r.totalOutstanding);
                       return (
                         <tr key={r.partyId ?? r.partyName} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
