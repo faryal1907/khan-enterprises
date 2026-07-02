@@ -910,12 +910,13 @@ export class InventoryService {
   async updatePartInventoryDiscount(inventoryId: string, onlineDiscountPercent: number, user: any) {
     const inventory = await this.prisma.client.partInventory.findUnique({
       where: { id: inventoryId },
-      include: { part: true },
+      include: { part: true, branch: true },
     });
-    if (!inventory) throw new NotFoundException("Inventory not found");
-    this.assertBranchAccess(inventory.branchId, user);
+    if (!inventory) {
+      throw new NotFoundException(`Inventory record not found`);
+    }
 
-    const updated = await this.prisma.client.partInventory.update({
+    await this.prisma.client.partInventory.update({
       where: { id: inventoryId },
       data: { onlineDiscountPercent },
     });
@@ -932,6 +933,35 @@ export class InventoryService {
       },
     });
 
-    return updated;
+    return inventory;
+  }
+
+  async updatePartInventoryReorderLevel(inventoryId: string, reorderLevel: number, user: any) {
+    const inventory = await this.prisma.client.partInventory.findUnique({
+      where: { id: inventoryId },
+      include: { part: true, branch: true },
+    });
+    if (!inventory) {
+      throw new NotFoundException(`Inventory record not found`);
+    }
+
+    await this.prisma.client.partInventory.update({
+      where: { id: inventoryId },
+      data: { reorderLevel },
+    });
+
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: AuditAction.UPDATE,
+        entityType: "PART_INVENTORY",
+        entityId: inventoryId,
+        oldValue: JSON.stringify({ reorderLevel: inventory.reorderLevel }),
+        newValue: JSON.stringify({ reorderLevel }),
+      },
+    });
+
+    return inventory;
   }
 }

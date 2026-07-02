@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { toast } from "sonner";
-import { getPartById, updatePart, deletePart } from "@/lib/api/inventory";
+import { getPartById, updatePart, deletePart, updatePartInventoryReorderLevel } from "@/lib/api/inventory";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { AsyncButton } from "@/components/async-button";
@@ -21,6 +21,9 @@ export default function EditPartPage() {
   const [deleting, setDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [inventories, setInventories] = useState<any[]>([]);
+  const [reorderLevels, setReorderLevels] = useState<Record<string, string>>({});
+  const [savingReorder, setSavingReorder] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (user && !canManage) router.replace("/parts");
@@ -50,6 +53,12 @@ export default function EditPartPage() {
           category: part.category,
           description: part.description || "",
         });
+        setInventories(part.inventories || []);
+        const initialLevels: Record<string, string> = {};
+        (part.inventories || []).forEach((inv: any) => {
+          initialLevels[inv.id] = String(inv.reorderLevel ?? 0);
+        });
+        setReorderLevels(initialLevels);
       } catch (error) {
         console.error("Failed to fetch part data:", error);
       } finally {
@@ -97,6 +106,29 @@ export default function EditPartPage() {
   const handleDelete = () => {
     setDeleteError("");
     setShowDeleteModal(true);
+  };
+
+  const handleReorderLevelChange = (inventoryId: string, value: string) => {
+    setReorderLevels((prev) => ({ ...prev, [inventoryId]: value }));
+  };
+
+  const handleSaveReorderLevel = async (inventoryId: string) => {
+    const value = parseInt(reorderLevels[inventoryId] || "0", 10);
+    if (isNaN(value) || value < 0) {
+      toast.error("Reorder level must be a non-negative number");
+      return;
+    }
+
+    setSavingReorder((prev) => ({ ...prev, [inventoryId]: true }));
+    try {
+      await updatePartInventoryReorderLevel(inventoryId, value);
+      toast.success("Reorder level updated");
+    } catch (error) {
+      console.error("Failed to update reorder level:", error);
+      toast.error("Failed to update reorder level");
+    } finally {
+      setSavingReorder((prev) => ({ ...prev, [inventoryId]: false }));
+    }
   };
 
   if (loading) {
@@ -227,6 +259,60 @@ export default function EditPartPage() {
                 </div>
               </div>
             </div>
+
+            {inventories.length > 0 && (
+              <div>
+                <h3
+                  className="text-lg font-semibold mb-4"
+                  style={{ color: theme.text.primary }}
+                >
+                  Reorder Levels by Branch
+                </h3>
+                <div className="space-y-3">
+                  {inventories.map((inv: any) => (
+                    <div
+                      key={inv.id}
+                      className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 rounded"
+                      style={{ backgroundColor: theme.backgrounds.tertiary }}
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium" style={{ color: theme.text.primary }}>
+                          {inv.branch?.name || "Unknown Branch"}
+                        </p>
+                        <p className="text-xs" style={{ color: theme.text.muted }}>
+                          Current quantity: {inv.quantity}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={reorderLevels[inv.id] ?? ""}
+                          onChange={(e) => handleReorderLevelChange(inv.id, e.target.value)}
+                          className="w-24 px-3 py-2 rounded text-sm"
+                          style={{
+                            backgroundColor: theme.backgrounds.primary,
+                            border: `1px solid ${theme.borders.medium}`,
+                            color: theme.text.primary,
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveReorderLevel(inv.id)}
+                          disabled={savingReorder[inv.id]}
+                          className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                          style={{
+                            backgroundColor: theme.accents.primary,
+                            color: theme.text.inverse,
+                          }}
+                        >
+                          {savingReorder[inv.id] ? "Saving..." : "Save"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-between items-center pt-6">
               {isAdmin && <button

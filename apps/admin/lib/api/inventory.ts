@@ -155,6 +155,14 @@ export async function updatePartInventoryDiscount(
   return response.data;
 }
 
+export async function updatePartInventoryReorderLevel(
+  inventoryId: string,
+  reorderLevel: number,
+) {
+  const response = await api.patch(`/inventory/parts/inventory/${inventoryId}/reorder-level`, { reorderLevel });
+  return response.data;
+}
+
 export async function transferPart(data: {
   partId: string;
   fromBranchId: string;

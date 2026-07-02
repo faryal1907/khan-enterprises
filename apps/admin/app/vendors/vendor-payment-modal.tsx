@@ -50,11 +50,12 @@ export function VendorPaymentModal({
     setNotes("");
     getAccounts()
       .then((all: Account[]) => {
-        // Show Cash, Bank, E-Wallet, Equity — anything the owner could send money from
+        // Only liquid asset accounts (Cash, Bank, E-Wallet) can fund a vendor payment.
+        // Equity accounts (Owner Capital) are not real cash — they represent ownership stake.
         const fundable = all.filter(
           (a) =>
             a.balance > 0 &&
-            ["CASH", "BANK", "EWALLET", "EQUITY"].includes(a.subtype),
+            ["CASH", "BANK", "EWALLET"].includes(a.subtype),
         );
         setAccounts(fundable);
       })

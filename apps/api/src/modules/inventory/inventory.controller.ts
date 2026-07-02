@@ -238,4 +238,14 @@ export class InventoryController {
   ) {
     return this.inventoryService.updatePartInventoryDiscount(inventoryId, onlineDiscountPercent, user);
   }
+
+  @Patch("parts/inventory/:inventoryId/reorder-level")
+  @Roles("ADMIN", "MANAGER")
+  async updatePartInventoryReorderLevel(
+    @Param("inventoryId") inventoryId: string,
+    @Body("reorderLevel") reorderLevel: number,
+    @CurrentUser() user: any,
+  ) {
+    return this.inventoryService.updatePartInventoryReorderLevel(inventoryId, reorderLevel, user);
+  }
 }

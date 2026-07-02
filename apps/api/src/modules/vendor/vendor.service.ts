@@ -385,6 +385,14 @@ export class VendorService {
       if (!fromAccount) throw new NotFoundException("Funding account not found");
       if (!fromAccount.isActive) throw new BadRequestException("Funding account is inactive");
 
+      const allowedSubtypes: string[] = [AccountSubtype.CASH, AccountSubtype.BANK, AccountSubtype.EWALLET];
+      if (!allowedSubtypes.includes(fromAccount.subtype)) {
+        throw new BadRequestException(
+          `Account "${fromAccount.name}" cannot be used as a payment source. ` +
+          `Only Cash, Bank, or E-Wallet accounts are allowed.`,
+        );
+      }
+
       const sourceBalance = await this._getAccountBalanceTx(tx, data.fromAccountId);
       if (sourceBalance < data.amount) {
         throw new BadRequestException(
