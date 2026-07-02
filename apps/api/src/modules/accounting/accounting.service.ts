@@ -45,8 +45,40 @@ export class AccountingService {
     });
   }
 
-  async getJournalEntries() {
+  async getJournalEntries(filters?: {
+    dateFrom?: Date;
+    dateTo?: Date;
+    journalType?: string;
+    accountId?: string;
+    vendorId?: string;
+    customerId?: string;
+  }) {
+    const where: any = {};
+
+    if (filters?.dateFrom || filters?.dateTo) {
+      where.createdAt = {};
+      if (filters.dateFrom) where.createdAt.gte = filters.dateFrom;
+      if (filters.dateTo) where.createdAt.lte = filters.dateTo;
+    }
+
+    if (filters?.journalType) {
+      where.description = { contains: filters.journalType, mode: 'insensitive' };
+    }
+
+    if (filters?.accountId) {
+      where.lines = { some: { accountId: filters.accountId } };
+    }
+
+    if (filters?.vendorId) {
+      where.vendorPayment = { vendorId: filters.vendorId };
+    }
+
+    if (filters?.customerId) {
+      where.description = { contains: filters.customerId, mode: 'insensitive' };
+    }
+
     return this.prisma.client.journalEntry.findMany({
+      where,
       include: {
         lines: {
           include: {
@@ -54,8 +86,7 @@ export class AccountingService {
           }
         }
       },
-      orderBy: { date: 'desc' },
-      take: 100 // Limit for now
+      orderBy: { createdAt: 'desc' },
     });
   }
 

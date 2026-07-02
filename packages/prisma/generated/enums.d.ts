@@ -98,6 +98,27 @@ export declare const ExpenseCategory: {
     readonly OTHER: "OTHER";
 };
 export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory];
+export declare const PayeeType: {
+    readonly VENDOR: "VENDOR";
+    readonly EMPLOYEE: "EMPLOYEE";
+    readonly SUPPLIER: "SUPPLIER";
+    readonly LANDLORD: "LANDLORD";
+    readonly UTILITY_COMPANY: "UTILITY_COMPANY";
+    readonly CONTRACTOR: "CONTRACTOR";
+    readonly OTHER: "OTHER";
+};
+export type PayeeType = (typeof PayeeType)[keyof typeof PayeeType];
+export declare const ReceivablePartyType: {
+    readonly CUSTOMER: "CUSTOMER";
+    readonly VENDOR: "VENDOR";
+    readonly EMPLOYEE: "EMPLOYEE";
+    readonly SUPPLIER: "SUPPLIER";
+    readonly LANDLORD: "LANDLORD";
+    readonly UTILITY_COMPANY: "UTILITY_COMPANY";
+    readonly BUSINESS_PARTNER: "BUSINESS_PARTNER";
+    readonly OTHER: "OTHER";
+};
+export type ReceivablePartyType = (typeof ReceivablePartyType)[keyof typeof ReceivablePartyType];
 export declare const AccountCategory: {
     readonly ASSET: "ASSET";
     readonly LIABILITY: "LIABILITY";

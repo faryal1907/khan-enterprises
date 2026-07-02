@@ -3,27 +3,79 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { theme } from "@/lib/colors";
 import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
-import { getExpenses } from "@/lib/api/expenses";
+import { getExpenses, getPayablesByPayee } from "@/lib/api/expenses";
+import { getVendors } from "@/lib/api/vendors";
 import { toast } from "sonner";
 import { getMessaging, onMessage, isSupported } from "firebase/messaging";
 import app from "@/lib/firebase";
 import { AsyncButton } from "@/components/async-button";
 import { SummaryCard } from "@/components/summary-card";
 import { AddExpenseModal } from "@/components/add-expense-modal";
-import { PayExpenseModal } from "./pay-expense-modal";
-import { ExpenseLedgerModal } from "./expense-ledger-modal";
+import { PayeeLedgerModal } from "./payee-ledger-modal";
 import { CreateJournalEntryModal } from "./create-journal-entry-modal";
 import { AccountLedgerModal } from "./account-ledger-modal";
 import { CapitalContributionModal } from "./capital-contribution-modal";
 import { OwnerWithdrawalModal } from "./owner-withdrawal-modal";
 import { InternalTransferModal } from "./internal-transfer-modal";
 import { CollectReceivableModal } from "./collect-receivable-modal";
-import { CustomerLedgerModal } from "./customer-ledger-modal";
+import { PartyLedgerModal } from "./party-ledger-modal";
+import { AddReceivableModal } from "./add-receivable-modal";
 import { getBranches } from "@/lib/api/inventory";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 
 type Tab = 'OVERVIEW' | 'JOURNALS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY';
+
+// ── Journal type detection ────────────────────────────────────────────────────
+type JournalTypeKey =
+  | 'Sale' | 'Payment Received' | 'Customer Refund' | 'Purchase'
+  | 'Vendor Payment' | 'Vendor Advance' | 'Inventory Receipt' | 'Inventory Return'
+  | 'Capital Contribution' | 'Owner Withdrawal' | 'Expense' | 'Depreciation'
+  | 'Internal Transfer' | 'Manual Journal' | 'Adjustment';
+
+const JOURNAL_TYPES: { label: JournalTypeKey; match: (je: any) => boolean }[] = [
+  { label: 'Sale',                match: (je) => /^JV-SALE-/i.test(je.entryNo) },
+  { label: 'Payment Received',    match: (je) => /^JV-PAY-/i.test(je.entryNo) || /^JV-RCVBL-/i.test(je.entryNo) },
+  { label: 'Customer Refund',     match: (je) => /^JV-REV-|^JV-REVPAY-/i.test(je.entryNo) },
+  { label: 'Purchase',            match: (je) => /^JV-PO-|^PO-/i.test(je.entryNo) },
+  { label: 'Vendor Payment',      match: (je) => /vendor payment/i.test(je.description) },
+  { label: 'Vendor Advance',      match: (je) => /vendor advance/i.test(je.description) },
+  { label: 'Inventory Receipt',   match: (je) => /inventory received/i.test(je.description) },
+  { label: 'Inventory Return',    match: (je) => /inventory returned/i.test(je.description) },
+  { label: 'Capital Contribution',match: (je) => /capital contribution/i.test(je.description) },
+  { label: 'Owner Withdrawal',    match: (je) => /owner withdrawal/i.test(je.description) },
+  { label: 'Expense',             match: (je) => /^JV-EXP-/i.test(je.entryNo) || /^JV-OUT-/i.test(je.entryNo) },
+  { label: 'Depreciation',        match: (je) => /depreciation/i.test(je.description) },
+  { label: 'Internal Transfer',   match: (je) => /internal transfer/i.test(je.description) },
+  { label: 'Manual Journal',      match: (je) => je.isManual === true },
+  { label: 'Adjustment',          match: (je) => /adjustment/i.test(je.description) },
+];
+
+function detectJournalType(je: any): string {
+  for (const t of JOURNAL_TYPES) {
+    if (t.match(je)) return t.label;
+  }
+  return 'Other';
+}
+
+const JOURNAL_TYPE_COLORS: Record<string, string> = {
+  'Sale': 'bg-blue-100 text-blue-800',
+  'Payment Received': 'bg-green-100 text-green-800',
+  'Customer Refund': 'bg-red-100 text-red-800',
+  'Purchase': 'bg-purple-100 text-purple-800',
+  'Vendor Payment': 'bg-orange-100 text-orange-800',
+  'Vendor Advance': 'bg-yellow-100 text-yellow-800',
+  'Inventory Receipt': 'bg-teal-100 text-teal-800',
+  'Inventory Return': 'bg-pink-100 text-pink-800',
+  'Capital Contribution': 'bg-emerald-100 text-emerald-800',
+  'Owner Withdrawal': 'bg-rose-100 text-rose-800',
+  'Expense': 'bg-amber-100 text-amber-800',
+  'Depreciation': 'bg-gray-100 text-gray-800',
+  'Internal Transfer': 'bg-indigo-100 text-indigo-800',
+  'Manual Journal': 'bg-violet-100 text-violet-800',
+  'Adjustment': 'bg-slate-100 text-slate-800',
+  'Other': 'bg-gray-100 text-gray-600',
+};
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR' }).format(amount);
@@ -52,6 +104,95 @@ export default function AccountsPage() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
 
+  // ── Journal filter state ──────────────────────────────────────────────────
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [journalsLoading, setJournalsLoading] = useState(false);
+  const [journalFilters, setJournalFilters] = useState({
+    quickDate: '' as '' | 'today' | 'yesterday' | 'last7' | 'last30' | 'custom',
+    dateFrom: '',
+    dateTo: '',
+    journalType: '' as JournalTypeKey | '',
+    accountId: '',
+    vendorId: '',
+    customerId: '',
+  });
+
+  // Derived date range from quick filter
+  const journalDateRange = useMemo(() => {
+    const today = new Date();
+    const pad = (d: Date) => d.toISOString().slice(0, 10);
+    switch (journalFilters.quickDate) {
+      case 'today': {
+        const s = pad(today);
+        return { dateFrom: s, dateTo: s };
+      }
+      case 'yesterday': {
+        const y = new Date(today); y.setDate(y.getDate() - 1);
+        const s = pad(y);
+        return { dateFrom: s, dateTo: s };
+      }
+      case 'last7': {
+        const s = new Date(today); s.setDate(s.getDate() - 6);
+        return { dateFrom: pad(s), dateTo: pad(today) };
+      }
+      case 'last30': {
+        const s = new Date(today); s.setDate(s.getDate() - 29);
+        return { dateFrom: pad(s), dateTo: pad(today) };
+      }
+      case 'custom':
+        return { dateFrom: journalFilters.dateFrom, dateTo: journalFilters.dateTo };
+      default:
+        return { dateFrom: '', dateTo: '' };
+    }
+  }, [journalFilters.quickDate, journalFilters.dateFrom, journalFilters.dateTo]);
+
+  const fetchJournals = useCallback(async () => {
+    setJournalsLoading(true);
+    try {
+      const data = await getJournalEntries({
+        dateFrom: journalDateRange.dateFrom || undefined,
+        dateTo: journalDateRange.dateTo || undefined,
+        accountId: journalFilters.accountId || undefined,
+        vendorId: journalFilters.vendorId || undefined,
+      });
+      setJournals(data || []);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to load journals');
+    } finally {
+      setJournalsLoading(false);
+    }
+  }, [journalDateRange.dateFrom, journalDateRange.dateTo, journalFilters.accountId, journalFilters.vendorId]);
+
+  // Client-side filtering for type/customer (description-based)
+  const filteredJournals = useMemo(() => {
+    let result = journals;
+    if (journalFilters.journalType) {
+      const typeDef = JOURNAL_TYPES.find(t => t.label === journalFilters.journalType);
+      if (typeDef) result = result.filter(je => typeDef.match(je));
+    }
+    if (journalFilters.customerId) {
+      const q = journalFilters.customerId.toLowerCase();
+      result = result.filter(je =>
+        je.description?.toLowerCase().includes(q) ||
+        je.sourceRef?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [journals, journalFilters.journalType, journalFilters.customerId]);
+
+  const hasActiveJournalFilters = useMemo(() =>
+    journalFilters.quickDate !== '' ||
+    journalFilters.journalType !== '' ||
+    journalFilters.accountId !== '' ||
+    journalFilters.vendorId !== '' ||
+    journalFilters.customerId !== '',
+    [journalFilters]
+  );
+
+  const resetJournalFilters = () => {
+    setJournalFilters({ quickDate: '', dateFrom: '', dateTo: '', journalType: '', accountId: '', vendorId: '', customerId: '' });
+  };
+
   // Account management state
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [editingAccount, setEditingAccount] = useState<any>(null);
@@ -72,15 +213,17 @@ export default function AccountsPage() {
   // Receivables modals
   const [collectModalData, setCollectModalData] = useState<{
     isOpen: boolean;
-    customer: { customerName: string; customerPhone: string; totalOutstanding: number } | null;
-  }>({ isOpen: false, customer: null });
+    party: { partyId: string; partyName: string; partyType: string; totalOutstanding: number } | null;
+  }>({ isOpen: false, party: null });
   const [ledgerModalReceivable, setLedgerModalReceivable] = useState<{
-    isOpen: boolean; customerPhone: string; customerName: string;
-  }>({ isOpen: false, customerPhone: '', customerName: '' });
+    isOpen: boolean; partyId: string; partyName: string; partyType: string;
+  }>({ isOpen: false, partyId: '', partyName: '', partyType: '' });
+  const [isAddReceivableOpen, setIsAddReceivableOpen] = useState(false);
 
   // ── Expenses / Payables state ──────────────────────────────────────────────
   const [branches, setBranches] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [payablesByPayee, setPayablesByPayee] = useState<any[]>([]);
   const [expensesLoading, setExpensesLoading] = useState(false);
   const [expensesError, setExpensesError] = useState('');
   const [expenseFilters, setExpenseFilters] = useState({
@@ -89,12 +232,9 @@ export default function AccountsPage() {
     dateTo: '',
   });
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
-  const [payExpenseModalData, setPayExpenseModalData] = useState<{
-    isOpen: boolean; payableId: string; remainingAmount: number; description: string;
-  }>({ isOpen: false, payableId: '', remainingAmount: 0, description: '' });
-  const [expenseLedgerModalData, setExpenseLedgerModalData] = useState<{
-    isOpen: boolean; expenseId: string;
-  }>({ isOpen: false, expenseId: '' });
+  const [payeeLedgerModalData, setPayeeLedgerModalData] = useState<{
+    isOpen: boolean; payeeAccountId: string; payeeName: string;
+  }>({ isOpen: false, payeeAccountId: '', payeeName: '' });
 
   const expenseRequestFilters = useMemo(() => ({
     branchId: expenseFilters.branch || undefined,
@@ -106,23 +246,35 @@ export default function AccountsPage() {
     setExpensesLoading(true);
     setExpensesError('');
     try {
-      const data = await getExpenses(expenseRequestFilters);
-      setExpenses(data || []);
+      const [byPayee, rawExpenses] = await Promise.all([
+        getPayablesByPayee({
+          branchId: expenseFilters.branch || undefined,
+          dateFrom: expenseFilters.dateFrom || undefined,
+          dateTo: expenseFilters.dateTo || undefined,
+        }),
+        getExpenses({
+          branchId: expenseFilters.branch || undefined,
+          dateFrom: expenseFilters.dateFrom || undefined,
+          dateTo: expenseFilters.dateTo || undefined,
+        }),
+      ]);
+      setPayablesByPayee(byPayee || []);
+      setExpenses(rawExpenses || []);
     } catch (err: any) {
       setExpensesError(err.response?.data?.message || 'Failed to load expenses');
+      setPayablesByPayee([]);
       setExpenses([]);
     } finally {
       setExpensesLoading(false);
     }
-  }, [expenseRequestFilters]);
+  }, [expenseFilters]);
 
   const expenseSummary = useMemo(() => ({
-    total: expenses.reduce((s, e) => s + Number(e.amount || 0), 0),
-    count: expenses.length,
-    unpaid: expenses
-      .filter((e) => e.payable && e.payable.status !== 'PAID')
-      .reduce((s, e) => s + Number(e.payable?.remaining || 0), 0),
-  }), [expenses]);
+    total: payablesByPayee.reduce((s, g) => s + g.totalExpenses, 0),
+    count: payablesByPayee.reduce((s, g) => s + g.expenseCount, 0),
+    unpaid: payablesByPayee.reduce((s, g) => s + g.totalOutstanding, 0),
+    payeeCount: payablesByPayee.length,
+  }), [payablesByPayee]);
 
   // Fetch expenses when PAYABLES tab is active
   useEffect(() => {
@@ -132,7 +284,13 @@ export default function AccountsPage() {
   // Load branches once for the filter dropdown
   useEffect(() => {
     getBranches().then((d) => setBranches(d.branches || [])).catch(() => {});
+    getVendors().then((d) => setVendors(d.vendors || [])).catch(() => {});
   }, []);
+
+  // Fetch journals when filters change or JOURNALS tab activates
+  useEffect(() => {
+    if (activeTab === 'JOURNALS') fetchJournals();
+  }, [activeTab, fetchJournals]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -450,9 +608,10 @@ export default function AccountsPage() {
 
         {activeTab === 'JOURNALS' && (
           <div>
-            <div className="flex items-center justify-between mb-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5">
               <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Journal Entries</h2>
-              <button 
+              <button
                 onClick={() => setIsJournalModalOpen(true)}
                 className="text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors"
                 style={{ backgroundColor: theme.accents.primary }}
@@ -460,41 +619,179 @@ export default function AccountsPage() {
                 + Create Journal Entry
               </button>
             </div>
-            <div className="space-y-4">
-              {journals.length === 0 && (
-                <div className="rounded-xl border bg-white p-8 text-center" style={{ borderColor: theme.borders.light, color: theme.text.muted }}>
-                  No journal entries yet.
+
+            {/* Filter Panel */}
+            <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+              {/* Quick date buttons */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Date</label>
+                <div className="flex flex-wrap gap-2">
+                  {(['today', 'yesterday', 'last7', 'last30'] as const).map(qd => (
+                    <button
+                      key={qd}
+                      onClick={() => setJournalFilters(p => ({ ...p, quickDate: p.quickDate === qd ? '' : qd, dateFrom: '', dateTo: '' }))}
+                      className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${journalFilters.quickDate === qd ? 'text-white border-transparent' : 'border-gray-300 text-gray-600 bg-white hover:bg-gray-50'}`}
+                      style={journalFilters.quickDate === qd ? { backgroundColor: theme.accents.primary, borderColor: theme.accents.primary } : {}}
+                    >
+                      {qd === 'today' ? 'Today' : qd === 'yesterday' ? 'Yesterday' : qd === 'last7' ? 'Last 7 Days' : 'Last 30 Days'}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setJournalFilters(p => ({ ...p, quickDate: p.quickDate === 'custom' ? '' : 'custom' }))}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${journalFilters.quickDate === 'custom' ? 'text-white border-transparent' : 'border-gray-300 text-gray-600 bg-white hover:bg-gray-50'}`}
+                    style={journalFilters.quickDate === 'custom' ? { backgroundColor: theme.accents.primary, borderColor: theme.accents.primary } : {}}
+                  >
+                    Custom Range
+                  </button>
+                </div>
+                {journalFilters.quickDate === 'custom' && (
+                  <div className="flex gap-3 mt-2">
+                    <input
+                      type="date"
+                      value={journalFilters.dateFrom}
+                      onChange={(e) => setJournalFilters(p => ({ ...p, dateFrom: e.target.value }))}
+                      className="px-3 py-2 rounded text-sm"
+                      style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                    />
+                    <span className="self-center text-sm" style={{ color: theme.text.secondary }}>to</span>
+                    <input
+                      type="date"
+                      value={journalFilters.dateTo}
+                      onChange={(e) => setJournalFilters(p => ({ ...p, dateTo: e.target.value }))}
+                      className="px-3 py-2 rounded text-sm"
+                      style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Other filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Journal Type */}
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Journal Type</label>
+                  <select
+                    value={journalFilters.journalType}
+                    onChange={(e) => setJournalFilters(p => ({ ...p, journalType: e.target.value as JournalTypeKey | '' }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Types</option>
+                    {(['Sale', 'Payment Received','Vendor Payment', 'Inventory Receipt', 'Inventory Return', 'Capital Contribution', 'Owner Withdrawal', 'Expense', 'Internal Transfer', 'Manual Journal'] as JournalTypeKey[]).map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+
+                
+
+                {/* Vendor Filter */}
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Vendor</label>
+                  <select
+                    value={journalFilters.vendorId}
+                    onChange={(e) => setJournalFilters(p => ({ ...p, vendorId: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Vendors</option>
+                    {vendors.map(v => (
+                      <option key={v.id} value={v.id}>{v.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Customer Search */}
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Customer name</label>
+                  <input
+                    type="text"
+                    placeholder="Search by name"
+                    value={journalFilters.customerId}
+                    onChange={(e) => setJournalFilters(p => ({ ...p, customerId: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
+              </div>
+
+              {hasActiveJournalFilters && (
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs" style={{ color: theme.text.secondary }}>
+                    Showing {filteredJournals.length} result{filteredJournals.length !== 1 ? 's' : ''}
+                  </span>
+                  <button
+                    onClick={resetJournalFilters}
+                    className="text-xs font-semibold px-3 py-1 rounded border transition-colors hover:bg-gray-50"
+                    style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}
+                  >
+                    Clear Filters
+                  </button>
                 </div>
               )}
-              {journals.map(je => (
-                <div key={je.id} className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
-                  <div className="p-4" style={{ backgroundColor: theme.backgrounds.secondary }}>
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold" style={{ color: theme.text.primary }}>{je.entryNo}</span>
-                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-white" style={{ color: theme.text.secondary }}>{new Date(je.date).toLocaleDateString()}</span>
-                    </div>
-                    <p className="text-sm mt-1" style={{ color: theme.text.secondary }}>{je.description}</p>
-                  </div>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b text-left" style={{ borderColor: theme.borders.light }}>
-                        <th className="pb-2 pl-4 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Account</th>
-                        <th className="pb-2 pr-4 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Debit</th>
-                        <th className="pb-2 pr-4 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Credit</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {je.lines.map((line: any) => (
-                        <tr key={line.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
-                          <td className="py-2 pl-4" style={{ color: theme.text.primary }}>{line.account?.name || line.accountId}</td>
-                          <td className="py-2 pr-4 text-right" style={{ color: theme.text.primary }}>{Number(line.debit) > 0 ? formatCurrency(line.debit) : '-'}</td>
-                          <td className="py-2 pr-4 text-right" style={{ color: theme.text.primary }}>{Number(line.credit) > 0 ? formatCurrency(line.credit) : '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            </div>
+
+            {/* Journal List */}
+            <div className="space-y-4 relative">
+              {journalsLoading && (
+                <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-xl">
+                  <span className="text-sm text-gray-500">Loading journals...</span>
                 </div>
-              ))}
+              )}
+              {!journalsLoading && filteredJournals.length === 0 && (
+                <div className="rounded-xl border bg-white p-8 text-center" style={{ borderColor: theme.borders.light, color: theme.text.muted }}>
+                  {hasActiveJournalFilters ? 'No journal entries match the current filters.' : 'No journal entries yet.'}
+                </div>
+              )}
+              {filteredJournals.map(je => {
+                const jType = detectJournalType(je);
+                const typeBadgeClass = JOURNAL_TYPE_COLORS[jType] || JOURNAL_TYPE_COLORS['Other'];
+                const createdAt = je.createdAt ? new Date(je.createdAt) : new Date(je.date);
+                return (
+                  <div key={je.id} className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
+                    <div className="p-4" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="flex justify-between items-start gap-3 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm" style={{ color: theme.text.primary }}>{je.entryNo}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${typeBadgeClass}`}>{jType}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-right">
+                          <div className="text-right">
+                            <div className="text-xs font-medium" style={{ color: theme.text.secondary }}>
+                              {createdAt.toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </div>
+                            <div className="text-xs" style={{ color: theme.text.muted }}>
+                              {createdAt.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm mt-1.5" style={{ color: theme.text.secondary }}>{je.description}</p>
+                      {je.notes && (
+                        <p className="text-xs mt-0.5 italic" style={{ color: theme.text.muted }}>{je.notes}</p>
+                      )}
+                    </div>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b text-left" style={{ borderColor: theme.borders.light }}>
+                          <th className="pb-2 pl-4 pt-2 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Account</th>
+                          <th className="pb-2 pr-4 pt-2 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Debit</th>
+                          <th className="pb-2 pr-4 pt-2 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Credit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {je.lines.map((line: any) => (
+                          <tr key={line.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
+                            <td className="py-2 pl-4" style={{ color: theme.text.primary }}>{line.account?.code ? `${line.account.code} – ${line.account.name}` : (line.account?.name || line.accountId)}</td>
+                            <td className="py-2 pr-4 text-right" style={{ color: Number(line.debit) > 0 ? '#059669' : theme.text.muted }}>{Number(line.debit) > 0 ? formatCurrency(line.debit) : '—'}</td>
+                            <td className="py-2 pr-4 text-right" style={{ color: Number(line.credit) > 0 ? '#dc2626' : theme.text.muted }}>{Number(line.credit) > 0 ? formatCurrency(line.credit) : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -503,7 +800,12 @@ export default function AccountsPage() {
           <div>
             {/* Header row */}
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Expenses</h2>
+              <div>
+                <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Payables</h2>
+                <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>
+                  Money owed to vendors, employees, landlords, and other payees.
+                </p>
+              </div>
               {(isAdmin || isManager) && (
                 <button
                   onClick={() => setIsAddExpenseOpen(true)}
@@ -516,10 +818,11 @@ export default function AccountsPage() {
             </div>
 
             {/* Summary cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
               <SummaryCard label="Total Expenses" value={`PKR ${expenseSummary.total.toLocaleString()}`} color="#ef4444" />
               <SummaryCard label="Outstanding" value={`PKR ${expenseSummary.unpaid.toLocaleString()}`} color="#f59e0b" />
-              <SummaryCard label="Records" value={expenseSummary.count} />
+              <SummaryCard label="Payees" value={expenseSummary.payeeCount} />
+              <SummaryCard label="Transactions" value={expenseSummary.count} />
             </div>
 
             {/* Filters */}
@@ -557,94 +860,67 @@ export default function AccountsPage() {
               </div>
             </div>
 
-            {/* Table */}
+            {/* Payee-grouped table */}
             <div className="rounded-xl border bg-white shadow-sm overflow-x-auto" style={{ borderColor: theme.borders.light }}>
               <table className="w-full text-sm text-left">
                 <thead>
                   <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                    {["Date", "Branch", "Category", "Amount", "Paid", "Remaining", "Status", "Description", "Recorded By", "Actions"].map((h) => (
+                    {["Payee", "Type", "Expenses", "Total Billed", "Total Paid", "Outstanding", "Status", "Actions"].map((h) => (
                       <th key={h} className="px-4 py-3 text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {expensesLoading ? (
-                    <tr><td colSpan={10} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>Loading expenses...</td></tr>
+                    <tr><td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>Loading payables...</td></tr>
                   ) : expensesError ? (
-                    <tr><td colSpan={10} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
+                    <tr><td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.secondary }}>
                       <div className="flex flex-col items-center gap-3">
                         <span>{expensesError}</span>
                         <AsyncButton onClick={fetchExpenses}>Retry</AsyncButton>
                       </div>
                     </td></tr>
-                  ) : expenses.length === 0 ? (
-                    <tr><td colSpan={10} className="px-6 py-12 text-center" style={{ color: theme.text.muted }}>No expenses found</td></tr>
-                  ) : expenses.map((expense) => {
-                    const payable = expense.payable;
-                    const status = payable?.status ?? null;
-                    const remaining = Number(payable?.remaining ?? 0);
-                    const paid = Number(payable?.paid ?? 0);
-                    const isPaid = status === 'PAID';
+                  ) : payablesByPayee.length === 0 ? (
+                    <tr><td colSpan={8} className="px-6 py-12 text-center" style={{ color: theme.text.muted }}>
+                      No payables found. Add an expense to get started.
+                    </td></tr>
+                  ) : payablesByPayee.map((group) => {
+                    const outstanding = Number(group.totalOutstanding);
+                    const status = outstanding <= 0 ? 'PAID' : group.totalOutstanding < group.totalExpenses ? 'PARTIAL' : 'DUE';
                     return (
-                      <tr key={expense.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
-                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.primary }}>
-                          {new Date(expense.date).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.primary }}>
-                          {expense.branch?.name || '—'}
+                      <tr key={group.payeeId} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
+                        <td className="px-4 py-3 font-medium" style={{ color: theme.text.primary }}>
+                          {group.payeeName}
                         </td>
                         <td className="px-4 py-3">
                           <span className="px-2 py-1 text-xs font-medium rounded"
-                            style={{ backgroundColor: `${theme.accents.primary}20`, color: theme.accents.primary, border: `1px solid ${theme.accents.primary}` }}>
-                            {expense.category.replace(/_/g, ' ')}
+                            style={{ backgroundColor: `${theme.accents.primary}15`, color: theme.accents.primary }}>
+                            {group.payeeType.replace(/_/g, ' ')}
                           </span>
                         </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.secondary }}>
+                          {group.expenseCount}
+                        </td>
                         <td className="px-4 py-3 text-sm font-medium text-red-500">
-                          PKR {Number(expense.amount || 0).toLocaleString()}
+                          PKR {Number(group.totalExpenses).toLocaleString()}
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-emerald-600">
-                          {payable ? `PKR ${paid.toLocaleString()}` : '—'}
+                          PKR {Number(group.totalPaid).toLocaleString()}
                         </td>
-                        <td className="px-4 py-3 text-sm font-medium" style={{ color: remaining > 0 ? '#ef4444' : '#22c55e' }}>
-                          {payable ? `PKR ${remaining.toLocaleString()}` : '—'}
-                        </td>
-                        <td className="px-4 py-3">
-                          {status
-                            ? <span className={`px-2 py-1 rounded-full text-xs font-semibold ${paymentStateBadge(status)}`}>{status}</span>
-                            : <span className="text-xs text-gray-400">—</span>}
-                        </td>
-                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.secondary }}>
-                          {expense.description || '—'}
-                        </td>
-                        <td className="px-4 py-3 text-sm" style={{ color: theme.text.primary }}>
-                          {expense.recordedBy?.fullName || '—'}
+                        <td className="px-4 py-3 text-sm font-semibold" style={{ color: outstanding > 0 ? '#ef4444' : '#22c55e' }}>
+                          PKR {outstanding.toLocaleString()}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            {isAdmin && payable && !isPaid && (
-                              <button
-                                onClick={() => setPayExpenseModalData({
-                                  isOpen: true,
-                                  payableId: payable.id,
-                                  remainingAmount: remaining,
-                                  description: expense.description || expense.category.replace(/_/g, ' '),
-                                })}
-                                className="text-white px-3 py-1 rounded-md text-xs font-semibold shadow-sm"
-                                style={{ backgroundColor: theme.accents.primary }}
-                              >
-                                Pay
-                              </button>
-                            )}
-                            {payable && (
-                              <button
-                                onClick={() => setExpenseLedgerModalData({ isOpen: true, expenseId: expense.id })}
-                                className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
-                                style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}
-                              >
-                                History
-                              </button>
-                            )}
-                          </div>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${paymentStateBadge(status)}`}>{status}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => setPayeeLedgerModalData({ isOpen: true, payeeAccountId: group.payeeId, payeeName: group.payeeName })}
+                            className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
+                            style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}
+                          >
+                            Ledger
+                          </button>
                         </td>
                       </tr>
                     );
@@ -661,120 +937,91 @@ export default function AccountsPage() {
               <div>
                 <h2 className="text-xl font-semibold" style={{ color: theme.text.primary }}>Receivables</h2>
                 <p className="text-xs mt-0.5" style={{ color: theme.text.secondary }}>
-                  All payment-verified orders. Outstanding balance updates automatically on every payment.
+                  Outstanding balances grouped by party. Updates automatically on every collection.
                 </p>
               </div>
-              {receivables.length > 0 && (() => {
-                const totalOutstanding = receivables.reduce((s: number, r: any) => s + Number(r.totalOutstanding), 0);
-                const hasOutstanding = receivables.some((r: any) => Number(r.totalOutstanding) > 0);
-                return (
-                  <div className={`text-xs font-semibold px-3 py-1.5 rounded-full ${hasOutstanding ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
-                    {receivables.length} customer{receivables.length !== 1 ? 's' : ''}{hasOutstanding ? ` · Rs. ${totalOutstanding.toLocaleString()} outstanding` : ' · fully settled'}
-                  </div>
-                );
-              })()}
+            <div className="flex items-center gap-3">
+                {isAdmin && (
+                  <button
+                    onClick={() => setIsAddReceivableOpen(true)}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white"
+                    style={{ backgroundColor: theme.accents.primary }}>
+                    + Add Receivable
+                  </button>
+                )}
+                {receivables.length > 0 && (() => {
+                  const totalOutstanding = receivables.reduce((s: number, r: any) => s + Number(r.totalOutstanding), 0);
+                  const hasOutstanding = receivables.some((r: any) => Number(r.totalOutstanding) > 0);
+                  return (
+                    <div className={`text-xs font-semibold px-3 py-1.5 rounded-full ${hasOutstanding ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+                      {receivables.length} part{receivables.length !== 1 ? 'ies' : 'y'}{hasOutstanding ? ` · Rs. ${totalOutstanding.toLocaleString()} outstanding` : ' · fully settled'}
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
 
             {receivables.length === 0 ? (
-              <div
-                className="rounded-xl border bg-white p-8 text-center"
-                style={{ borderColor: theme.borders.light, color: theme.text.muted }}
-              >
-                No payment-verified orders yet.
+              <div className="rounded-xl border bg-white p-8 text-center" style={{ borderColor: theme.borders.light, color: theme.text.muted }}>
+                No receivables yet.
               </div>
             ) : (
               <div className="rounded-xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: theme.borders.light }}>
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                      <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Customer</th>
-                      <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Invoiced</th>
-                      <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Paid</th>
+                      <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Party Name</th>
+                      <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Party Type</th>
+                      <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Billed</th>
+                      <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Collected</th>
                       <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Outstanding</th>
-                      <th className="p-3 text-center font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Last Payment</th>
                       <th className="p-3 text-center font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Status</th>
                       <th className="p-3 text-center font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {receivables.map((r: any) => {
-                      const lastPayment = r.lastPaymentDate ? new Date(r.lastPaymentDate) : null;
-                      const lastPaymentLabel = lastPayment
-                        ? lastPayment.toLocaleDateString('en-PK', { day: '2-digit', month: 'short' })
-                        : '-';
                       const outstanding = Number(r.totalOutstanding);
                       return (
-                        <tr
-                          key={r.customerPhone}
-                          className="border-b last:border-0 hover:bg-gray-50 transition-colors"
-                          style={{ borderColor: theme.borders.light }}
-                        >
-                          <td className="p-3 font-medium" style={{ color: theme.text.primary }}>{r.customerName}</td>
-                          <td className="p-3 text-right" style={{ color: theme.text.primary }}>
-                            {Number(r.totalBilled).toLocaleString()}
+                        <tr key={r.partyId ?? r.partyName} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
+                          <td className="p-3 font-medium" style={{ color: theme.text.primary }}>{r.partyName}</td>
+                          <td className="p-3">
+                            <span className="px-2 py-1 rounded-full text-xs font-semibold"
+                              style={{ backgroundColor: `${theme.accents.primary}15`, color: theme.accents.primary }}>
+                              {(r.partyType as string).replace(/_/g, ' ')}
+                            </span>
                           </td>
-                          <td className="p-3 text-right text-emerald-600">
-                            {Number(r.totalPaid).toLocaleString()}
-                          </td>
+                          <td className="p-3 text-right" style={{ color: theme.text.primary }}>{Number(r.totalBilled).toLocaleString()}</td>
+                          <td className="p-3 text-right text-emerald-600">{Number(r.totalPaid).toLocaleString()}</td>
                           <td className="p-3 text-right font-semibold" style={{ color: outstanding > 0 ? theme.accents.error : theme.text.secondary }}>
                             {outstanding.toLocaleString()}
                           </td>
-                          <td className="p-3 text-center" style={{ color: theme.text.secondary }}>
-                            {lastPaymentLabel}
-                          </td>
                           <td className="p-3 text-center">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                r.status === 'PAID'
-                                  ? 'bg-green-100 text-green-800'
-                                  : r.status === 'PARTIAL'
-                                  ? 'bg-orange-100 text-orange-800'
-                                  : r.status === 'OVERDUE'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}
-                            >
-                              {r.status}
-                            </span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${paymentStateBadge(r.status)}`}>{r.status}</span>
                           </td>
-<td className="p-3">
-                           <div className="flex items-center justify-center gap-2">
-                             {outstanding > 0 && (
-                             <button
-                               onClick={() =>
-                                 setCollectModalData({
-                                   isOpen: true,
-                                   customer: {
-                                     customerName: r.customerName,
-                                     customerPhone: r.customerPhone,
-                                     totalOutstanding: outstanding,
-                                   },
-                                 })
-                               }
-                               className="text-white px-3 py-1 rounded-md text-xs font-semibold shadow-sm"
-                               style={{ backgroundColor: theme.accents.primary }}
-                             >
-                               Collect
-                             </button>
-                             )}
-                             <button
-                               onClick={() =>
-                                 setLedgerModalReceivable({
-                                   isOpen: true,
-                                   customerPhone: r.customerPhone,
-                                   customerName: r.customerName,
-                                 })
-                               }
-                               className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
-                               style={{
-                                 color: theme.text.primary,
-                                 borderColor: theme.borders?.medium || '#d1d5db',
-                               }}
-                             >
-                               Ledger
-                             </button>
-                           </div>
-                         </td>
+                          <td className="p-3">
+                            <div className="flex items-center justify-center gap-2">
+                              {outstanding > 0 && r.partyId && (
+                                <button
+                                  onClick={() => setCollectModalData({ isOpen: true, party: {
+                                    partyId: r.partyId, partyName: r.partyName,
+                                    partyType: r.partyType, totalOutstanding: outstanding,
+                                  }})}
+                                  className="text-white px-3 py-1 rounded-md text-xs font-semibold shadow-sm"
+                                  style={{ backgroundColor: theme.accents.primary }}>
+                                  Collect
+                                </button>
+                              )}
+                              {r.partyId && (
+                                <button
+                                  onClick={() => setLedgerModalReceivable({ isOpen: true, partyId: r.partyId, partyName: r.partyName, partyType: r.partyType })}
+                                  className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
+                                  style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}>
+                                  Ledger
+                                </button>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       );
                     })}
@@ -1004,25 +1251,18 @@ export default function AccountsPage() {
         defaultBranchId={isBranchScoped ? user?.branchId : null}
       />
 
-      <PayExpenseModal
-        isOpen={payExpenseModalData.isOpen}
-        onClose={() => setPayExpenseModalData({ ...payExpenseModalData, isOpen: false })}
+      <PayeeLedgerModal
+        isOpen={payeeLedgerModalData.isOpen}
+        onClose={() => setPayeeLedgerModalData({ ...payeeLedgerModalData, isOpen: false })}
         onSuccess={fetchExpenses}
-        payableId={payExpenseModalData.payableId}
-        remainingAmount={payExpenseModalData.remainingAmount}
-        expenseDescription={payExpenseModalData.description}
-      />
-
-      <ExpenseLedgerModal
-        isOpen={expenseLedgerModalData.isOpen}
-        onClose={() => setExpenseLedgerModalData({ ...expenseLedgerModalData, isOpen: false })}
-        expenseId={expenseLedgerModalData.expenseId}
+        payeeAccountId={payeeLedgerModalData.payeeAccountId}
+        payeeName={payeeLedgerModalData.payeeName}
       />
 
       <CreateJournalEntryModal
         isOpen={isJournalModalOpen}
         onClose={() => setIsJournalModalOpen(false)}
-        onSuccess={fetchData}
+        onSuccess={async () => { await fetchData(); fetchJournals(); }}
         accounts={accounts}
       />
 
@@ -1037,33 +1277,40 @@ export default function AccountsPage() {
       <CapitalContributionModal
         isOpen={isCapitalContributionOpen}
         onClose={() => setIsCapitalContributionOpen(false)}
-        onSuccess={async () => { await fetchData(); setActiveTab('JOURNALS'); }}
+        onSuccess={async () => { await fetchData(); fetchJournals(); setActiveTab('JOURNALS'); }}
       />
 
       <OwnerWithdrawalModal
         isOpen={isOwnerWithdrawalOpen}
         onClose={() => setIsOwnerWithdrawalOpen(false)}
-        onSuccess={async () => { await fetchData(); setActiveTab('JOURNALS'); }}
+        onSuccess={async () => { await fetchData(); fetchJournals(); setActiveTab('JOURNALS'); }}
       />
 
       <InternalTransferModal
         isOpen={isInternalTransferOpen}
         onClose={() => setIsInternalTransferOpen(false)}
-        onSuccess={async () => { await fetchData(); setActiveTab('JOURNALS'); }}
+        onSuccess={async () => { await fetchData(); fetchJournals(); setActiveTab('JOURNALS'); }}
       />
 
-<CollectReceivableModal
+      <AddReceivableModal
+        isOpen={isAddReceivableOpen}
+        onClose={() => setIsAddReceivableOpen(false)}
+        onSuccess={fetchData}
+      />
+
+      <CollectReceivableModal
         isOpen={collectModalData.isOpen}
         onClose={() => setCollectModalData({ ...collectModalData, isOpen: false })}
         onSuccess={fetchData}
-        customer={collectModalData.customer}
+        party={collectModalData.party}
       />
 
-      <CustomerLedgerModal
+      <PartyLedgerModal
         isOpen={ledgerModalReceivable.isOpen}
         onClose={() => setLedgerModalReceivable({ ...ledgerModalReceivable, isOpen: false })}
-        customerPhone={ledgerModalReceivable.customerPhone}
-        customerName={ledgerModalReceivable.customerName}
+        partyId={ledgerModalReceivable.partyId}
+        partyName={ledgerModalReceivable.partyName}
+        partyType={ledgerModalReceivable.partyType}
       />
 
        {deleteConfirmData.isOpen && (

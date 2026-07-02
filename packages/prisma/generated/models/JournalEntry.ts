@@ -33,6 +33,7 @@ export type JournalEntryMinAggregateOutputType = {
   notes: string | null
   status: $Enums.JournalStatus | null
   isManual: boolean | null
+  createdAt: Date | null
 }
 
 export type JournalEntryMaxAggregateOutputType = {
@@ -44,6 +45,7 @@ export type JournalEntryMaxAggregateOutputType = {
   notes: string | null
   status: $Enums.JournalStatus | null
   isManual: boolean | null
+  createdAt: Date | null
 }
 
 export type JournalEntryCountAggregateOutputType = {
@@ -55,6 +57,7 @@ export type JournalEntryCountAggregateOutputType = {
   notes: number
   status: number
   isManual: number
+  createdAt: number
   _all: number
 }
 
@@ -68,6 +71,7 @@ export type JournalEntryMinAggregateInputType = {
   notes?: true
   status?: true
   isManual?: true
+  createdAt?: true
 }
 
 export type JournalEntryMaxAggregateInputType = {
@@ -79,6 +83,7 @@ export type JournalEntryMaxAggregateInputType = {
   notes?: true
   status?: true
   isManual?: true
+  createdAt?: true
 }
 
 export type JournalEntryCountAggregateInputType = {
@@ -90,6 +95,7 @@ export type JournalEntryCountAggregateInputType = {
   notes?: true
   status?: true
   isManual?: true
+  createdAt?: true
   _all?: true
 }
 
@@ -174,6 +180,7 @@ export type JournalEntryGroupByOutputType = {
   notes: string | null
   status: $Enums.JournalStatus
   isManual: boolean
+  createdAt: Date
   _count: JournalEntryCountAggregateOutputType | null
   _min: JournalEntryMinAggregateOutputType | null
   _max: JournalEntryMaxAggregateOutputType | null
@@ -206,10 +213,12 @@ export type JournalEntryWhereInput = {
   notes?: Prisma.StringNullableFilter<"JournalEntry"> | string | null
   status?: Prisma.EnumJournalStatusFilter<"JournalEntry"> | $Enums.JournalStatus
   isManual?: Prisma.BoolFilter<"JournalEntry"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"JournalEntry"> | Date | string
   lines?: Prisma.JournalEntryLineListRelationFilter
   vendorPayment?: Prisma.XOR<Prisma.VendorPaymentNullableScalarRelationFilter, Prisma.VendorPaymentWhereInput> | null
   vendorAllocation?: Prisma.XOR<Prisma.VendorAllocationNullableScalarRelationFilter, Prisma.VendorAllocationWhereInput> | null
   vendorDefectiveReturn?: Prisma.XOR<Prisma.VendorDefectiveReturnNullableScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput> | null
+  receivablePayment?: Prisma.XOR<Prisma.ReceivablePaymentNullableScalarRelationFilter, Prisma.ReceivablePaymentWhereInput> | null
 }
 
 export type JournalEntryOrderByWithRelationInput = {
@@ -221,10 +230,12 @@ export type JournalEntryOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   isManual?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   lines?: Prisma.JournalEntryLineOrderByRelationAggregateInput
   vendorPayment?: Prisma.VendorPaymentOrderByWithRelationInput
   vendorAllocation?: Prisma.VendorAllocationOrderByWithRelationInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnOrderByWithRelationInput
+  receivablePayment?: Prisma.ReceivablePaymentOrderByWithRelationInput
 }
 
 export type JournalEntryWhereUniqueInput = Prisma.AtLeast<{
@@ -239,10 +250,12 @@ export type JournalEntryWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"JournalEntry"> | string | null
   status?: Prisma.EnumJournalStatusFilter<"JournalEntry"> | $Enums.JournalStatus
   isManual?: Prisma.BoolFilter<"JournalEntry"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"JournalEntry"> | Date | string
   lines?: Prisma.JournalEntryLineListRelationFilter
   vendorPayment?: Prisma.XOR<Prisma.VendorPaymentNullableScalarRelationFilter, Prisma.VendorPaymentWhereInput> | null
   vendorAllocation?: Prisma.XOR<Prisma.VendorAllocationNullableScalarRelationFilter, Prisma.VendorAllocationWhereInput> | null
   vendorDefectiveReturn?: Prisma.XOR<Prisma.VendorDefectiveReturnNullableScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput> | null
+  receivablePayment?: Prisma.XOR<Prisma.ReceivablePaymentNullableScalarRelationFilter, Prisma.ReceivablePaymentWhereInput> | null
 }, "id" | "entryNo">
 
 export type JournalEntryOrderByWithAggregationInput = {
@@ -254,6 +267,7 @@ export type JournalEntryOrderByWithAggregationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   isManual?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   _count?: Prisma.JournalEntryCountOrderByAggregateInput
   _max?: Prisma.JournalEntryMaxOrderByAggregateInput
   _min?: Prisma.JournalEntryMinOrderByAggregateInput
@@ -271,6 +285,7 @@ export type JournalEntryScalarWhereWithAggregatesInput = {
   notes?: Prisma.StringNullableWithAggregatesFilter<"JournalEntry"> | string | null
   status?: Prisma.EnumJournalStatusWithAggregatesFilter<"JournalEntry"> | $Enums.JournalStatus
   isManual?: Prisma.BoolWithAggregatesFilter<"JournalEntry"> | boolean
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"JournalEntry"> | Date | string
 }
 
 export type JournalEntryCreateInput = {
@@ -282,10 +297,12 @@ export type JournalEntryCreateInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
   vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateInput = {
@@ -297,10 +314,12 @@ export type JournalEntryUncheckedCreateInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
   vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUpdateInput = {
@@ -312,10 +331,12 @@ export type JournalEntryUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
   vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateInput = {
@@ -327,10 +348,12 @@ export type JournalEntryUncheckedUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
   vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateManyInput = {
@@ -342,6 +365,7 @@ export type JournalEntryCreateManyInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
 }
 
 export type JournalEntryUpdateManyMutationInput = {
@@ -353,6 +377,7 @@ export type JournalEntryUpdateManyMutationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type JournalEntryUncheckedUpdateManyInput = {
@@ -364,6 +389,7 @@ export type JournalEntryUncheckedUpdateManyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type JournalEntryCountOrderByAggregateInput = {
@@ -375,6 +401,7 @@ export type JournalEntryCountOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isManual?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type JournalEntryMaxOrderByAggregateInput = {
@@ -386,6 +413,7 @@ export type JournalEntryMaxOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isManual?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type JournalEntryMinOrderByAggregateInput = {
@@ -397,6 +425,7 @@ export type JournalEntryMinOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isManual?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type JournalEntryScalarRelationFilter = {
@@ -475,6 +504,22 @@ export type JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.JournalEntryUpdateToOneWithWhereWithoutVendorDefectiveReturnInput, Prisma.JournalEntryUpdateWithoutVendorDefectiveReturnInput>, Prisma.JournalEntryUncheckedUpdateWithoutVendorDefectiveReturnInput>
 }
 
+export type JournalEntryCreateNestedOneWithoutReceivablePaymentInput = {
+  create?: Prisma.XOR<Prisma.JournalEntryCreateWithoutReceivablePaymentInput, Prisma.JournalEntryUncheckedCreateWithoutReceivablePaymentInput>
+  connectOrCreate?: Prisma.JournalEntryCreateOrConnectWithoutReceivablePaymentInput
+  connect?: Prisma.JournalEntryWhereUniqueInput
+}
+
+export type JournalEntryUpdateOneWithoutReceivablePaymentNestedInput = {
+  create?: Prisma.XOR<Prisma.JournalEntryCreateWithoutReceivablePaymentInput, Prisma.JournalEntryUncheckedCreateWithoutReceivablePaymentInput>
+  connectOrCreate?: Prisma.JournalEntryCreateOrConnectWithoutReceivablePaymentInput
+  upsert?: Prisma.JournalEntryUpsertWithoutReceivablePaymentInput
+  disconnect?: Prisma.JournalEntryWhereInput | boolean
+  delete?: Prisma.JournalEntryWhereInput | boolean
+  connect?: Prisma.JournalEntryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JournalEntryUpdateToOneWithWhereWithoutReceivablePaymentInput, Prisma.JournalEntryUpdateWithoutReceivablePaymentInput>, Prisma.JournalEntryUncheckedUpdateWithoutReceivablePaymentInput>
+}
+
 export type JournalEntryCreateWithoutLinesInput = {
   id?: string
   entryNo: string
@@ -484,9 +529,11 @@ export type JournalEntryCreateWithoutLinesInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutLinesInput = {
@@ -498,9 +545,11 @@ export type JournalEntryUncheckedCreateWithoutLinesInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutLinesInput = {
@@ -528,9 +577,11 @@ export type JournalEntryUpdateWithoutLinesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutLinesInput = {
@@ -542,9 +593,11 @@ export type JournalEntryUncheckedUpdateWithoutLinesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutVendorPaymentInput = {
@@ -556,9 +609,11 @@ export type JournalEntryCreateWithoutVendorPaymentInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutVendorPaymentInput = {
@@ -570,9 +625,11 @@ export type JournalEntryUncheckedCreateWithoutVendorPaymentInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutVendorPaymentInput = {
@@ -600,9 +657,11 @@ export type JournalEntryUpdateWithoutVendorPaymentInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutVendorPaymentInput = {
@@ -614,9 +673,11 @@ export type JournalEntryUncheckedUpdateWithoutVendorPaymentInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutVendorAllocationInput = {
@@ -628,9 +689,11 @@ export type JournalEntryCreateWithoutVendorAllocationInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
   vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutVendorAllocationInput = {
@@ -642,9 +705,11 @@ export type JournalEntryUncheckedCreateWithoutVendorAllocationInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
   vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutVendorAllocationInput = {
@@ -672,9 +737,11 @@ export type JournalEntryUpdateWithoutVendorAllocationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
   vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutVendorAllocationInput = {
@@ -686,9 +753,11 @@ export type JournalEntryUncheckedUpdateWithoutVendorAllocationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
   vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutVendorDefectiveReturnInput = {
@@ -700,9 +769,11 @@ export type JournalEntryCreateWithoutVendorDefectiveReturnInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
   vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutVendorDefectiveReturnInput = {
@@ -714,9 +785,11 @@ export type JournalEntryUncheckedCreateWithoutVendorDefectiveReturnInput = {
   notes?: string | null
   status?: $Enums.JournalStatus
   isManual?: boolean
+  createdAt?: Date | string
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
   vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutVendorDefectiveReturnInput = {
@@ -744,9 +817,11 @@ export type JournalEntryUpdateWithoutVendorDefectiveReturnInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
   vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutVendorDefectiveReturnInput = {
@@ -758,9 +833,91 @@ export type JournalEntryUncheckedUpdateWithoutVendorDefectiveReturnInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
   isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
   vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+}
+
+export type JournalEntryCreateWithoutReceivablePaymentInput = {
+  id?: string
+  entryNo: string
+  date?: Date | string
+  description: string
+  sourceRef?: string | null
+  notes?: string | null
+  status?: $Enums.JournalStatus
+  isManual?: boolean
+  createdAt?: Date | string
+  lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
+  vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+}
+
+export type JournalEntryUncheckedCreateWithoutReceivablePaymentInput = {
+  id?: string
+  entryNo: string
+  date?: Date | string
+  description: string
+  sourceRef?: string | null
+  notes?: string | null
+  status?: $Enums.JournalStatus
+  isManual?: boolean
+  createdAt?: Date | string
+  lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+}
+
+export type JournalEntryCreateOrConnectWithoutReceivablePaymentInput = {
+  where: Prisma.JournalEntryWhereUniqueInput
+  create: Prisma.XOR<Prisma.JournalEntryCreateWithoutReceivablePaymentInput, Prisma.JournalEntryUncheckedCreateWithoutReceivablePaymentInput>
+}
+
+export type JournalEntryUpsertWithoutReceivablePaymentInput = {
+  update: Prisma.XOR<Prisma.JournalEntryUpdateWithoutReceivablePaymentInput, Prisma.JournalEntryUncheckedUpdateWithoutReceivablePaymentInput>
+  create: Prisma.XOR<Prisma.JournalEntryCreateWithoutReceivablePaymentInput, Prisma.JournalEntryUncheckedCreateWithoutReceivablePaymentInput>
+  where?: Prisma.JournalEntryWhereInput
+}
+
+export type JournalEntryUpdateToOneWithWhereWithoutReceivablePaymentInput = {
+  where?: Prisma.JournalEntryWhereInput
+  data: Prisma.XOR<Prisma.JournalEntryUpdateWithoutReceivablePaymentInput, Prisma.JournalEntryUncheckedUpdateWithoutReceivablePaymentInput>
+}
+
+export type JournalEntryUpdateWithoutReceivablePaymentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  entryNo?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
+  isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
+  vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+}
+
+export type JournalEntryUncheckedUpdateWithoutReceivablePaymentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  entryNo?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumJournalStatusFieldUpdateOperationsInput | $Enums.JournalStatus
+  isManual?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 
@@ -803,10 +960,12 @@ export type JournalEntrySelect<ExtArgs extends runtime.Types.Extensions.Internal
   notes?: boolean
   status?: boolean
   isManual?: boolean
+  createdAt?: boolean
   lines?: boolean | Prisma.JournalEntry$linesArgs<ExtArgs>
   vendorPayment?: boolean | Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.JournalEntry$vendorAllocationArgs<ExtArgs>
   vendorDefectiveReturn?: boolean | Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs>
+  receivablePayment?: boolean | Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>
   _count?: boolean | Prisma.JournalEntryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["journalEntry"]>
 
@@ -819,6 +978,7 @@ export type JournalEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   notes?: boolean
   status?: boolean
   isManual?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["journalEntry"]>
 
 export type JournalEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -830,6 +990,7 @@ export type JournalEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   notes?: boolean
   status?: boolean
   isManual?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["journalEntry"]>
 
 export type JournalEntrySelectScalar = {
@@ -841,14 +1002,16 @@ export type JournalEntrySelectScalar = {
   notes?: boolean
   status?: boolean
   isManual?: boolean
+  createdAt?: boolean
 }
 
-export type JournalEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryNo" | "date" | "description" | "sourceRef" | "notes" | "status" | "isManual", ExtArgs["result"]["journalEntry"]>
+export type JournalEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryNo" | "date" | "description" | "sourceRef" | "notes" | "status" | "isManual" | "createdAt", ExtArgs["result"]["journalEntry"]>
 export type JournalEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lines?: boolean | Prisma.JournalEntry$linesArgs<ExtArgs>
   vendorPayment?: boolean | Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.JournalEntry$vendorAllocationArgs<ExtArgs>
   vendorDefectiveReturn?: boolean | Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs>
+  receivablePayment?: boolean | Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>
   _count?: boolean | Prisma.JournalEntryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JournalEntryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -861,6 +1024,7 @@ export type $JournalEntryPayload<ExtArgs extends runtime.Types.Extensions.Intern
     vendorPayment: Prisma.$VendorPaymentPayload<ExtArgs> | null
     vendorAllocation: Prisma.$VendorAllocationPayload<ExtArgs> | null
     vendorDefectiveReturn: Prisma.$VendorDefectiveReturnPayload<ExtArgs> | null
+    receivablePayment: Prisma.$ReceivablePaymentPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -871,6 +1035,7 @@ export type $JournalEntryPayload<ExtArgs extends runtime.Types.Extensions.Intern
     notes: string | null
     status: $Enums.JournalStatus
     isManual: boolean
+    createdAt: Date
   }, ExtArgs["result"]["journalEntry"]>
   composites: {}
 }
@@ -1269,6 +1434,7 @@ export interface Prisma__JournalEntryClient<T, Null = never, ExtArgs extends run
   vendorPayment<T extends Prisma.JournalEntry$vendorPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>>): Prisma.Prisma__VendorPaymentClient<runtime.Types.Result.GetResult<Prisma.$VendorPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   vendorAllocation<T extends Prisma.JournalEntry$vendorAllocationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorAllocationArgs<ExtArgs>>): Prisma.Prisma__VendorAllocationClient<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   vendorDefectiveReturn<T extends Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs>>): Prisma.Prisma__VendorDefectiveReturnClient<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  receivablePayment<T extends Prisma.JournalEntry$receivablePaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>>): Prisma.Prisma__ReceivablePaymentClient<runtime.Types.Result.GetResult<Prisma.$ReceivablePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1306,6 +1472,7 @@ export interface JournalEntryFieldRefs {
   readonly notes: Prisma.FieldRef<"JournalEntry", 'String'>
   readonly status: Prisma.FieldRef<"JournalEntry", 'JournalStatus'>
   readonly isManual: Prisma.FieldRef<"JournalEntry", 'Boolean'>
+  readonly createdAt: Prisma.FieldRef<"JournalEntry", 'DateTime'>
 }
     
 
@@ -1777,6 +1944,25 @@ export type JournalEntry$vendorDefectiveReturnArgs<ExtArgs extends runtime.Types
    */
   include?: Prisma.VendorDefectiveReturnInclude<ExtArgs> | null
   where?: Prisma.VendorDefectiveReturnWhereInput
+}
+
+/**
+ * JournalEntry.receivablePayment
+ */
+export type JournalEntry$receivablePaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReceivablePayment
+   */
+  select?: Prisma.ReceivablePaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReceivablePayment
+   */
+  omit?: Prisma.ReceivablePaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReceivablePaymentInclude<ExtArgs> | null
+  where?: Prisma.ReceivablePaymentWhereInput
 }
 
 /**

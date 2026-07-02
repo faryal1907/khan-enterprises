@@ -5,13 +5,23 @@ export const getAccounts = async () => {
   return data;
 };
 
-export const getPaymentAccounts = async () => {
-  const { data } = await api.get('/accounting/receivables/payment-accounts');
-  return data;
-};
-
-export const getJournalEntries = async () => {
-  const { data } = await api.get('/accounting/journals');
+export const getJournalEntries = async (filters?: {
+  dateFrom?: string;
+  dateTo?: string;
+  journalType?: string;
+  accountId?: string;
+  vendorId?: string;
+  customerId?: string;
+}) => {
+  const params = new URLSearchParams();
+  if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+  if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+  if (filters?.journalType) params.append('journalType', filters.journalType);
+  if (filters?.accountId) params.append('accountId', filters.accountId);
+  if (filters?.vendorId) params.append('vendorId', filters.vendorId);
+  if (filters?.customerId) params.append('customerId', filters.customerId);
+  const query = params.toString();
+  const { data } = await api.get(`/accounting/journals${query ? `?${query}` : ''}`);
   return data;
 };
 
@@ -92,11 +102,64 @@ export const recordInternalTransfer = async (payload: { fromAccountId: string; t
 
 // ─── Receivables ──────────────────────────────────────────────────────────────
 
+export type ReceivablePartyType =
+  | 'CUSTOMER' | 'VENDOR' | 'EMPLOYEE' | 'SUPPLIER'
+  | 'LANDLORD' | 'UTILITY_COMPANY' | 'BUSINESS_PARTNER' | 'OTHER';
+
+export const RECEIVABLE_PARTY_TYPE_LABELS: Record<ReceivablePartyType, string> = {
+  CUSTOMER: 'Customer',
+  VENDOR: 'Vendor',
+  EMPLOYEE: 'Employee',
+  SUPPLIER: 'Supplier',
+  LANDLORD: 'Landlord',
+  UTILITY_COMPANY: 'Utility Company',
+  BUSINESS_PARTNER: 'Business Partner',
+  OTHER: 'Other',
+};
+
 export const getReceivables = async () => {
   const { data } = await api.get('/accounting/receivables');
   return data;
 };
 
+export const getReceivableParties = async () => {
+  const { data } = await api.get('/accounting/receivables/parties');
+  return data;
+};
+
+export const createReceivableParty = async (payload: {
+  name: string; partyType?: ReceivablePartyType; phone?: string; email?: string; address?: string; notes?: string;
+}) => {
+  const { data } = await api.post('/accounting/receivables/parties', payload);
+  return data;
+};
+
+export const createReceivableEntry = async (payload: {
+  partyId: string; amount: number; description: string; date: string; dueDate?: string;
+}) => {
+  const { data } = await api.post('/accounting/receivables/entries', payload);
+  return data;
+};
+
+export const getPartyLedger = async (partyId: string) => {
+  const { data } = await api.get(`/accounting/receivables/parties/${partyId}/ledger`);
+  return data;
+};
+
+export const collectFromParty = async (
+  partyId: string,
+  payload: { amount: number; paymentMethod: string; notes?: string; accountId?: string }
+) => {
+  const { data } = await api.post(`/accounting/receivables/parties/${partyId}/collect`, payload);
+  return data;
+};
+
+export const getPaymentAccounts = async () => {
+  const { data } = await api.get('/accounting/receivables/payment-accounts');
+  return data;
+};
+
+// Legacy phone-based (used by existing order flows)
 export const getCustomerLedger = async (customerPhone: string) => {
   const { data } = await api.get(`/accounting/receivables/${encodeURIComponent(customerPhone)}/ledger`);
   return data;

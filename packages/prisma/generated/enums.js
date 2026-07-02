@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PaymentState = exports.PayableType = exports.POStatus = exports.JournalStatus = exports.AccountSubtype = exports.AccountCategory = exports.ExpenseCategory = exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
+exports.PaymentState = exports.PayableType = exports.POStatus = exports.JournalStatus = exports.AccountSubtype = exports.AccountCategory = exports.ReceivablePartyType = exports.PayeeType = exports.ExpenseCategory = exports.FileType = exports.InventoryMovementType = exports.AuditAction = exports.PickupType = exports.OrderType = exports.PaymentMethod = exports.PaymentStatus = exports.DeliveryStatus = exports.OrderStatus = exports.BikeStatus = exports.UserStatus = exports.UserRole = void 0;
 exports.UserRole = {
     ADMIN: 'ADMIN',
     MANAGER: 'MANAGER',
@@ -86,6 +86,25 @@ exports.ExpenseCategory = {
     MAINTENANCE: 'MAINTENANCE',
     SALARY: 'SALARY',
     MARKETING: 'MARKETING',
+    OTHER: 'OTHER'
+};
+exports.PayeeType = {
+    VENDOR: 'VENDOR',
+    EMPLOYEE: 'EMPLOYEE',
+    SUPPLIER: 'SUPPLIER',
+    LANDLORD: 'LANDLORD',
+    UTILITY_COMPANY: 'UTILITY_COMPANY',
+    CONTRACTOR: 'CONTRACTOR',
+    OTHER: 'OTHER'
+};
+exports.ReceivablePartyType = {
+    CUSTOMER: 'CUSTOMER',
+    VENDOR: 'VENDOR',
+    EMPLOYEE: 'EMPLOYEE',
+    SUPPLIER: 'SUPPLIER',
+    LANDLORD: 'LANDLORD',
+    UTILITY_COMPANY: 'UTILITY_COMPANY',
+    BUSINESS_PARTNER: 'BUSINESS_PARTNER',
     OTHER: 'OTHER'
 };
 exports.AccountCategory = {

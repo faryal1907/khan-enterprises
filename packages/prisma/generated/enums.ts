@@ -148,6 +148,33 @@ export const ExpenseCategory = {
 export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory]
 
 
+export const PayeeType = {
+  VENDOR: 'VENDOR',
+  EMPLOYEE: 'EMPLOYEE',
+  SUPPLIER: 'SUPPLIER',
+  LANDLORD: 'LANDLORD',
+  UTILITY_COMPANY: 'UTILITY_COMPANY',
+  CONTRACTOR: 'CONTRACTOR',
+  OTHER: 'OTHER'
+} as const
+
+export type PayeeType = (typeof PayeeType)[keyof typeof PayeeType]
+
+
+export const ReceivablePartyType = {
+  CUSTOMER: 'CUSTOMER',
+  VENDOR: 'VENDOR',
+  EMPLOYEE: 'EMPLOYEE',
+  SUPPLIER: 'SUPPLIER',
+  LANDLORD: 'LANDLORD',
+  UTILITY_COMPANY: 'UTILITY_COMPANY',
+  BUSINESS_PARTNER: 'BUSINESS_PARTNER',
+  OTHER: 'OTHER'
+} as const
+
+export type ReceivablePartyType = (typeof ReceivablePartyType)[keyof typeof ReceivablePartyType]
+
+
 export const AccountCategory = {
   ASSET: 'ASSET',
   LIABILITY: 'LIABILITY',

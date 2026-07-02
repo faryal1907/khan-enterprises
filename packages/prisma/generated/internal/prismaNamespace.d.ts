@@ -172,6 +172,7 @@ export declare const ModelName: {
     readonly PartOrder: "PartOrder";
     readonly PaymentTransaction: "PaymentTransaction";
     readonly PartPaymentTransaction: "PartPaymentTransaction";
+    readonly PayeeAccount: "PayeeAccount";
     readonly Expense: "Expense";
     readonly DeliveryRequest: "DeliveryRequest";
     readonly Document: "Document";
@@ -190,6 +191,9 @@ export declare const ModelName: {
     readonly VendorDefectiveReturn: "VendorDefectiveReturn";
     readonly VendorDefectiveReturnBike: "VendorDefectiveReturnBike";
     readonly VendorDefectiveReturnPartLine: "VendorDefectiveReturnPartLine";
+    readonly ReceivableParty: "ReceivableParty";
+    readonly ReceivableEntry: "ReceivableEntry";
+    readonly ReceivablePayment: "ReceivablePayment";
     readonly ReceivablesAlert: "ReceivablesAlert";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -203,7 +207,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "vendorPayment" | "vendorAllocation" | "vendorAllocationPartLine" | "vendorDefectiveReturn" | "vendorDefectiveReturnBike" | "vendorDefectiveReturnPartLine" | "receivablesAlert";
+        modelProps: "user" | "refreshToken" | "passwordResetToken" | "branch" | "vendor" | "bikeModel" | "bikeUnit" | "part" | "partInventory" | "stockMovement" | "order" | "orderAlert" | "partOrder" | "paymentTransaction" | "partPaymentTransaction" | "payeeAccount" | "expense" | "deliveryRequest" | "document" | "auditLog" | "systemSetting" | "account" | "journalEntry" | "journalEntryLine" | "purchaseOrder" | "purchaseOrderItem" | "payable" | "paymentAllocation" | "vendorPayment" | "vendorAllocation" | "vendorAllocationPartLine" | "vendorDefectiveReturn" | "vendorDefectiveReturnBike" | "vendorDefectiveReturnPartLine" | "receivableParty" | "receivableEntry" | "receivablePayment" | "receivablesAlert";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1314,6 +1318,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 count: {
                     args: Prisma.PartPaymentTransactionCountArgs<ExtArgs>;
                     result: runtime.Types.Utils.Optional<Prisma.PartPaymentTransactionCountAggregateOutputType> | number;
+                };
+            };
+        };
+        PayeeAccount: {
+            payload: Prisma.$PayeeAccountPayload<ExtArgs>;
+            fields: Prisma.PayeeAccountFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PayeeAccountFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PayeeAccountFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>;
+                };
+                findFirst: {
+                    args: Prisma.PayeeAccountFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PayeeAccountFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>;
+                };
+                findMany: {
+                    args: Prisma.PayeeAccountFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>[];
+                };
+                create: {
+                    args: Prisma.PayeeAccountCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>;
+                };
+                createMany: {
+                    args: Prisma.PayeeAccountCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.PayeeAccountCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>[];
+                };
+                delete: {
+                    args: Prisma.PayeeAccountDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>;
+                };
+                update: {
+                    args: Prisma.PayeeAccountUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PayeeAccountDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PayeeAccountUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.PayeeAccountUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>[];
+                };
+                upsert: {
+                    args: Prisma.PayeeAccountUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PayeeAccountPayload>;
+                };
+                aggregate: {
+                    args: Prisma.PayeeAccountAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePayeeAccount>;
+                };
+                groupBy: {
+                    args: Prisma.PayeeAccountGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PayeeAccountGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PayeeAccountCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PayeeAccountCountAggregateOutputType> | number;
                 };
             };
         };
@@ -2649,6 +2727,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        ReceivableParty: {
+            payload: Prisma.$ReceivablePartyPayload<ExtArgs>;
+            fields: Prisma.ReceivablePartyFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ReceivablePartyFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ReceivablePartyFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>;
+                };
+                findFirst: {
+                    args: Prisma.ReceivablePartyFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ReceivablePartyFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>;
+                };
+                findMany: {
+                    args: Prisma.ReceivablePartyFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>[];
+                };
+                create: {
+                    args: Prisma.ReceivablePartyCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>;
+                };
+                createMany: {
+                    args: Prisma.ReceivablePartyCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.ReceivablePartyCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>[];
+                };
+                delete: {
+                    args: Prisma.ReceivablePartyDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>;
+                };
+                update: {
+                    args: Prisma.ReceivablePartyUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ReceivablePartyDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ReceivablePartyUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.ReceivablePartyUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>[];
+                };
+                upsert: {
+                    args: Prisma.ReceivablePartyUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePartyPayload>;
+                };
+                aggregate: {
+                    args: Prisma.ReceivablePartyAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateReceivableParty>;
+                };
+                groupBy: {
+                    args: Prisma.ReceivablePartyGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivablePartyGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ReceivablePartyCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivablePartyCountAggregateOutputType> | number;
+                };
+            };
+        };
+        ReceivableEntry: {
+            payload: Prisma.$ReceivableEntryPayload<ExtArgs>;
+            fields: Prisma.ReceivableEntryFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ReceivableEntryFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ReceivableEntryFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>;
+                };
+                findFirst: {
+                    args: Prisma.ReceivableEntryFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ReceivableEntryFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>;
+                };
+                findMany: {
+                    args: Prisma.ReceivableEntryFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>[];
+                };
+                create: {
+                    args: Prisma.ReceivableEntryCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>;
+                };
+                createMany: {
+                    args: Prisma.ReceivableEntryCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.ReceivableEntryCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>[];
+                };
+                delete: {
+                    args: Prisma.ReceivableEntryDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>;
+                };
+                update: {
+                    args: Prisma.ReceivableEntryUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ReceivableEntryDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ReceivableEntryUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.ReceivableEntryUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>[];
+                };
+                upsert: {
+                    args: Prisma.ReceivableEntryUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivableEntryPayload>;
+                };
+                aggregate: {
+                    args: Prisma.ReceivableEntryAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateReceivableEntry>;
+                };
+                groupBy: {
+                    args: Prisma.ReceivableEntryGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivableEntryGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ReceivableEntryCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivableEntryCountAggregateOutputType> | number;
+                };
+            };
+        };
+        ReceivablePayment: {
+            payload: Prisma.$ReceivablePaymentPayload<ExtArgs>;
+            fields: Prisma.ReceivablePaymentFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ReceivablePaymentFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ReceivablePaymentFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>;
+                };
+                findFirst: {
+                    args: Prisma.ReceivablePaymentFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ReceivablePaymentFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>;
+                };
+                findMany: {
+                    args: Prisma.ReceivablePaymentFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>[];
+                };
+                create: {
+                    args: Prisma.ReceivablePaymentCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>;
+                };
+                createMany: {
+                    args: Prisma.ReceivablePaymentCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.ReceivablePaymentCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>[];
+                };
+                delete: {
+                    args: Prisma.ReceivablePaymentDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>;
+                };
+                update: {
+                    args: Prisma.ReceivablePaymentUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ReceivablePaymentDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ReceivablePaymentUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.ReceivablePaymentUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>[];
+                };
+                upsert: {
+                    args: Prisma.ReceivablePaymentUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReceivablePaymentPayload>;
+                };
+                aggregate: {
+                    args: Prisma.ReceivablePaymentAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateReceivablePayment>;
+                };
+                groupBy: {
+                    args: Prisma.ReceivablePaymentGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivablePaymentGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ReceivablePaymentCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReceivablePaymentCountAggregateOutputType> | number;
+                };
+            };
+        };
         ReceivablesAlert: {
             payload: Prisma.$ReceivablesAlertPayload<ExtArgs>;
             fields: Prisma.ReceivablesAlertFieldRefs;
@@ -2986,12 +3286,26 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum];
+export declare const PayeeAccountScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly type: "type";
+    readonly phone: "phone";
+    readonly email: "email";
+    readonly address: "address";
+    readonly notes: "notes";
+    readonly isActive: "isActive";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type PayeeAccountScalarFieldEnum = (typeof PayeeAccountScalarFieldEnum)[keyof typeof PayeeAccountScalarFieldEnum];
 export declare const ExpenseScalarFieldEnum: {
     readonly id: "id";
     readonly amount: "amount";
     readonly date: "date";
     readonly category: "category";
     readonly description: "description";
+    readonly payeeAccountId: "payeeAccountId";
     readonly branchId: "branchId";
     readonly recordedById: "recordedById";
     readonly createdAt: "createdAt";
@@ -3071,6 +3385,7 @@ export declare const JournalEntryScalarFieldEnum: {
     readonly notes: "notes";
     readonly status: "status";
     readonly isManual: "isManual";
+    readonly createdAt: "createdAt";
 };
 export type JournalEntryScalarFieldEnum = (typeof JournalEntryScalarFieldEnum)[keyof typeof JournalEntryScalarFieldEnum];
 export declare const JournalEntryLineScalarFieldEnum: {
@@ -3113,6 +3428,7 @@ export declare const PayableScalarFieldEnum: {
     readonly dueDate: "dueDate";
     readonly status: "status";
     readonly poId: "poId";
+    readonly expenseId: "expenseId";
 };
 export type PayableScalarFieldEnum = (typeof PayableScalarFieldEnum)[keyof typeof PayableScalarFieldEnum];
 export declare const PaymentAllocationScalarFieldEnum: {
@@ -3190,6 +3506,47 @@ export declare const VendorDefectiveReturnPartLineScalarFieldEnum: {
     readonly totalCost: "totalCost";
 };
 export type VendorDefectiveReturnPartLineScalarFieldEnum = (typeof VendorDefectiveReturnPartLineScalarFieldEnum)[keyof typeof VendorDefectiveReturnPartLineScalarFieldEnum];
+export declare const ReceivablePartyScalarFieldEnum: {
+    readonly id: "id";
+    readonly name: "name";
+    readonly partyType: "partyType";
+    readonly phone: "phone";
+    readonly email: "email";
+    readonly address: "address";
+    readonly notes: "notes";
+    readonly isActive: "isActive";
+    readonly customerPhone: "customerPhone";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type ReceivablePartyScalarFieldEnum = (typeof ReceivablePartyScalarFieldEnum)[keyof typeof ReceivablePartyScalarFieldEnum];
+export declare const ReceivableEntryScalarFieldEnum: {
+    readonly id: "id";
+    readonly partyId: "partyId";
+    readonly amount: "amount";
+    readonly description: "description";
+    readonly date: "date";
+    readonly dueDate: "dueDate";
+    readonly paidAmount: "paidAmount";
+    readonly balanceDue: "balanceDue";
+    readonly status: "status";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type ReceivableEntryScalarFieldEnum = (typeof ReceivableEntryScalarFieldEnum)[keyof typeof ReceivableEntryScalarFieldEnum];
+export declare const ReceivablePaymentScalarFieldEnum: {
+    readonly id: "id";
+    readonly entryId: "entryId";
+    readonly amount: "amount";
+    readonly method: "method";
+    readonly accountId: "accountId";
+    readonly notes: "notes";
+    readonly journalEntryId: "journalEntryId";
+    readonly recordedById: "recordedById";
+    readonly collectedAt: "collectedAt";
+    readonly createdAt: "createdAt";
+};
+export type ReceivablePaymentScalarFieldEnum = (typeof ReceivablePaymentScalarFieldEnum)[keyof typeof ReceivablePaymentScalarFieldEnum];
 export declare const ReceivablesAlertScalarFieldEnum: {
     readonly id: "id";
     readonly customerPhone: "customerPhone";
@@ -3261,6 +3618,8 @@ export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>;
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>;
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>;
+export type EnumPayeeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayeeType'>;
+export type ListEnumPayeeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayeeType[]'>;
 export type EnumExpenseCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExpenseCategory'>;
 export type ListEnumExpenseCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExpenseCategory[]'>;
 export type EnumDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliveryStatus'>;
@@ -3279,6 +3638,8 @@ export type EnumPOStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 export type ListEnumPOStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'POStatus[]'>;
 export type EnumPayableTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayableType'>;
 export type ListEnumPayableTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayableType[]'>;
+export type EnumReceivablePartyTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReceivablePartyType'>;
+export type ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReceivablePartyType[]'>;
 export type BatchPayload = {
     count: number;
 };
@@ -3319,6 +3680,7 @@ export type GlobalOmitConfig = {
     partOrder?: Prisma.PartOrderOmit;
     paymentTransaction?: Prisma.PaymentTransactionOmit;
     partPaymentTransaction?: Prisma.PartPaymentTransactionOmit;
+    payeeAccount?: Prisma.PayeeAccountOmit;
     expense?: Prisma.ExpenseOmit;
     deliveryRequest?: Prisma.DeliveryRequestOmit;
     document?: Prisma.DocumentOmit;
@@ -3337,6 +3699,9 @@ export type GlobalOmitConfig = {
     vendorDefectiveReturn?: Prisma.VendorDefectiveReturnOmit;
     vendorDefectiveReturnBike?: Prisma.VendorDefectiveReturnBikeOmit;
     vendorDefectiveReturnPartLine?: Prisma.VendorDefectiveReturnPartLineOmit;
+    receivableParty?: Prisma.ReceivablePartyOmit;
+    receivableEntry?: Prisma.ReceivableEntryOmit;
+    receivablePayment?: Prisma.ReceivablePaymentOmit;
     receivablesAlert?: Prisma.ReceivablesAlertOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';

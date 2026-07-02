@@ -24,7 +24,7 @@ export function ActionModal({ title, children, onClose, className = "" }: Action
           border: `1px solid ${theme.borders.light}`,
         }}
       >
-        <h3 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>
+        <h3 className="text-lg font-semibold mb-4 shrink-0" style={{ color: theme.text.primary }}>
           {title}
         </h3>
         {children}

@@ -115,6 +115,12 @@ export type PaymentTransaction = Prisma.PaymentTransactionModel
  */
 export type PartPaymentTransaction = Prisma.PartPaymentTransactionModel
 /**
+ * Model PayeeAccount
+ * A person or entity that the business owes money to.
+ * Acts as a payable ledger account (mirroring CustomerReceivable on the receivables side).
+ */
+export type PayeeAccount = Prisma.PayeeAccountModel
+/**
  * Model Expense
  * 
  */
@@ -205,6 +211,23 @@ export type VendorDefectiveReturnBike = Prisma.VendorDefectiveReturnBikeModel
  * A single part line inside a VendorDefectiveReturn.
  */
 export type VendorDefectiveReturnPartLine = Prisma.VendorDefectiveReturnPartLineModel
+/**
+ * Model ReceivableParty
+ * A person or entity that owes the business money.
+ * Customers auto-link via phone. Other party types use manual entries.
+ */
+export type ReceivableParty = Prisma.ReceivablePartyModel
+/**
+ * Model ReceivableEntry
+ * A manually-created receivable line for non-order parties
+ * (e.g. a loan to a vendor, advance to an employee, etc.)
+ */
+export type ReceivableEntry = Prisma.ReceivableEntryModel
+/**
+ * Model ReceivablePayment
+ * A payment collected against a manual ReceivableEntry
+ */
+export type ReceivablePayment = Prisma.ReceivablePaymentModel
 /**
  * Model ReceivablesAlert
  * 

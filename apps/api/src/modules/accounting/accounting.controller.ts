@@ -160,8 +160,22 @@ export class AccountingController {
 
   @Get("journals")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getJournals() {
-    return this.accountingService.getJournalEntries();
+  async getJournals(
+    @Query("dateFrom") dateFrom?: string,
+    @Query("dateTo") dateTo?: string,
+    @Query("journalType") journalType?: string,
+    @Query("accountId") accountId?: string,
+    @Query("vendorId") vendorId?: string,
+    @Query("customerId") customerId?: string,
+  ) {
+    return this.accountingService.getJournalEntries({
+      dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+      dateTo: dateTo ? new Date(new Date(dateTo).setHours(23, 59, 59, 999)) : undefined,
+      journalType,
+      accountId,
+      vendorId,
+      customerId,
+    });
   }
 
   @Post("journals")
@@ -214,19 +228,51 @@ export class AccountingController {
     return this.receivablesService.getPaymentAccounts();
   }
 
+  @Get("receivables/parties")
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getParties() {
+    return this.receivablesService.getParties();
+  }
+
+  @Post("receivables/parties")
+  @Roles(UserRole.ADMIN)
+  async createParty(@Body() data: { name: string; partyType?: string; phone?: string; email?: string; address?: string; notes?: string }) {
+    return this.receivablesService.createParty(data as any);
+  }
+
+  @Post("receivables/entries")
+  @Roles(UserRole.ADMIN)
+  async createEntry(@Body() data: { partyId: string; amount: number; description: string; date: string; dueDate?: string }) {
+    return this.receivablesService.createEntry(data);
+  }
+
+  @Get("receivables/parties/:partyId/ledger")
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getPartyLedger(@Param("partyId") partyId: string) {
+    return this.receivablesService.getPartyLedger(partyId);
+  }
+
+  @Post("receivables/parties/:partyId/collect")
+  @Roles(UserRole.ADMIN)
+  async collectFromParty(
+    @Param("partyId") partyId: string,
+    @Body() data: { amount: number; paymentMethod: string; notes?: string; accountId?: string },
+    @Request() req: any,
+  ) {
+    return this.receivablesService.collectPayment(partyId, data.amount, data.paymentMethod, req.user.id, data.notes, data.accountId);
+  }
+
+  // ─── Legacy phone-based routes (kept for existing order flows) ────────────
+
   @Get("receivables/:customerPhone/ledger")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getCustomerLedger(
-    @Param("customerPhone") customerPhone: string,
-  ) {
+  async getCustomerLedger(@Param("customerPhone") customerPhone: string) {
     return this.receivablesService.getCustomerLedger(customerPhone);
   }
 
   @Get("receivables/:customerPhone/statement")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getCustomerStatement(
-    @Param("customerPhone") customerPhone: string,
-  ) {
+  async getCustomerStatement(@Param("customerPhone") customerPhone: string) {
     return this.receivablesService.getCustomerStatement(customerPhone);
   }
 
@@ -234,23 +280,10 @@ export class AccountingController {
   @Roles(UserRole.ADMIN)
   async collectReceivable(
     @Param("customerPhone") customerPhone: string,
-    @Body()
-    data: {
-      amount: number;
-      paymentMethod: string;
-      notes?: string;
-      accountId?: string;
-    },
+    @Body() data: { amount: number; paymentMethod: string; notes?: string; accountId?: string },
     @Request() req: any,
   ) {
-    return this.receivablesService.collectPayment(
-      customerPhone,
-      data.amount,
-      data.paymentMethod,
-      req.user.id,
-      data.notes,
-      data.accountId,
-    );
+    return this.receivablesService.collectPaymentByPhone(customerPhone, data.amount, data.paymentMethod, req.user.id, data.notes, data.accountId);
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────

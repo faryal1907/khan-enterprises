@@ -75,6 +75,9 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get partPaymentTransaction(): Prisma.PartPaymentTransactionDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get payeeAccount(): Prisma.PayeeAccountDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get expense(): Prisma.ExpenseDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
@@ -127,6 +130,15 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
         omit: OmitOpts;
     }>;
     get vendorDefectiveReturnPartLine(): Prisma.VendorDefectiveReturnPartLineDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get receivableParty(): Prisma.ReceivablePartyDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get receivableEntry(): Prisma.ReceivableEntryDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get receivablePayment(): Prisma.ReceivablePaymentDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
     get receivablesAlert(): Prisma.ReceivablesAlertDelegate<ExtArgs, {

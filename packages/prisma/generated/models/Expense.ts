@@ -40,6 +40,7 @@ export type ExpenseMinAggregateOutputType = {
   date: Date | null
   category: $Enums.ExpenseCategory | null
   description: string | null
+  payeeAccountId: string | null
   branchId: string | null
   recordedById: string | null
   createdAt: Date | null
@@ -52,6 +53,7 @@ export type ExpenseMaxAggregateOutputType = {
   date: Date | null
   category: $Enums.ExpenseCategory | null
   description: string | null
+  payeeAccountId: string | null
   branchId: string | null
   recordedById: string | null
   createdAt: Date | null
@@ -64,6 +66,7 @@ export type ExpenseCountAggregateOutputType = {
   date: number
   category: number
   description: number
+  payeeAccountId: number
   branchId: number
   recordedById: number
   createdAt: number
@@ -86,6 +89,7 @@ export type ExpenseMinAggregateInputType = {
   date?: true
   category?: true
   description?: true
+  payeeAccountId?: true
   branchId?: true
   recordedById?: true
   createdAt?: true
@@ -98,6 +102,7 @@ export type ExpenseMaxAggregateInputType = {
   date?: true
   category?: true
   description?: true
+  payeeAccountId?: true
   branchId?: true
   recordedById?: true
   createdAt?: true
@@ -110,6 +115,7 @@ export type ExpenseCountAggregateInputType = {
   date?: true
   category?: true
   description?: true
+  payeeAccountId?: true
   branchId?: true
   recordedById?: true
   createdAt?: true
@@ -209,6 +215,7 @@ export type ExpenseGroupByOutputType = {
   date: Date
   category: $Enums.ExpenseCategory
   description: string | null
+  payeeAccountId: string | null
   branchId: string
   recordedById: string
   createdAt: Date
@@ -244,10 +251,12 @@ export type ExpenseWhereInput = {
   date?: Prisma.DateTimeFilter<"Expense"> | Date | string
   category?: Prisma.EnumExpenseCategoryFilter<"Expense"> | $Enums.ExpenseCategory
   description?: Prisma.StringNullableFilter<"Expense"> | string | null
+  payeeAccountId?: Prisma.StringNullableFilter<"Expense"> | string | null
   branchId?: Prisma.StringFilter<"Expense"> | string
   recordedById?: Prisma.StringFilter<"Expense"> | string
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
+  payeeAccount?: Prisma.XOR<Prisma.PayeeAccountNullableScalarRelationFilter, Prisma.PayeeAccountWhereInput> | null
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   recordedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -258,10 +267,12 @@ export type ExpenseOrderByWithRelationInput = {
   date?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  payeeAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   branchId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  payeeAccount?: Prisma.PayeeAccountOrderByWithRelationInput
   branch?: Prisma.BranchOrderByWithRelationInput
   recordedBy?: Prisma.UserOrderByWithRelationInput
 }
@@ -275,10 +286,12 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<{
   date?: Prisma.DateTimeFilter<"Expense"> | Date | string
   category?: Prisma.EnumExpenseCategoryFilter<"Expense"> | $Enums.ExpenseCategory
   description?: Prisma.StringNullableFilter<"Expense"> | string | null
+  payeeAccountId?: Prisma.StringNullableFilter<"Expense"> | string | null
   branchId?: Prisma.StringFilter<"Expense"> | string
   recordedById?: Prisma.StringFilter<"Expense"> | string
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
+  payeeAccount?: Prisma.XOR<Prisma.PayeeAccountNullableScalarRelationFilter, Prisma.PayeeAccountWhereInput> | null
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   recordedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
@@ -289,6 +302,7 @@ export type ExpenseOrderByWithAggregationInput = {
   date?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  payeeAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   branchId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -309,6 +323,7 @@ export type ExpenseScalarWhereWithAggregatesInput = {
   date?: Prisma.DateTimeWithAggregatesFilter<"Expense"> | Date | string
   category?: Prisma.EnumExpenseCategoryWithAggregatesFilter<"Expense"> | $Enums.ExpenseCategory
   description?: Prisma.StringNullableWithAggregatesFilter<"Expense"> | string | null
+  payeeAccountId?: Prisma.StringNullableWithAggregatesFilter<"Expense"> | string | null
   branchId?: Prisma.StringWithAggregatesFilter<"Expense"> | string
   recordedById?: Prisma.StringWithAggregatesFilter<"Expense"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Expense"> | Date | string
@@ -323,6 +338,7 @@ export type ExpenseCreateInput = {
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
   branch: Prisma.BranchCreateNestedOneWithoutExpensesInput
   recordedBy: Prisma.UserCreateNestedOneWithoutRecordedExpensesInput
 }
@@ -333,6 +349,7 @@ export type ExpenseUncheckedCreateInput = {
   date: Date | string
   category: $Enums.ExpenseCategory
   description?: string | null
+  payeeAccountId?: string | null
   branchId: string
   recordedById: string
   createdAt?: Date | string
@@ -347,6 +364,7 @@ export type ExpenseUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutExpensesNestedInput
   recordedBy?: Prisma.UserUpdateOneRequiredWithoutRecordedExpensesNestedInput
 }
@@ -357,6 +375,7 @@ export type ExpenseUncheckedUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payeeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   recordedById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -369,6 +388,7 @@ export type ExpenseCreateManyInput = {
   date: Date | string
   category: $Enums.ExpenseCategory
   description?: string | null
+  payeeAccountId?: string | null
   branchId: string
   recordedById: string
   createdAt?: Date | string
@@ -391,6 +411,7 @@ export type ExpenseUncheckedUpdateManyInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payeeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   recordedById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -413,6 +434,7 @@ export type ExpenseCountOrderByAggregateInput = {
   date?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  payeeAccountId?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -429,6 +451,7 @@ export type ExpenseMaxOrderByAggregateInput = {
   date?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  payeeAccountId?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -441,6 +464,7 @@ export type ExpenseMinOrderByAggregateInput = {
   date?: Prisma.SortOrder
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  payeeAccountId?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -535,6 +559,48 @@ export type ExpenseUncheckedUpdateManyWithoutBranchNestedInput = {
   deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
 }
 
+export type ExpenseCreateNestedManyWithoutPayeeAccountInput = {
+  create?: Prisma.XOR<Prisma.ExpenseCreateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput> | Prisma.ExpenseCreateWithoutPayeeAccountInput[] | Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput[]
+  connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput | Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput[]
+  createMany?: Prisma.ExpenseCreateManyPayeeAccountInputEnvelope
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+}
+
+export type ExpenseUncheckedCreateNestedManyWithoutPayeeAccountInput = {
+  create?: Prisma.XOR<Prisma.ExpenseCreateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput> | Prisma.ExpenseCreateWithoutPayeeAccountInput[] | Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput[]
+  connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput | Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput[]
+  createMany?: Prisma.ExpenseCreateManyPayeeAccountInputEnvelope
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+}
+
+export type ExpenseUpdateManyWithoutPayeeAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.ExpenseCreateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput> | Prisma.ExpenseCreateWithoutPayeeAccountInput[] | Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput[]
+  connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput | Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput[]
+  upsert?: Prisma.ExpenseUpsertWithWhereUniqueWithoutPayeeAccountInput | Prisma.ExpenseUpsertWithWhereUniqueWithoutPayeeAccountInput[]
+  createMany?: Prisma.ExpenseCreateManyPayeeAccountInputEnvelope
+  set?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  disconnect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  delete?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  update?: Prisma.ExpenseUpdateWithWhereUniqueWithoutPayeeAccountInput | Prisma.ExpenseUpdateWithWhereUniqueWithoutPayeeAccountInput[]
+  updateMany?: Prisma.ExpenseUpdateManyWithWhereWithoutPayeeAccountInput | Prisma.ExpenseUpdateManyWithWhereWithoutPayeeAccountInput[]
+  deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
+}
+
+export type ExpenseUncheckedUpdateManyWithoutPayeeAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.ExpenseCreateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput> | Prisma.ExpenseCreateWithoutPayeeAccountInput[] | Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput[]
+  connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput | Prisma.ExpenseCreateOrConnectWithoutPayeeAccountInput[]
+  upsert?: Prisma.ExpenseUpsertWithWhereUniqueWithoutPayeeAccountInput | Prisma.ExpenseUpsertWithWhereUniqueWithoutPayeeAccountInput[]
+  createMany?: Prisma.ExpenseCreateManyPayeeAccountInputEnvelope
+  set?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  disconnect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  delete?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  update?: Prisma.ExpenseUpdateWithWhereUniqueWithoutPayeeAccountInput | Prisma.ExpenseUpdateWithWhereUniqueWithoutPayeeAccountInput[]
+  updateMany?: Prisma.ExpenseUpdateManyWithWhereWithoutPayeeAccountInput | Prisma.ExpenseUpdateManyWithWhereWithoutPayeeAccountInput[]
+  deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
+}
+
 export type EnumExpenseCategoryFieldUpdateOperationsInput = {
   set?: $Enums.ExpenseCategory
 }
@@ -547,6 +613,7 @@ export type ExpenseCreateWithoutRecordedByInput = {
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
   branch: Prisma.BranchCreateNestedOneWithoutExpensesInput
 }
 
@@ -556,6 +623,7 @@ export type ExpenseUncheckedCreateWithoutRecordedByInput = {
   date: Date | string
   category: $Enums.ExpenseCategory
   description?: string | null
+  payeeAccountId?: string | null
   branchId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -596,6 +664,7 @@ export type ExpenseScalarWhereInput = {
   date?: Prisma.DateTimeFilter<"Expense"> | Date | string
   category?: Prisma.EnumExpenseCategoryFilter<"Expense"> | $Enums.ExpenseCategory
   description?: Prisma.StringNullableFilter<"Expense"> | string | null
+  payeeAccountId?: Prisma.StringNullableFilter<"Expense"> | string | null
   branchId?: Prisma.StringFilter<"Expense"> | string
   recordedById?: Prisma.StringFilter<"Expense"> | string
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
@@ -610,6 +679,7 @@ export type ExpenseCreateWithoutBranchInput = {
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
   recordedBy: Prisma.UserCreateNestedOneWithoutRecordedExpensesInput
 }
 
@@ -619,6 +689,7 @@ export type ExpenseUncheckedCreateWithoutBranchInput = {
   date: Date | string
   category: $Enums.ExpenseCategory
   description?: string | null
+  payeeAccountId?: string | null
   recordedById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -650,12 +721,63 @@ export type ExpenseUpdateManyWithWhereWithoutBranchInput = {
   data: Prisma.XOR<Prisma.ExpenseUpdateManyMutationInput, Prisma.ExpenseUncheckedUpdateManyWithoutBranchInput>
 }
 
+export type ExpenseCreateWithoutPayeeAccountInput = {
+  id?: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  date: Date | string
+  category: $Enums.ExpenseCategory
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branch: Prisma.BranchCreateNestedOneWithoutExpensesInput
+  recordedBy: Prisma.UserCreateNestedOneWithoutRecordedExpensesInput
+}
+
+export type ExpenseUncheckedCreateWithoutPayeeAccountInput = {
+  id?: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  date: Date | string
+  category: $Enums.ExpenseCategory
+  description?: string | null
+  branchId: string
+  recordedById: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ExpenseCreateOrConnectWithoutPayeeAccountInput = {
+  where: Prisma.ExpenseWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExpenseCreateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput>
+}
+
+export type ExpenseCreateManyPayeeAccountInputEnvelope = {
+  data: Prisma.ExpenseCreateManyPayeeAccountInput | Prisma.ExpenseCreateManyPayeeAccountInput[]
+  skipDuplicates?: boolean
+}
+
+export type ExpenseUpsertWithWhereUniqueWithoutPayeeAccountInput = {
+  where: Prisma.ExpenseWhereUniqueInput
+  update: Prisma.XOR<Prisma.ExpenseUpdateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedUpdateWithoutPayeeAccountInput>
+  create: Prisma.XOR<Prisma.ExpenseCreateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedCreateWithoutPayeeAccountInput>
+}
+
+export type ExpenseUpdateWithWhereUniqueWithoutPayeeAccountInput = {
+  where: Prisma.ExpenseWhereUniqueInput
+  data: Prisma.XOR<Prisma.ExpenseUpdateWithoutPayeeAccountInput, Prisma.ExpenseUncheckedUpdateWithoutPayeeAccountInput>
+}
+
+export type ExpenseUpdateManyWithWhereWithoutPayeeAccountInput = {
+  where: Prisma.ExpenseScalarWhereInput
+  data: Prisma.XOR<Prisma.ExpenseUpdateManyMutationInput, Prisma.ExpenseUncheckedUpdateManyWithoutPayeeAccountInput>
+}
+
 export type ExpenseCreateManyRecordedByInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   date: Date | string
   category: $Enums.ExpenseCategory
   description?: string | null
+  payeeAccountId?: string | null
   branchId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -669,6 +791,7 @@ export type ExpenseUpdateWithoutRecordedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutExpensesNestedInput
 }
 
@@ -678,6 +801,7 @@ export type ExpenseUncheckedUpdateWithoutRecordedByInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payeeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -689,6 +813,7 @@ export type ExpenseUncheckedUpdateManyWithoutRecordedByInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payeeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branchId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -700,6 +825,7 @@ export type ExpenseCreateManyBranchInput = {
   date: Date | string
   category: $Enums.ExpenseCategory
   description?: string | null
+  payeeAccountId?: string | null
   recordedById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -713,6 +839,7 @@ export type ExpenseUpdateWithoutBranchInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
   recordedBy?: Prisma.UserUpdateOneRequiredWithoutRecordedExpensesNestedInput
 }
 
@@ -722,6 +849,7 @@ export type ExpenseUncheckedUpdateWithoutBranchInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payeeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -733,6 +861,55 @@ export type ExpenseUncheckedUpdateManyWithoutBranchInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payeeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recordedById?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ExpenseCreateManyPayeeAccountInput = {
+  id?: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  date: Date | string
+  category: $Enums.ExpenseCategory
+  description?: string | null
+  branchId: string
+  recordedById: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ExpenseUpdateWithoutPayeeAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branch?: Prisma.BranchUpdateOneRequiredWithoutExpensesNestedInput
+  recordedBy?: Prisma.UserUpdateOneRequiredWithoutRecordedExpensesNestedInput
+}
+
+export type ExpenseUncheckedUpdateWithoutPayeeAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  recordedById?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ExpenseUncheckedUpdateManyWithoutPayeeAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.EnumExpenseCategoryFieldUpdateOperationsInput | $Enums.ExpenseCategory
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
   recordedById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -746,10 +923,12 @@ export type ExpenseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   date?: boolean
   category?: boolean
   description?: boolean
+  payeeAccountId?: boolean
   branchId?: boolean
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expense"]>
@@ -760,10 +939,12 @@ export type ExpenseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   date?: boolean
   category?: boolean
   description?: boolean
+  payeeAccountId?: boolean
   branchId?: boolean
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expense"]>
@@ -774,10 +955,12 @@ export type ExpenseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   date?: boolean
   category?: boolean
   description?: boolean
+  payeeAccountId?: boolean
   branchId?: boolean
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expense"]>
@@ -788,22 +971,26 @@ export type ExpenseSelectScalar = {
   date?: boolean
   category?: boolean
   description?: boolean
+  payeeAccountId?: boolean
   branchId?: boolean
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "amount" | "date" | "category" | "description" | "branchId" | "recordedById" | "createdAt" | "updatedAt", ExtArgs["result"]["expense"]>
+export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "amount" | "date" | "category" | "description" | "payeeAccountId" | "branchId" | "recordedById" | "createdAt" | "updatedAt", ExtArgs["result"]["expense"]>
 export type ExpenseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ExpenseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ExpenseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -811,6 +998,7 @@ export type ExpenseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type $ExpensePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Expense"
   objects: {
+    payeeAccount: Prisma.$PayeeAccountPayload<ExtArgs> | null
     branch: Prisma.$BranchPayload<ExtArgs>
     recordedBy: Prisma.$UserPayload<ExtArgs>
   }
@@ -820,6 +1008,10 @@ export type $ExpensePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     date: Date
     category: $Enums.ExpenseCategory
     description: string | null
+    /**
+     * The payee this expense is owed to (required for AP tracking)
+     */
+    payeeAccountId: string | null
     branchId: string
     recordedById: string
     createdAt: Date
@@ -1218,6 +1410,7 @@ readonly fields: ExpenseFieldRefs;
  */
 export interface Prisma__ExpenseClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  payeeAccount<T extends Prisma.Expense$payeeAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Expense$payeeAccountArgs<ExtArgs>>): Prisma.Prisma__PayeeAccountClient<runtime.Types.Result.GetResult<Prisma.$PayeeAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   recordedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1254,6 +1447,7 @@ export interface ExpenseFieldRefs {
   readonly date: Prisma.FieldRef<"Expense", 'DateTime'>
   readonly category: Prisma.FieldRef<"Expense", 'ExpenseCategory'>
   readonly description: Prisma.FieldRef<"Expense", 'String'>
+  readonly payeeAccountId: Prisma.FieldRef<"Expense", 'String'>
   readonly branchId: Prisma.FieldRef<"Expense", 'String'>
   readonly recordedById: Prisma.FieldRef<"Expense", 'String'>
   readonly createdAt: Prisma.FieldRef<"Expense", 'DateTime'>
@@ -1656,6 +1850,25 @@ export type ExpenseDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Expenses to delete.
    */
   limit?: number
+}
+
+/**
+ * Expense.payeeAccount
+ */
+export type Expense$payeeAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PayeeAccount
+   */
+  select?: Prisma.PayeeAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PayeeAccount
+   */
+  omit?: Prisma.PayeeAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PayeeAccountInclude<ExtArgs> | null
+  where?: Prisma.PayeeAccountWhereInput
 }
 
 /**

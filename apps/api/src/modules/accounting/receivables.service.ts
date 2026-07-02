@@ -1,396 +1,375 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { AccountSubtype, JournalStatus, PaymentState } from "@khan/prisma";
+import { AccountSubtype, JournalStatus, PaymentState, ReceivablePartyType } from "@khan/prisma";
 
 @Injectable()
 export class ReceivablesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Aggregate outstanding balances per customer across both bike orders AND part orders.
-   * Shows all payment-verified orders (including fully paid), so admin can see the full picture.
-   */
-  async getReceivables() {
-    // ── 1. Fetch bike orders — all that have been payment-verified ─────────
-    const orders = await this.prisma.client.order.findMany({
-      where: {
-        paymentVerified: true,
-        status: { notIn: ["CANCELLED"] as any },
+  // ─── Party CRUD ────────────────────────────────────────────────────────────
+
+  async getParties() {
+    return this.prisma.client.receivableParty.findMany({
+      where: { isActive: true },
+      orderBy: [{ partyType: "asc" }, { name: "asc" }],
+    });
+  }
+
+  async createParty(data: {
+    name: string;
+    partyType?: ReceivablePartyType;
+    phone?: string;
+    email?: string;
+    address?: string;
+    notes?: string;
+  }) {
+    return this.prisma.client.receivableParty.create({ data });
+  }
+
+  async updateParty(id: string, data: {
+    name?: string;
+    partyType?: ReceivablePartyType;
+    phone?: string;
+    email?: string;
+    address?: string;
+    notes?: string;
+  }) {
+    const party = await this.prisma.client.receivableParty.findUnique({ where: { id } });
+    if (!party) throw new NotFoundException("Party not found");
+    return this.prisma.client.receivableParty.update({ where: { id }, data });
+  }
+
+  // ─── Manual receivable entry ───────────────────────────────────────────────
+
+  async createEntry(data: {
+    partyId: string;
+    amount: number;
+    description: string;
+    date: string;
+    dueDate?: string;
+  }) {
+    const party = await this.prisma.client.receivableParty.findUnique({ where: { id: data.partyId } });
+    if (!party) throw new NotFoundException("Party not found");
+    if (data.amount <= 0) throw new BadRequestException("Amount must be greater than 0");
+
+    const entryDate = new Date(`${data.date}T12:00:00Z`);
+    const entry = await this.prisma.client.receivableEntry.create({
+      data: {
+        partyId: data.partyId,
+        amount: data.amount,
+        description: data.description,
+        date: entryDate,
+        dueDate: data.dueDate ? new Date(`${data.dueDate}T12:00:00Z`) : null,
+        balanceDue: data.amount,
+        status: PaymentState.DUE,
       },
-      select: {
-        id: true,
-        orderNumber: true,
-        customerName: true,
-        customerPhone: true,
-        customerCNIC: true,
-        customerId: true,
-        totalAmount: true,
-        paidAmount: true,
-        balanceDue: true,
-        paymentState: true,
-        status: true,
-        createdAt: true,
-        isInstallmentPlan: true,
-        bike: {
-          select: {
-            model: { select: { brand: true, modelName: true, year: true } },
+    });
+
+    const arAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+    if (arAcc) {
+      const revenueAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+      if (revenueAcc) {
+        await this.prisma.client.journalEntry.create({
+          data: {
+            entryNo: `JV-RCV-${entry.id.substring(0, 8)}`,
+            date: entryDate,
+            description: `Receivable from ${party.name} — ${data.description}`,
+            sourceRef: entry.id,
+            status: JournalStatus.POSTED,
+            lines: {
+              create: [
+                { accountId: arAcc.id, debit: data.amount, credit: 0 },
+                { accountId: revenueAcc.id, debit: 0, credit: data.amount },
+              ],
+            },
           },
-        },
-        branch: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    // ── 2. Fetch part orders — all that have been payment-verified ─────────
-    const partOrders = await this.prisma.client.partOrder.findMany({
-      where: {
-        paymentVerified: true,
-        status: { notIn: ["CANCELLED"] as any },
-      },
-      select: {
-        id: true,
-        orderNumber: true,
-        customerName: true,
-        customerPhone: true,
-        customerId: true,
-        amount: true,
-        paidAmount: true,
-        balanceDue: true,
-        paymentState: true,
-        status: true,
-        createdAt: true,
-        branch: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    // ── 3. Group by customer (customerPhone as key) ────────────────────────
-    const customerMap = new Map<
-      string,
-      {
-        customerId: string | null;
-        customerName: string;
-        customerPhone: string;
-        totalOutstanding: number;
-        totalBilled: number;
-        totalPaid: number;
-        orderCount: number;
-        latestOrderDate: Date;
-        status: "DUE" | "PARTIAL" | "OVERDUE" | "PAID";
+        });
       }
-    >();
+    }
 
-    // Helper to merge an order/partOrder into the map
-    const mergeItem = (item: {
-      customerPhone: string;
-      customerName: string;
-      customerId: string | null;
-      billed: number;
-      paid: number;
-      outstanding: number;
-      createdAt: Date;
-      paymentState: string;
-    }) => {
-      const key = item.customerPhone;
-      const existing = customerMap.get(key);
+    return entry;
+  }
 
-      const itemStatus =
-        item.paymentState === PaymentState.OVERDUE
-          ? "OVERDUE"
-          : item.paymentState === PaymentState.PARTIAL
-          ? "PARTIAL"
-          : item.paymentState === PaymentState.PAID
-          ? "PAID"
-          : "DUE";
+  // ─── Aggregate receivables list (all parties) ─────────────────────────────
+
+  async getReceivables() {
+    // ── Order-based receivables (CUSTOMER parties) ─────────────────────────
+    const orders = await this.prisma.client.order.findMany({
+      where: { paymentVerified: true, status: { notIn: ["CANCELLED"] as any } },
+      select: {
+        id: true, orderNumber: true, customerName: true, customerPhone: true,
+        customerId: true, totalAmount: true, paidAmount: true, balanceDue: true,
+        paymentState: true, status: true, createdAt: true,
+        bike: { select: { model: { select: { brand: true, modelName: true, year: true } } } },
+        branch: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const partOrders = await this.prisma.client.partOrder.findMany({
+      where: { paymentVerified: true, status: { notIn: ["CANCELLED"] as any } },
+      select: {
+        id: true, orderNumber: true, customerName: true, customerPhone: true,
+        customerId: true, amount: true, paidAmount: true, balanceDue: true,
+        paymentState: true, status: true, createdAt: true,
+        branch: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Build phone→party map from existing ReceivableParty records (CUSTOMER type)
+    const customerParties = await this.prisma.client.receivableParty.findMany({
+      where: { partyType: ReceivablePartyType.CUSTOMER, isActive: true },
+    });
+    const partyByPhone = new Map(customerParties.map((p) => [p.customerPhone ?? "", p]));
+
+    // Auto-create missing CUSTOMER parties for any phone not yet in the map
+    const allPhones = new Set([
+      ...orders.map((o) => o.customerPhone),
+      ...partOrders.map((po) => po.customerPhone),
+    ]);
+    for (const phone of allPhones) {
+      if (!partyByPhone.has(phone)) {
+        const name = orders.find((o) => o.customerPhone === phone)?.customerName
+          ?? partOrders.find((po) => po.customerPhone === phone)?.customerName
+          ?? phone;
+        const newParty = await this.prisma.client.receivableParty.upsert({
+          where: { customerPhone: phone },
+          update: {},
+          create: { name, partyType: ReceivablePartyType.CUSTOMER, customerPhone: phone },
+        });
+        partyByPhone.set(phone, newParty);
+      }
+    }
+
+    type PartyRow = {
+      partyId: string | null;
+      partyName: string;
+      partyType: string;
+      partyPhone: string | null;
+      totalOutstanding: number;
+      totalBilled: number;
+      totalPaid: number;
+      orderCount: number;
+      latestDate: Date;
+      lastPaymentDate: Date | null;
+      status: "DUE" | "PARTIAL" | "OVERDUE" | "PAID";
+    };
+
+    const map = new Map<string, PartyRow>();
+
+    const mergeOrder = (phone: string, name: string, billed: number, paid: number,
+      outstanding: number, createdAt: Date, paymentState: string) => {
+      const existing = map.get(phone);
+      const party = partyByPhone.get(phone);
+      const itemStatus = paymentState === "OVERDUE" ? "OVERDUE"
+        : paymentState === "PARTIAL" ? "PARTIAL"
+        : paymentState === "PAID" ? "PAID" : "DUE";
 
       if (existing) {
-        existing.totalOutstanding += item.outstanding;
-        existing.totalBilled += item.billed;
-        existing.totalPaid += item.paid;
+        existing.totalOutstanding += outstanding;
+        existing.totalBilled += billed;
+        existing.totalPaid += paid;
         existing.orderCount += 1;
-        if (item.createdAt > existing.latestOrderDate) {
-          existing.latestOrderDate = item.createdAt;
-        }
-        // Priority: OVERDUE > PARTIAL > DUE > PAID
-        if (itemStatus === "OVERDUE") {
-          existing.status = "OVERDUE";
-        } else if (existing.status !== "OVERDUE" && itemStatus === "PARTIAL") {
-          existing.status = "PARTIAL";
-        } else if (existing.status !== "OVERDUE" && existing.status !== "PARTIAL" && itemStatus === "DUE") {
-          existing.status = "DUE";
-        }
+        if (createdAt > existing.latestDate) existing.latestDate = createdAt;
+        if (itemStatus === "OVERDUE") existing.status = "OVERDUE";
+        else if (existing.status !== "OVERDUE" && itemStatus === "PARTIAL") existing.status = "PARTIAL";
+        else if (existing.status !== "OVERDUE" && existing.status !== "PARTIAL" && itemStatus === "DUE") existing.status = "DUE";
       } else {
-        customerMap.set(key, {
-          customerId: item.customerId,
-          customerName: item.customerName,
-          customerPhone: item.customerPhone,
-          totalOutstanding: item.outstanding,
-          totalBilled: item.billed,
-          totalPaid: item.paid,
+        map.set(phone, {
+          partyId: party?.id ?? null,
+          partyName: party?.name ?? name,
+          partyType: "CUSTOMER",
+          partyPhone: phone,
+          totalOutstanding: outstanding,
+          totalBilled: billed,
+          totalPaid: paid,
           orderCount: 1,
-          latestOrderDate: item.createdAt,
-          status: itemStatus,
+          latestDate: createdAt,
+          lastPaymentDate: null,
+          status: itemStatus as any,
         });
       }
     };
 
-    // Merge bike orders
-    for (const order of orders) {
-      mergeItem({
-        customerPhone: order.customerPhone,
-        customerName: order.customerName,
-        customerId: order.customerId,
-        billed: Number(order.totalAmount),
-        paid: Number(order.paidAmount),
-        outstanding: Number(order.balanceDue),
-        createdAt: order.createdAt,
-        paymentState: order.paymentState,
+    for (const o of orders) mergeOrder(o.customerPhone, o.customerName,
+      Number(o.totalAmount), Number(o.paidAmount), Number(o.balanceDue), o.createdAt, o.paymentState);
+    for (const po of partOrders) mergeOrder(po.customerPhone, po.customerName,
+      Number(po.amount), Number(po.paidAmount), Number(po.balanceDue), po.createdAt, po.paymentState);
+
+    // Compute last payment dates for customer parties
+    const phones = Array.from(map.keys());
+    if (phones.length > 0) {
+      const bikePmts = await this.prisma.client.paymentTransaction.findMany({
+        where: { order: { customerPhone: { in: phones }, status: { notIn: ["CANCELLED"] as any } }, status: "SUCCESS", verifiedAt: { not: null } },
+        select: { verifiedAt: true, order: { select: { customerPhone: true } } },
+        orderBy: { verifiedAt: "desc" },
       });
-    }
-
-    // Merge part orders
-    for (const po of partOrders) {
-      mergeItem({
-        customerPhone: po.customerPhone,
-        customerName: po.customerName,
-        customerId: po.customerId,
-        billed: Number(po.amount),
-        paid: Number(po.paidAmount),
-        outstanding: Number(po.balanceDue),
-        createdAt: po.createdAt,
-        paymentState: po.paymentState,
+      const partPmts = await this.prisma.client.partPaymentTransaction.findMany({
+        where: { partOrder: { customerPhone: { in: phones }, status: { notIn: ["CANCELLED"] as any } }, status: "SUCCESS", verifiedAt: { not: null } },
+        select: { verifiedAt: true, partOrder: { select: { customerPhone: true } } },
+        orderBy: { verifiedAt: "desc" },
       });
+      for (const t of bikePmts) {
+        const row = map.get(t.order!.customerPhone);
+        if (row && !row.lastPaymentDate) row.lastPaymentDate = t.verifiedAt!;
+      }
+      for (const t of partPmts) {
+        const row = map.get(t.partOrder!.customerPhone);
+        if (row && !row.lastPaymentDate) row.lastPaymentDate = t.verifiedAt!;
+      }
     }
 
-    // Compute lastPaymentDate per customer from both payment transaction tables
-    const customerPhones = Array.from(customerMap.keys());
+    // ── Manual-entry receivables (non-CUSTOMER parties) ────────────────────
+    const nonCustomerParties = await this.prisma.client.receivableParty.findMany({
+      where: { partyType: { not: ReceivablePartyType.CUSTOMER }, isActive: true },
+      include: {
+        entries: {
+          select: { amount: true, paidAmount: true, balanceDue: true, status: true, date: true },
+        },
+      },
+    });
 
-    const bikeLastPayments = customerPhones.length > 0
-      ? await this.prisma.client.paymentTransaction.findMany({
-          where: {
-            order: {
-              customerPhone: { in: customerPhones },
-              status: { notIn: ["CANCELLED"] as any },
-            },
-            status: "SUCCESS",
-            verifiedAt: { not: null },
-          },
-          select: {
-            verifiedAt: true,
-            order: { select: { customerPhone: true } },
-          },
-          orderBy: { verifiedAt: "desc" },
-        })
-      : [];
+    const nonCustomerRows: PartyRow[] = nonCustomerParties
+      .filter((p) => p.entries.length > 0)
+      .map((p) => {
+        const totalBilled = p.entries.reduce((s, e) => s + Number(e.amount), 0);
+        const totalPaid = p.entries.reduce((s, e) => s + Number(e.paidAmount), 0);
+        const totalOutstanding = p.entries.reduce((s, e) => s + Number(e.balanceDue), 0);
+        const latestDate = p.entries.reduce((d, e) => e.date > d ? e.date : d, p.entries[0].date);
+        const hasDue = p.entries.some((e) => e.status === "DUE");
+        const hasPartial = p.entries.some((e) => e.status === "PARTIAL");
+        const status: "DUE" | "PARTIAL" | "PAID" =
+          totalOutstanding <= 0 ? "PAID" : hasPartial || (totalPaid > 0) ? "PARTIAL" : hasDue ? "DUE" : "PAID";
+        return {
+          partyId: p.id,
+          partyName: p.name,
+          partyType: p.partyType,
+          partyPhone: p.phone,
+          totalBilled,
+          totalPaid,
+          totalOutstanding,
+          orderCount: p.entries.length,
+          latestDate,
+          lastPaymentDate: null,
+          status,
+        };
+      });
 
-    const partLastPayments = customerPhones.length > 0
-      ? await this.prisma.client.partPaymentTransaction.findMany({
-          where: {
-            partOrder: {
-              customerPhone: { in: customerPhones },
-              status: { notIn: ["CANCELLED"] as any },
-            },
-            status: "SUCCESS",
-            verifiedAt: { not: null },
-          },
-          select: {
-            verifiedAt: true,
-            partOrder: { select: { customerPhone: true } },
-          },
-          orderBy: { verifiedAt: "desc" },
-        })
-      : [];
-
-    const customerLastPayment = new Map<string, Date>();
-    for (const tx of bikeLastPayments) {
-      const phone = tx.order!.customerPhone;
-      if (!customerLastPayment.has(phone)) customerLastPayment.set(phone, tx.verifiedAt!);
-    }
-    for (const tx of partLastPayments) {
-      const phone = tx.partOrder!.customerPhone;
-      if (!customerLastPayment.has(phone)) customerLastPayment.set(phone, tx.verifiedAt!);
-    }
-
-    return Array.from(customerMap.entries()).map(([phone, data]) => ({
-      customerPhone: phone,
-      customerId: data.customerId,
-      customerName: data.customerName,
-      totalOutstanding: data.totalOutstanding,
-      totalBilled: data.totalBilled,
-      totalPaid: data.totalPaid,
-      orderCount: data.orderCount,
-      latestOrderDate: data.latestOrderDate,
-      lastPaymentDate: customerLastPayment.get(phone) || null,
-      // If all balances net to zero or less, always show as PAID regardless of stored paymentState
-      status: data.totalOutstanding <= 0 ? "PAID" : data.status,
+    const customerRows = Array.from(map.values()).map((r) => ({
+      ...r,
+      status: r.totalOutstanding <= 0 ? "PAID" as const : r.status,
     }));
+
+    return [...customerRows, ...nonCustomerRows];
   }
 
-  /**
-   * Get customer ledger — all orders AND part orders for a customer phone number with drill-down.
-   */
-  async getCustomerLedger(customerPhone: string) {
-    const orders = await this.prisma.client.order.findMany({
-      where: {
-        customerPhone,
-        status: { notIn: ["CANCELLED"] as any },
-      },
-      include: {
-        bike: {
-          include: {
-            model: { select: { brand: true, modelName: true, year: true } },
-          },
-        },
-        branch: { select: { name: true } },
-        transactions: {
-          where: { status: "SUCCESS" },
-          select: { id: true, amount: true, method: true, createdAt: true, verifiedAt: true },
-          orderBy: { createdAt: "asc" },
-        },
-      },
-      orderBy: { createdAt: "asc" },
-    });
+  // ─── Party ledger ──────────────────────────────────────────────────────────
 
-    const partOrders = await this.prisma.client.partOrder.findMany({
-      where: {
-        customerPhone,
-        status: { notIn: ["CANCELLED"] as any },
-      },
-      include: {
-        part: { select: { name: true } },
-        branch: { select: { name: true } },
-        transactions: {
-          where: { status: "SUCCESS" },
-          select: { id: true, amount: true, method: true, createdAt: true, verifiedAt: true },
-          orderBy: { createdAt: "asc" },
-        },
-      },
-      orderBy: { createdAt: "asc" },
-    });
+  async getPartyLedger(partyId: string) {
+    const party = await this.prisma.client.receivableParty.findUnique({ where: { id: partyId } });
+    if (!party) throw new NotFoundException("Party not found");
 
-    if (orders.length === 0 && partOrders.length === 0) {
-      return {
-        customerName: null,
-        customerPhone,
-        entries: [],
-        summary: { totalBilled: 0, totalPaid: 0, totalOutstanding: 0 },
-      };
-    }
-
-    // Build a running ledger across all orders (first bike orders, then part orders)
     let runningBalance = 0;
     const entries: any[] = [];
 
-    for (const order of orders) {
-      const invoiceAmount = Number(order.totalAmount);
-      runningBalance += invoiceAmount;
-      entries.push({
-        date: order.createdAt,
-        type: "INVOICE",
-        ref: order.orderNumber,
-        description: `Bike Sale - ${order.bike.model.brand} ${order.bike.model.modelName} (${order.bike.model.year})`,
-        debit: invoiceAmount,
-        credit: 0,
-        balance: runningBalance,
-        orderId: order.id,
-        orderStatus: order.status,
-        paymentState: order.paymentState,
-        branch: order.branch.name,
+    if (party.partyType === ReceivablePartyType.CUSTOMER && party.customerPhone) {
+      const phone = party.customerPhone;
+      const orders = await this.prisma.client.order.findMany({
+        where: { customerPhone: phone, status: { notIn: ["CANCELLED"] as any } },
+        include: {
+          bike: { include: { model: { select: { brand: true, modelName: true, year: true } } } },
+          branch: { select: { name: true } },
+          transactions: { where: { status: "SUCCESS" },
+            select: { id: true, amount: true, method: true, createdAt: true, verifiedAt: true },
+            orderBy: { createdAt: "asc" } },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+      const partOrders = await this.prisma.client.partOrder.findMany({
+        where: { customerPhone: phone, status: { notIn: ["CANCELLED"] as any } },
+        include: {
+          part: { select: { name: true } },
+          branch: { select: { name: true } },
+          transactions: { where: { status: "SUCCESS" },
+            select: { id: true, amount: true, method: true, createdAt: true, verifiedAt: true },
+            orderBy: { createdAt: "asc" } },
+        },
+        orderBy: { createdAt: "asc" },
       });
 
-      for (const txn of order.transactions) {
-        const paymentAmount = Number(txn.amount);
-        runningBalance -= paymentAmount;
-        entries.push({
-          date: txn.verifiedAt ?? txn.createdAt,
-          type: "PAYMENT",
-          ref: `PAY-${txn.id.substring(0, 8)}`,
-          description: `Payment received via ${txn.method}`,
-          debit: 0,
-          credit: paymentAmount,
-          balance: runningBalance,
-          orderId: order.id,
-        });
+      for (const o of orders) {
+        runningBalance += Number(o.totalAmount);
+        entries.push({ date: o.createdAt, type: "INVOICE", ref: o.orderNumber,
+          description: `Bike Sale — ${o.bike.model.brand} ${o.bike.model.modelName} (${o.bike.model.year})`,
+          debit: Number(o.totalAmount), credit: 0, balance: runningBalance,
+          orderId: o.id, orderStatus: o.status, paymentState: o.paymentState, branch: o.branch.name });
+        for (const t of o.transactions) {
+          runningBalance -= Number(t.amount);
+          entries.push({ date: t.verifiedAt ?? t.createdAt, type: "PAYMENT",
+            ref: `PAY-${t.id.substring(0, 8)}`,
+            description: `Payment received via ${t.method}`,
+            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: o.id });
+        }
+      }
+      for (const po of partOrders) {
+        runningBalance += Number(po.amount);
+        entries.push({ date: po.createdAt, type: "INVOICE", ref: po.orderNumber,
+          description: `Part Sale — ${po.part.name}`,
+          debit: Number(po.amount), credit: 0, balance: runningBalance,
+          orderId: po.id, orderStatus: po.status, paymentState: po.paymentState, branch: po.branch.name });
+        for (const t of po.transactions) {
+          runningBalance -= Number(t.amount);
+          entries.push({ date: t.verifiedAt ?? t.createdAt, type: "PAYMENT",
+            ref: `PAY-${t.id.substring(0, 8)}`,
+            description: `Payment received via ${t.method}`,
+            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: po.id });
+        }
+      }
+    } else {
+      // Non-customer: manual entries
+      const dbEntries = await this.prisma.client.receivableEntry.findMany({
+        where: { partyId },
+        include: {
+          payments: {
+            include: { account: { select: { name: true, subtype: true } } },
+            orderBy: { collectedAt: "asc" },
+          },
+        },
+        orderBy: { date: "asc" },
+      });
+      for (const e of dbEntries) {
+        runningBalance += Number(e.amount);
+        entries.push({ date: e.date, type: "INVOICE", ref: `RCV-${e.id.substring(0, 8).toUpperCase()}`,
+          description: e.description, debit: Number(e.amount), credit: 0,
+          balance: runningBalance, entryId: e.id, status: e.status });
+        for (const p of e.payments) {
+          runningBalance -= Number(p.amount);
+          entries.push({ date: p.collectedAt, type: "PAYMENT",
+            ref: `PMT-${p.id.substring(0, 8).toUpperCase()}`,
+            description: `Payment via ${p.method === "ONLINE_TRANSFER" ? "Bank Transfer" : "Cash"}${p.account ? ` (${p.account.name})` : ""}`,
+            debit: 0, credit: Number(p.amount), balance: runningBalance, entryId: e.id });
+        }
       }
     }
 
-    for (const po of partOrders) {
-      const invoiceAmount = Number(po.amount);
-      runningBalance += invoiceAmount;
-      entries.push({
-        date: po.createdAt,
-        type: "INVOICE",
-        ref: po.orderNumber,
-        description: `Part Sale - ${po.part.name}`,
-        debit: invoiceAmount,
-        credit: 0,
-        balance: runningBalance,
-        orderId: po.id,
-        orderStatus: po.status,
-        paymentState: po.paymentState,
-        branch: po.branch.name,
-      });
+    entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-      for (const txn of po.transactions) {
-        const paymentAmount = Number(txn.amount);
-        runningBalance -= paymentAmount;
-        entries.push({
-          date: txn.verifiedAt ?? txn.createdAt,
-          type: "PAYMENT",
-          ref: `PAY-${txn.id.substring(0, 8)}`,
-          description: `Payment received via ${txn.method}`,
-          debit: 0,
-          credit: paymentAmount,
-          balance: runningBalance,
-          orderId: po.id,
-        });
-      }
-    }
-
-    const totalBilledOrders = orders.reduce((s, o) => s + Number(o.totalAmount), 0);
-    const totalPaidOrders = orders.reduce((s, o) => s + Number(o.paidAmount), 0);
-    const totalBilledParts = partOrders.reduce((s, p) => s + Number(p.amount), 0);
-    const totalPaidParts = partOrders.reduce((s, p) => s + Number(p.paidAmount), 0);
+    const totalBilled = entries.filter((e) => e.type === "INVOICE").reduce((s, e) => s + e.debit, 0);
+    const totalPaid = entries.filter((e) => e.type === "PAYMENT").reduce((s, e) => s + e.credit, 0);
 
     return {
-      customerName: orders[0]?.customerName || partOrders[0]?.customerName || null,
-      customerPhone,
+      party: { id: party.id, name: party.name, partyType: party.partyType,
+        phone: party.customerPhone ?? party.phone },
+      summary: { totalBilled, totalPaid, totalOutstanding: totalBilled - totalPaid },
       entries,
-      summary: {
-        totalBilled: totalBilledOrders + totalBilledParts,
-        totalPaid: totalPaidOrders + totalPaidParts,
-        totalOutstanding: (totalBilledOrders + totalBilledParts) - (totalPaidOrders + totalPaidParts),
-      },
     };
   }
 
-  /**
-   * Get available payment accounts (Bank, E-Wallet, Cash) for payment method selection.
-   */
-  async getPaymentAccounts() {
-    const accounts = await this.prisma.client.account.findMany({
-      where: {
-        subtype: { in: [AccountSubtype.BANK, AccountSubtype.EWALLET, AccountSubtype.CASH] },
-        isActive: true,
-      },
-      select: {
-        id: true,
-        code: true,
-        name: true,
-        subtype: true,
-        accountNumber: true,
-      },
-      orderBy: [{ subtype: "asc" }, { name: "asc" }],
-    });
-    return accounts;
-  }
+  // ─── Collect payment ───────────────────────────────────────────────────────
 
-/**
-    * Collect payment from a customer — allocate across outstanding orders (oldest-first).
-    * Supports advance payments (credit held if amount > total outstanding).
-    */
   async collectPayment(
-    customerPhone: string,
+    partyId: string,
     amount: number,
     paymentMethod: string,
     userId: string,
@@ -399,200 +378,199 @@ export class ReceivablesService {
   ) {
     if (amount <= 0) throw new BadRequestException("Amount must be greater than 0");
 
+    const party = await this.prisma.client.receivableParty.findUnique({ where: { id: partyId } });
+    if (!party) throw new NotFoundException("Party not found");
+
     return this.prisma.client.$transaction(async (tx) => {
-      // Fetch all outstanding bike orders for this customer, oldest first
-      const outstandingOrders = await tx.order.findMany({
-        where: {
-          customerPhone,
-          paymentState: { in: [PaymentState.DUE, PaymentState.PARTIAL, PaymentState.OVERDUE] },
-          status: { notIn: ["CANCELLED"] as any },
-        },
-        orderBy: { createdAt: "asc" },
-      });
-
-      // Fetch all outstanding part orders for this customer, oldest first
-      const outstandingPartOrders = await tx.partOrder.findMany({
-        where: {
-          customerPhone,
-          paymentState: { in: [PaymentState.DUE, PaymentState.PARTIAL, PaymentState.OVERDUE] },
-          status: { notIn: ["CANCELLED"] as any },
-        },
-        orderBy: { createdAt: "asc" },
-      });
-
-      // Get accounting accounts
       const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-      
-      // For online payments: use selected accountId if provided, otherwise fallback to generic account
       let paymentAcc: any = null;
-      if (paymentMethod === "ONLINE_TRANSFER") {
-        if (accountId) {
-          paymentAcc = await tx.account.findUnique({ where: { id: accountId } });
-        } else {
-          // Fallback for backward compatibility
-          paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
-        }
+      if (accountId) {
+        paymentAcc = await tx.account.findUnique({ where: { id: accountId } });
+      } else if (paymentMethod === "ONLINE_TRANSFER") {
+        paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
       } else {
         paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
       }
+      if (!paymentAcc || !arAcc) throw new BadRequestException("Required accounting accounts not found");
 
-      if (!paymentAcc || !arAcc) {
-        throw new BadRequestException("Required accounting accounts not found");
+      if (party.partyType === ReceivablePartyType.CUSTOMER && party.customerPhone) {
+        // Customer: allocate against orders (oldest first) — existing logic
+        return this._collectFromOrders(tx, party, amount, paymentMethod, userId, notes, paymentAcc, arAcc);
+      } else {
+        // Non-customer: allocate against manual ReceivableEntry records (oldest first)
+        return this._collectFromEntries(tx, party, amount, paymentMethod, userId, notes, paymentAcc, arAcc);
       }
-
-      let remaining = amount;
-      const allocations: { orderId: string; allocated: number; isPartOrder: boolean }[] = [];
-
-      // Allocate across bike orders
-      for (const order of outstandingOrders) {
-        if (remaining <= 0) break;
-        const due = Number(order.balanceDue);
-        const allocated = Math.min(remaining, due);
-        remaining -= allocated;
-        allocations.push({ orderId: order.id, allocated, isPartOrder: false });
-      }
-
-      // Allocate across part orders
-      for (const po of outstandingPartOrders) {
-        if (remaining <= 0) break;
-        const due = Number(po.balanceDue);
-        const allocated = Math.min(remaining, due);
-        remaining -= allocated;
-        allocations.push({ orderId: po.id, allocated, isPartOrder: true });
-      }
-
-      const totalAllocated = amount - remaining;
-      const isAdvance = remaining > 0;
-      const transactionIds: string[] = [];
-
-      for (const alloc of allocations) {
-        if (alloc.isPartOrder) {
-          const po = outstandingPartOrders.find((o) => o.id === alloc.orderId)!;
-          const txRecord = await tx.partPaymentTransaction.create({
-            data: {
-              partOrderId: alloc.orderId,
-              amount: alloc.allocated,
-              method: paymentMethod as any,
-              status: "SUCCESS",
-              verifiedAt: new Date(),
-              verifiedById: userId,
-              accountId: paymentAcc.id,
-            },
-          });
-          transactionIds.push(txRecord.id);
-
-          const newPaid = Number(po.paidAmount) + alloc.allocated;
-          const newBalance = Number(po.amount) - newPaid;
-          const newState = newPaid >= Number(po.amount) ? PaymentState.PAID : PaymentState.PARTIAL;
-
-          await tx.partOrder.update({
-            where: { id: alloc.orderId },
-            data: {
-              paidAmount: newPaid,
-              balanceDue: newBalance,
-              paymentState: newState,
-            },
-          });
-
-          await tx.journalEntry.create({
-            data: {
-              entryNo: `JV-RCVBL-${txRecord.id.substring(0, 8)}`,
-              description: `Payment collected from ${po.customerName} for ${po.orderNumber}${notes ? ` — ${notes}` : ""}`,
-              sourceRef: txRecord.id,
-              status: JournalStatus.POSTED,
-              lines: {
-                create: [
-                  { accountId: paymentAcc.id, debit: alloc.allocated, credit: 0 },
-                  { accountId: arAcc.id, debit: 0, credit: alloc.allocated },
-                ],
-              },
-            },
-          });
-        } else {
-          const order = outstandingOrders.find((o) => o.id === alloc.orderId)!;
-          const txRecord = await tx.paymentTransaction.create({
-            data: {
-              orderId: alloc.orderId,
-              amount: alloc.allocated,
-              method: paymentMethod as any,
-              status: "SUCCESS",
-              verifiedAt: new Date(),
-              verifiedById: userId,
-              accountId: paymentAcc.id,
-            },
-          });
-          transactionIds.push(txRecord.id);
-
-          await tx.paymentAllocation.create({
-            data: {
-              paymentId: txRecord.id,
-              orderId: alloc.orderId,
-              allocatedAmount: alloc.allocated,
-            },
-          });
-
-          const newPaid = Number(order.paidAmount) + alloc.allocated;
-          const newBalance = Number(order.totalAmount) - newPaid;
-          const newState = newPaid >= Number(order.totalAmount) ? PaymentState.PAID : PaymentState.PARTIAL;
-
-          await tx.order.update({
-            where: { id: alloc.orderId },
-            data: {
-              paidAmount: newPaid,
-              balanceDue: newBalance,
-              paymentState: newState,
-              status: newState === PaymentState.PAID ? "PAID" : order.status,
-            },
-          });
-
-          await tx.journalEntry.create({
-            data: {
-              entryNo: `JV-RCVBL-${txRecord.id.substring(0, 8)}`,
-              description: `Payment collected from ${order.customerName} for ${order.orderNumber}${notes ? ` — ${notes}` : ""}`,
-              sourceRef: txRecord.id,
-              status: JournalStatus.POSTED,
-              lines: {
-                create: [
-                  { accountId: paymentAcc.id, debit: alloc.allocated, credit: 0 },
-                  { accountId: arAcc.id, debit: 0, credit: alloc.allocated },
-                ],
-              },
-            },
-          });
-        }
-      }
-
-      return {
-        totalReceived: amount,
-        totalAllocated,
-        advanceAmount: remaining,
-        isAdvance,
-        allocations,
-        transactionIds,
-        message: isAdvance
-          ? `Rs. ${totalAllocated.toLocaleString()} allocated. Rs. ${remaining.toLocaleString()} held as advance credit.`
-          : `Rs. ${totalAllocated.toLocaleString()} collected and allocated successfully.`,
-      };
     });
   }
 
-  /**
-   * Customer statement — summary of all activity (invoices + payments).
-   */
+  private async _collectFromOrders(tx: any, party: any, amount: number,
+    paymentMethod: string, userId: string, notes: string | undefined,
+    paymentAcc: any, arAcc: any) {
+    const phone = party.customerPhone;
+    const outstandingOrders = await tx.order.findMany({
+      where: { customerPhone: phone, paymentState: { in: ["DUE", "PARTIAL", "OVERDUE"] }, status: { notIn: ["CANCELLED"] as any } },
+      orderBy: { createdAt: "asc" },
+    });
+    const outstandingPartOrders = await tx.partOrder.findMany({
+      where: { customerPhone: phone, paymentState: { in: ["DUE", "PARTIAL", "OVERDUE"] }, status: { notIn: ["CANCELLED"] as any } },
+      orderBy: { createdAt: "asc" },
+    });
+
+    let remaining = amount;
+    const allocations: any[] = [];
+    for (const o of outstandingOrders) {
+      if (remaining <= 0) break;
+      const allocated = Math.min(remaining, Number(o.balanceDue));
+      remaining -= allocated;
+      allocations.push({ orderId: o.id, allocated, isPartOrder: false });
+    }
+    for (const po of outstandingPartOrders) {
+      if (remaining <= 0) break;
+      const allocated = Math.min(remaining, Number(po.balanceDue));
+      remaining -= allocated;
+      allocations.push({ orderId: po.id, allocated, isPartOrder: true });
+    }
+
+    const totalAllocated = amount - remaining;
+    for (const alloc of allocations) {
+      if (alloc.isPartOrder) {
+        const po = outstandingPartOrders.find((o: any) => o.id === alloc.orderId)!;
+        const txRecord = await tx.partPaymentTransaction.create({ data: {
+          partOrderId: alloc.orderId, amount: alloc.allocated, method: paymentMethod as any,
+          status: "SUCCESS", verifiedAt: new Date(), verifiedById: userId, accountId: paymentAcc.id,
+        }});
+        const newPaid = Number(po.paidAmount) + alloc.allocated;
+        const newBalance = Number(po.amount) - newPaid;
+        await tx.partOrder.update({ where: { id: alloc.orderId }, data: {
+          paidAmount: newPaid, balanceDue: newBalance,
+          paymentState: newPaid >= Number(po.amount) ? "PAID" : "PARTIAL",
+        }});
+        await tx.journalEntry.create({ data: {
+          entryNo: `JV-RCVBL-${txRecord.id.substring(0, 8)}`,
+          description: `Payment from ${party.name} for ${po.orderNumber}${notes ? ` — ${notes}` : ""}`,
+          sourceRef: txRecord.id, status: JournalStatus.POSTED,
+          lines: { create: [
+            { accountId: paymentAcc.id, debit: alloc.allocated, credit: 0 },
+            { accountId: arAcc.id, debit: 0, credit: alloc.allocated },
+          ]},
+        }});
+      } else {
+        const o = outstandingOrders.find((x: any) => x.id === alloc.orderId)!;
+        const txRecord = await tx.paymentTransaction.create({ data: {
+          orderId: alloc.orderId, amount: alloc.allocated, method: paymentMethod as any,
+          status: "SUCCESS", verifiedAt: new Date(), verifiedById: userId, accountId: paymentAcc.id,
+        }});
+        await tx.paymentAllocation.create({ data: { paymentId: txRecord.id, orderId: alloc.orderId, allocatedAmount: alloc.allocated }});
+        const newPaid = Number(o.paidAmount) + alloc.allocated;
+        const newBalance = Number(o.totalAmount) - newPaid;
+        const newState = newPaid >= Number(o.totalAmount) ? "PAID" : "PARTIAL";
+        await tx.order.update({ where: { id: alloc.orderId }, data: {
+          paidAmount: newPaid, balanceDue: newBalance, paymentState: newState,
+          status: newState === "PAID" ? "PAID" : o.status,
+        }});
+        await tx.journalEntry.create({ data: {
+          entryNo: `JV-RCVBL-${txRecord.id.substring(0, 8)}`,
+          description: `Payment from ${party.name} for ${o.orderNumber}${notes ? ` — ${notes}` : ""}`,
+          sourceRef: txRecord.id, status: JournalStatus.POSTED,
+          lines: { create: [
+            { accountId: paymentAcc.id, debit: alloc.allocated, credit: 0 },
+            { accountId: arAcc.id, debit: 0, credit: alloc.allocated },
+          ]},
+        }});
+      }
+    }
+    return { totalReceived: amount, totalAllocated, advanceAmount: remaining, isAdvance: remaining > 0,
+      message: remaining > 0
+        ? `Rs. ${totalAllocated.toLocaleString()} allocated. Rs. ${remaining.toLocaleString()} held as advance.`
+        : `Rs. ${totalAllocated.toLocaleString()} collected and allocated successfully.` };
+  }
+
+  private async _collectFromEntries(tx: any, party: any, amount: number,
+    paymentMethod: string, userId: string, notes: string | undefined,
+    paymentAcc: any, arAcc: any) {
+    const outstanding = await tx.receivableEntry.findMany({
+      where: { partyId: party.id, status: { in: ["DUE", "PARTIAL", "OVERDUE"] } },
+      orderBy: { date: "asc" },
+    });
+
+    let remaining = amount;
+    for (const entry of outstanding) {
+      if (remaining <= 0) break;
+      const allocated = Math.min(remaining, Number(entry.balanceDue));
+      remaining -= allocated;
+
+      const newPaid = Number(entry.paidAmount) + allocated;
+      const newBalance = Number(entry.amount) - newPaid;
+      const newStatus = newPaid >= Number(entry.amount) ? "PAID" : "PARTIAL";
+
+      await tx.receivableEntry.update({ where: { id: entry.id }, data: {
+        paidAmount: newPaid, balanceDue: newBalance, status: newStatus,
+      }});
+
+      const pmtRecord = await tx.receivablePayment.create({ data: {
+        entryId: entry.id, amount: allocated,
+        method: paymentMethod as any, accountId: paymentAcc.id,
+        notes: notes ?? null, recordedById: userId,
+      }});
+
+      const je = await tx.journalEntry.create({ data: {
+        entryNo: `JV-RCVBL-${pmtRecord.id.substring(0, 8)}`,
+        description: `Payment from ${party.name}${notes ? ` — ${notes}` : ""}`,
+        sourceRef: pmtRecord.id, status: JournalStatus.POSTED,
+        lines: { create: [
+          { accountId: paymentAcc.id, debit: allocated, credit: 0 },
+          { accountId: arAcc.id, debit: 0, credit: allocated },
+        ]},
+      }});
+
+      await tx.receivablePayment.update({ where: { id: pmtRecord.id }, data: { journalEntryId: je.id }});
+    }
+
+    const totalAllocated = amount - remaining;
+    return { totalReceived: amount, totalAllocated, advanceAmount: remaining, isAdvance: remaining > 0,
+      message: `Rs. ${totalAllocated.toLocaleString()} collected successfully.` };
+  }
+
+  // ─── Payment accounts ──────────────────────────────────────────────────────
+
+  async getPaymentAccounts() {
+    return this.prisma.client.account.findMany({
+      where: { subtype: { in: [AccountSubtype.BANK, AccountSubtype.EWALLET, AccountSubtype.CASH] }, isActive: true },
+      select: { id: true, code: true, name: true, subtype: true, accountNumber: true },
+      orderBy: [{ subtype: "asc" }, { name: "asc" }],
+    });
+  }
+
+  // ─── Legacy customer-phone-based methods (kept for backward compat) ────────
+
+  async getCustomerLedger(customerPhone: string) {
+    // Find or surface party by phone
+    let party = await this.prisma.client.receivableParty.findFirst({ where: { customerPhone } });
+    if (!party) {
+      // Auto-create a CUSTOMER party from order data
+      const order = await this.prisma.client.order.findFirst({ where: { customerPhone } });
+      const name = order?.customerName ?? customerPhone;
+      party = await this.prisma.client.receivableParty.create({
+        data: { name, partyType: ReceivablePartyType.CUSTOMER, customerPhone },
+      });
+    }
+    return this.getPartyLedger(party.id);
+  }
+
   async getCustomerStatement(customerPhone: string) {
     const ledger = await this.getCustomerLedger(customerPhone);
+    return { ...ledger, generatedAt: new Date() };
+  }
 
-    const invoices = ledger.entries.filter((e) => e.type === "INVOICE");
-    const payments = ledger.entries.filter((e) => e.type === "PAYMENT");
-
-    return {
-      customerName: ledger.customerName,
-      customerPhone,
-      generatedAt: new Date(),
-      summary: ledger.summary,
-      invoices,
-      payments,
-      ledger: ledger.entries,
-    };
+  async collectPaymentByPhone(customerPhone: string, amount: number, paymentMethod: string,
+    userId: string, notes?: string, accountId?: string) {
+    let party = await this.prisma.client.receivableParty.findFirst({ where: { customerPhone } });
+    if (!party) {
+      const order = await this.prisma.client.order.findFirst({ where: { customerPhone } });
+      party = await this.prisma.client.receivableParty.create({
+        data: { name: order?.customerName ?? customerPhone, partyType: ReceivablePartyType.CUSTOMER, customerPhone },
+      });
+    }
+    return this.collectPayment(party.id, amount, paymentMethod, userId, notes, accountId);
   }
 }

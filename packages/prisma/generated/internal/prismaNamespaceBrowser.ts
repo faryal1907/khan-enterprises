@@ -66,6 +66,7 @@ export const ModelName = {
   PartOrder: 'PartOrder',
   PaymentTransaction: 'PaymentTransaction',
   PartPaymentTransaction: 'PartPaymentTransaction',
+  PayeeAccount: 'PayeeAccount',
   Expense: 'Expense',
   DeliveryRequest: 'DeliveryRequest',
   Document: 'Document',
@@ -84,6 +85,9 @@ export const ModelName = {
   VendorDefectiveReturn: 'VendorDefectiveReturn',
   VendorDefectiveReturnBike: 'VendorDefectiveReturnBike',
   VendorDefectiveReturnPartLine: 'VendorDefectiveReturnPartLine',
+  ReceivableParty: 'ReceivableParty',
+  ReceivableEntry: 'ReceivableEntry',
+  ReceivablePayment: 'ReceivablePayment',
   ReceivablesAlert: 'ReceivablesAlert'
 } as const
 
@@ -380,12 +384,29 @@ export const PartPaymentTransactionScalarFieldEnum = {
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
 
 
+export const PayeeAccountScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  phone: 'phone',
+  email: 'email',
+  address: 'address',
+  notes: 'notes',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PayeeAccountScalarFieldEnum = (typeof PayeeAccountScalarFieldEnum)[keyof typeof PayeeAccountScalarFieldEnum]
+
+
 export const ExpenseScalarFieldEnum = {
   id: 'id',
   amount: 'amount',
   date: 'date',
   category: 'category',
   description: 'description',
+  payeeAccountId: 'payeeAccountId',
   branchId: 'branchId',
   recordedById: 'recordedById',
   createdAt: 'createdAt',
@@ -482,7 +503,8 @@ export const JournalEntryScalarFieldEnum = {
   sourceRef: 'sourceRef',
   notes: 'notes',
   status: 'status',
-  isManual: 'isManual'
+  isManual: 'isManual',
+  createdAt: 'createdAt'
 } as const
 
 export type JournalEntryScalarFieldEnum = (typeof JournalEntryScalarFieldEnum)[keyof typeof JournalEntryScalarFieldEnum]
@@ -536,7 +558,8 @@ export const PayableScalarFieldEnum = {
   remaining: 'remaining',
   dueDate: 'dueDate',
   status: 'status',
-  poId: 'poId'
+  poId: 'poId',
+  expenseId: 'expenseId'
 } as const
 
 export type PayableScalarFieldEnum = (typeof PayableScalarFieldEnum)[keyof typeof PayableScalarFieldEnum]
@@ -636,6 +659,56 @@ export const VendorDefectiveReturnPartLineScalarFieldEnum = {
 } as const
 
 export type VendorDefectiveReturnPartLineScalarFieldEnum = (typeof VendorDefectiveReturnPartLineScalarFieldEnum)[keyof typeof VendorDefectiveReturnPartLineScalarFieldEnum]
+
+
+export const ReceivablePartyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  partyType: 'partyType',
+  phone: 'phone',
+  email: 'email',
+  address: 'address',
+  notes: 'notes',
+  isActive: 'isActive',
+  customerPhone: 'customerPhone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReceivablePartyScalarFieldEnum = (typeof ReceivablePartyScalarFieldEnum)[keyof typeof ReceivablePartyScalarFieldEnum]
+
+
+export const ReceivableEntryScalarFieldEnum = {
+  id: 'id',
+  partyId: 'partyId',
+  amount: 'amount',
+  description: 'description',
+  date: 'date',
+  dueDate: 'dueDate',
+  paidAmount: 'paidAmount',
+  balanceDue: 'balanceDue',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReceivableEntryScalarFieldEnum = (typeof ReceivableEntryScalarFieldEnum)[keyof typeof ReceivableEntryScalarFieldEnum]
+
+
+export const ReceivablePaymentScalarFieldEnum = {
+  id: 'id',
+  entryId: 'entryId',
+  amount: 'amount',
+  method: 'method',
+  accountId: 'accountId',
+  notes: 'notes',
+  journalEntryId: 'journalEntryId',
+  recordedById: 'recordedById',
+  collectedAt: 'collectedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ReceivablePaymentScalarFieldEnum = (typeof ReceivablePaymentScalarFieldEnum)[keyof typeof ReceivablePaymentScalarFieldEnum]
 
 
 export const ReceivablesAlertScalarFieldEnum = {

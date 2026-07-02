@@ -477,6 +477,23 @@ export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
   _max?: Prisma.NestedJsonNullableFilter<$PrismaModel>
 }
 
+export type EnumPayeeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayeeType | Prisma.EnumPayeeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPayeeTypeFilter<$PrismaModel> | $Enums.PayeeType
+}
+
+export type EnumPayeeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayeeType | Prisma.EnumPayeeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPayeeTypeWithAggregatesFilter<$PrismaModel> | $Enums.PayeeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPayeeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPayeeTypeFilter<$PrismaModel>
+}
+
 export type EnumExpenseCategoryFilter<$PrismaModel = never> = {
   equals?: $Enums.ExpenseCategory | Prisma.EnumExpenseCategoryFieldRefInput<$PrismaModel>
   in?: $Enums.ExpenseCategory[] | Prisma.ListEnumExpenseCategoryFieldRefInput<$PrismaModel>
@@ -645,6 +662,23 @@ export type EnumPayableTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPayableTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPayableTypeFilter<$PrismaModel>
+}
+
+export type EnumReceivablePartyTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReceivablePartyType | Prisma.EnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReceivablePartyTypeFilter<$PrismaModel> | $Enums.ReceivablePartyType
+}
+
+export type EnumReceivablePartyTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReceivablePartyType | Prisma.EnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReceivablePartyTypeWithAggregatesFilter<$PrismaModel> | $Enums.ReceivablePartyType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReceivablePartyTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReceivablePartyTypeFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -1096,6 +1130,23 @@ export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
 }
 
+export type NestedEnumPayeeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayeeType | Prisma.EnumPayeeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPayeeTypeFilter<$PrismaModel> | $Enums.PayeeType
+}
+
+export type NestedEnumPayeeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayeeType | Prisma.EnumPayeeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PayeeType[] | Prisma.ListEnumPayeeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPayeeTypeWithAggregatesFilter<$PrismaModel> | $Enums.PayeeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPayeeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPayeeTypeFilter<$PrismaModel>
+}
+
 export type NestedEnumExpenseCategoryFilter<$PrismaModel = never> = {
   equals?: $Enums.ExpenseCategory | Prisma.EnumExpenseCategoryFieldRefInput<$PrismaModel>
   in?: $Enums.ExpenseCategory[] | Prisma.ListEnumExpenseCategoryFieldRefInput<$PrismaModel>
@@ -1264,6 +1315,23 @@ export type NestedEnumPayableTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPayableTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPayableTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumReceivablePartyTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReceivablePartyType | Prisma.EnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReceivablePartyTypeFilter<$PrismaModel> | $Enums.ReceivablePartyType
+}
+
+export type NestedEnumReceivablePartyTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReceivablePartyType | Prisma.EnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReceivablePartyType[] | Prisma.ListEnumReceivablePartyTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReceivablePartyTypeWithAggregatesFilter<$PrismaModel> | $Enums.ReceivablePartyType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReceivablePartyTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReceivablePartyTypeFilter<$PrismaModel>
 }
 
 

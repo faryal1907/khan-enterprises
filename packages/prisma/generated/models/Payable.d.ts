@@ -31,6 +31,7 @@ export type PayableMinAggregateOutputType = {
     dueDate: Date | null;
     status: $Enums.PaymentState | null;
     poId: string | null;
+    expenseId: string | null;
 };
 export type PayableMaxAggregateOutputType = {
     id: string | null;
@@ -44,6 +45,7 @@ export type PayableMaxAggregateOutputType = {
     dueDate: Date | null;
     status: $Enums.PaymentState | null;
     poId: string | null;
+    expenseId: string | null;
 };
 export type PayableCountAggregateOutputType = {
     id: number;
@@ -57,6 +59,7 @@ export type PayableCountAggregateOutputType = {
     dueDate: number;
     status: number;
     poId: number;
+    expenseId: number;
     _all: number;
 };
 export type PayableAvgAggregateInputType = {
@@ -81,6 +84,7 @@ export type PayableMinAggregateInputType = {
     dueDate?: true;
     status?: true;
     poId?: true;
+    expenseId?: true;
 };
 export type PayableMaxAggregateInputType = {
     id?: true;
@@ -94,6 +98,7 @@ export type PayableMaxAggregateInputType = {
     dueDate?: true;
     status?: true;
     poId?: true;
+    expenseId?: true;
 };
 export type PayableCountAggregateInputType = {
     id?: true;
@@ -107,6 +112,7 @@ export type PayableCountAggregateInputType = {
     dueDate?: true;
     status?: true;
     poId?: true;
+    expenseId?: true;
     _all?: true;
 };
 export type PayableAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -149,6 +155,7 @@ export type PayableGroupByOutputType = {
     dueDate: Date | null;
     status: $Enums.PaymentState;
     poId: string | null;
+    expenseId: string | null;
     _count: PayableCountAggregateOutputType | null;
     _avg: PayableAvgAggregateOutputType | null;
     _sum: PayableSumAggregateOutputType | null;
@@ -173,6 +180,7 @@ export type PayableWhereInput = {
     dueDate?: Prisma.DateTimeNullableFilter<"Payable"> | Date | string | null;
     status?: Prisma.EnumPaymentStateFilter<"Payable"> | $Enums.PaymentState;
     poId?: Prisma.StringNullableFilter<"Payable"> | string | null;
+    expenseId?: Prisma.StringNullableFilter<"Payable"> | string | null;
     purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderNullableScalarRelationFilter, Prisma.PurchaseOrderWhereInput> | null;
     allocations?: Prisma.PaymentAllocationListRelationFilter;
 };
@@ -188,6 +196,7 @@ export type PayableOrderByWithRelationInput = {
     dueDate?: Prisma.SortOrderInput | Prisma.SortOrder;
     status?: Prisma.SortOrder;
     poId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    expenseId?: Prisma.SortOrderInput | Prisma.SortOrder;
     purchaseOrder?: Prisma.PurchaseOrderOrderByWithRelationInput;
     allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput;
 };
@@ -195,6 +204,7 @@ export type PayableWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
     ref?: string;
     poId?: string;
+    expenseId?: string;
     AND?: Prisma.PayableWhereInput | Prisma.PayableWhereInput[];
     OR?: Prisma.PayableWhereInput[];
     NOT?: Prisma.PayableWhereInput | Prisma.PayableWhereInput[];
@@ -208,7 +218,7 @@ export type PayableWhereUniqueInput = Prisma.AtLeast<{
     status?: Prisma.EnumPaymentStateFilter<"Payable"> | $Enums.PaymentState;
     purchaseOrder?: Prisma.XOR<Prisma.PurchaseOrderNullableScalarRelationFilter, Prisma.PurchaseOrderWhereInput> | null;
     allocations?: Prisma.PaymentAllocationListRelationFilter;
-}, "id" | "ref" | "poId">;
+}, "id" | "ref" | "poId" | "expenseId">;
 export type PayableOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     ref?: Prisma.SortOrder;
@@ -221,6 +231,7 @@ export type PayableOrderByWithAggregationInput = {
     dueDate?: Prisma.SortOrderInput | Prisma.SortOrder;
     status?: Prisma.SortOrder;
     poId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    expenseId?: Prisma.SortOrderInput | Prisma.SortOrder;
     _count?: Prisma.PayableCountOrderByAggregateInput;
     _avg?: Prisma.PayableAvgOrderByAggregateInput;
     _max?: Prisma.PayableMaxOrderByAggregateInput;
@@ -242,6 +253,7 @@ export type PayableScalarWhereWithAggregatesInput = {
     dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Payable"> | Date | string | null;
     status?: Prisma.EnumPaymentStateWithAggregatesFilter<"Payable"> | $Enums.PaymentState;
     poId?: Prisma.StringNullableWithAggregatesFilter<"Payable"> | string | null;
+    expenseId?: Prisma.StringNullableWithAggregatesFilter<"Payable"> | string | null;
 };
 export type PayableCreateInput = {
     id?: string;
@@ -254,6 +266,7 @@ export type PayableCreateInput = {
     remaining: runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
+    expenseId?: string | null;
     purchaseOrder?: Prisma.PurchaseOrderCreateNestedOneWithoutPayableInput;
     allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPayableInput;
 };
@@ -269,6 +282,7 @@ export type PayableUncheckedCreateInput = {
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
     poId?: string | null;
+    expenseId?: string | null;
     allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPayableInput;
 };
 export type PayableUpdateInput = {
@@ -282,6 +296,7 @@ export type PayableUpdateInput = {
     remaining?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     purchaseOrder?: Prisma.PurchaseOrderUpdateOneWithoutPayableNestedInput;
     allocations?: Prisma.PaymentAllocationUpdateManyWithoutPayableNestedInput;
 };
@@ -297,6 +312,7 @@ export type PayableUncheckedUpdateInput = {
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     poId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPayableNestedInput;
 };
 export type PayableCreateManyInput = {
@@ -311,6 +327,7 @@ export type PayableCreateManyInput = {
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
     poId?: string | null;
+    expenseId?: string | null;
 };
 export type PayableUpdateManyMutationInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -323,6 +340,7 @@ export type PayableUpdateManyMutationInput = {
     remaining?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type PayableUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -336,6 +354,7 @@ export type PayableUncheckedUpdateManyInput = {
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     poId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type PayableNullableScalarRelationFilter = {
     is?: Prisma.PayableWhereInput | null;
@@ -353,6 +372,7 @@ export type PayableCountOrderByAggregateInput = {
     dueDate?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     poId?: Prisma.SortOrder;
+    expenseId?: Prisma.SortOrder;
 };
 export type PayableAvgOrderByAggregateInput = {
     total?: Prisma.SortOrder;
@@ -371,6 +391,7 @@ export type PayableMaxOrderByAggregateInput = {
     dueDate?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     poId?: Prisma.SortOrder;
+    expenseId?: Prisma.SortOrder;
 };
 export type PayableMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -384,6 +405,7 @@ export type PayableMinOrderByAggregateInput = {
     dueDate?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     poId?: Prisma.SortOrder;
+    expenseId?: Prisma.SortOrder;
 };
 export type PayableSumOrderByAggregateInput = {
     total?: Prisma.SortOrder;
@@ -446,6 +468,7 @@ export type PayableCreateWithoutPurchaseOrderInput = {
     remaining: runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
+    expenseId?: string | null;
     allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPayableInput;
 };
 export type PayableUncheckedCreateWithoutPurchaseOrderInput = {
@@ -459,6 +482,7 @@ export type PayableUncheckedCreateWithoutPurchaseOrderInput = {
     remaining: runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
+    expenseId?: string | null;
     allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPayableInput;
 };
 export type PayableCreateOrConnectWithoutPurchaseOrderInput = {
@@ -485,6 +509,7 @@ export type PayableUpdateWithoutPurchaseOrderInput = {
     remaining?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     allocations?: Prisma.PaymentAllocationUpdateManyWithoutPayableNestedInput;
 };
 export type PayableUncheckedUpdateWithoutPurchaseOrderInput = {
@@ -498,6 +523,7 @@ export type PayableUncheckedUpdateWithoutPurchaseOrderInput = {
     remaining?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPayableNestedInput;
 };
 export type PayableCreateWithoutAllocationsInput = {
@@ -511,6 +537,7 @@ export type PayableCreateWithoutAllocationsInput = {
     remaining: runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
+    expenseId?: string | null;
     purchaseOrder?: Prisma.PurchaseOrderCreateNestedOneWithoutPayableInput;
 };
 export type PayableUncheckedCreateWithoutAllocationsInput = {
@@ -525,6 +552,7 @@ export type PayableUncheckedCreateWithoutAllocationsInput = {
     dueDate?: Date | string | null;
     status?: $Enums.PaymentState;
     poId?: string | null;
+    expenseId?: string | null;
 };
 export type PayableCreateOrConnectWithoutAllocationsInput = {
     where: Prisma.PayableWhereUniqueInput;
@@ -550,6 +578,7 @@ export type PayableUpdateWithoutAllocationsInput = {
     remaining?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     purchaseOrder?: Prisma.PurchaseOrderUpdateOneWithoutPayableNestedInput;
 };
 export type PayableUncheckedUpdateWithoutAllocationsInput = {
@@ -564,6 +593,7 @@ export type PayableUncheckedUpdateWithoutAllocationsInput = {
     dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     poId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    expenseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type PayableCountOutputType = {
     allocations: number;
@@ -589,6 +619,7 @@ export type PayableSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     dueDate?: boolean;
     status?: boolean;
     poId?: boolean;
+    expenseId?: boolean;
     purchaseOrder?: boolean | Prisma.Payable$purchaseOrderArgs<ExtArgs>;
     allocations?: boolean | Prisma.Payable$allocationsArgs<ExtArgs>;
     _count?: boolean | Prisma.PayableCountOutputTypeDefaultArgs<ExtArgs>;
@@ -605,6 +636,7 @@ export type PayableSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
     dueDate?: boolean;
     status?: boolean;
     poId?: boolean;
+    expenseId?: boolean;
     purchaseOrder?: boolean | Prisma.Payable$purchaseOrderArgs<ExtArgs>;
 }, ExtArgs["result"]["payable"]>;
 export type PayableSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -619,6 +651,7 @@ export type PayableSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
     dueDate?: boolean;
     status?: boolean;
     poId?: boolean;
+    expenseId?: boolean;
     purchaseOrder?: boolean | Prisma.Payable$purchaseOrderArgs<ExtArgs>;
 }, ExtArgs["result"]["payable"]>;
 export type PayableSelectScalar = {
@@ -633,8 +666,9 @@ export type PayableSelectScalar = {
     dueDate?: boolean;
     status?: boolean;
     poId?: boolean;
+    expenseId?: boolean;
 };
-export type PayableOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ref" | "type" | "partyName" | "description" | "total" | "paid" | "remaining" | "dueDate" | "status" | "poId", ExtArgs["result"]["payable"]>;
+export type PayableOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ref" | "type" | "partyName" | "description" | "total" | "paid" | "remaining" | "dueDate" | "status" | "poId" | "expenseId", ExtArgs["result"]["payable"]>;
 export type PayableInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     purchaseOrder?: boolean | Prisma.Payable$purchaseOrderArgs<ExtArgs>;
     allocations?: boolean | Prisma.Payable$allocationsArgs<ExtArgs>;
@@ -664,6 +698,7 @@ export type $PayablePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
         dueDate: Date | null;
         status: $Enums.PaymentState;
         poId: string | null;
+        expenseId: string | null;
     }, ExtArgs["result"]["payable"]>;
     composites: {};
 };
@@ -734,6 +769,7 @@ export interface PayableFieldRefs {
     readonly dueDate: Prisma.FieldRef<"Payable", 'DateTime'>;
     readonly status: Prisma.FieldRef<"Payable", 'PaymentState'>;
     readonly poId: Prisma.FieldRef<"Payable", 'String'>;
+    readonly expenseId: Prisma.FieldRef<"Payable", 'String'>;
 }
 export type PayableFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PayableSelect<ExtArgs> | null;

@@ -254,6 +254,7 @@ export type AccountWhereInput = {
   orderPayments?: Prisma.OrderListRelationFilter
   partOrderPayments?: Prisma.PartOrderListRelationFilter
   vendorPayments?: Prisma.VendorPaymentListRelationFilter
+  receivablePayments?: Prisma.ReceivablePaymentListRelationFilter
 }
 
 export type AccountOrderByWithRelationInput = {
@@ -272,6 +273,7 @@ export type AccountOrderByWithRelationInput = {
   orderPayments?: Prisma.OrderOrderByRelationAggregateInput
   partOrderPayments?: Prisma.PartOrderOrderByRelationAggregateInput
   vendorPayments?: Prisma.VendorPaymentOrderByRelationAggregateInput
+  receivablePayments?: Prisma.ReceivablePaymentOrderByRelationAggregateInput
 }
 
 export type AccountWhereUniqueInput = Prisma.AtLeast<{
@@ -293,6 +295,7 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   orderPayments?: Prisma.OrderListRelationFilter
   partOrderPayments?: Prisma.PartOrderListRelationFilter
   vendorPayments?: Prisma.VendorPaymentListRelationFilter
+  receivablePayments?: Prisma.ReceivablePaymentListRelationFilter
 }, "id" | "code">
 
 export type AccountOrderByWithAggregationInput = {
@@ -343,6 +346,7 @@ export type AccountCreateInput = {
   orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateInput = {
@@ -361,6 +365,7 @@ export type AccountUncheckedCreateInput = {
   orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUpdateInput = {
@@ -379,6 +384,7 @@ export type AccountUpdateInput = {
   orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateInput = {
@@ -397,6 +403,7 @@ export type AccountUncheckedUpdateInput = {
   orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateManyInput = {
@@ -589,6 +596,22 @@ export type AccountUpdateOneRequiredWithoutVendorPaymentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutVendorPaymentsInput, Prisma.AccountUpdateWithoutVendorPaymentsInput>, Prisma.AccountUncheckedUpdateWithoutVendorPaymentsInput>
 }
 
+export type AccountCreateNestedOneWithoutReceivablePaymentsInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutReceivablePaymentsInput, Prisma.AccountUncheckedCreateWithoutReceivablePaymentsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutReceivablePaymentsInput
+  connect?: Prisma.AccountWhereUniqueInput
+}
+
+export type AccountUpdateOneWithoutReceivablePaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AccountCreateWithoutReceivablePaymentsInput, Prisma.AccountUncheckedCreateWithoutReceivablePaymentsInput>
+  connectOrCreate?: Prisma.AccountCreateOrConnectWithoutReceivablePaymentsInput
+  upsert?: Prisma.AccountUpsertWithoutReceivablePaymentsInput
+  disconnect?: Prisma.AccountWhereInput | boolean
+  delete?: Prisma.AccountWhereInput | boolean
+  connect?: Prisma.AccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccountUpdateToOneWithWhereWithoutReceivablePaymentsInput, Prisma.AccountUpdateWithoutReceivablePaymentsInput>, Prisma.AccountUncheckedUpdateWithoutReceivablePaymentsInput>
+}
+
 export type AccountCreateWithoutOrderPaymentsInput = {
   id?: string
   code: string
@@ -604,6 +627,7 @@ export type AccountCreateWithoutOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
   partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutOrderPaymentsInput = {
@@ -621,6 +645,7 @@ export type AccountUncheckedCreateWithoutOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
   partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutOrderPaymentsInput = {
@@ -654,6 +679,7 @@ export type AccountUpdateWithoutOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutOrderPaymentsInput = {
@@ -671,6 +697,7 @@ export type AccountUncheckedUpdateWithoutOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutPartOrderPaymentsInput = {
@@ -688,6 +715,7 @@ export type AccountCreateWithoutPartOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
   orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutPartOrderPaymentsInput = {
@@ -705,6 +733,7 @@ export type AccountUncheckedCreateWithoutPartOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
   orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutPartOrderPaymentsInput = {
@@ -738,6 +767,7 @@ export type AccountUpdateWithoutPartOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
   orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutPartOrderPaymentsInput = {
@@ -755,6 +785,7 @@ export type AccountUncheckedUpdateWithoutPartOrderPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
   orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutPaymentsInput = {
@@ -772,6 +803,7 @@ export type AccountCreateWithoutPaymentsInput = {
   orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutPaymentsInput = {
@@ -789,6 +821,7 @@ export type AccountUncheckedCreateWithoutPaymentsInput = {
   orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutPaymentsInput = {
@@ -822,6 +855,7 @@ export type AccountUpdateWithoutPaymentsInput = {
   orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutPaymentsInput = {
@@ -839,6 +873,7 @@ export type AccountUncheckedUpdateWithoutPaymentsInput = {
   orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutPartPaymentTransactionsInput = {
@@ -856,6 +891,7 @@ export type AccountCreateWithoutPartPaymentTransactionsInput = {
   orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutPartPaymentTransactionsInput = {
@@ -873,6 +909,7 @@ export type AccountUncheckedCreateWithoutPartPaymentTransactionsInput = {
   orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutPartPaymentTransactionsInput = {
@@ -906,6 +943,7 @@ export type AccountUpdateWithoutPartPaymentTransactionsInput = {
   orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutPartPaymentTransactionsInput = {
@@ -923,6 +961,7 @@ export type AccountUncheckedUpdateWithoutPartPaymentTransactionsInput = {
   orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutLinesInput = {
@@ -940,6 +979,7 @@ export type AccountCreateWithoutLinesInput = {
   orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutLinesInput = {
@@ -957,6 +997,7 @@ export type AccountUncheckedCreateWithoutLinesInput = {
   orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutLinesInput = {
@@ -990,6 +1031,7 @@ export type AccountUpdateWithoutLinesInput = {
   orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutLinesInput = {
@@ -1007,6 +1049,7 @@ export type AccountUncheckedUpdateWithoutLinesInput = {
   orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountCreateWithoutVendorPaymentsInput = {
@@ -1024,6 +1067,7 @@ export type AccountCreateWithoutVendorPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
   orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentCreateNestedManyWithoutAccountInput
 }
 
 export type AccountUncheckedCreateWithoutVendorPaymentsInput = {
@@ -1041,6 +1085,7 @@ export type AccountUncheckedCreateWithoutVendorPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
   orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
   partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type AccountCreateOrConnectWithoutVendorPaymentsInput = {
@@ -1074,6 +1119,7 @@ export type AccountUpdateWithoutVendorPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
   orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUpdateManyWithoutAccountNestedInput
 }
 
 export type AccountUncheckedUpdateWithoutVendorPaymentsInput = {
@@ -1091,6 +1137,95 @@ export type AccountUncheckedUpdateWithoutVendorPaymentsInput = {
   partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
   orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
   partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  receivablePayments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type AccountCreateWithoutReceivablePaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  category: $Enums.AccountCategory
+  subtype: $Enums.AccountSubtype
+  accountNumber?: string | null
+  openingBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: boolean
+  isSystem?: boolean
+  lines?: Prisma.JournalEntryLineCreateNestedManyWithoutAccountInput
+  payments?: Prisma.PaymentTransactionCreateNestedManyWithoutAccountInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderCreateNestedManyWithoutPaymentAccountInput
+  vendorPayments?: Prisma.VendorPaymentCreateNestedManyWithoutFromAccountInput
+}
+
+export type AccountUncheckedCreateWithoutReceivablePaymentsInput = {
+  id?: string
+  code: string
+  name: string
+  category: $Enums.AccountCategory
+  subtype: $Enums.AccountSubtype
+  accountNumber?: string | null
+  openingBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: boolean
+  isSystem?: boolean
+  lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutAccountInput
+  payments?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutAccountInput
+  orderPayments?: Prisma.OrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  partOrderPayments?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPaymentAccountInput
+  vendorPayments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutFromAccountInput
+}
+
+export type AccountCreateOrConnectWithoutReceivablePaymentsInput = {
+  where: Prisma.AccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccountCreateWithoutReceivablePaymentsInput, Prisma.AccountUncheckedCreateWithoutReceivablePaymentsInput>
+}
+
+export type AccountUpsertWithoutReceivablePaymentsInput = {
+  update: Prisma.XOR<Prisma.AccountUpdateWithoutReceivablePaymentsInput, Prisma.AccountUncheckedUpdateWithoutReceivablePaymentsInput>
+  create: Prisma.XOR<Prisma.AccountCreateWithoutReceivablePaymentsInput, Prisma.AccountUncheckedCreateWithoutReceivablePaymentsInput>
+  where?: Prisma.AccountWhereInput
+}
+
+export type AccountUpdateToOneWithWhereWithoutReceivablePaymentsInput = {
+  where?: Prisma.AccountWhereInput
+  data: Prisma.XOR<Prisma.AccountUpdateWithoutReceivablePaymentsInput, Prisma.AccountUncheckedUpdateWithoutReceivablePaymentsInput>
+}
+
+export type AccountUpdateWithoutReceivablePaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumAccountCategoryFieldUpdateOperationsInput | $Enums.AccountCategory
+  subtype?: Prisma.EnumAccountSubtypeFieldUpdateOperationsInput | $Enums.AccountSubtype
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openingBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lines?: Prisma.JournalEntryLineUpdateManyWithoutAccountNestedInput
+  payments?: Prisma.PaymentTransactionUpdateManyWithoutAccountNestedInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUpdateManyWithoutPaymentAccountNestedInput
+  vendorPayments?: Prisma.VendorPaymentUpdateManyWithoutFromAccountNestedInput
+}
+
+export type AccountUncheckedUpdateWithoutReceivablePaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumAccountCategoryFieldUpdateOperationsInput | $Enums.AccountCategory
+  subtype?: Prisma.EnumAccountSubtypeFieldUpdateOperationsInput | $Enums.AccountSubtype
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  openingBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutAccountNestedInput
+  payments?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  partPaymentTransactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutAccountNestedInput
+  orderPayments?: Prisma.OrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  partOrderPayments?: Prisma.PartOrderUncheckedUpdateManyWithoutPaymentAccountNestedInput
+  vendorPayments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutFromAccountNestedInput
 }
 
 
@@ -1105,6 +1240,7 @@ export type AccountCountOutputType = {
   orderPayments: number
   partOrderPayments: number
   vendorPayments: number
+  receivablePayments: number
 }
 
 export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1114,6 +1250,7 @@ export type AccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   orderPayments?: boolean | AccountCountOutputTypeCountOrderPaymentsArgs
   partOrderPayments?: boolean | AccountCountOutputTypeCountPartOrderPaymentsArgs
   vendorPayments?: boolean | AccountCountOutputTypeCountVendorPaymentsArgs
+  receivablePayments?: boolean | AccountCountOutputTypeCountReceivablePaymentsArgs
 }
 
 /**
@@ -1168,6 +1305,13 @@ export type AccountCountOutputTypeCountVendorPaymentsArgs<ExtArgs extends runtim
   where?: Prisma.VendorPaymentWhereInput
 }
 
+/**
+ * AccountCountOutputType without action
+ */
+export type AccountCountOutputTypeCountReceivablePaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReceivablePaymentWhereInput
+}
+
 
 export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1185,6 +1329,7 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   orderPayments?: boolean | Prisma.Account$orderPaymentsArgs<ExtArgs>
   partOrderPayments?: boolean | Prisma.Account$partOrderPaymentsArgs<ExtArgs>
   vendorPayments?: boolean | Prisma.Account$vendorPaymentsArgs<ExtArgs>
+  receivablePayments?: boolean | Prisma.Account$receivablePaymentsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -1232,6 +1377,7 @@ export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   orderPayments?: boolean | Prisma.Account$orderPaymentsArgs<ExtArgs>
   partOrderPayments?: boolean | Prisma.Account$partOrderPaymentsArgs<ExtArgs>
   vendorPayments?: boolean | Prisma.Account$vendorPaymentsArgs<ExtArgs>
+  receivablePayments?: boolean | Prisma.Account$receivablePaymentsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1246,6 +1392,7 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     orderPayments: Prisma.$OrderPayload<ExtArgs>[]
     partOrderPayments: Prisma.$PartOrderPayload<ExtArgs>[]
     vendorPayments: Prisma.$VendorPaymentPayload<ExtArgs>[]
+    receivablePayments: Prisma.$ReceivablePaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1657,6 +1804,7 @@ export interface Prisma__AccountClient<T, Null = never, ExtArgs extends runtime.
   orderPayments<T extends Prisma.Account$orderPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$orderPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   partOrderPayments<T extends Prisma.Account$partOrderPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$partOrderPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vendorPayments<T extends Prisma.Account$vendorPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$vendorPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receivablePayments<T extends Prisma.Account$receivablePaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Account$receivablePaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReceivablePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2229,6 +2377,30 @@ export type Account$vendorPaymentsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.VendorPaymentScalarFieldEnum | Prisma.VendorPaymentScalarFieldEnum[]
+}
+
+/**
+ * Account.receivablePayments
+ */
+export type Account$receivablePaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReceivablePayment
+   */
+  select?: Prisma.ReceivablePaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReceivablePayment
+   */
+  omit?: Prisma.ReceivablePaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReceivablePaymentInclude<ExtArgs> | null
+  where?: Prisma.ReceivablePaymentWhereInput
+  orderBy?: Prisma.ReceivablePaymentOrderByWithRelationInput | Prisma.ReceivablePaymentOrderByWithRelationInput[]
+  cursor?: Prisma.ReceivablePaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReceivablePaymentScalarFieldEnum | Prisma.ReceivablePaymentScalarFieldEnum[]
 }
 
 /**

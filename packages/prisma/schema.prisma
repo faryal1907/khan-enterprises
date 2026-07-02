@@ -118,6 +118,27 @@ enum ExpenseCategory {
   OTHER
 }
 
+enum PayeeType {
+  VENDOR
+  EMPLOYEE
+  SUPPLIER
+  LANDLORD
+  UTILITY_COMPANY
+  CONTRACTOR
+  OTHER
+}
+
+enum ReceivablePartyType {
+  CUSTOMER
+  VENDOR
+  EMPLOYEE
+  SUPPLIER
+  LANDLORD
+  UTILITY_COMPANY
+  BUSINESS_PARTNER
+  OTHER
+}
+
 enum AccountCategory {
   ASSET
   LIABILITY
@@ -669,6 +690,31 @@ model PartPaymentTransaction {
 }
 
 // ============================================================================
+// PAYEE ACCOUNTS (Accounts Payable — who we owe money to)
+// ============================================================================
+
+/// A person or entity that the business owes money to.
+/// Acts as a payable ledger account (mirroring CustomerReceivable on the receivables side).
+model PayeeAccount {
+  id          String    @id @default(uuid())
+  name        String
+  type        PayeeType @default(OTHER)
+  phone       String?
+  email       String?
+  address     String?
+  notes       String?
+  isActive    Boolean   @default(true)
+
+  expenses Expense[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([type])
+}
+
+// ============================================================================
 // EXPENSES
 // ============================================================================
 
@@ -679,6 +725,10 @@ model Expense {
   date        DateTime
   category    ExpenseCategory
   description String?
+
+  /// The payee this expense is owed to (required for AP tracking)
+  payeeAccountId String?
+  payeeAccount   PayeeAccount? @relation(fields: [payeeAccountId], references: [id])
 
   branchId String
   branch   Branch @relation(fields: [branchId], references: [id])
@@ -692,6 +742,7 @@ model Expense {
   @@index([branchId])
   @@index([recordedById])
   @@index([date])
+  @@index([payeeAccountId])
 }
 
 // ============================================================================
@@ -826,6 +877,7 @@ model Account {
   orderPayments           Order[]                  @relation("OrderPaymentAccount")
   partOrderPayments       PartOrder[]              @relation("PartOrderPaymentAccount")
   vendorPayments          VendorPayment[]          @relation("VendorPaymentFromAccount")
+  receivablePayments      ReceivablePayment[]
 }
 
 model JournalEntry {
@@ -837,12 +889,15 @@ model JournalEntry {
   notes       String?
   status      JournalStatus @default(POSTED)
   isManual    Boolean       @default(false)
+  createdAt   DateTime      @default(now())
 
   lines            JournalEntryLine[]
   vendorPayment    VendorPayment?
   vendorAllocation VendorAllocation?
   vendorDefectiveReturn VendorDefectiveReturn?
+  receivablePayment ReceivablePayment?
 
+  @@index([createdAt])
 }
 
 model JournalEntryLine {
@@ -898,6 +953,9 @@ model Payable {
 
   poId          String?        @unique
   purchaseOrder PurchaseOrder? @relation(fields: [poId], references: [id])
+
+  /// Direct link to the expense that created this payable (replaces fragile ref-string matching)
+  expenseId String? @unique
 
   allocations PaymentAllocation[]
 }
@@ -1072,6 +1130,83 @@ model VendorDefectiveReturnPartLine {
 
   @@index([returnId])
   @@index([partInventoryId])
+}
+
+// ============================================================================
+// RECEIVABLE PARTIES (generic AR — who owes us money)
+// ============================================================================
+
+/// A person or entity that owes the business money.
+/// Customers auto-link via phone. Other party types use manual entries.
+model ReceivableParty {
+  id          String              @id @default(uuid())
+  name        String
+  partyType   ReceivablePartyType @default(CUSTOMER)
+  phone       String?
+  email       String?
+  address     String?
+  notes       String?
+  isActive    Boolean             @default(true)
+
+  /// For CUSTOMER parties this mirrors the customerPhone on orders
+  customerPhone String?           @unique
+
+  entries ReceivableEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([partyType])
+  @@index([customerPhone])
+}
+
+/// A manually-created receivable line for non-order parties
+/// (e.g. a loan to a vendor, advance to an employee, etc.)
+model ReceivableEntry {
+  id          String       @id @default(uuid())
+  partyId     String
+  party       ReceivableParty @relation(fields: [partyId], references: [id])
+
+  amount      Decimal      @db.Decimal(12, 2)
+  description String
+  date        DateTime     @default(now())
+  dueDate     DateTime?
+
+  paidAmount  Decimal      @default(0) @db.Decimal(12, 2)
+  balanceDue  Decimal      @db.Decimal(12, 2)
+  status      PaymentState @default(DUE)
+
+  payments ReceivablePayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([partyId])
+  @@index([date])
+}
+
+/// A payment collected against a manual ReceivableEntry
+model ReceivablePayment {
+  id        String          @id @default(uuid())
+  entryId   String
+  entry     ReceivableEntry @relation(fields: [entryId], references: [id])
+
+  amount    Decimal      @db.Decimal(12, 2)
+  method    PaymentMethod
+  accountId String?
+  account   Account?     @relation(fields: [accountId], references: [id])
+  notes     String?
+
+  journalEntryId String?       @unique
+  journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
+
+  recordedById String?
+  collectedAt  DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([entryId])
 }
 
 // ============================================================================
