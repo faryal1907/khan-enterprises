@@ -24,8 +24,18 @@ async function bootstrap() {
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
   // Enable CORS for frontend apps (Web: 3000, Admin: 3001)
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:4000",
+    // Production — set ALLOWED_ORIGINS in Render env vars to add more
+    ...(process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+      : []),
+  ];
+
   app.enableCors({
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:4000"],
+    origin: allowedOrigins,
     credentials: true,
   });
 
