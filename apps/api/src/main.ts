@@ -29,8 +29,10 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Global prefix for all API routes
-  app.setGlobalPrefix("api");
+  // Global prefix for all API routes except /health
+  app.setGlobalPrefix("api", {
+    exclude: ['health'],
+  });
 
   const port = process.env.PORT || 4000;
 

@@ -22,8 +22,10 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
 import { ExpensesModule } from "./modules/expenses/expenses.module";
 import { SettingsModule } from "./modules/settings/settings.module";
 import { AccountingModule } from "./modules/accounting/accounting.module";
+import { HealthController } from "./health/health.controller";
 
 @Module({
+  controllers: [HealthController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
