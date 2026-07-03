@@ -71,11 +71,11 @@ export default function AuthCallbackPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
+      className="min-h-screen flex items-center justify-center p-4"
       style={{ backgroundColor: theme.backgrounds.primary }}
     >
       <div
-        className="w-full max-w-md rounded-2xl shadow-md p-8 text-center"
+        className="w-full max-w-md rounded-2xl shadow-md p-6 sm:p-8 text-center"
         style={{
           backgroundColor: theme.backgrounds.secondary,
           border: `1px solid ${theme.borders.light}`,
@@ -84,16 +84,16 @@ export default function AuthCallbackPage() {
         {status === "loading" && (
           <div>
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 animate-spin"
               style={{ 
                 border: `3px solid ${theme.borders.medium}`,
                 borderTopColor: theme.accents.primary 
               }}
             />
-            <h2 className="text-xl font-semibold mb-2" style={{ color: theme.text.primary }}>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
               Authenticating...
             </h2>
-            <p style={{ color: theme.text.muted }}>
+            <p className="text-sm sm:text-base" style={{ color: theme.text.muted }}>
               Please wait while we sign you in
             </p>
           </div>
@@ -102,11 +102,11 @@ export default function AuthCallbackPage() {
         {status === "success" && (
           <div>
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
               style={{ backgroundColor: `${theme.accents.primary}20` }}
             >
               <svg
-                className="w-8 h-8"
+                className="w-6 h-6 sm:w-8 sm:h-8"
                 style={{ color: theme.accents.primary }}
                 fill="none"
                 stroke="currentColor"
@@ -120,10 +120,10 @@ export default function AuthCallbackPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: theme.text.primary }}>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
               Success!
             </h2>
-            <p style={{ color: theme.text.muted }}>
+            <p className="text-sm sm:text-base" style={{ color: theme.text.muted }}>
               Redirecting you to the home page...
             </p>
           </div>
@@ -132,11 +132,11 @@ export default function AuthCallbackPage() {
         {status === "error" && (
           <div>
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
               style={{ backgroundColor: `${theme.accents.secondary}20` }}
             >
               <svg
-                className="w-8 h-8"
+                className="w-6 h-6 sm:w-8 sm:h-8"
                 style={{ color: theme.accents.secondary }}
                 fill="none"
                 stroke="currentColor"
@@ -150,13 +150,13 @@ export default function AuthCallbackPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: theme.text.primary }}>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
               Authentication Failed
             </h2>
-            <p className="mb-4" style={{ color: theme.text.muted }}>
+            <p className="mb-3 sm:mb-4 text-sm sm:text-base" style={{ color: theme.text.muted }}>
               {error || "Something went wrong during authentication"}
             </p>
-            <p style={{ color: theme.text.muted }}>
+            <p className="text-sm sm:text-base" style={{ color: theme.text.muted }}>
               Redirecting to login page...
             </p>
           </div>

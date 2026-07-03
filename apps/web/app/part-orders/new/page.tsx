@@ -9,7 +9,7 @@ import { createPartOrder } from "@/lib/api/part-orders";
 import { getPaymentAccounts, PaymentAccount } from "@/lib/api/catalog";
 
 const CameraIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto", display: "block" }}>
+  <svg width="32" height="32" className="sm:w-12 sm:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto", display: "block" }}>
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
     <circle cx="12" cy="13" r="4" />
   </svg>
@@ -192,18 +192,18 @@ export default function NewPartOrderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
       </div>
     );
   }
 
   if (!part || !inventory) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="rounded-xl p-12 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-          <p style={{ color: theme.text.secondary }}>Part not found</p>
-          <Link href="/parts" className="mt-4 inline-block px-6 py-3 rounded-lg font-semibold" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="rounded-xl p-6 sm:p-12 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+          <p className="text-sm sm:text-base" style={{ color: theme.text.secondary }}>Part not found</p>
+          <Link href="/parts" className="mt-4 inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold text-sm sm:text-base" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
             Back to Parts
           </Link>
         </div>
@@ -214,51 +214,51 @@ export default function NewPartOrderPage() {
   if (createdOrder) {
     const isCash = createdOrder.paymentMethod === "CASH";
     return (
-      <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="max-w-2xl mx-auto px-6 py-12">
-          <div className="rounded-xl p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-            <div className="text-5xl mb-4">{isCash ? "" : ""}</div>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>
+      <div className="min-h-screen px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="max-w-2xl mx-auto py-6 sm:py-12">
+          <div className="rounded-xl p-4 sm:p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+            <div className="text-3xl sm:text-5xl mb-2 sm:mb-4">{isCash ? "" : ""}</div>
+            <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
               {isCash ? "Order Confirmed!" : "Order Created!"}
             </h1>
-            <p className="mb-2" style={{ color: theme.text.secondary }}>
+            <p className="text-xs sm:text-sm mb-1 sm:mb-2" style={{ color: theme.text.secondary }}>
               Order Number: <span className="font-mono font-bold" style={{ color: theme.accents.primary }}>{createdOrder.orderNumber}</span>
             </p>
 
             {isCash ? (
-              <div className="rounded-xl p-6 text-left mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
-                <p className="font-semibold" style={{ color: "#065F46" }}>Cash on Delivery — Onsite Pickup</p>
-                <p className="text-sm mt-2" style={{ color: "#065F46" }}>
+              <div className="rounded-xl p-3 sm:p-6 text-left mt-3 sm:mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
+                <p className="font-semibold text-xs sm:text-sm" style={{ color: "#065F46" }}>Cash on Delivery — Onsite Pickup</p>
+                <p className="text-xs sm:text-sm mt-1 sm:mt-2" style={{ color: "#065F46" }}>
                   Your parts have been reserved for <strong>24 hours</strong>. Please visit the store within this time to pick them up.
                 </p>
                 <p className="text-xs mt-1" style={{ color: "#065F46" }}>
                   If not picked up within 24 hours, your order will be automatically cancelled.
                 </p>
-                <p className="text-sm mt-2" style={{ color: "#065F46" }}>
+                <p className="text-xs sm:text-sm mt-1 sm:mt-2" style={{ color: "#065F46" }}>
                   Total Amount: <strong>PKR {Number(createdOrder.amount).toLocaleString()}</strong>
                 </p>
               </div>
             ) : (
-              <div className="rounded-xl p-6 text-left mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
-                <p className="font-semibold" style={{ color: "#065F46" }}>Payment proof submitted!</p>
-                <p className="text-sm mt-2" style={{ color: "#065F46" }}>Status: Awaiting admin verification</p>
-                <p className="text-sm mt-1" style={{ color: "#065F46" }}>
+              <div className="rounded-xl p-3 sm:p-6 text-left mt-3 sm:mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
+                <p className="font-semibold text-xs sm:text-sm" style={{ color: "#065F46" }}>Payment proof submitted!</p>
+                <p className="text-xs sm:text-sm mt-1 sm:mt-2" style={{ color: "#065F46" }}>Status: Awaiting admin verification</p>
+                <p className="text-xs sm:text-sm mt-1" style={{ color: "#065F46" }}>
                   Your order will be confirmed once our team verifies your payment. We'll notify you once verified.
                 </p>
 
                 {paymentProofUrl && (
-                  <div className="mt-3 rounded-lg overflow-hidden border" style={{ borderColor: theme.borders.light }}>
-                    <img src={paymentProofUrl} alt="Payment Proof" className="w-full h-32 object-contain" style={{ backgroundColor: theme.backgrounds.primary }} />
+                  <div className="mt-2 sm:mt-3 rounded-lg overflow-hidden border" style={{ borderColor: theme.borders.light }}>
+                    <img src={paymentProofUrl} alt="Payment Proof" className="w-full h-32 sm:h-48 object-contain" style={{ backgroundColor: theme.backgrounds.primary }} />
                   </div>
                 )}
 
-                <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.primary }}>
-                  <p className="text-sm font-medium mb-3" style={{ color: theme.text.primary }}>Once verified, you may choose between delivery and onsite-pickup!</p>
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.primary }}>
+                  <p className="text-xs sm:text-sm font-medium mb-1 sm:mb-3" style={{ color: theme.text.primary }}>Once verified, you may choose between delivery and onsite-pickup!</p>
                 </div>
               </div>
             )}
 
-            <button onClick={handleProceed} className="mt-6 w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
+            <button onClick={handleProceed} className="mt-4 sm:mt-6 w-full px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold rounded-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
               View Order Details
             </button>
           </div>
@@ -269,29 +269,29 @@ export default function NewPartOrderPage() {
 
   const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded && !!selectedAccountId);
 
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <Link href={`/parts/${partId}`} className="text-sm hover:opacity-70" style={{ color: theme.text.secondary }}>← Back to Part</Link>
+return (
+    <div className="min-h-screen px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+      <div className="max-w-2xl mx-auto py-6 sm:py-12">
+        <div className="mb-4 sm:mb-8">
+          <Link href={`/parts/${partId}`} className="text-xs sm:text-sm hover:opacity-70" style={{ color: theme.text.secondary }}>← Back to Part</Link>
         </div>
 
-        <div className="rounded-xl p-8" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>Complete Your Order</h1>
+        <div className="rounded-xl p-4 sm:p-8" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+          <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>Complete Your Order</h1>
 
           {part && (
-            <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.tertiary }}>
-              <p className="font-semibold" style={{ color: theme.text.primary }}>
+            <div className="mb-3 sm:mb-6 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.tertiary }}>
+              <p className="font-semibold text-sm sm:text-base" style={{ color: theme.text.primary }}>
                 {part.name}
               </p>
-              <p className="text-sm mt-1" style={{ color: theme.text.muted }}>{inventory.branch?.name}</p>
-              <div className="mt-2 pt-2 border-t" style={{ borderColor: theme.borders.light }}>
+              <p className="text-xs sm:text-sm mt-1" style={{ color: theme.text.muted }}>{inventory.branch?.name}</p>
+              <div className="mt-1 sm:mt-2 pt-1 sm:pt-2 border-t" style={{ borderColor: theme.borders.light }}>
                 {discountPercent > 0 && (
-                  <p className="text-sm" style={{ color: theme.text.secondary }}>
+                  <p className="text-xs sm:text-sm" style={{ color: theme.text.secondary }}>
                     Store Price: <span className="line-through">PKR {basePrice.toLocaleString()}</span>
                   </p>
                 )}
-                <p className="text-lg font-bold" style={{ color: theme.accents.primary }}>
+                <p className="text-base sm:text-lg font-bold" style={{ color: theme.accents.primary }}>
                   Total: PKR {totalPrice.toLocaleString()}
                 </p>
                 <p className="text-xs" style={{ color: theme.text.muted }}>Qty: {quantity || 0} × PKR {unitPrice.toLocaleString()}</p>
@@ -305,61 +305,61 @@ export default function NewPartOrderPage() {
           )}
 
           {error && (
-            <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: "#FEE2E2", color: "#991B1B" }}>{error}</div>
+            <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-lg text-xs sm:text-sm" style={{ backgroundColor: "#FEE2E2", color: "#991B1B" }}>{error}</div>
           )}
 
           {/* Customer Details */}
-          <div className="space-y-4 mb-6">
+          <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Full Name</label>
-              <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: theme.text.secondary }}>Full Name</label>
+              <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg focus:outline-none text-xs sm:text-sm" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Phone Number</label>
-              <input type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: theme.text.secondary }}>Phone Number</label>
+              <input type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg focus:outline-none text-xs sm:text-sm" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Email</label>
-              <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: theme.text.secondary }}>Email</label>
+              <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg focus:outline-none text-xs sm:text-sm" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>Quantity</label>
-              <input type="number" min="1" max={inventory.quantity - inventory.reservedQuantity} value={quantity} onChange={(e) => setQuantity(e.target.value === "" ? "" : parseInt(e.target.value))} className="w-full px-4 py-3 rounded-lg focus:outline-none" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
+              <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: theme.text.secondary }}>Quantity</label>
+              <input type="number" min="1" max={inventory.quantity - inventory.reservedQuantity} value={quantity} onChange={(e) => setQuantity(e.target.value === "" ? "" : parseInt(e.target.value))} className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg focus:outline-none text-xs sm:text-sm" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }} />
               <p className="text-xs mt-1" style={{ color: theme.text.muted }}>Available: {inventory.quantity - inventory.reservedQuantity}</p>
             </div>
           </div>
 
           {/* Payment Method Selector */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-3" style={{ color: theme.text.secondary }}>Select Payment Method</label>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium mb-2 sm:mb-3" style={{ color: theme.text.secondary }}>Select Payment Method</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setPaymentMethod("CASH")}
-                className="p-4 rounded-lg text-left transition-all"
+                className="p-3 sm:p-4 rounded-lg text-left transition-all"
                 style={{
                   backgroundColor: paymentMethod === "CASH" ? theme.accents.primary : theme.backgrounds.tertiary,
                   color: paymentMethod === "CASH" ? theme.text.inverse : theme.text.primary,
                   border: `2px solid ${paymentMethod === "CASH" ? theme.accents.primary : theme.borders.medium}`,
                 }}
               >
-                <p className="font-semibold">Cash on Delivery</p>
-                <p className="text-xs mt-1 opacity-80">Pay at store, pickup in person</p>
-                <p className="text-sm font-bold mt-2">PKR {totalPrice.toLocaleString()}</p>
+                <p className="font-semibold text-xs sm:text-sm">Cash on Delivery</p>
+                <p className="text-xs mt-0.5 sm:mt-1 opacity-80">Pay at store, pickup in person</p>
+                <p className="text-xs sm:text-sm font-bold mt-1 sm:mt-2">PKR {totalPrice.toLocaleString()}</p>
               </button>
               <button
                 type="button"
                 onClick={() => setPaymentMethod("ONLINE_TRANSFER")}
-                className="p-4 rounded-lg text-left transition-all"
+                className="p-3 sm:p-4 rounded-lg text-left transition-all"
                 style={{
                   backgroundColor: paymentMethod === "ONLINE_TRANSFER" ? theme.accents.primary : theme.backgrounds.tertiary,
                   color: paymentMethod === "ONLINE_TRANSFER" ? theme.text.inverse : theme.text.primary,
                   border: `2px solid ${paymentMethod === "ONLINE_TRANSFER" ? theme.accents.primary : theme.borders.medium}`,
                 }}
               >
-                <p className="font-semibold">Online Transfer</p>
-                <p className="text-xs mt-1 opacity-80">Pay via bank transfer or mobile wallet</p>
-                <p className="text-sm font-bold mt-2">PKR {totalPrice.toLocaleString()}</p>
+                <p className="font-semibold text-xs sm:text-sm">Online Transfer</p>
+                <p className="text-xs mt-0.5 sm:mt-1 opacity-80">Pay via bank transfer or mobile wallet</p>
+                <p className="text-xs sm:text-sm font-bold mt-1 sm:mt-2">PKR {totalPrice.toLocaleString()}</p>
               </button>
             </div>
           </div>
@@ -367,112 +367,112 @@ export default function NewPartOrderPage() {
           {/* Payment Proof Upload for ONLINE_TRANSFER */}
           {paymentMethod === "ONLINE_TRANSFER" && (
             <>
-              <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: "#DBEAFE", border: "1px solid #3B82F6" }}>
-                <p className="text-sm" style={{ color: "#1E40AF" }}>
+              <div className="mb-3 sm:mb-4 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: "#DBEAFE", border: "1px solid #3B82F6" }}>
+                <p className="text-xs sm:text-sm" style={{ color: "#1E40AF" }}>
                   <strong>Important:</strong> Please enable notifications to receive updates when your payment is verified by our team so that you can request delivery at the earliest, in case pickup is not feasible.
                 </p>
-                <p className="text-sm" style={{ color: "#1E40AF" }}>
+                <p className="text-xs sm:text-sm" style={{ color: "#1E40AF" }}>
                   <strong>Delivery is free upto 10km from the chosen branch!</strong> 
                 </p>
               </div>
-              <div className="mb-6 p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
-                <h2 className="text-lg font-semibold mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
+              <div className="mb-4 sm:mb-6 p-3 sm:p-6 rounded-xl" style={{ backgroundColor: theme.backgrounds.tertiary, border: `1px solid ${theme.borders.light}` }}>
+                <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4" style={{ color: theme.text.primary }}>Upload Payment Proof</h2>
 
-              {/* Account selector */}
-              {paymentAccounts.length > 0 && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                    Transfer To <span style={{ color: "#EF4444" }}>*</span>
-                  </label>
-                  <div className="space-y-2">
-                    {paymentAccounts.map((acc) => (
-                      <button
-                        key={acc.id}
-                        type="button"
-                        onClick={() => setSelectedAccountId(acc.id)}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all"
-                        style={{
-                          backgroundColor: selectedAccountId === acc.id ? theme.accents.primary + "15" : theme.backgrounds.primary,
-                          border: `2px solid ${selectedAccountId === acc.id ? theme.accents.primary : theme.borders.medium}`,
-                        }}
-                      >
-                        <span
-                          className="px-2 py-0.5 rounded text-xs font-bold shrink-0"
+                {/* Account selector */}
+                {paymentAccounts.length > 0 && (
+                  <div className="mb-3 sm:mb-4">
+                    <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2" style={{ color: theme.text.secondary }}>
+                      Transfer To <span style={{ color: "#EF4444" }}>*</span>
+                    </label>
+                    <div className="space-y-1.5 sm:space-y-2">
+                      {paymentAccounts.map((acc) => (
+                        <button
+                          key={acc.id}
+                          type="button"
+                          onClick={() => setSelectedAccountId(acc.id)}
+                          className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-left transition-all"
                           style={{
-                            backgroundColor: acc.subtype === 'BANK' ? '#DBEAFE' : '#F0FDF4',
-                            color: acc.subtype === 'BANK' ? '#1D4ED8' : '#15803D',
+                            backgroundColor: selectedAccountId === acc.id ? theme.accents.primary + "15" : theme.backgrounds.primary,
+                            border: `2px solid ${selectedAccountId === acc.id ? theme.accents.primary : theme.borders.medium}`,
                           }}
                         >
-                          {acc.subtype === 'BANK' ? 'BANK' : 'WALLET'}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm truncate" style={{ color: theme.text.primary }}>{acc.name}</p>
-                          {acc.accountNumber && (
-                            <p className="text-xs mt-0.5 font-mono" style={{ color: theme.text.secondary }}>{acc.accountNumber}</p>
+                          <span
+                            className="px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0"
+                            style={{
+                              backgroundColor: acc.subtype === 'BANK' ? '#DBEAFE' : '#F0FDF4',
+                              color: acc.subtype === 'BANK' ? '#1D4ED8' : '#15803D',
+                            }}
+                          >
+                            {acc.subtype === 'BANK' ? 'BANK' : 'WALLET'}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-xs sm:text-sm truncate" style={{ color: theme.text.primary }}>{acc.name}</p>
+                            {acc.accountNumber && (
+                              <p className="text-[10px] sm:text-xs mt-0.5 font-mono" style={{ color: theme.text.secondary }}>{acc.accountNumber}</p>
+                            )}
+                          </div>
+                          {selectedAccountId === acc.id && (
+                            <svg className="w-3.5 h-3.5 sm:w-5 sm:h-5 shrink-0" fill="none" stroke={theme.accents.primary} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
                           )}
-                        </div>
-                        {selectedAccountId === acc.id && (
-                          <svg className="w-5 h-5 shrink-0" fill="none" stroke={theme.accents.primary} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className="mb-4 p-8 rounded-lg cursor-pointer transition-colors"
-                style={{
-                  backgroundColor: isDragging ? theme.accents.primary + "20" : theme.backgrounds.primary,
-                  border: `2px dashed ${isDragging ? theme.accents.primary : theme.borders.medium}`,
-                }}
-              >
-                <input ref={fileInputRef} type="file" accept="image/*,.pdf" onChange={handleFileInput} className="hidden" />
-                {paymentProofPreview ? (
-                  <div className="rounded-lg overflow-hidden border" style={{ borderColor: theme.borders.light }}>
-                    <img src={paymentProofPreview} alt="Payment Proof Preview" className="w-full h-48 object-contain" style={{ backgroundColor: theme.backgrounds.primary }} />
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <CameraIcon />
-                    <p className="text-sm mt-2" style={{ color: theme.text.secondary }}>Drag & drop your payment screenshot here</p>
-                    <p className="text-xs mt-1" style={{ color: theme.text.muted }}>or click to browse (Images & PDF only)</p>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mb-3 sm:mb-4 p-4 sm:p-8 rounded-lg cursor-pointer transition-colors"
+                  style={{
+                    backgroundColor: isDragging ? theme.accents.primary + "20" : theme.backgrounds.primary,
+                    border: `2px dashed ${isDragging ? theme.accents.primary : theme.borders.medium}`,
+                  }}
+                >
+                  <input ref={fileInputRef} type="file" accept="image/*,.pdf" onChange={handleFileInput} className="hidden" />
+                  {paymentProofPreview ? (
+                    <div className="rounded-lg overflow-hidden border" style={{ borderColor: theme.borders.light }}>
+                      <img src={paymentProofPreview} alt="Payment Proof Preview" className="w-full h-32 sm:h-48 object-contain" style={{ backgroundColor: theme.backgrounds.primary }} />
+                    </div>
+                  ) : (
+                    <div className="text-center py-3 sm:py-6">
+                      <CameraIcon />
+                      <p className="text-xs sm:text-sm mt-1 sm:mt-2" style={{ color: theme.text.secondary }}>Drag & drop your payment screenshot here</p>
+                      <p className="text-[10px] sm:text-xs mt-0.5 sm:mt-1" style={{ color: theme.text.muted }}>or click to browse (Images & PDF only)</p>
+                    </div>
+                  )}
+                </div>
+
+                {selectedFile && (
+                  <p className="text-[10px] sm:text-xs mb-2 sm:mb-4" style={{ color: theme.text.muted }}>Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</p>
+                )}
+
+                {uploadingProof && (
+                  <p className="text-xs sm:text-sm font-semibold" style={{ color: theme.accents.primary }}>Uploading payment proof...</p>
+                )}
+
+                {proofUploaded && (
+                  <p className="text-xs sm:text-sm font-semibold" style={{ color: "#10B981" }}>Proof Uploaded</p>
+                )}
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
+                  <p className="text-xs sm:text-sm mb-1 sm:mb-2" style={{ color: "#92400E" }}>
+                    <strong>Note:</strong> If you prefer delivery instead of pickup, you can provide your address after your payment is verified.
+                  </p>
+                  <p className="text-xs sm:text-sm" style={{ color: "#92400E" }}>
+                    <strong>Delivery is free up to 10km from the chosen branch!</strong>
+                  </p>
+                </div>
               </div>
-
-              {selectedFile && (
-                <p className="text-xs mb-4" style={{ color: theme.text.muted }}>Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</p>
-              )}
-
-              {uploadingProof && (
-                <p className="text-sm font-semibold" style={{ color: theme.accents.primary }}>Uploading payment proof...</p>
-              )}
-
-              {proofUploaded && (
-                <p className="text-sm font-semibold" style={{ color: "#10B981" }}>Proof Uploaded</p>
-              )}
-              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
-                <p className="text-sm mb-2" style={{ color: "#92400E" }}>
-                  <strong>Note:</strong> If you prefer delivery instead of pickup, you can provide your address after your payment is verified.
-                </p>
-                <p className="text-sm" style={{ color: "#92400E" }}>
-                  <strong>Delivery is free up to 10km from the chosen branch!</strong>
-                </p>
-              </div>
-            </div>
             </>
           )}
 
           {paymentMethod === "CASH" && (
-            <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
-              <p className="text-sm" style={{ color: "#92400E" }}>
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
+              <p className="text-xs sm:text-sm" style={{ color: "#92400E" }}>
                 <strong>Note:</strong> Your parts will be reserved for <strong>24 hours</strong>. Please visit the store to complete your purchase. If not picked up within 24 hours, the reservation will be cancelled.
               </p>
             </div>
@@ -482,7 +482,7 @@ export default function NewPartOrderPage() {
             type="button"
             onClick={handleCreateOrder}
             disabled={!canPlaceOrder || submitting}
-            className="w-full px-6 py-4 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="w-full px-4 sm:px-6 py-2 sm:py-4 text-xs sm:text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
           >
             {submitting ? "Creating Order..." : `Place Order `}

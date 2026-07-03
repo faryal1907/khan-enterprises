@@ -56,28 +56,28 @@ export default function SignupPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
+      className="min-h-screen flex items-center justify-center p-4"
       style={{ backgroundColor: theme.backgrounds.primary }}
     >
       <div
-        className="w-full max-w-md rounded-2xl shadow-md p-8"
+        className="w-full max-w-md rounded-2xl shadow-md p-6 sm:p-8"
         style={{
           backgroundColor: theme.backgrounds.secondary,
           border: `1px solid ${theme.borders.light}`,
         }}
       >
         {/* Brand header */}
-        <div className="mb-2 text-center">
-          <div className="w-48 h-48 flex items-center justify-center mx-auto mb-1">
+        <div className="mb-4 sm:mb-2 text-center">
+          <div className="w-32 h-32 sm:w-48 sm:h-48 flex items-center justify-center mx-auto mb-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="Ali & Khan's Logo" className="w-full h-full object-contain" />
           </div>
-          <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
+          <p className="text-xs sm:text-sm mt-1" style={{ color: theme.text.muted }}>
             Create your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
           {/* Full name field */}
           <div>
             <label
@@ -216,7 +216,7 @@ export default function SignupPage() {
           {/* API error banner */}
           {error && (
             <div
-              className="text-sm rounded-lg px-4 py-3"
+              className="text-xs sm:text-sm rounded-lg px-4 py-3"
               style={{
                 backgroundColor: `${theme.accents.secondary}18`,
                 border: `1px solid ${theme.accents.secondary}`,

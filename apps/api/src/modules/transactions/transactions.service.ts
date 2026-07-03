@@ -141,7 +141,6 @@ export class TransactionsService {
     // ── Payable payments (expense / PO payments — no orderId, but has payable allocation) ──
     const payableTxWhere: any = {
       orderId: null,
-      partOrderId: null,
       allocations: { some: { payableId: { not: null } } },
     };
     if (status) payableTxWhere.status = status;

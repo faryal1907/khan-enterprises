@@ -89,7 +89,7 @@ export default function BikeDetailPage() {
                   )}
                 </div>
                 {bike.media.length > 1 && (
-                  <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-4 gap-2 sm:gap-4">
+<div className="grid grid-cols-4 sm:grid-cols-4 gap-2 sm:gap-4">
                     {bike.media.map((url: string, i: number) => (
                       <div
                         key={i}

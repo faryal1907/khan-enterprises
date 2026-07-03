@@ -215,7 +215,7 @@ export class AuthService {
     });
 
     const response: any = {
-      message: "If an account with that email exists, a password reset link has been sent.",
+      message: "If an account with that email exists, a password reset link has been sent. Check in Spam folder just in case!",
     };
 
     // ⚠️ INSECURE - Only for local development convenience

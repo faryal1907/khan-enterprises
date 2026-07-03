@@ -32,28 +32,28 @@ export default function ForgotPasswordPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center"
+      className="min-h-screen flex items-center justify-center p-4"
       style={{ backgroundColor: theme.backgrounds.primary }}
     >
       <div
-        className="w-full max-w-md rounded-2xl shadow-md p-8"
+        className="w-full max-w-md rounded-2xl shadow-md p-6 sm:p-8"
         style={{
           backgroundColor: theme.backgrounds.secondary,
           border: `1px solid ${theme.borders.light}`,
         }}
       >
         {/* Brand header */}
-        <div className="mb-2 text-center">
-          <div className="w-48 h-48 flex items-center justify-center mx-auto mb-1">
+        <div className="mb-4 sm:mb-2 text-center">
+          <div className="w-32 h-32 sm:w-48 sm:h-48 flex items-center justify-center mx-auto mb-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="Ali & Khan's Logo" className="w-full h-full object-contain" />
           </div>
-          <p className="text-sm mt-1" style={{ color: theme.text.muted }}>
+          <p className="text-xs sm:text-sm mt-1" style={{ color: theme.text.muted }}>
             Enter your email to receive a password reset link
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
           {/* Email field */}
           <div>
             <label
@@ -124,8 +124,8 @@ export default function ForgotPasswordPage() {
         </form>
 
         {/* Link back to login */}
-        <div className="mt-6 text-center">
-          <p className="text-sm" style={{ color: theme.text.muted }}>
+        <div className="mt-4 sm:mt-6 text-center">
+          <p className="text-xs sm:text-sm" style={{ color: theme.text.muted }}>
             Remember your password?{" "}
             <a href="/login" className="font-semibold hover:underline" style={{ color: theme.accents.primary }}>
               Sign in

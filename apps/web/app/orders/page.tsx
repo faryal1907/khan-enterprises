@@ -285,8 +285,8 @@ export default function CustomerOrdersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
       </div>
     );
   }
@@ -294,13 +294,13 @@ export default function CustomerOrdersPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
       <NotificationPermissionBanner />
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: theme.text.primary }}>
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
             My Orders
           </h1>
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
+          <p className="text-xs sm:text-sm" style={{ color: theme.text.secondary }}>
             Track your order status and details
           </p>
         </div>
@@ -337,25 +337,25 @@ export default function CustomerOrdersPage() {
 
         {error && (
           <div
-            className="rounded-xl p-6 mb-6"
+            className="rounded-xl p-4 sm:p-6 mb-4 sm:mb-6"
             style={{ backgroundColor: "#FEE2E2", border: "1px solid #EF4444" }}
           >
-            <p className="text-sm" style={{ color: "#991B1B" }}>{error}</p>
+            <p className="text-xs sm:text-sm" style={{ color: "#991B1B" }}>{error}</p>
           </div>
         )}
 
         {filteredOrders.length === 0 && !error ? (
           <div
-            className="rounded-xl p-12 text-center"
+            className="rounded-xl p-6 sm:p-12 text-center"
             style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
           >
-            <p className="text-lg mb-4" style={{ color: theme.text.secondary }}>
+            <p className="text-sm sm:text-lg mb-3 sm:mb-4" style={{ color: theme.text.secondary }}>
               {activeTab === "current" ? "You don't have any current orders" : "You don't have any order history"}
             </p>
             {activeTab === "current" && (
               <Link
                 href="/bikes"
-                className="inline-block px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                className="inline-block px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                 style={{
                   backgroundColor: theme.accents.primary,
                   color: theme.text.inverse,
@@ -366,18 +366,18 @@ export default function CustomerOrdersPage() {
             )}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {filteredOrders.map((order) => (
               <div
                 key={order.id}
-                className="rounded-xl p-6"
+                className="rounded-xl p-4 sm:p-6"
                 style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}
               >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex flex-col gap-3 sm:gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 mb-2 sm:mb-3">
                       <span
-                        className="inline-block px-3 py-1 text-xs font-medium rounded-full uppercase"
+                        className="inline-block px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full uppercase"
                         style={{
                           backgroundColor: order.type === "BIKE" ? colors.lime : theme.accents.primary,
                           color: theme.text.inverse,
@@ -386,7 +386,7 @@ export default function CustomerOrdersPage() {
                         {order.type}
                       </span>
                       <span
-                        className="inline-block px-3 py-1 text-xs font-medium rounded-full"
+                        className="inline-block px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full"
                         style={getStatusBadgeStyle(getDisplayStatus(order))}
                       >
                         {getStatusLabel(getDisplayStatus(order))}
@@ -396,7 +396,7 @@ export default function CustomerOrdersPage() {
                         if (!paymentStatus) return null;
                         return (
                           <span
-                            className="inline-block px-3 py-1 text-xs font-medium rounded-full"
+                            className="inline-block px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full"
                             style={getPaymentStatusBadgeStyle(paymentStatus)}
                           >
                             {getPaymentStatusLabel(paymentStatus)}
@@ -407,17 +407,17 @@ export default function CustomerOrdersPage() {
                         <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />
                       )}
 
-                      <span className="text-xs" style={{ color: theme.text.muted }}>
+                      <span className="text-[10px] sm:text-xs" style={{ color: theme.text.muted }}>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                     
                     {order.type === "BIKE" && order.bike ? (
                       <>
-                        <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text.primary }}>
+                        <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
                           {order.bike.model.brand} {order.bike.model.modelName} ({order.bike.model.year})
                         </h3>
-                        <div className="space-y-1 text-sm">
+                        <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
                           <p style={{ color: theme.text.secondary }}>
                             <span className="font-medium" style={{ color: theme.text.primary }}>Order Number:</span> {order.orderNumber}
                           </p>
@@ -431,10 +431,10 @@ export default function CustomerOrdersPage() {
                       </>
                     ) : order.type === "PART" && order.part ? (
                       <>
-                        <h3 className="text-lg font-semibold mb-2" style={{ color: theme.text.primary }}>
+                        <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
                           {order.part.name} (Qty: {order.quantity})
                         </h3>
-                        <div className="space-y-1 text-sm">
+                        <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
                           <p style={{ color: theme.text.secondary }}>
                             <span className="font-medium" style={{ color: theme.text.primary }}>Order Number:</span> {order.orderNumber}
                           </p>
@@ -451,18 +451,20 @@ export default function CustomerOrdersPage() {
                       </>
                     ) : null}
                   </div>
-                  {(order.type === "BIKE" || order.type === "PART") ? (
-                    <Link
-                      href={`/orders/${order.orderNumber}`}
-                      className="px-6 py-3 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity text-center"
-                      style={{
-                        backgroundColor: theme.accents.primary,
-                        color: theme.text.inverse,
-                      }}
-                    >
-                      View Details
-                    </Link>
-                  ) : null}
+                  <div className="mt-1 sm:mt-0">
+                    {(order.type === "BIKE" || order.type === "PART") ? (
+                      <Link
+                        href={`/orders/${order.orderNumber}`}
+                        className="px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-sm font-medium rounded-lg hover:opacity-90 transition-opacity text-center inline-block"
+                        style={{
+                          backgroundColor: theme.accents.primary,
+                          color: theme.text.inverse,
+                        }}
+                      >
+                        View Details
+                      </Link>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ))}

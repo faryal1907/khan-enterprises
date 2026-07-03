@@ -319,18 +319,18 @@ export default function OrderStatusPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
       </div>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="rounded-xl p-12 text-center max-w-md" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-          <p style={{ color: theme.text.secondary }}>{error || "Order not found"}</p>
-          <Link href="/bikes" className="inline-block mt-4 text-sm hover:opacity-70" style={{ color: theme.accents.primary }}>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="rounded-xl p-6 sm:p-12 text-center max-w-md" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+          <p className="text-sm sm:text-base" style={{ color: theme.text.secondary }}>{error || "Order not found"}</p>
+          <Link href="/bikes" className="inline-block mt-3 sm:mt-4 text-xs sm:text-sm hover:opacity-70" style={{ color: theme.accents.primary }}>
             Browse Bikes
           </Link>
         </div>
@@ -355,21 +355,21 @@ export default function OrderStatusPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: theme.text.primary }}>
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
             Order Status
           </h1>
-          <p className="text-sm" style={{ color: theme.text.secondary }}>
+          <p className="text-xs sm:text-sm" style={{ color: theme.text.secondary }}>
             Order Number: {order.orderNumber}
           </p>
         </div>
 
         {/* Status Badge - uses same getDisplayStatus as list page */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <span
-            className="inline-block px-4 py-2 text-sm font-medium rounded-full"
+            className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-full"
             style={getStatusBadgeStyle(displayStatus)}
           >
             {getStatusLabel(displayStatus)}
@@ -379,18 +379,18 @@ export default function OrderStatusPage() {
         {/* Pending Payment Notice */}
         {isPendingPayment && (
           <div
-            className="rounded-xl p-6 mb-6"
+            className="rounded-xl p-4 sm:p-6 mb-4 sm:mb-6"
             style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-3 sm:gap-4">
               <div className="shrink-0">
-                <svg className="w-6 h-6" style={{ color: "#92400E" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: "#92400E" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-lg font-semibold" style={{ color: "#92400E" }}>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 mb-1.5 sm:mb-2">
+                  <h2 className="text-base sm:text-lg font-semibold" style={{ color: "#92400E" }}>
                     {hasVerificationPending ? "Awaiting Admin Verification" : "Payment Pending"}
                   </h2>
                   {displayStatus === "PENDING_PAYMENT" && isCash && <CountdownTimer expiresAt={order.expiresAt || order.createdAt} />}

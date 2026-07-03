@@ -244,20 +244,20 @@ export default function NewOrderPage() {
     if (createdOrder) router.push(`/orders/${createdOrder.orderNumber}`);
   };
 
-  if (loading) {
+if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2" style={{ borderColor: theme.accents.primary }} />
       </div>
     );
   }
 
   if (!bike && !error) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="rounded-xl p-12 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-          <p style={{ color: theme.text.secondary }}>Bike not found</p>
-          <Link href="/bikes" className="mt-4 inline-block px-6 py-3 rounded-lg font-semibold" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: theme.backgrounds.primary }}>
+        <div className="rounded-xl p-6 sm:p-12 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+          <p className="text-sm sm:text-base" style={{ color: theme.text.secondary }}>Bike not found</p>
+          <Link href="/bikes" className="mt-3 sm:mt-4 inline-block px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold text-xs sm:text-sm" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
             Back to Inventory
           </Link>
         </div>
@@ -269,42 +269,87 @@ export default function NewOrderPage() {
     const isCash = createdOrder.paymentMethod === "CASH";
     return (
       <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
-        <div className="max-w-2xl mx-auto px-6 py-12">
-          <div className="rounded-xl p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-            <div className="text-5xl mb-4">{isCash ? <CheckIcon /> : ""}</div>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
+          <div className="rounded-xl p-4 sm:p-8 text-center" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+            <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">{isCash ? <CheckIcon /> : ""}</div>
+            <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>
               {isCash ? "Order Placed!" : "Order Created!"}
             </h1>
-            <p className="mb-2" style={{ color: theme.text.secondary }}>
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm" style={{ color: theme.text.secondary }}>
               Order Number: <span className="font-mono font-bold" style={{ color: theme.accents.primary }}>{createdOrder.orderNumber}</span>
             </p>
 
             {isCash ? (
-              <div className="rounded-xl p-6 text-left mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
-                <p className="font-semibold" style={{ color: "#065F46" }}>Cash on Delivery — Onsite Pickup</p>
-                <p className="text-sm mt-2" style={{ color: "#065F46" }}>
+              <div className="rounded-xl p-4 sm:p-6 text-left mt-4 sm:mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
+                <p className="font-semibold text-xs sm:text-sm" style={{ color: "#065F46" }}>Cash on Delivery — Onsite Pickup</p>
+                <p className="text-[10px] sm:text-xs mt-1 sm:mt-2" style={{ color: "#065F46" }}>
                   Your bike has been reserved for <strong>24 hours</strong>. Please visit the store within this time to pick it up.
                 </p>
-                <p className="text-xs mt-1" style={{ color: "#065F46" }}>
+                <p className="text-[10px] sm:mt-1" style={{ color: "#065F46" }}>
                   If not picked up within 24 hours, your order will be automatically cancelled.
                 </p>
-                <p className="text-sm mt-2" style={{ color: "#065F46" }}>
+                <p className="text-xs sm:text-sm mt-1 sm:mt-2" style={{ color: "#065F46" }}>
                   Total Amount: <strong>PKR {onlinePrice.toLocaleString()}</strong>
                 </p>
               </div>
             ) : (
-              <div className="rounded-xl p-6 text-left mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
-                <p className="font-semibold" style={{ color: "#065F46" }}>Payment proof submitted!</p>
-                <p className="text-sm mt-2" style={{ color: "#065F46" }}>Status: Awaiting admin verification</p>
-                <p className="text-sm mt-1" style={{ color: "#065F46" }}>
+              <div className="rounded-xl p-4 sm:p-6 text-left mt-4 sm:mt-6" style={{ backgroundColor: "#D1FAE5", border: "1px solid #10B981" }}>
+                <p className="font-semibold text-xs sm:text-sm" style={{ color: "#065F46" }}>Payment proof submitted!</p>
+                <p className="text-[10px] sm:text-xs mt-1 sm:mt-2" style={{ color: "#065F46" }}>Status: Awaiting admin verification</p>
+                <p className="text-[10px] sm:text-xs mt-1" style={{ color: "#065F46" }}>
                   Your order will be confirmed once our team verifies your payment. We'll notify you once verified.
                 </p>
 
                 {paymentProofUrl && (
-                  <div className="mt-3 rounded-lg overflow-hidden border" style={{ borderColor: theme.borders.light }}>
-                    <img src={paymentProofUrl} alt="Payment Proof" className="w-full h-32 object-contain" style={{ backgroundColor: theme.backgrounds.primary }} />
+                  <div className="mt-2 sm:mt-3 rounded-lg overflow-hidden border" style={{ borderColor: theme.borders.light }}>
+                    <img src={paymentProofUrl} alt="Payment Proof" className="w-full h-24 sm:h-32 object-contain" style={{ backgroundColor: theme.backgrounds.primary }} />
                   </div>
                 )}
+
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.primary }}>
+                  <p className="text-[10px] sm:text-sm font-medium mb-1.5 sm:mb-3" style={{ color: theme.text.primary }}>Once verified, you may choose between delivery and onsite-pickup!</p>
+                </div>
+              </div>
+            )}
+
+            <button onClick={handleProceed} className="mt-4 sm:mt-6 w-full px-4 py-2 sm:px-6 sm:py-3 text-xs sm:text-base font-semibold rounded-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
+              View Order Details
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
+        <div className="mb-4 sm:mb-8">
+          <Link href="/bikes" className="text-xs sm:text-sm hover:opacity-70" style={{ color: theme.text.secondary }}>← Back to Inventory</Link>
+        </div>
+
+        <div className="rounded-xl p-4 sm:p-8" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
+          <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: theme.text.primary }}>Complete Your Order</h1>
+
+          {bike && (
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.tertiary }}>
+              <p className="font-semibold text-xs sm:text-sm" style={{ color: theme.text.primary }}>
+                {bike.model?.brand} {bike.model?.modelName} ({bike.model?.year})
+              </p>
+              <p className="text-[10px] sm:text-xs mt-0.5 sm:mt-1" style={{ color: theme.text.muted }}>{bike.branch?.name}</p>
+              <div className="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t" style={{ borderColor: theme.borders.light }}>
+                <p className="text-[10px] sm:text-xs" style={{ color: theme.text.secondary }}>
+                  Store Price: <span className="line-through">PKR {basePrice.toLocaleString()}</span>
+                </p>
+                <p className="text-base sm:text-lg font-bold" style={{ color: theme.accents.primary }}>
+                  Online Price: PKR {onlinePrice.toLocaleString()}
+                </p>
+                <p className="text-[10px] sm:text-xs" style={{ color: theme.text.muted }}>
+                  You save PKR {discountAmount.toLocaleString()} ({discountPercent}% discount)
+                </p>
+              </div>
+            </div>
+          )}
 
                 <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.primary }}>
                   <p className="text-sm font-medium mb-3" style={{ color: theme.text.primary }}>Once verified, you may choose between delivery and onsite-pickup!</p>
