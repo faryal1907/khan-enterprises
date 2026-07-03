@@ -195,7 +195,7 @@ export class AuthService {
       },
     });
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.WEB_URL || "http://localhost:3000";
     const resetLink = `${frontendUrl}/reset-password?token=${rawToken}`;
 
     // Send email via EmailService (falls back to console log if SMTP not configured)

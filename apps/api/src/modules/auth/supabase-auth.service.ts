@@ -13,7 +13,7 @@ export class SupabaseAuthService {
       throw new Error('Supabase is not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.WEB_URL || "http://localhost:3000";
 
     const { data, error } = await supabase!.auth.signInWithOAuth({
       provider: 'google',
@@ -39,7 +39,7 @@ export class SupabaseAuthService {
       throw new Error('Supabase is not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.WEB_URL || "http://localhost:3000";
 
     const { data, error } = await supabase!.auth.signInWithOAuth({
       provider: 'facebook',
