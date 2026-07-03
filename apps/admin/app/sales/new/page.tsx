@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { getBikes, getParts } from "@/lib/api/inventory";
 import { createManualOrder, createManualPartOrder } from "@/lib/api/orders";
 import { getPaymentAccounts } from "@/lib/api/accounting";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { AsyncButton } from "@/components/async-button";

@@ -6,7 +6,7 @@ import { theme } from "@/lib/colors";
 import { AsyncButton } from "@/components/async-button";
 import { recordVendorPayment } from "@/lib/api/vendors";
 import { getAccounts } from "@/lib/api/accounting";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 
 type Account = { id: string; code: string; name: string; subtype: string; balance: number };
 

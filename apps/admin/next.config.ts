@@ -9,7 +9,7 @@ try {
 }
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@repo/utils'],
+  /* config options here */
 };
 
 export default nextConfig;

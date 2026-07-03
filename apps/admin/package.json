@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@repo/utils": "*",
     "@hookform/resolvers": "^5.4.0",
     "@types/js-cookie": "^3.0.6",
     "axios": "^1.16.1",

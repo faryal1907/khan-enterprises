@@ -6,7 +6,7 @@ import { theme } from "@/lib/colors";
 import { AsyncButton } from "@/components/async-button";
 import { allocateVendorInventory } from "@/lib/api/vendors";
 import { getBikeModels, getBranches } from "@/lib/api/inventory";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 
 type ModelOption = { id: string; brand: string; modelName: string; year: number };
 type BranchOption = { id: string; name: string };

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { getBikeModelById, updateBikeModel } from "@/lib/api/inventory";
 import Link from "next/link";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 import { AsyncButton } from "@/components/async-button";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";

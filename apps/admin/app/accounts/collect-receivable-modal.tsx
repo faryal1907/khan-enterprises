@@ -5,7 +5,7 @@ import { theme } from "@/lib/colors";
 import { collectFromParty, getPaymentAccounts, RECEIVABLE_PARTY_TYPE_LABELS, ReceivablePartyType } from "@/lib/api/accounting";
 import { toast } from "sonner";
 import { AsyncButton } from "@/components/async-button";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 
 type ReceivableParty = {
   partyId: string;

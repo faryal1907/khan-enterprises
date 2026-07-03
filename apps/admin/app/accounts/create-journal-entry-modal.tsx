@@ -3,7 +3,7 @@ import { theme } from "@/lib/colors";
 import { createJournalEntry } from "@/lib/api/accounting";
 import { toast } from "sonner";
 import { AsyncButton } from "@/components/async-button";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 
 export function CreateJournalEntryModal({ 
   isOpen, 

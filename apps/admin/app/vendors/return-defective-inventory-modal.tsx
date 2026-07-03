@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { theme } from "@/lib/colors";
 import { AsyncButton } from "@/components/async-button";
 import { returnDefectiveInventory, getVendorReturnableInventory } from "@/lib/api/vendors";
-import { numberToWords } from "@repo/utils";
+import { numberToWords } from "@/lib/number-to-words";
 
 type ReturnableBike = {
   id: string;
