@@ -157,6 +157,16 @@ export default function LoginPage() {
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
+
+        <div className="mt-4 text-center">
+          <a
+            href="/forgot-password"
+            className="text-xs sm:text-sm hover:underline"
+            style={{ color: theme.text.muted }}
+          >
+            Forgot your password?
+          </a>
+        </div>
       </div>
     </div>
   );

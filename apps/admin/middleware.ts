@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicPaths = ["/login"];
+const publicPaths = ["/login", "/forgot-password", "/reset-password"];
 const ADMIN_ACCESS_TOKEN_COOKIE = "adminAccessToken";
 
 // Roles allowed to access admin dashboard

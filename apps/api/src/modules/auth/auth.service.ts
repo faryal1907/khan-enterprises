@@ -166,7 +166,7 @@ export class AuthService {
 
   // ─── Forgot Password ──────────────────────────────────────────────────────
 
-  async forgotPassword(dto: { email: string }) {
+  async forgotPassword(dto: { email: string }, options?: { isAdmin?: boolean }) {
     // Always succeed silently to prevent email enumeration
     const user = await this.prisma.client.user.findUnique({
       where: { email: dto.email },
@@ -195,7 +195,10 @@ export class AuthService {
       },
     });
 
-    const frontendUrl = process.env.WEB_URL || "http://localhost:3000";
+    // Use ADMIN_URL for admin password resets, WEB_URL for customer resets
+    const frontendUrl = options?.isAdmin
+      ? (process.env.ADMIN_URL || "http://localhost:3001")
+      : (process.env.WEB_URL || "http://localhost:3000");
     const resetLink = `${frontendUrl}/reset-password?token=${rawToken}`;
 
     // Send email via EmailService (falls back to console log if SMTP not configured)

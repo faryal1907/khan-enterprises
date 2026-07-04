@@ -107,6 +107,18 @@ export class AuthController {
   }
 
   /**
+   * POST /api/auth/admin/forgot-password
+   * Sends a password reset link that points to the admin app.
+   * Same flow as forgotPassword but uses ADMIN_URL for the reset link.
+   */
+  @Post("admin/forgot-password")
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  async adminForgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto, { isAdmin: true });
+  }
+
+  /**
    * POST /api/auth/reset-password
    * Resets the user's password using a valid reset token.
    */
