@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "@nestjs/config";
-import { ThrottlerModule } from "@nestjs/throttler";
+import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { PrismaModule } from "./prisma/prisma.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { InventoryModule } from "./modules/inventory/inventory.module";
@@ -52,12 +53,37 @@ import { HealthController } from "./health/health.controller";
     ExpensesModule,
     SettingsModule,
     AccountingModule,
+    // ─── Rate Limiting ────────────────────────────────────────────────────────
+    // ThrottlerGuard is registered globally below via APP_GUARD.
+    // Individual endpoints can override with @Throttle() or opt-out with @SkipThrottle().
+    //
+    // Redis-backed store (recommended for multi-instance production):
+    //   1. npm install @nestjs-throttler-storage-redis ioredis
+    //   2. Replace ThrottlerModule.forRoot([...]) with:
+    //        ThrottlerModule.forRootAsync({
+    //          useFactory: () => ({
+    //            throttlers: [...],
+    //            storage: new ThrottlerStorageRedisService(
+    //              new Redis(process.env.REDIS_URL)
+    //            ),
+    //          }),
+    //        }),
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,  // 1 minute
-        limit: 100,  // generous global limit; login endpoint overrides with @Throttle
+        name: 'global',
+        ttl: 60_000,   // 1 minute window
+        limit: 120,    // 120 requests per minute per IP (2 req/sec average)
       },
     ]),
+  ],
+  providers: [
+    // ─── Apply ThrottlerGuard globally ────────────────────────────────────────
+    // Without this, ThrottlerModule is configured but never enforced.
+    // Use @SkipThrottle() on any route/controller that should be exempt.
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

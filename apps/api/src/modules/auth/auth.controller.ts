@@ -67,6 +67,7 @@ export class AuthController {
    * Exchanges a valid refresh token for a new access + refresh token pair.
    */
   @Post("refresh")
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() dto: RefreshDto) {
     return this.authService.refresh(dto.refreshToken);
@@ -77,6 +78,7 @@ export class AuthController {
    * Invalidates the refresh token. Access token expires naturally (15m).
    */
   @Post("logout")
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async logout(@Body() dto: RefreshDto) {
     return this.authService.logout(dto.refreshToken);
