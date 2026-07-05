@@ -242,7 +242,7 @@ export class AccountingController {
 
   @Post("receivables/entries")
   @Roles(UserRole.ADMIN)
-  async createEntry(@Body() data: { partyId: string; amount: number; description: string; date: string; dueDate?: string }) {
+  async createEntry(@Body() data: { partyId: string; amount: number; description: string; date: string; dueDate?: string; vendorId?: string }) {
     return this.receivablesService.createEntry(data);
   }
 

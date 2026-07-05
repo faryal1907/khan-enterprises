@@ -1,26 +1,5 @@
+npm warn Unknown env config "filter". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > api@1.0.0 build
 > nest build
 
-[96msrc/modules/accounting/purchase-orders.service.ts[0m:[93m54[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'PENDING_SETUP' does not exist on type '{ readonly AVAILABLE: "AVAILABLE"; readonly RESERVED: "RESERVED"; readonly SOLD: "SOLD"; readonly IN_DELIVERY: "IN_DELIVERY"; }'.
-
-[7m54[0m                 status: BikeStatus.PENDING_SETUP
-[7m  [0m [91m                                   ~~~~~~~~~~~~~[0m
-[96msrc/modules/inventory/inventory.service.ts[0m:[93m119[0m:[93m88[0m - [91merror[0m[90m TS2339: [0mProperty 'PENDING_SETUP' does not exist on type '{ readonly AVAILABLE: "AVAILABLE"; readonly RESERVED: "RESERVED"; readonly SOLD: "SOLD"; readonly IN_DELIVERY: "IN_DELIVERY"; }'.
-
-[7m119[0m       this.prisma.client.bikeUnit.count({ where: { ...summaryWhere, status: BikeStatus.PENDING_SETUP } }),
-[7m   [0m [91m                                                                                       ~~~~~~~~~~~~~[0m
-[96msrc/modules/inventory/inventory.service.ts[0m:[93m232[0m:[93m39[0m - [91merror[0m[90m TS2339: [0mProperty 'PENDING_SETUP' does not exist on type '{ readonly AVAILABLE: "AVAILABLE"; readonly RESERVED: "RESERVED"; readonly SOLD: "SOLD"; readonly IN_DELIVERY: "IN_DELIVERY"; }'.
-
-[7m232[0m         oldBike.status === BikeStatus.PENDING_SETUP &&
-[7m   [0m [91m                                      ~~~~~~~~~~~~~[0m
-
-Found 3 error(s).
-
-npm error Lifecycle script `build` failed with error:
-npm error code 1
-npm error path C:\Users\Ibsham Tariq\Desktop\khan Enterprise\khan-enterprises\apps\api
-npm error workspace api@1.0.0
-npm error location C:\Users\Ibsham Tariq\Desktop\khan Enterprise\khan-enterprises\apps\api
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c nest build

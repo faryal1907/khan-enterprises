@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 import path from "path";
 import { defineConfig, env } from "prisma/config";
 
-// Load .env from root workspace since packages/prisma is nested
+// Load .env.local first so local credentials override placeholder values in .env
+dotenv.config({ path: path.resolve(process.cwd(), "../../apps/web/.env.local") });
+dotenv.config({ path: path.resolve(process.cwd(), "../../apps/admin/.env.local") });
+// Fallback to root .env
 dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 

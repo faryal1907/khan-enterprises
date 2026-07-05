@@ -507,6 +507,7 @@ exports.ReceivablePartyScalarFieldEnum = {
 exports.ReceivableEntryScalarFieldEnum = {
     id: 'id',
     partyId: 'partyId',
+    vendorId: 'vendorId',
     amount: 'amount',
     description: 'description',
     date: 'date',

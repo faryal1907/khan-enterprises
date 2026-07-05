@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = require("dotenv");
 const path_1 = require("path");
 // Load root .env — seed runs standalone outside NestJS so env vars aren't pre-loaded
-(0, dotenv_1.config)({ path: path_1.resolve(process.cwd(), "../../.env") });
+(0, dotenv_1.config)({ path: path_1.resolve(process.cwd(), "../.env") });
 (0, dotenv_1.config)({ path: path_1.resolve(process.cwd(), ".env") });
 const bcrypt_1 = require("bcrypt");
 async function main() {
-    const { prisma } = await Promise.resolve().then(() => require("./index"));
+    const { prisma } = await Promise.resolve().then(() => require("../packages/prisma/index.js"));
     console.log("🌱 Starting database seeding...");
     // ============================================================================
     // CLEAN DB
@@ -16,9 +16,11 @@ async function main() {
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "AuditLog" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "Document" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "DeliveryRequest" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartPaymentTransaction" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "PaymentTransaction" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "OrderAlert" CASCADE;');
+    await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartOrder" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "Order" CASCADE;');
-    await prisma.$executeRawUnsafe('TRUNCATE TABLE "Offer" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "StockMovement" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "PartInventory" CASCADE;');
     await prisma.$executeRawUnsafe('TRUNCATE TABLE "Part" CASCADE;');
@@ -62,9 +64,9 @@ async function main() {
     // 2. USERS
     // ============================================================================
     console.log("👥 Seeding System Users...");
-    const adminPasswordHash = await bcrypt_1.default.hash("admin123", 10);
-    const managerPasswordHash = await bcrypt_1.default.hash("manager123", 10);
-    const salesPasswordHash = await bcrypt_1.default.hash("sales123", 10);
+    const adminPasswordHash = await bcrypt_1.hash("admin123", 10);
+    const managerPasswordHash = await bcrypt_1.hash("manager123", 10);
+    const salesPasswordHash = await bcrypt_1.hash("sales123", 10);
     // ADMIN — global, no branch
     await prisma.user.create({
         data: {
@@ -106,7 +108,7 @@ async function main() {
     // SALES_STAFF — added after vendors are seeded; see below
     console.log("✅ Seeded users: 1 ADMIN, 2 MANAGERs (sales staff added after vendors).");
     // TEST CUSTOMER (Non-Admin)
-    const customerPasswordHash = await bcrypt_1.default.hash("customer123", 10);
+    const customerPasswordHash = await bcrypt_1.hash("customer123", 10);
     await prisma.user.create({
         data: {
             email: "customer1@khan.com",
@@ -574,3 +576,4 @@ main()
     .finally(async () => {
     await prisma.$disconnect();
 });
+

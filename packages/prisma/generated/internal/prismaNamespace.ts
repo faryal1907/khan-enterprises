@@ -3866,6 +3866,7 @@ export type ReceivablePartyScalarFieldEnum = (typeof ReceivablePartyScalarFieldE
 export const ReceivableEntryScalarFieldEnum = {
   id: 'id',
   partyId: 'partyId',
+  vendorId: 'vendorId',
   amount: 'amount',
   description: 'description',
   date: 'date',

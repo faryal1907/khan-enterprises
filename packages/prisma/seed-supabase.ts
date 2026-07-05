@@ -1,7 +1,10 @@
 import { config } from "dotenv";
 import path from "path";
 
-// Load root .env — seed runs standalone outside NestJS so env vars aren't pre-loaded
+// Load .env.local files first so local credentials take precedence over .env placeholders
+config({ path: path.resolve(process.cwd(), "../../apps/web/.env.local") });
+config({ path: path.resolve(process.cwd(), "../../apps/admin/.env.local") });
+// Fallback to root .env for any vars not in .env.local
 config({ path: path.resolve(process.cwd(), "../../.env") });
 config({ path: path.resolve(process.cwd(), ".env") });
 import bcrypt from "bcrypt";

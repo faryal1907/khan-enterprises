@@ -134,6 +134,7 @@ export type VendorWhereInput = {
     payments?: Prisma.VendorPaymentListRelationFilter;
     allocations?: Prisma.VendorAllocationListRelationFilter;
     defectiveReturns?: Prisma.VendorDefectiveReturnListRelationFilter;
+    receivableEntries?: Prisma.ReceivableEntryListRelationFilter;
 };
 export type VendorOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -151,6 +152,7 @@ export type VendorOrderByWithRelationInput = {
     payments?: Prisma.VendorPaymentOrderByRelationAggregateInput;
     allocations?: Prisma.VendorAllocationOrderByRelationAggregateInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnOrderByRelationAggregateInput;
+    receivableEntries?: Prisma.ReceivableEntryOrderByRelationAggregateInput;
 };
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -171,6 +173,7 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
     payments?: Prisma.VendorPaymentListRelationFilter;
     allocations?: Prisma.VendorAllocationListRelationFilter;
     defectiveReturns?: Prisma.VendorDefectiveReturnListRelationFilter;
+    receivableEntries?: Prisma.ReceivableEntryListRelationFilter;
 }, "id">;
 export type VendorOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -216,6 +219,7 @@ export type VendorCreateInput = {
     payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateInput = {
     id?: string;
@@ -233,6 +237,7 @@ export type VendorUncheckedCreateInput = {
     payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -250,6 +255,7 @@ export type VendorUpdateInput = {
     payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -267,6 +273,7 @@ export type VendorUncheckedUpdateInput = {
     payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateManyInput = {
     id?: string;
@@ -419,6 +426,20 @@ export type VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput = {
     connect?: Prisma.VendorWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutDefectiveReturnsInput, Prisma.VendorUpdateWithoutDefectiveReturnsInput>, Prisma.VendorUncheckedUpdateWithoutDefectiveReturnsInput>;
 };
+export type VendorCreateNestedOneWithoutReceivableEntriesInput = {
+    create?: Prisma.XOR<Prisma.VendorCreateWithoutReceivableEntriesInput, Prisma.VendorUncheckedCreateWithoutReceivableEntriesInput>;
+    connectOrCreate?: Prisma.VendorCreateOrConnectWithoutReceivableEntriesInput;
+    connect?: Prisma.VendorWhereUniqueInput;
+};
+export type VendorUpdateOneWithoutReceivableEntriesNestedInput = {
+    create?: Prisma.XOR<Prisma.VendorCreateWithoutReceivableEntriesInput, Prisma.VendorUncheckedCreateWithoutReceivableEntriesInput>;
+    connectOrCreate?: Prisma.VendorCreateOrConnectWithoutReceivableEntriesInput;
+    upsert?: Prisma.VendorUpsertWithoutReceivableEntriesInput;
+    disconnect?: Prisma.VendorWhereInput | boolean;
+    delete?: Prisma.VendorWhereInput | boolean;
+    connect?: Prisma.VendorWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutReceivableEntriesInput, Prisma.VendorUpdateWithoutReceivableEntriesInput>, Prisma.VendorUncheckedUpdateWithoutReceivableEntriesInput>;
+};
 export type VendorCreateWithoutStaffInput = {
     id?: string;
     name: string;
@@ -434,6 +455,7 @@ export type VendorCreateWithoutStaffInput = {
     payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutStaffInput = {
     id?: string;
@@ -450,6 +472,7 @@ export type VendorUncheckedCreateWithoutStaffInput = {
     payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutStaffInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -479,6 +502,7 @@ export type VendorUpdateWithoutStaffInput = {
     payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutStaffInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -495,6 +519,7 @@ export type VendorUncheckedUpdateWithoutStaffInput = {
     payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateWithoutSuppliedBikesInput = {
     id?: string;
@@ -511,6 +536,7 @@ export type VendorCreateWithoutSuppliedBikesInput = {
     payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
     id?: string;
@@ -527,6 +553,7 @@ export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
     payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutSuppliedBikesInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -556,6 +583,7 @@ export type VendorUpdateWithoutSuppliedBikesInput = {
     payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -572,6 +600,7 @@ export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
     payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateWithoutPurchaseOrdersInput = {
     id?: string;
@@ -588,6 +617,7 @@ export type VendorCreateWithoutPurchaseOrdersInput = {
     payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutPurchaseOrdersInput = {
     id?: string;
@@ -604,6 +634,7 @@ export type VendorUncheckedCreateWithoutPurchaseOrdersInput = {
     payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutPurchaseOrdersInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -633,6 +664,7 @@ export type VendorUpdateWithoutPurchaseOrdersInput = {
     payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutPurchaseOrdersInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -649,6 +681,7 @@ export type VendorUncheckedUpdateWithoutPurchaseOrdersInput = {
     payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateWithoutPaymentsInput = {
     id?: string;
@@ -665,6 +698,7 @@ export type VendorCreateWithoutPaymentsInput = {
     purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutPaymentsInput = {
     id?: string;
@@ -681,6 +715,7 @@ export type VendorUncheckedCreateWithoutPaymentsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutPaymentsInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -710,6 +745,7 @@ export type VendorUpdateWithoutPaymentsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutPaymentsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -726,6 +762,7 @@ export type VendorUncheckedUpdateWithoutPaymentsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateWithoutAllocationsInput = {
     id?: string;
@@ -742,6 +779,7 @@ export type VendorCreateWithoutAllocationsInput = {
     purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput;
     payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutAllocationsInput = {
     id?: string;
@@ -758,6 +796,7 @@ export type VendorUncheckedCreateWithoutAllocationsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput;
     payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutAllocationsInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -787,6 +826,7 @@ export type VendorUpdateWithoutAllocationsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput;
     payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutAllocationsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -803,6 +843,7 @@ export type VendorUncheckedUpdateWithoutAllocationsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput;
     payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
     defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCreateWithoutDefectiveReturnsInput = {
     id?: string;
@@ -819,6 +860,7 @@ export type VendorCreateWithoutDefectiveReturnsInput = {
     purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput;
     payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryCreateNestedManyWithoutVendorInput;
 };
 export type VendorUncheckedCreateWithoutDefectiveReturnsInput = {
     id?: string;
@@ -835,6 +877,7 @@ export type VendorUncheckedCreateWithoutDefectiveReturnsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput;
     payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
     allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput;
 };
 export type VendorCreateOrConnectWithoutDefectiveReturnsInput = {
     where: Prisma.VendorWhereUniqueInput;
@@ -864,6 +907,7 @@ export type VendorUpdateWithoutDefectiveReturnsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput;
     payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUpdateManyWithoutVendorNestedInput;
 };
 export type VendorUncheckedUpdateWithoutDefectiveReturnsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -880,6 +924,88 @@ export type VendorUncheckedUpdateWithoutDefectiveReturnsInput = {
     purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput;
     payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
     allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
+    receivableEntries?: Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput;
+};
+export type VendorCreateWithoutReceivableEntriesInput = {
+    id?: string;
+    name: string;
+    contactPerson?: string | null;
+    phoneNumber?: string | null;
+    email?: string | null;
+    address?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
+    staff?: Prisma.UserCreateNestedManyWithoutVendorInput;
+    purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutVendorInput;
+    payments?: Prisma.VendorPaymentCreateNestedManyWithoutVendorInput;
+    allocations?: Prisma.VendorAllocationCreateNestedManyWithoutVendorInput;
+    defectiveReturns?: Prisma.VendorDefectiveReturnCreateNestedManyWithoutVendorInput;
+};
+export type VendorUncheckedCreateWithoutReceivableEntriesInput = {
+    id?: string;
+    name: string;
+    contactPerson?: string | null;
+    phoneNumber?: string | null;
+    email?: string | null;
+    address?: string | null;
+    isActive?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
+    staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput;
+    purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutVendorInput;
+    payments?: Prisma.VendorPaymentUncheckedCreateNestedManyWithoutVendorInput;
+    allocations?: Prisma.VendorAllocationUncheckedCreateNestedManyWithoutVendorInput;
+    defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedCreateNestedManyWithoutVendorInput;
+};
+export type VendorCreateOrConnectWithoutReceivableEntriesInput = {
+    where: Prisma.VendorWhereUniqueInput;
+    create: Prisma.XOR<Prisma.VendorCreateWithoutReceivableEntriesInput, Prisma.VendorUncheckedCreateWithoutReceivableEntriesInput>;
+};
+export type VendorUpsertWithoutReceivableEntriesInput = {
+    update: Prisma.XOR<Prisma.VendorUpdateWithoutReceivableEntriesInput, Prisma.VendorUncheckedUpdateWithoutReceivableEntriesInput>;
+    create: Prisma.XOR<Prisma.VendorCreateWithoutReceivableEntriesInput, Prisma.VendorUncheckedCreateWithoutReceivableEntriesInput>;
+    where?: Prisma.VendorWhereInput;
+};
+export type VendorUpdateToOneWithWhereWithoutReceivableEntriesInput = {
+    where?: Prisma.VendorWhereInput;
+    data: Prisma.XOR<Prisma.VendorUpdateWithoutReceivableEntriesInput, Prisma.VendorUncheckedUpdateWithoutReceivableEntriesInput>;
+};
+export type VendorUpdateWithoutReceivableEntriesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    contactPerson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
+    staff?: Prisma.UserUpdateManyWithoutVendorNestedInput;
+    purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutVendorNestedInput;
+    payments?: Prisma.VendorPaymentUpdateManyWithoutVendorNestedInput;
+    allocations?: Prisma.VendorAllocationUpdateManyWithoutVendorNestedInput;
+    defectiveReturns?: Prisma.VendorDefectiveReturnUpdateManyWithoutVendorNestedInput;
+};
+export type VendorUncheckedUpdateWithoutReceivableEntriesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    contactPerson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
+    staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput;
+    purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutVendorNestedInput;
+    payments?: Prisma.VendorPaymentUncheckedUpdateManyWithoutVendorNestedInput;
+    allocations?: Prisma.VendorAllocationUncheckedUpdateManyWithoutVendorNestedInput;
+    defectiveReturns?: Prisma.VendorDefectiveReturnUncheckedUpdateManyWithoutVendorNestedInput;
 };
 export type VendorCountOutputType = {
     suppliedBikes: number;
@@ -888,6 +1014,7 @@ export type VendorCountOutputType = {
     payments: number;
     allocations: number;
     defectiveReturns: number;
+    receivableEntries: number;
 };
 export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     suppliedBikes?: boolean | VendorCountOutputTypeCountSuppliedBikesArgs;
@@ -896,6 +1023,7 @@ export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
     payments?: boolean | VendorCountOutputTypeCountPaymentsArgs;
     allocations?: boolean | VendorCountOutputTypeCountAllocationsArgs;
     defectiveReturns?: boolean | VendorCountOutputTypeCountDefectiveReturnsArgs;
+    receivableEntries?: boolean | VendorCountOutputTypeCountReceivableEntriesArgs;
 };
 export type VendorCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.VendorCountOutputTypeSelect<ExtArgs> | null;
@@ -918,6 +1046,9 @@ export type VendorCountOutputTypeCountAllocationsArgs<ExtArgs extends runtime.Ty
 export type VendorCountOutputTypeCountDefectiveReturnsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.VendorDefectiveReturnWhereInput;
 };
+export type VendorCountOutputTypeCountReceivableEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ReceivableEntryWhereInput;
+};
 export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     name?: boolean;
@@ -934,6 +1065,7 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     payments?: boolean | Prisma.Vendor$paymentsArgs<ExtArgs>;
     allocations?: boolean | Prisma.Vendor$allocationsArgs<ExtArgs>;
     defectiveReturns?: boolean | Prisma.Vendor$defectiveReturnsArgs<ExtArgs>;
+    receivableEntries?: boolean | Prisma.Vendor$receivableEntriesArgs<ExtArgs>;
     _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendor"]>;
 export type VendorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -977,6 +1109,7 @@ export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     payments?: boolean | Prisma.Vendor$paymentsArgs<ExtArgs>;
     allocations?: boolean | Prisma.Vendor$allocationsArgs<ExtArgs>;
     defectiveReturns?: boolean | Prisma.Vendor$defectiveReturnsArgs<ExtArgs>;
+    receivableEntries?: boolean | Prisma.Vendor$receivableEntriesArgs<ExtArgs>;
     _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
@@ -990,6 +1123,7 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         payments: Prisma.$VendorPaymentPayload<ExtArgs>[];
         allocations: Prisma.$VendorAllocationPayload<ExtArgs>[];
         defectiveReturns: Prisma.$VendorDefectiveReturnPayload<ExtArgs>[];
+        receivableEntries: Prisma.$ReceivableEntryPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -1059,6 +1193,7 @@ export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.T
     payments<T extends Prisma.Vendor$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     allocations<T extends Prisma.Vendor$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     defectiveReturns<T extends Prisma.Vendor$defectiveReturnsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$defectiveReturnsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    receivableEntries<T extends Prisma.Vendor$receivableEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$receivableEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReceivableEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -1237,6 +1372,17 @@ export type Vendor$defectiveReturnsArgs<ExtArgs extends runtime.Types.Extensions
     take?: number;
     skip?: number;
     distinct?: Prisma.VendorDefectiveReturnScalarFieldEnum | Prisma.VendorDefectiveReturnScalarFieldEnum[];
+};
+export type Vendor$receivableEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.ReceivableEntrySelect<ExtArgs> | null;
+    omit?: Prisma.ReceivableEntryOmit<ExtArgs> | null;
+    include?: Prisma.ReceivableEntryInclude<ExtArgs> | null;
+    where?: Prisma.ReceivableEntryWhereInput;
+    orderBy?: Prisma.ReceivableEntryOrderByWithRelationInput | Prisma.ReceivableEntryOrderByWithRelationInput[];
+    cursor?: Prisma.ReceivableEntryWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ReceivableEntryScalarFieldEnum | Prisma.ReceivableEntryScalarFieldEnum[];
 };
 export type VendorDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.VendorSelect<ExtArgs> | null;
