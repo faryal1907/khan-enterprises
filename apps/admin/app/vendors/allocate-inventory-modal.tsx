@@ -8,11 +8,11 @@ import { allocateVendorInventory } from "@/lib/api/vendors";
 import { getBikeModels, getBranches } from "@/lib/api/inventory";
 import { numberToWords } from "@/lib/number-to-words";
 
-type ModelOption = { id: string; brand: string; modelName: string; year: number };
+type ModelOption = { id: string; brand: string; modelName: string; year: number; basePrice: number };
 type BranchOption = { id: string; name: string };
 
 // One row per bike model received
-type BikeLine = { modelId: string; quantity: string; unitCost: string };
+type BikeLine = { modelId: string; quantity: string };
 // One row per part type received (part may not yet exist in catalog — just a name)
 type PartLine = { partName: string; quantity: string; unitCost: string };
 
@@ -23,6 +23,7 @@ type Props = {
   vendorId: string;
   vendorName: string;
   currentBalance: number;
+  vendorCommissionRate: number;
 };
 
 const fmt = (n: number) =>
@@ -41,6 +42,7 @@ export function AllocateInventoryModal({
   vendorId,
   vendorName,
   currentBalance,
+  vendorCommissionRate,
 }: Props) {
   const [models, setModels] = useState<ModelOption[]>([]);
   const [branches, setBranches] = useState<BranchOption[]>([]);
@@ -82,7 +84,7 @@ export function AllocateInventoryModal({
 
   // ── Bike line helpers ─────────────────────────────────────────────────────
   const addBikeLine = () =>
-    setBikeLines((prev) => [...prev, { modelId: "", quantity: "", unitCost: "" }]);
+    setBikeLines((prev) => [...prev, { modelId: "", quantity: "" }]);
 
   const updateBikeLine = (i: number, field: keyof BikeLine, value: string) =>
     setBikeLines((prev) =>
@@ -104,14 +106,23 @@ export function AllocateInventoryModal({
   const removePartLine = (i: number) =>
     setPartLines((prev) => prev.filter((_, idx) => idx !== i));
 
+  // Coerce commissionRate to number (Prisma Decimal can arrive as a string)
+  const commissionRate = Number(vendorCommissionRate) || 0;
+
   // ── Totals ────────────────────────────────────────────────────────────────
   const bikeTotal = useMemo(
     () =>
       bikeLines.reduce(
-        (s, l) => s + (Number(l.quantity) || 0) * (Number(l.unitCost) || 0),
+        (s, l) => {
+          const model = models.find(m => m.id === l.modelId);
+          if (!model) return s;
+          const commissionAmount = Number(model.basePrice) * (commissionRate / 100);
+          const unitCost = Number(model.basePrice) - commissionAmount;
+          return s + (Number(l.quantity) || 0) * unitCost;
+        },
         0,
       ),
-    [bikeLines],
+    [bikeLines, models, commissionRate],
   );
 
   const partTotal = useMemo(
@@ -142,7 +153,6 @@ export function AllocateInventoryModal({
     for (const l of bikeLines) {
       if (!l.modelId) return toast.error("Select a model for each bike line");
       if (!(Number(l.quantity) > 0)) return toast.error("Quantity must be > 0 for all bike lines");
-      if (!(Number(l.unitCost) > 0)) return toast.error("Unit cost must be > 0 for all bike lines");
     }
     for (const l of partLines) {
       if (!l.partName.trim()) return toast.error("Enter a part name for each part line");
@@ -159,7 +169,6 @@ export function AllocateInventoryModal({
         bikes: bikeLines.map((l) => ({
           modelId: l.modelId,
           quantity: Number(l.quantity),
-          unitCost: Number(l.unitCost),
         })),
         parts: partLines.map((l) => ({
           partName: l.partName.trim(),
@@ -310,12 +319,18 @@ export function AllocateInventoryModal({
                   <div className="grid grid-cols-12 gap-3 px-1">
                     <div className="col-span-5 text-xs font-medium uppercase tracking-wide" style={{ color: theme.text.muted }}>Model</div>
                     <div className="col-span-2 text-xs font-medium uppercase tracking-wide" style={{ color: theme.text.muted }}>Qty</div>
-                    <div className="col-span-3 text-xs font-medium uppercase tracking-wide" style={{ color: theme.text.muted }}>Unit Cost (Rs)</div>
+                    <div className="col-span-3 text-xs font-medium uppercase tracking-wide" style={{ color: theme.text.muted }}>Cost Price (Rs)</div>
                     <div className="col-span-1 text-xs font-medium uppercase tracking-wide text-right" style={{ color: theme.text.muted }}>Line Total</div>
                     <div className="col-span-1" />
                   </div>
                   {bikeLines.map((line, i) => {
-                    const lineTotal = (Number(line.quantity) || 0) * (Number(line.unitCost) || 0);
+                    const model = models.find(m => m.id === line.modelId);
+                    let unitCost = 0;
+                    if (model) {
+                      const commissionAmount = Number(model.basePrice) * (commissionRate / 100);
+                      unitCost = Number(model.basePrice) - commissionAmount;
+                    }
+                    const lineTotal = (Number(line.quantity) || 0) * unitCost;
                     return (
                       <div
                         key={i}
@@ -350,13 +365,13 @@ export function AllocateInventoryModal({
                         </div>
                         <div className="col-span-3">
                           <input
-                            type="number"
-                            min="0"
-                            className="w-full border rounded px-2 py-1.5 text-sm outline-none"
-                            style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
-                            placeholder="e.g. 315000"
-                            value={line.unitCost}
-                            onChange={(e) => updateBikeLine(i, "unitCost", e.target.value)}
+                            type="text"
+                            readOnly
+                            className="w-full border rounded px-2 py-1.5 text-sm outline-none bg-gray-50 cursor-not-allowed"
+                            style={{ borderColor: theme.borders.medium, color: theme.text.muted }}
+                            placeholder="Calculated"
+                            value={unitCost > 0 ? fmt(unitCost) : "—"}
+                            title={model ? `Sale Price: ${fmt(Number(model.basePrice))} - ${commissionRate}% commission` : ""}
                           />
                         </div>
                         <div className="col-span-1 text-right text-xs font-semibold" style={{ color: theme.text.primary }}>

@@ -61,6 +61,7 @@ export class VendorController {
       phoneNumber?: string;
       email?: string;
       address?: string;
+      commissionRate?: number;
     },
   ) {
     return this.vendorService.createVendor(data);
@@ -78,6 +79,7 @@ export class VendorController {
       phoneNumber?: string;
       email?: string;
       address?: string;
+      commissionRate?: number;
     },
   ) {
     return this.vendorService.updateVendor(id, data);
@@ -119,7 +121,7 @@ export class VendorController {
       branchId: string;
       date: string;
       notes?: string;
-      bikes: { modelId: string; quantity: number; unitCost: number }[];
+      bikes: { modelId: string; quantity: number; unitCost?: number }[];
       parts: { partName: string; quantity: number; unitCost: number }[];
     },
     @Request() req: any,

@@ -3107,6 +3107,7 @@ export declare const VendorScalarFieldEnum: {
     readonly email: "email";
     readonly address: "address";
     readonly isActive: "isActive";
+    readonly commissionRate: "commissionRate";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -3597,10 +3598,10 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>;
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>;
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>;
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>;
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>;
 export type EnumBikeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BikeStatus'>;
 export type ListEnumBikeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BikeStatus[]'>;
 export type EnumInventoryMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryMovementType'>;

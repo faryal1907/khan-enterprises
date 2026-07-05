@@ -48,7 +48,7 @@ type LedgerEntry =
     };
 
 type Summary = { totalPaid: number; totalAllocated: number; totalDefectiveReturned?: number; prepaidBalance: number };
-type Vendor = { id: string; name: string; contactPerson: string | null; phoneNumber: string | null; email: string | null };
+type Vendor = { id: string; name: string; contactPerson: string | null; phoneNumber: string | null; email: string | null; commissionRate: number };
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }).format(n);
@@ -74,7 +74,7 @@ export default function VendorDetailPage() {
 
   // Edit
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: "", contactPerson: "", phoneNumber: "", email: "", address: "" });
+  const [editForm, setEditForm] = useState({ name: "", contactPerson: "", phoneNumber: "", email: "", address: "", commissionRate: 0 });
   const [editSaving, setEditSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -103,6 +103,7 @@ export default function VendorDetailPage() {
         phoneNumber: editForm.phoneNumber.trim() || undefined,
         email: editForm.email.trim() || undefined,
         address: editForm.address.trim() || undefined,
+        commissionRate: Number(editForm.commissionRate),
       });
       toast.success("Vendor updated");
       setEditing(false);
@@ -150,15 +151,16 @@ export default function VendorDetailPage() {
                   { label: "Phone", key: "phoneNumber" },
                   { label: "Email", key: "email" },
                   { label: "Address", key: "address" },
+                  { label: "Commission Rate (%)", key: "commissionRate" },
                 ].map(({ label, key }) => (
                   <div key={key} className="flex items-center gap-3">
                     <span className="w-28 text-xs font-medium shrink-0" style={{ color: theme.text.muted }}>{label}</span>
                     <input
-                      type="text"
+                      type={key === "commissionRate" ? "number" : "text"}
                       className="flex-1 border rounded px-2 py-1.5 text-sm outline-none"
                       style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
                       value={(editForm as any)[key]}
-                      onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}
+                      onChange={(e) => setEditForm((f) => ({ ...f, [key]: key === "commissionRate" ? Number(e.target.value) : e.target.value }))}
                     />
                   </div>
                 ))}
@@ -196,6 +198,7 @@ export default function VendorDetailPage() {
                   phoneNumber: (vendor as any).phoneNumber ?? "",
                   email: (vendor as any).email ?? "",
                   address: (vendor as any).address ?? "",
+                  commissionRate: vendor.commissionRate ?? 0,
                 });
                 setEditing(true);
               }}
@@ -354,7 +357,7 @@ export default function VendorDetailPage() {
                           <span className="font-medium" style={{ color: theme.text.primary }}>Bikes: </span>
                           {entry.bikes.map((b) => (
                             <span key={b.id} className="mr-2">
-                              {b.model.brand} {b.model.modelName} ({b.chassisNumber}) — {fmt(b.unitCost ?? 0)}
+                              {b.model.brand} {b.model.modelName} ({b.chassisNumber}) — {fmt(b.purchaseCost ?? b.unitCost ?? 0)}
                             </span>
                           ))}
                         </div>
@@ -400,6 +403,7 @@ export default function VendorDetailPage() {
         vendorId={id}
         vendorName={vendor.name}
         currentBalance={summary.prepaidBalance}
+        vendorCommissionRate={vendor.commissionRate ?? 0}
       />
       <ReturnDefectiveInventoryModal
         isOpen={returnOpen}

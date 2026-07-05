@@ -122,6 +122,7 @@ exports.VendorScalarFieldEnum = {
     email: 'email',
     address: 'address',
     isActive: 'isActive',
+    commissionRate: 'commissionRate',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
