@@ -238,9 +238,9 @@ export default function AccountsPage() {
   const [vendorDeleteTarget, setVendorDeleteTarget] = useState<any>(null);
   const [vendorDeleting, setVendorDeleting] = useState(false);
   const [vendorSaving, setVendorSaving] = useState(false);
-  const [vendorForm, setVendorForm] = useState({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' });
+  const [vendorForm, setVendorForm] = useState({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '', commissionRate: 0 });
   const [vendorEditing, setVendorEditing] = useState(false);
-  const [vendorEditForm, setVendorEditForm] = useState({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' });
+  const [vendorEditForm, setVendorEditForm] = useState({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '', commissionRate: 0 });
   const [vendorEditSaving, setVendorEditSaving] = useState(false);
   const [vendorPayOpen, setVendorPayOpen] = useState(false);
   const [vendorAllocOpen, setVendorAllocOpen] = useState(false);
@@ -373,10 +373,11 @@ export default function AccountsPage() {
         phoneNumber: vendorForm.phoneNumber.trim() || undefined,
         email: vendorForm.email.trim() || undefined,
         address: vendorForm.address.trim() || undefined,
+        commissionRate: Number(vendorForm.commissionRate) || 0,
       });
       toast.success('Vendor created');
       setShowCreateVendor(false);
-      setVendorForm({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' });
+      setVendorForm({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '', commissionRate: 0 });
       await fetchVendors();
     } catch (e: any) {
       toast.error(e.response?.data?.message || 'Failed to create vendor');
@@ -410,6 +411,7 @@ export default function AccountsPage() {
         phoneNumber: vendorEditForm.phoneNumber.trim() || undefined,
         email: vendorEditForm.email.trim() || undefined,
         address: vendorEditForm.address.trim() || undefined,
+        commissionRate: Number(vendorEditForm.commissionRate),
       });
       toast.success('Vendor updated');
       setVendorEditing(false);
@@ -1605,13 +1607,14 @@ export default function AccountsPage() {
                                 {[
                                   { label: 'Name', key: 'name' }, { label: 'Contact Person', key: 'contactPerson' },
                                   { label: 'Phone', key: 'phoneNumber' }, { label: 'Email', key: 'email' }, { label: 'Address', key: 'address' },
+                                  { label: 'Commission Rate (%)', key: 'commissionRate' }
                                 ].map(({ label, key }) => (
                                   <div key={key} className="flex items-center gap-3">
                                      <span className="w-20 sm:w-28 text-xs font-medium shrink-0" style={{ color: theme.text.muted }}>{label}</span>
-                                    <input type="text" className="flex-1 border rounded px-2 py-1.5 text-sm outline-none"
+                                    <input type={key === "commissionRate" ? "number" : "text"} className="flex-1 border rounded px-2 py-1.5 text-sm outline-none"
                                       style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
-                                      value={(vendorEditForm as any)[key]}
-                                      onChange={(e) => setVendorEditForm(f => ({ ...f, [key]: e.target.value }))} />
+                                      value={(vendorEditForm as any)[key] ?? ""}
+                                      onChange={(e) => setVendorEditForm(f => ({ ...f, [key]: key === "commissionRate" ? Number(e.target.value) : e.target.value }))} />
                                   </div>
                                 ))}
                                 <div className="flex gap-2 pt-1">
@@ -1636,7 +1639,7 @@ export default function AccountsPage() {
                           </div>
                           {isAdmin && !vendorEditing && (
                             <button onClick={() => {
-                              setVendorEditForm({ name: vendor.name ?? '', contactPerson: vendor.contactPerson ?? '', phoneNumber: vendor.phoneNumber ?? '', email: vendor.email ?? '', address: '' });
+                              setVendorEditForm({ name: vendor.name ?? '', contactPerson: vendor.contactPerson ?? '', phoneNumber: vendor.phoneNumber ?? '', email: vendor.email ?? '', address: vendor.address ?? '', commissionRate: vendor.commissionRate ?? 0 });
                               setVendorEditing(true);
                             }} className="px-3 py-1.5 text-xs font-medium border rounded"
                               style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}>Edit</button>
@@ -1715,7 +1718,7 @@ export default function AccountsPage() {
                                     <>
                                       {entry.bikes?.length > 0 && (
                                         <p><span className="font-medium" style={{ color: theme.text.primary }}>Bikes: </span>
-                                          {entry.bikes.map((b: any) => `${b.model?.brand} ${b.model?.modelName} (${b.chassisNumber}) — ${fmtCurrency(b.unitCost ?? 0)}`).join(', ')}</p>
+                                          {entry.bikes.map((b: any) => `${b.model?.brand} ${b.model?.modelName} (${b.chassisNumber}) — ${fmtCurrency(b.purchaseCost ?? b.unitCost ?? 0)}`).join(', ')}</p>
                                       )}
                                       {entry.partLines?.length > 0 && (
                                         <p><span className="font-medium" style={{ color: theme.text.primary }}>Parts: </span>
@@ -1748,19 +1751,20 @@ export default function AccountsPage() {
                       { label: 'Phone', key: 'phoneNumber', placeholder: '+92300...' },
                       { label: 'Email', key: 'email', placeholder: 'info@vendor.com' },
                       { label: 'Address', key: 'address', placeholder: 'Street, City' },
+                      { label: 'Commission Rate (%)', key: 'commissionRate', placeholder: 'e.g. 5' },
                     ].map(({ label, key, placeholder }) => (
                       <div key={key}>
                         <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>{label}</label>
-                        <input type="text" className="w-full px-3 py-2 rounded-md text-sm border outline-none"
+                        <input type={key === "commissionRate" ? "number" : "text"} className="w-full px-3 py-2 rounded-md text-sm border outline-none"
                           style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
                           placeholder={placeholder}
-                          value={(vendorForm as any)[key]}
-                          onChange={(e) => setVendorForm(f => ({ ...f, [key]: e.target.value }))} />
+                          value={(vendorForm as any)[key] ?? ""}
+                          onChange={(e) => setVendorForm(f => ({ ...f, [key]: key === "commissionRate" ? Number(e.target.value) : e.target.value }))} />
                       </div>
                     ))}
                   </div>
                   <div className="flex justify-end gap-3 mt-6 pt-5 border-t" style={{ borderColor: theme.borders.light }}>
-                    <button onClick={() => { setShowCreateVendor(false); setVendorForm({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '' }); }}
+                    <button onClick={() => { setShowCreateVendor(false); setVendorForm({ name: '', contactPerson: '', phoneNumber: '', email: '', address: '', commissionRate: 0 }); }}
                       className="px-4 py-2 border rounded-md text-sm font-medium"
                       style={{ color: theme.text.primary, borderColor: theme.borders.medium }}>Cancel</button>
                     <AsyncButton loading={vendorSaving} onClick={handleCreateVendor}
@@ -1825,6 +1829,7 @@ export default function AccountsPage() {
             vendorId={selectedVendorId}
             vendorName={vendorDetail.vendor?.name ?? ''}
             currentBalance={vendorDetail.summary?.prepaidBalance ?? 0}
+            vendorCommissionRate={Number(vendorDetail.vendor?.commissionRate ?? 0)}
           />
           <ReturnDefectiveInventoryModal
             isOpen={vendorReturnOpen}

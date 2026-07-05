@@ -309,6 +309,7 @@ model Vendor {
   email         String?
   address       String?
   isActive      Boolean @default(true)
+  commissionRate Decimal @default(0) @db.Decimal(5, 2)
 
   suppliedBikes  BikeUnit[]
   staff          User[]

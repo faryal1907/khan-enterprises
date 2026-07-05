@@ -60,6 +60,7 @@ export class VendorService {
     phoneNumber?: string;
     email?: string;
     address?: string;
+    commissionRate?: number;
   }) {
     return this.prisma.client.vendor.create({ data });
   }
@@ -72,6 +73,7 @@ export class VendorService {
       phoneNumber?: string;
       email?: string;
       address?: string;
+      commissionRate?: number;
     },
   ) {
     const vendor = await this.prisma.client.vendor.findUnique({
@@ -284,6 +286,8 @@ export class VendorService {
         contactPerson: vendor.contactPerson,
         phoneNumber: vendor.phoneNumber,
         email: vendor.email,
+        address: vendor.address,
+        commissionRate: Number(vendor.commissionRate ?? 0),
       },
       summary: {
         totalPaid,
@@ -465,7 +469,7 @@ export class VendorService {
       date: string;
       notes?: string;
       // Bike model rows — system creates BikeUnit records automatically
-      bikes: { modelId: string; quantity: number; unitCost: number }[];
+      bikes: { modelId: string; quantity: number; unitCost?: number }[];
       // Part rows — increases PartInventory quantity
       parts: { partName: string; quantity: number; unitCost: number }[];
     },
@@ -481,10 +485,22 @@ export class VendorService {
     const branch = await this.prisma.client.branch.findUnique({ where: { id: data.branchId } });
     if (!branch) throw new NotFoundException("Branch not found");
 
-    // Validate bike model rows
+    const resolvedBikes: { modelId: string; quantity: number; unitCost: number }[] = [];
+    let bikeTotal = 0;
+    const commissionRate = Number(vendor.commissionRate ?? 0);
+
+    // Validate bike model rows and calculate unit cost automatically
     for (const b of data.bikes) {
       if (b.quantity <= 0) throw new BadRequestException("Bike quantity must be greater than 0");
-      if (b.unitCost <= 0) throw new BadRequestException("Bike unit cost must be greater than 0");
+      const model = await this.prisma.client.bikeModel.findUnique({ where: { id: b.modelId } });
+      if (!model) throw new NotFoundException(`Bike model ${b.modelId} not found`);
+      
+      const salePrice = Number(model.basePrice);
+      const commissionAmount = salePrice * (commissionRate / 100);
+      const unitCost = salePrice - commissionAmount;
+
+      resolvedBikes.push({ modelId: b.modelId, quantity: b.quantity, unitCost });
+      bikeTotal += unitCost * b.quantity;
     }
 
     // Validate part rows
@@ -494,7 +510,6 @@ export class VendorService {
       if (p.unitCost <= 0) throw new BadRequestException("Part unit cost must be greater than 0");
     }
 
-    const bikeTotal = data.bikes.reduce((s, b) => s + b.unitCost * b.quantity, 0);
     const partTotal = data.parts.reduce((s, p) => s + p.unitCost * p.quantity, 0);
     const totalAmount = bikeTotal + partTotal;
 
@@ -508,11 +523,8 @@ export class VendorService {
     }
 
     return this.prisma.client.$transaction(async (tx) => {
-      // Validate all bike models exist
-      for (const b of data.bikes) {
-        const model = await tx.bikeModel.findUnique({ where: { id: b.modelId } });
-        if (!model) throw new NotFoundException(`Bike model ${b.modelId} not found`);
-      }
+      // Models were already validated above, no need to re-validate in transaction
+      // unless concurrency is a major concern, but it's fine for now.
 
       const inventoryAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.INVENTORY } });
       const prepaidAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.VENDOR_PREPAID } });
@@ -608,7 +620,7 @@ export class VendorService {
       // ── Step 4: Create BikeUnit records (PENDING_SETUP, no chassis/engine yet)
       const createdBikeIds: string[] = [];
       let bikeCounter = Date.now();
-      for (const b of data.bikes) {
+      for (const b of resolvedBikes) {
         for (let i = 0; i < b.quantity; i++) {
           const placeholder = `PENDING-${bikeCounter++}-${i}`;
           const bike = await tx.bikeUnit.create({

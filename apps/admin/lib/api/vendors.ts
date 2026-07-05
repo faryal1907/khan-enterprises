@@ -28,6 +28,7 @@ export const createVendor = async (payload: {
   phoneNumber?: string;
   email?: string;
   address?: string;
+  commissionRate?: number;
 }) => {
   const { data } = await api.post("/vendors", payload);
   return data;
@@ -41,6 +42,7 @@ export const updateVendor = async (
     phoneNumber?: string;
     email?: string;
     address?: string;
+    commissionRate?: number;
   },
 ) => {
   const { data } = await api.patch(`/vendors/${id}`, payload);
@@ -73,7 +75,7 @@ export const allocateVendorInventory = async (
     branchId: string;
     date: string;
     notes?: string;
-    bikes: { modelId: string; quantity: number; unitCost: number }[];
+    bikes: { modelId: string; quantity: number; unitCost?: number }[];
     parts: { partName: string; quantity: number; unitCost: number }[];
   },
 ) => {

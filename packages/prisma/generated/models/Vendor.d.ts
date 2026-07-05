@@ -3,8 +3,16 @@ import type * as Prisma from "../internal/prismaNamespace.ts";
 export type VendorModel = runtime.Types.Result.DefaultSelection<Prisma.$VendorPayload>;
 export type AggregateVendor = {
     _count: VendorCountAggregateOutputType | null;
+    _avg: VendorAvgAggregateOutputType | null;
+    _sum: VendorSumAggregateOutputType | null;
     _min: VendorMinAggregateOutputType | null;
     _max: VendorMaxAggregateOutputType | null;
+};
+export type VendorAvgAggregateOutputType = {
+    commissionRate: runtime.Decimal | null;
+};
+export type VendorSumAggregateOutputType = {
+    commissionRate: runtime.Decimal | null;
 };
 export type VendorMinAggregateOutputType = {
     id: string | null;
@@ -14,6 +22,7 @@ export type VendorMinAggregateOutputType = {
     email: string | null;
     address: string | null;
     isActive: boolean | null;
+    commissionRate: runtime.Decimal | null;
     createdAt: Date | null;
     updatedAt: Date | null;
 };
@@ -25,6 +34,7 @@ export type VendorMaxAggregateOutputType = {
     email: string | null;
     address: string | null;
     isActive: boolean | null;
+    commissionRate: runtime.Decimal | null;
     createdAt: Date | null;
     updatedAt: Date | null;
 };
@@ -36,9 +46,16 @@ export type VendorCountAggregateOutputType = {
     email: number;
     address: number;
     isActive: number;
+    commissionRate: number;
     createdAt: number;
     updatedAt: number;
     _all: number;
+};
+export type VendorAvgAggregateInputType = {
+    commissionRate?: true;
+};
+export type VendorSumAggregateInputType = {
+    commissionRate?: true;
 };
 export type VendorMinAggregateInputType = {
     id?: true;
@@ -48,6 +65,7 @@ export type VendorMinAggregateInputType = {
     email?: true;
     address?: true;
     isActive?: true;
+    commissionRate?: true;
     createdAt?: true;
     updatedAt?: true;
 };
@@ -59,6 +77,7 @@ export type VendorMaxAggregateInputType = {
     email?: true;
     address?: true;
     isActive?: true;
+    commissionRate?: true;
     createdAt?: true;
     updatedAt?: true;
 };
@@ -70,6 +89,7 @@ export type VendorCountAggregateInputType = {
     email?: true;
     address?: true;
     isActive?: true;
+    commissionRate?: true;
     createdAt?: true;
     updatedAt?: true;
     _all?: true;
@@ -81,6 +101,8 @@ export type VendorAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
     take?: number;
     skip?: number;
     _count?: true | VendorCountAggregateInputType;
+    _avg?: VendorAvgAggregateInputType;
+    _sum?: VendorSumAggregateInputType;
     _min?: VendorMinAggregateInputType;
     _max?: VendorMaxAggregateInputType;
 };
@@ -95,6 +117,8 @@ export type VendorGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
     take?: number;
     skip?: number;
     _count?: VendorCountAggregateInputType | true;
+    _avg?: VendorAvgAggregateInputType;
+    _sum?: VendorSumAggregateInputType;
     _min?: VendorMinAggregateInputType;
     _max?: VendorMaxAggregateInputType;
 };
@@ -106,9 +130,12 @@ export type VendorGroupByOutputType = {
     email: string | null;
     address: string | null;
     isActive: boolean;
+    commissionRate: runtime.Decimal;
     createdAt: Date;
     updatedAt: Date;
     _count: VendorCountAggregateOutputType | null;
+    _avg: VendorAvgAggregateOutputType | null;
+    _sum: VendorSumAggregateOutputType | null;
     _min: VendorMinAggregateOutputType | null;
     _max: VendorMaxAggregateOutputType | null;
 };
@@ -126,6 +153,7 @@ export type VendorWhereInput = {
     email?: Prisma.StringNullableFilter<"Vendor"> | string | null;
     address?: Prisma.StringNullableFilter<"Vendor"> | string | null;
     isActive?: Prisma.BoolFilter<"Vendor"> | boolean;
+    commissionRate?: Prisma.DecimalFilter<"Vendor"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     suppliedBikes?: Prisma.BikeUnitListRelationFilter;
@@ -144,6 +172,7 @@ export type VendorOrderByWithRelationInput = {
     email?: Prisma.SortOrderInput | Prisma.SortOrder;
     address?: Prisma.SortOrderInput | Prisma.SortOrder;
     isActive?: Prisma.SortOrder;
+    commissionRate?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     suppliedBikes?: Prisma.BikeUnitOrderByRelationAggregateInput;
@@ -165,6 +194,7 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
     email?: Prisma.StringNullableFilter<"Vendor"> | string | null;
     address?: Prisma.StringNullableFilter<"Vendor"> | string | null;
     isActive?: Prisma.BoolFilter<"Vendor"> | boolean;
+    commissionRate?: Prisma.DecimalFilter<"Vendor"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Vendor"> | Date | string;
     suppliedBikes?: Prisma.BikeUnitListRelationFilter;
@@ -183,11 +213,14 @@ export type VendorOrderByWithAggregationInput = {
     email?: Prisma.SortOrderInput | Prisma.SortOrder;
     address?: Prisma.SortOrderInput | Prisma.SortOrder;
     isActive?: Prisma.SortOrder;
+    commissionRate?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     _count?: Prisma.VendorCountOrderByAggregateInput;
+    _avg?: Prisma.VendorAvgOrderByAggregateInput;
     _max?: Prisma.VendorMaxOrderByAggregateInput;
     _min?: Prisma.VendorMinOrderByAggregateInput;
+    _sum?: Prisma.VendorSumOrderByAggregateInput;
 };
 export type VendorScalarWhereWithAggregatesInput = {
     AND?: Prisma.VendorScalarWhereWithAggregatesInput | Prisma.VendorScalarWhereWithAggregatesInput[];
@@ -200,6 +233,7 @@ export type VendorScalarWhereWithAggregatesInput = {
     email?: Prisma.StringNullableWithAggregatesFilter<"Vendor"> | string | null;
     address?: Prisma.StringNullableWithAggregatesFilter<"Vendor"> | string | null;
     isActive?: Prisma.BoolWithAggregatesFilter<"Vendor"> | boolean;
+    commissionRate?: Prisma.DecimalWithAggregatesFilter<"Vendor"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"Vendor"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Vendor"> | Date | string;
 };
@@ -211,6 +245,7 @@ export type VendorCreateInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -229,6 +264,7 @@ export type VendorUncheckedCreateInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -247,6 +283,7 @@ export type VendorUpdateInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -265,6 +302,7 @@ export type VendorUncheckedUpdateInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -283,6 +321,7 @@ export type VendorCreateManyInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -294,6 +333,7 @@ export type VendorUpdateManyMutationInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -305,6 +345,7 @@ export type VendorUncheckedUpdateManyInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -320,8 +361,12 @@ export type VendorCountOrderByAggregateInput = {
     email?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     isActive?: Prisma.SortOrder;
+    commissionRate?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type VendorAvgOrderByAggregateInput = {
+    commissionRate?: Prisma.SortOrder;
 };
 export type VendorMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -331,6 +376,7 @@ export type VendorMaxOrderByAggregateInput = {
     email?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     isActive?: Prisma.SortOrder;
+    commissionRate?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
@@ -342,8 +388,12 @@ export type VendorMinOrderByAggregateInput = {
     email?: Prisma.SortOrder;
     address?: Prisma.SortOrder;
     isActive?: Prisma.SortOrder;
+    commissionRate?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type VendorSumOrderByAggregateInput = {
+    commissionRate?: Prisma.SortOrder;
 };
 export type VendorScalarRelationFilter = {
     is?: Prisma.VendorWhereInput;
@@ -365,6 +415,13 @@ export type VendorUpdateOneWithoutStaffNestedInput = {
 };
 export type BoolFieldUpdateOperationsInput = {
     set?: boolean;
+};
+export type DecimalFieldUpdateOperationsInput = {
+    set?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    increment?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    divide?: runtime.Decimal | runtime.DecimalJsLike | number | string;
 };
 export type VendorCreateNestedOneWithoutSuppliedBikesInput = {
     create?: Prisma.XOR<Prisma.VendorCreateWithoutSuppliedBikesInput, Prisma.VendorUncheckedCreateWithoutSuppliedBikesInput>;
@@ -448,6 +505,7 @@ export type VendorCreateWithoutStaffInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -465,6 +523,7 @@ export type VendorUncheckedCreateWithoutStaffInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -495,6 +554,7 @@ export type VendorUpdateWithoutStaffInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -512,6 +572,7 @@ export type VendorUncheckedUpdateWithoutStaffInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -529,6 +590,7 @@ export type VendorCreateWithoutSuppliedBikesInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     staff?: Prisma.UserCreateNestedManyWithoutVendorInput;
@@ -546,6 +608,7 @@ export type VendorUncheckedCreateWithoutSuppliedBikesInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     staff?: Prisma.UserUncheckedCreateNestedManyWithoutVendorInput;
@@ -576,6 +639,7 @@ export type VendorUpdateWithoutSuppliedBikesInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     staff?: Prisma.UserUpdateManyWithoutVendorNestedInput;
@@ -593,6 +657,7 @@ export type VendorUncheckedUpdateWithoutSuppliedBikesInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     staff?: Prisma.UserUncheckedUpdateManyWithoutVendorNestedInput;
@@ -610,6 +675,7 @@ export type VendorCreateWithoutPurchaseOrdersInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -627,6 +693,7 @@ export type VendorUncheckedCreateWithoutPurchaseOrdersInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -657,6 +724,7 @@ export type VendorUpdateWithoutPurchaseOrdersInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -674,6 +742,7 @@ export type VendorUncheckedUpdateWithoutPurchaseOrdersInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -691,6 +760,7 @@ export type VendorCreateWithoutPaymentsInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -708,6 +778,7 @@ export type VendorUncheckedCreateWithoutPaymentsInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -738,6 +809,7 @@ export type VendorUpdateWithoutPaymentsInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -755,6 +827,7 @@ export type VendorUncheckedUpdateWithoutPaymentsInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -772,6 +845,7 @@ export type VendorCreateWithoutAllocationsInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -789,6 +863,7 @@ export type VendorUncheckedCreateWithoutAllocationsInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -819,6 +894,7 @@ export type VendorUpdateWithoutAllocationsInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -836,6 +912,7 @@ export type VendorUncheckedUpdateWithoutAllocationsInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -853,6 +930,7 @@ export type VendorCreateWithoutDefectiveReturnsInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -870,6 +948,7 @@ export type VendorUncheckedCreateWithoutDefectiveReturnsInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -900,6 +979,7 @@ export type VendorUpdateWithoutDefectiveReturnsInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -917,6 +997,7 @@ export type VendorUncheckedUpdateWithoutDefectiveReturnsInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -934,6 +1015,7 @@ export type VendorCreateWithoutReceivableEntriesInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorInput;
@@ -951,6 +1033,7 @@ export type VendorUncheckedCreateWithoutReceivableEntriesInput = {
     email?: string | null;
     address?: string | null;
     isActive?: boolean;
+    commissionRate?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedCreateNestedManyWithoutVendorInput;
@@ -981,6 +1064,7 @@ export type VendorUpdateWithoutReceivableEntriesInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUpdateManyWithoutVendorNestedInput;
@@ -998,6 +1082,7 @@ export type VendorUncheckedUpdateWithoutReceivableEntriesInput = {
     email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    commissionRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     suppliedBikes?: Prisma.BikeUnitUncheckedUpdateManyWithoutVendorNestedInput;
@@ -1057,6 +1142,7 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email?: boolean;
     address?: boolean;
     isActive?: boolean;
+    commissionRate?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
     suppliedBikes?: boolean | Prisma.Vendor$suppliedBikesArgs<ExtArgs>;
@@ -1076,6 +1162,7 @@ export type VendorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
     email?: boolean;
     address?: boolean;
     isActive?: boolean;
+    commissionRate?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 }, ExtArgs["result"]["vendor"]>;
@@ -1087,6 +1174,7 @@ export type VendorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
     email?: boolean;
     address?: boolean;
     isActive?: boolean;
+    commissionRate?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 }, ExtArgs["result"]["vendor"]>;
@@ -1098,10 +1186,11 @@ export type VendorSelectScalar = {
     email?: boolean;
     address?: boolean;
     isActive?: boolean;
+    commissionRate?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "contactPerson" | "phoneNumber" | "email" | "address" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["vendor"]>;
+export type VendorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "contactPerson" | "phoneNumber" | "email" | "address" | "isActive" | "commissionRate" | "createdAt" | "updatedAt", ExtArgs["result"]["vendor"]>;
 export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     suppliedBikes?: boolean | Prisma.Vendor$suppliedBikesArgs<ExtArgs>;
     staff?: boolean | Prisma.Vendor$staffArgs<ExtArgs>;
@@ -1133,6 +1222,7 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         email: string | null;
         address: string | null;
         isActive: boolean;
+        commissionRate: runtime.Decimal;
         createdAt: Date;
         updatedAt: Date;
     }, ExtArgs["result"]["vendor"]>;
@@ -1206,6 +1296,7 @@ export interface VendorFieldRefs {
     readonly email: Prisma.FieldRef<"Vendor", 'String'>;
     readonly address: Prisma.FieldRef<"Vendor", 'String'>;
     readonly isActive: Prisma.FieldRef<"Vendor", 'Boolean'>;
+    readonly commissionRate: Prisma.FieldRef<"Vendor", 'Decimal'>;
     readonly createdAt: Prisma.FieldRef<"Vendor", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"Vendor", 'DateTime'>;
 }
