@@ -321,6 +321,8 @@ if (loading) {
     );
   }
 
+  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded && !!selectedAccountId);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
@@ -345,54 +347,6 @@ if (loading) {
                   Online Price: PKR {onlinePrice.toLocaleString()}
                 </p>
                 <p className="text-[10px] sm:text-xs" style={{ color: theme.text.muted }}>
-                  You save PKR {discountAmount.toLocaleString()} ({discountPercent}% discount)
-                </p>
-              </div>
-            </div>
-          )}
-
-                <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.primary }}>
-                  <p className="text-sm font-medium mb-3" style={{ color: theme.text.primary }}>Once verified, you may choose between delivery and onsite-pickup!</p>
-                  
-                </div>
-              </div>
-            )}
-
-            <button onClick={handleProceed} className="mt-6 w-full px-6 py-3 text-base font-semibold rounded-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}>
-              View Order Details
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const canPlaceOrder = paymentMethod === "CASH" || (paymentMethod === "ONLINE_TRANSFER" && proofUploaded && !!selectedAccountId);
-
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: theme.backgrounds.primary }}>
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <Link href="/bikes" className="text-sm hover:opacity-70" style={{ color: theme.text.secondary }}>← Back to Inventory</Link>
-        </div>
-
-        <div className="rounded-xl p-8" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: theme.text.primary }}>Complete Your Order</h1>
-
-          {bike && (
-            <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: theme.backgrounds.tertiary }}>
-              <p className="font-semibold" style={{ color: theme.text.primary }}>
-                {bike.model?.brand} {bike.model?.modelName} ({bike.model?.year})
-              </p>
-              <p className="text-sm mt-1" style={{ color: theme.text.muted }}>{bike.branch?.name}</p>
-              <div className="mt-2 pt-2 border-t" style={{ borderColor: theme.borders.light }}>
-                <p className="text-sm" style={{ color: theme.text.secondary }}>
-                  Store Price: <span className="line-through">PKR {basePrice.toLocaleString()}</span>
-                </p>
-                <p className="text-lg font-bold" style={{ color: theme.accents.primary }}>
-                  Online Price: PKR {onlinePrice.toLocaleString()}
-                </p>
-                <p className="text-xs" style={{ color: theme.text.muted }}>
                   You save PKR {discountAmount.toLocaleString()} ({discountPercent}% discount)
                 </p>
               </div>

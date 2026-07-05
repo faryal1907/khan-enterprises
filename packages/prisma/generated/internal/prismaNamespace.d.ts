@@ -3523,6 +3523,7 @@ export type ReceivablePartyScalarFieldEnum = (typeof ReceivablePartyScalarFieldE
 export declare const ReceivableEntryScalarFieldEnum: {
     readonly id: "id";
     readonly partyId: "partyId";
+    readonly vendorId: "vendorId";
     readonly amount: "amount";
     readonly description: "description";
     readonly date: "date";

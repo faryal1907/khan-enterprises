@@ -22,6 +22,7 @@ export type ReceivableEntrySumAggregateOutputType = {
 export type ReceivableEntryMinAggregateOutputType = {
     id: string | null;
     partyId: string | null;
+    vendorId: string | null;
     amount: runtime.Decimal | null;
     description: string | null;
     date: Date | null;
@@ -35,6 +36,7 @@ export type ReceivableEntryMinAggregateOutputType = {
 export type ReceivableEntryMaxAggregateOutputType = {
     id: string | null;
     partyId: string | null;
+    vendorId: string | null;
     amount: runtime.Decimal | null;
     description: string | null;
     date: Date | null;
@@ -48,6 +50,7 @@ export type ReceivableEntryMaxAggregateOutputType = {
 export type ReceivableEntryCountAggregateOutputType = {
     id: number;
     partyId: number;
+    vendorId: number;
     amount: number;
     description: number;
     date: number;
@@ -72,6 +75,7 @@ export type ReceivableEntrySumAggregateInputType = {
 export type ReceivableEntryMinAggregateInputType = {
     id?: true;
     partyId?: true;
+    vendorId?: true;
     amount?: true;
     description?: true;
     date?: true;
@@ -85,6 +89,7 @@ export type ReceivableEntryMinAggregateInputType = {
 export type ReceivableEntryMaxAggregateInputType = {
     id?: true;
     partyId?: true;
+    vendorId?: true;
     amount?: true;
     description?: true;
     date?: true;
@@ -98,6 +103,7 @@ export type ReceivableEntryMaxAggregateInputType = {
 export type ReceivableEntryCountAggregateInputType = {
     id?: true;
     partyId?: true;
+    vendorId?: true;
     amount?: true;
     description?: true;
     date?: true;
@@ -140,6 +146,7 @@ export type ReceivableEntryGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type ReceivableEntryGroupByOutputType = {
     id: string;
     partyId: string;
+    vendorId: string | null;
     amount: runtime.Decimal;
     description: string;
     date: Date;
@@ -164,6 +171,7 @@ export type ReceivableEntryWhereInput = {
     NOT?: Prisma.ReceivableEntryWhereInput | Prisma.ReceivableEntryWhereInput[];
     id?: Prisma.StringFilter<"ReceivableEntry"> | string;
     partyId?: Prisma.StringFilter<"ReceivableEntry"> | string;
+    vendorId?: Prisma.StringNullableFilter<"ReceivableEntry"> | string | null;
     amount?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringFilter<"ReceivableEntry"> | string;
     date?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
@@ -174,11 +182,13 @@ export type ReceivableEntryWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
     party?: Prisma.XOR<Prisma.ReceivablePartyScalarRelationFilter, Prisma.ReceivablePartyWhereInput>;
+    vendor?: Prisma.XOR<Prisma.VendorNullableScalarRelationFilter, Prisma.VendorWhereInput> | null;
     payments?: Prisma.ReceivablePaymentListRelationFilter;
 };
 export type ReceivableEntryOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
     partyId?: Prisma.SortOrder;
+    vendorId?: Prisma.SortOrderInput | Prisma.SortOrder;
     amount?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     date?: Prisma.SortOrder;
@@ -189,6 +199,7 @@ export type ReceivableEntryOrderByWithRelationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     party?: Prisma.ReceivablePartyOrderByWithRelationInput;
+    vendor?: Prisma.VendorOrderByWithRelationInput;
     payments?: Prisma.ReceivablePaymentOrderByRelationAggregateInput;
 };
 export type ReceivableEntryWhereUniqueInput = Prisma.AtLeast<{
@@ -197,6 +208,7 @@ export type ReceivableEntryWhereUniqueInput = Prisma.AtLeast<{
     OR?: Prisma.ReceivableEntryWhereInput[];
     NOT?: Prisma.ReceivableEntryWhereInput | Prisma.ReceivableEntryWhereInput[];
     partyId?: Prisma.StringFilter<"ReceivableEntry"> | string;
+    vendorId?: Prisma.StringNullableFilter<"ReceivableEntry"> | string | null;
     amount?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringFilter<"ReceivableEntry"> | string;
     date?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
@@ -207,11 +219,13 @@ export type ReceivableEntryWhereUniqueInput = Prisma.AtLeast<{
     createdAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
     party?: Prisma.XOR<Prisma.ReceivablePartyScalarRelationFilter, Prisma.ReceivablePartyWhereInput>;
+    vendor?: Prisma.XOR<Prisma.VendorNullableScalarRelationFilter, Prisma.VendorWhereInput> | null;
     payments?: Prisma.ReceivablePaymentListRelationFilter;
 }, "id">;
 export type ReceivableEntryOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
     partyId?: Prisma.SortOrder;
+    vendorId?: Prisma.SortOrderInput | Prisma.SortOrder;
     amount?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     date?: Prisma.SortOrder;
@@ -233,6 +247,7 @@ export type ReceivableEntryScalarWhereWithAggregatesInput = {
     NOT?: Prisma.ReceivableEntryScalarWhereWithAggregatesInput | Prisma.ReceivableEntryScalarWhereWithAggregatesInput[];
     id?: Prisma.StringWithAggregatesFilter<"ReceivableEntry"> | string;
     partyId?: Prisma.StringWithAggregatesFilter<"ReceivableEntry"> | string;
+    vendorId?: Prisma.StringNullableWithAggregatesFilter<"ReceivableEntry"> | string | null;
     amount?: Prisma.DecimalWithAggregatesFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringWithAggregatesFilter<"ReceivableEntry"> | string;
     date?: Prisma.DateTimeWithAggregatesFilter<"ReceivableEntry"> | Date | string;
@@ -255,11 +270,13 @@ export type ReceivableEntryCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     party: Prisma.ReceivablePartyCreateNestedOneWithoutEntriesInput;
+    vendor?: Prisma.VendorCreateNestedOneWithoutReceivableEntriesInput;
     payments?: Prisma.ReceivablePaymentCreateNestedManyWithoutEntryInput;
 };
 export type ReceivableEntryUncheckedCreateInput = {
     id?: string;
     partyId: string;
+    vendorId?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     description: string;
     date?: Date | string;
@@ -283,11 +300,13 @@ export type ReceivableEntryUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     party?: Prisma.ReceivablePartyUpdateOneRequiredWithoutEntriesNestedInput;
+    vendor?: Prisma.VendorUpdateOneWithoutReceivableEntriesNestedInput;
     payments?: Prisma.ReceivablePaymentUpdateManyWithoutEntryNestedInput;
 };
 export type ReceivableEntryUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     partyId?: Prisma.StringFieldUpdateOperationsInput | string;
+    vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -302,6 +321,7 @@ export type ReceivableEntryUncheckedUpdateInput = {
 export type ReceivableEntryCreateManyInput = {
     id?: string;
     partyId: string;
+    vendorId?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     description: string;
     date?: Date | string;
@@ -327,6 +347,7 @@ export type ReceivableEntryUpdateManyMutationInput = {
 export type ReceivableEntryUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     partyId?: Prisma.StringFieldUpdateOperationsInput | string;
+    vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -348,6 +369,7 @@ export type ReceivableEntryOrderByRelationAggregateInput = {
 export type ReceivableEntryCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     partyId?: Prisma.SortOrder;
+    vendorId?: Prisma.SortOrder;
     amount?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     date?: Prisma.SortOrder;
@@ -366,6 +388,7 @@ export type ReceivableEntryAvgOrderByAggregateInput = {
 export type ReceivableEntryMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     partyId?: Prisma.SortOrder;
+    vendorId?: Prisma.SortOrder;
     amount?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     date?: Prisma.SortOrder;
@@ -379,6 +402,7 @@ export type ReceivableEntryMaxOrderByAggregateInput = {
 export type ReceivableEntryMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     partyId?: Prisma.SortOrder;
+    vendorId?: Prisma.SortOrder;
     amount?: Prisma.SortOrder;
     description?: Prisma.SortOrder;
     date?: Prisma.SortOrder;
@@ -397,6 +421,44 @@ export type ReceivableEntrySumOrderByAggregateInput = {
 export type ReceivableEntryScalarRelationFilter = {
     is?: Prisma.ReceivableEntryWhereInput;
     isNot?: Prisma.ReceivableEntryWhereInput;
+};
+export type ReceivableEntryCreateNestedManyWithoutVendorInput = {
+    create?: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutVendorInput, Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput> | Prisma.ReceivableEntryCreateWithoutVendorInput[] | Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput[];
+    connectOrCreate?: Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput | Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput[];
+    createMany?: Prisma.ReceivableEntryCreateManyVendorInputEnvelope;
+    connect?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+};
+export type ReceivableEntryUncheckedCreateNestedManyWithoutVendorInput = {
+    create?: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutVendorInput, Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput> | Prisma.ReceivableEntryCreateWithoutVendorInput[] | Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput[];
+    connectOrCreate?: Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput | Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput[];
+    createMany?: Prisma.ReceivableEntryCreateManyVendorInputEnvelope;
+    connect?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+};
+export type ReceivableEntryUpdateManyWithoutVendorNestedInput = {
+    create?: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutVendorInput, Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput> | Prisma.ReceivableEntryCreateWithoutVendorInput[] | Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput[];
+    connectOrCreate?: Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput | Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput[];
+    upsert?: Prisma.ReceivableEntryUpsertWithWhereUniqueWithoutVendorInput | Prisma.ReceivableEntryUpsertWithWhereUniqueWithoutVendorInput[];
+    createMany?: Prisma.ReceivableEntryCreateManyVendorInputEnvelope;
+    set?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    disconnect?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    delete?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    connect?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    update?: Prisma.ReceivableEntryUpdateWithWhereUniqueWithoutVendorInput | Prisma.ReceivableEntryUpdateWithWhereUniqueWithoutVendorInput[];
+    updateMany?: Prisma.ReceivableEntryUpdateManyWithWhereWithoutVendorInput | Prisma.ReceivableEntryUpdateManyWithWhereWithoutVendorInput[];
+    deleteMany?: Prisma.ReceivableEntryScalarWhereInput | Prisma.ReceivableEntryScalarWhereInput[];
+};
+export type ReceivableEntryUncheckedUpdateManyWithoutVendorNestedInput = {
+    create?: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutVendorInput, Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput> | Prisma.ReceivableEntryCreateWithoutVendorInput[] | Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput[];
+    connectOrCreate?: Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput | Prisma.ReceivableEntryCreateOrConnectWithoutVendorInput[];
+    upsert?: Prisma.ReceivableEntryUpsertWithWhereUniqueWithoutVendorInput | Prisma.ReceivableEntryUpsertWithWhereUniqueWithoutVendorInput[];
+    createMany?: Prisma.ReceivableEntryCreateManyVendorInputEnvelope;
+    set?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    disconnect?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    delete?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    connect?: Prisma.ReceivableEntryWhereUniqueInput | Prisma.ReceivableEntryWhereUniqueInput[];
+    update?: Prisma.ReceivableEntryUpdateWithWhereUniqueWithoutVendorInput | Prisma.ReceivableEntryUpdateWithWhereUniqueWithoutVendorInput[];
+    updateMany?: Prisma.ReceivableEntryUpdateManyWithWhereWithoutVendorInput | Prisma.ReceivableEntryUpdateManyWithWhereWithoutVendorInput[];
+    deleteMany?: Prisma.ReceivableEntryScalarWhereInput | Prisma.ReceivableEntryScalarWhereInput[];
 };
 export type ReceivableEntryCreateNestedManyWithoutPartyInput = {
     create?: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutPartyInput, Prisma.ReceivableEntryUncheckedCreateWithoutPartyInput> | Prisma.ReceivableEntryCreateWithoutPartyInput[] | Prisma.ReceivableEntryUncheckedCreateWithoutPartyInput[];
@@ -448,6 +510,72 @@ export type ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput = {
     connect?: Prisma.ReceivableEntryWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.ReceivableEntryUpdateToOneWithWhereWithoutPaymentsInput, Prisma.ReceivableEntryUpdateWithoutPaymentsInput>, Prisma.ReceivableEntryUncheckedUpdateWithoutPaymentsInput>;
 };
+export type ReceivableEntryCreateWithoutVendorInput = {
+    id?: string;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description: string;
+    date?: Date | string;
+    dueDate?: Date | string | null;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    party: Prisma.ReceivablePartyCreateNestedOneWithoutEntriesInput;
+    payments?: Prisma.ReceivablePaymentCreateNestedManyWithoutEntryInput;
+};
+export type ReceivableEntryUncheckedCreateWithoutVendorInput = {
+    id?: string;
+    partyId: string;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description: string;
+    date?: Date | string;
+    dueDate?: Date | string | null;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    payments?: Prisma.ReceivablePaymentUncheckedCreateNestedManyWithoutEntryInput;
+};
+export type ReceivableEntryCreateOrConnectWithoutVendorInput = {
+    where: Prisma.ReceivableEntryWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutVendorInput, Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput>;
+};
+export type ReceivableEntryCreateManyVendorInputEnvelope = {
+    data: Prisma.ReceivableEntryCreateManyVendorInput | Prisma.ReceivableEntryCreateManyVendorInput[];
+    skipDuplicates?: boolean;
+};
+export type ReceivableEntryUpsertWithWhereUniqueWithoutVendorInput = {
+    where: Prisma.ReceivableEntryWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ReceivableEntryUpdateWithoutVendorInput, Prisma.ReceivableEntryUncheckedUpdateWithoutVendorInput>;
+    create: Prisma.XOR<Prisma.ReceivableEntryCreateWithoutVendorInput, Prisma.ReceivableEntryUncheckedCreateWithoutVendorInput>;
+};
+export type ReceivableEntryUpdateWithWhereUniqueWithoutVendorInput = {
+    where: Prisma.ReceivableEntryWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ReceivableEntryUpdateWithoutVendorInput, Prisma.ReceivableEntryUncheckedUpdateWithoutVendorInput>;
+};
+export type ReceivableEntryUpdateManyWithWhereWithoutVendorInput = {
+    where: Prisma.ReceivableEntryScalarWhereInput;
+    data: Prisma.XOR<Prisma.ReceivableEntryUpdateManyMutationInput, Prisma.ReceivableEntryUncheckedUpdateManyWithoutVendorInput>;
+};
+export type ReceivableEntryScalarWhereInput = {
+    AND?: Prisma.ReceivableEntryScalarWhereInput | Prisma.ReceivableEntryScalarWhereInput[];
+    OR?: Prisma.ReceivableEntryScalarWhereInput[];
+    NOT?: Prisma.ReceivableEntryScalarWhereInput | Prisma.ReceivableEntryScalarWhereInput[];
+    id?: Prisma.StringFilter<"ReceivableEntry"> | string;
+    partyId?: Prisma.StringFilter<"ReceivableEntry"> | string;
+    vendorId?: Prisma.StringNullableFilter<"ReceivableEntry"> | string | null;
+    amount?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description?: Prisma.StringFilter<"ReceivableEntry"> | string;
+    date?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
+    dueDate?: Prisma.DateTimeNullableFilter<"ReceivableEntry"> | Date | string | null;
+    paidAmount?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: Prisma.EnumPaymentStateFilter<"ReceivableEntry"> | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
+};
 export type ReceivableEntryCreateWithoutPartyInput = {
     id?: string;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -459,10 +587,12 @@ export type ReceivableEntryCreateWithoutPartyInput = {
     status?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    vendor?: Prisma.VendorCreateNestedOneWithoutReceivableEntriesInput;
     payments?: Prisma.ReceivablePaymentCreateNestedManyWithoutEntryInput;
 };
 export type ReceivableEntryUncheckedCreateWithoutPartyInput = {
     id?: string;
+    vendorId?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     description: string;
     date?: Date | string;
@@ -495,22 +625,6 @@ export type ReceivableEntryUpdateManyWithWhereWithoutPartyInput = {
     where: Prisma.ReceivableEntryScalarWhereInput;
     data: Prisma.XOR<Prisma.ReceivableEntryUpdateManyMutationInput, Prisma.ReceivableEntryUncheckedUpdateManyWithoutPartyInput>;
 };
-export type ReceivableEntryScalarWhereInput = {
-    AND?: Prisma.ReceivableEntryScalarWhereInput | Prisma.ReceivableEntryScalarWhereInput[];
-    OR?: Prisma.ReceivableEntryScalarWhereInput[];
-    NOT?: Prisma.ReceivableEntryScalarWhereInput | Prisma.ReceivableEntryScalarWhereInput[];
-    id?: Prisma.StringFilter<"ReceivableEntry"> | string;
-    partyId?: Prisma.StringFilter<"ReceivableEntry"> | string;
-    amount?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    description?: Prisma.StringFilter<"ReceivableEntry"> | string;
-    date?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
-    dueDate?: Prisma.DateTimeNullableFilter<"ReceivableEntry"> | Date | string | null;
-    paidAmount?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFilter<"ReceivableEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    status?: Prisma.EnumPaymentStateFilter<"ReceivableEntry"> | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
-    updatedAt?: Prisma.DateTimeFilter<"ReceivableEntry"> | Date | string;
-};
 export type ReceivableEntryCreateWithoutPaymentsInput = {
     id?: string;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -523,10 +637,12 @@ export type ReceivableEntryCreateWithoutPaymentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     party: Prisma.ReceivablePartyCreateNestedOneWithoutEntriesInput;
+    vendor?: Prisma.VendorCreateNestedOneWithoutReceivableEntriesInput;
 };
 export type ReceivableEntryUncheckedCreateWithoutPaymentsInput = {
     id?: string;
     partyId: string;
+    vendorId?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     description: string;
     date?: Date | string;
@@ -562,8 +678,64 @@ export type ReceivableEntryUpdateWithoutPaymentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     party?: Prisma.ReceivablePartyUpdateOneRequiredWithoutEntriesNestedInput;
+    vendor?: Prisma.VendorUpdateOneWithoutReceivableEntriesNestedInput;
 };
 export type ReceivableEntryUncheckedUpdateWithoutPaymentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    partyId?: Prisma.StringFieldUpdateOperationsInput | string;
+    vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description?: Prisma.StringFieldUpdateOperationsInput | string;
+    date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ReceivableEntryCreateManyVendorInput = {
+    id?: string;
+    partyId: string;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description: string;
+    date?: Date | string;
+    dueDate?: Date | string | null;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type ReceivableEntryUpdateWithoutVendorInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description?: Prisma.StringFieldUpdateOperationsInput | string;
+    date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    party?: Prisma.ReceivablePartyUpdateOneRequiredWithoutEntriesNestedInput;
+    payments?: Prisma.ReceivablePaymentUpdateManyWithoutEntryNestedInput;
+};
+export type ReceivableEntryUncheckedUpdateWithoutVendorInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    partyId?: Prisma.StringFieldUpdateOperationsInput | string;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    description?: Prisma.StringFieldUpdateOperationsInput | string;
+    date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    payments?: Prisma.ReceivablePaymentUncheckedUpdateManyWithoutEntryNestedInput;
+};
+export type ReceivableEntryUncheckedUpdateManyWithoutVendorInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     partyId?: Prisma.StringFieldUpdateOperationsInput | string;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -578,6 +750,7 @@ export type ReceivableEntryUncheckedUpdateWithoutPaymentsInput = {
 };
 export type ReceivableEntryCreateManyPartyInput = {
     id?: string;
+    vendorId?: string | null;
     amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
     description: string;
     date?: Date | string;
@@ -599,10 +772,12 @@ export type ReceivableEntryUpdateWithoutPartyInput = {
     status?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    vendor?: Prisma.VendorUpdateOneWithoutReceivableEntriesNestedInput;
     payments?: Prisma.ReceivablePaymentUpdateManyWithoutEntryNestedInput;
 };
 export type ReceivableEntryUncheckedUpdateWithoutPartyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -616,6 +791,7 @@ export type ReceivableEntryUncheckedUpdateWithoutPartyInput = {
 };
 export type ReceivableEntryUncheckedUpdateManyWithoutPartyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
+    vendorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     description?: Prisma.StringFieldUpdateOperationsInput | string;
     date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -641,6 +817,7 @@ export type ReceivableEntryCountOutputTypeCountPaymentsArgs<ExtArgs extends runt
 export type ReceivableEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     partyId?: boolean;
+    vendorId?: boolean;
     amount?: boolean;
     description?: boolean;
     date?: boolean;
@@ -651,12 +828,14 @@ export type ReceivableEntrySelect<ExtArgs extends runtime.Types.Extensions.Inter
     createdAt?: boolean;
     updatedAt?: boolean;
     party?: boolean | Prisma.ReceivablePartyDefaultArgs<ExtArgs>;
+    vendor?: boolean | Prisma.ReceivableEntry$vendorArgs<ExtArgs>;
     payments?: boolean | Prisma.ReceivableEntry$paymentsArgs<ExtArgs>;
     _count?: boolean | Prisma.ReceivableEntryCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["receivableEntry"]>;
 export type ReceivableEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     partyId?: boolean;
+    vendorId?: boolean;
     amount?: boolean;
     description?: boolean;
     date?: boolean;
@@ -667,10 +846,12 @@ export type ReceivableEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Typ
     createdAt?: boolean;
     updatedAt?: boolean;
     party?: boolean | Prisma.ReceivablePartyDefaultArgs<ExtArgs>;
+    vendor?: boolean | Prisma.ReceivableEntry$vendorArgs<ExtArgs>;
 }, ExtArgs["result"]["receivableEntry"]>;
 export type ReceivableEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     partyId?: boolean;
+    vendorId?: boolean;
     amount?: boolean;
     description?: boolean;
     date?: boolean;
@@ -681,10 +862,12 @@ export type ReceivableEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
     createdAt?: boolean;
     updatedAt?: boolean;
     party?: boolean | Prisma.ReceivablePartyDefaultArgs<ExtArgs>;
+    vendor?: boolean | Prisma.ReceivableEntry$vendorArgs<ExtArgs>;
 }, ExtArgs["result"]["receivableEntry"]>;
 export type ReceivableEntrySelectScalar = {
     id?: boolean;
     partyId?: boolean;
+    vendorId?: boolean;
     amount?: boolean;
     description?: boolean;
     date?: boolean;
@@ -695,27 +878,32 @@ export type ReceivableEntrySelectScalar = {
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type ReceivableEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "partyId" | "amount" | "description" | "date" | "dueDate" | "paidAmount" | "balanceDue" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["receivableEntry"]>;
+export type ReceivableEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "partyId" | "vendorId" | "amount" | "description" | "date" | "dueDate" | "paidAmount" | "balanceDue" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["receivableEntry"]>;
 export type ReceivableEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     party?: boolean | Prisma.ReceivablePartyDefaultArgs<ExtArgs>;
+    vendor?: boolean | Prisma.ReceivableEntry$vendorArgs<ExtArgs>;
     payments?: boolean | Prisma.ReceivableEntry$paymentsArgs<ExtArgs>;
     _count?: boolean | Prisma.ReceivableEntryCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type ReceivableEntryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     party?: boolean | Prisma.ReceivablePartyDefaultArgs<ExtArgs>;
+    vendor?: boolean | Prisma.ReceivableEntry$vendorArgs<ExtArgs>;
 };
 export type ReceivableEntryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     party?: boolean | Prisma.ReceivablePartyDefaultArgs<ExtArgs>;
+    vendor?: boolean | Prisma.ReceivableEntry$vendorArgs<ExtArgs>;
 };
 export type $ReceivableEntryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "ReceivableEntry";
     objects: {
         party: Prisma.$ReceivablePartyPayload<ExtArgs>;
+        vendor: Prisma.$VendorPayload<ExtArgs> | null;
         payments: Prisma.$ReceivablePaymentPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
         partyId: string;
+        vendorId: string | null;
         amount: runtime.Decimal;
         description: string;
         date: Date;
@@ -778,6 +966,7 @@ export interface ReceivableEntryDelegate<ExtArgs extends runtime.Types.Extension
 export interface Prisma__ReceivableEntryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
     party<T extends Prisma.ReceivablePartyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePartyDefaultArgs<ExtArgs>>): Prisma.Prisma__ReceivablePartyClient<runtime.Types.Result.GetResult<Prisma.$ReceivablePartyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    vendor<T extends Prisma.ReceivableEntry$vendorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivableEntry$vendorArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     payments<T extends Prisma.ReceivableEntry$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivableEntry$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReceivablePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
@@ -786,6 +975,7 @@ export interface Prisma__ReceivableEntryClient<T, Null = never, ExtArgs extends 
 export interface ReceivableEntryFieldRefs {
     readonly id: Prisma.FieldRef<"ReceivableEntry", 'String'>;
     readonly partyId: Prisma.FieldRef<"ReceivableEntry", 'String'>;
+    readonly vendorId: Prisma.FieldRef<"ReceivableEntry", 'String'>;
     readonly amount: Prisma.FieldRef<"ReceivableEntry", 'Decimal'>;
     readonly description: Prisma.FieldRef<"ReceivableEntry", 'String'>;
     readonly date: Prisma.FieldRef<"ReceivableEntry", 'DateTime'>;
@@ -895,6 +1085,12 @@ export type ReceivableEntryDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
 export type ReceivableEntryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.ReceivableEntryWhereInput;
     limit?: number;
+};
+export type ReceivableEntry$vendorArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.VendorSelect<ExtArgs> | null;
+    omit?: Prisma.VendorOmit<ExtArgs> | null;
+    include?: Prisma.VendorInclude<ExtArgs> | null;
+    where?: Prisma.VendorWhereInput;
 };
 export type ReceivableEntry$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ReceivablePaymentSelect<ExtArgs> | null;

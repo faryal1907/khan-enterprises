@@ -135,7 +135,7 @@ export const createReceivableParty = async (payload: {
 };
 
 export const createReceivableEntry = async (payload: {
-  partyId: string; amount: number; description: string; date: string; dueDate?: string;
+  partyId: string; amount: number; description: string; date: string; dueDate?: string; vendorId?: string;
 }) => {
   const { data } = await api.post('/accounting/receivables/entries', payload);
   return data;

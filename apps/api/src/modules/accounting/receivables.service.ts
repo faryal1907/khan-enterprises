@@ -47,47 +47,118 @@ export class ReceivablesService {
     description: string;
     date: string;
     dueDate?: string;
+    vendorId?: string;
   }) {
     const party = await this.prisma.client.receivableParty.findUnique({ where: { id: data.partyId } });
     if (!party) throw new NotFoundException("Party not found");
     if (data.amount <= 0) throw new BadRequestException("Amount must be greater than 0");
 
-    const entryDate = new Date(`${data.date}T12:00:00Z`);
-    const entry = await this.prisma.client.receivableEntry.create({
-      data: {
-        partyId: data.partyId,
-        amount: data.amount,
-        description: data.description,
-        date: entryDate,
-        dueDate: data.dueDate ? new Date(`${data.dueDate}T12:00:00Z`) : null,
-        balanceDue: data.amount,
-        status: PaymentState.DUE,
-      },
-    });
+    // If sourcing from a vendor, validate vendor and balance
+    if (data.vendorId) {
+      const vendor = await this.prisma.client.vendor.findUnique({ where: { id: data.vendorId } });
+      if (!vendor) throw new NotFoundException("Vendor not found");
+      if (!vendor.isActive) throw new BadRequestException("Vendor is inactive");
 
-    const arAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-    if (arAcc) {
-      const revenueAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
-      if (revenueAcc) {
-        await this.prisma.client.journalEntry.create({
+      // Calculate vendor prepaid balance
+      const [paid, allocated, defectiveReturned] = await Promise.all([
+        this.prisma.client.vendorPayment.aggregate({ where: { vendorId: data.vendorId }, _sum: { amount: true } }),
+        this.prisma.client.vendorAllocation.aggregate({ where: { vendorId: data.vendorId }, _sum: { totalAmount: true } }),
+        this.prisma.client.vendorDefectiveReturn.aggregate({ where: { vendorId: data.vendorId }, _sum: { totalAmount: true } }),
+      ]);
+      const totalPaid = Number(paid._sum.amount ?? 0);
+      const currentAllocated = Number(allocated._sum.totalAmount ?? 0) - Number(defectiveReturned._sum.totalAmount ?? 0);
+      const vendorBalance = totalPaid - currentAllocated;
+
+      if (data.amount > vendorBalance) {
+        throw new BadRequestException(
+          `Amount (Rs. ${data.amount.toLocaleString()}) exceeds vendor prepaid balance (Rs. ${vendorBalance.toLocaleString()}).`,
+        );
+      }
+    }
+
+    const entryDate = new Date(`${data.date}T12:00:00Z`);
+
+    return this.prisma.client.$transaction(async (tx) => {
+      const entry = await tx.receivableEntry.create({
+        data: {
+          partyId: data.partyId,
+          amount: data.amount,
+          description: data.description,
+          date: entryDate,
+          dueDate: data.dueDate ? new Date(`${data.dueDate}T12:00:00Z`) : null,
+          balanceDue: data.amount,
+          status: PaymentState.DUE,
+          vendorId: data.vendorId ?? null,
+        },
+      });
+
+      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+
+      if (data.vendorId && arAcc) {
+        // Vendor-sourced receivable: DR A/R, CR Vendor Prepaid
+        const prepaidAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.VENDOR_PREPAID } });
+        if (!prepaidAcc) {
+          throw new NotFoundException("Vendor Prepaid account not found in Chart of Accounts");
+        }
+
+        const vendor = await tx.vendor.findUnique({ where: { id: data.vendorId } });
+
+        // Create a VendorAllocation record so vendor balance stays consistent
+        const allocation = await tx.vendorAllocation.create({
+          data: {
+            vendorId: data.vendorId,
+            totalAmount: data.amount,
+            date: entryDate,
+            notes: `Receivable to ${party.name} — ${data.description}`,
+          },
+        });
+
+        // Post journal entry: DR A/R / CR Vendor Prepaid
+        const journalEntry = await tx.journalEntry.create({
           data: {
             entryNo: `JV-RCV-${entry.id.substring(0, 8)}`,
             date: entryDate,
-            description: `Receivable from ${party.name} — ${data.description}`,
+            description: `Receivable from ${party.name} via ${vendor!.name} prepaid — ${data.description}`,
             sourceRef: entry.id,
             status: JournalStatus.POSTED,
             lines: {
               create: [
                 { accountId: arAcc.id, debit: data.amount, credit: 0 },
-                { accountId: revenueAcc.id, debit: 0, credit: data.amount },
+                { accountId: prepaidAcc.id, debit: 0, credit: data.amount },
               ],
             },
           },
         });
-      }
-    }
 
-    return entry;
+        // Link journal entry to allocation
+        await tx.vendorAllocation.update({
+          where: { id: allocation.id },
+          data: { journalEntryId: journalEntry.id },
+        });
+      } else if (arAcc) {
+        // Standard receivable: DR A/R, CR Revenue
+        const revenueAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+        if (revenueAcc) {
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-RCV-${entry.id.substring(0, 8)}`,
+              date: entryDate,
+              description: `Receivable from ${party.name} — ${data.description}`,
+              sourceRef: entry.id,
+              status: JournalStatus.POSTED,
+              lines: {
+                create: [
+                  { accountId: arAcc.id, debit: data.amount, credit: 0 },
+                  { accountId: revenueAcc.id, debit: 0, credit: data.amount },
+                ],
+              },
+            },
+          });
+        }
+      }
+
+      return entry;
+    });
   }
 
   // ─── Aggregate receivables list (all parties) ─────────────────────────────
