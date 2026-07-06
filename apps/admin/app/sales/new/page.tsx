@@ -179,7 +179,6 @@ export default function ManualOrderPage() {
     setSelectedMethod(acc.subtype === "CASH" ? "CASH" : "ONLINE_TRANSFER");
   };
 
-  const [lookupLoading, setLookupLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRegisterSale = async () => {
@@ -286,47 +285,6 @@ export default function ManualOrderPage() {
     }
   };
 
-  const handleChassisLookup = async () => {
-    if (!formData.chassisNumber.trim()) {
-      toast.error("Please enter a chassis number");
-      return;
-    }
-    try {
-      setLookupLoading(true);
-      const res = await getBikes({
-        search: formData.chassisNumber.trim(),
-        status: "AVAILABLE",
-        limit: 50,
-      });
-      const bikes = res.bikes || [];
-      const exactBike = bikes.find(
-        (b) => b.chassisNumber.toUpperCase() === formData.chassisNumber.trim().toUpperCase()
-      );
-      if (!exactBike) {
-        toast.error("No bike found with this chassis number");
-        return;
-      }
-      if (exactBike.status !== "AVAILABLE") {
-        toast.error(`Bike cannot be sold. Current status is ${exactBike.status}`);
-        return;
-      }
-      const modelName = `${exactBike.model.brand} ${exactBike.model.modelName}`;
-      const price = exactBike.price || exactBike.model.basePrice || 0;
-      setBikeDetails({ id: exactBike.id, model: modelName, price: price.toString() });
-      setFormData((prev) => ({
-        ...prev,
-        bikeModel: modelName,
-        bikePrice: Number(price).toLocaleString(),
-        salePrice: Number(price).toLocaleString(),
-      }));
-      toast.success("Bike found and available");
-    } catch (error) {
-      console.error("Lookup failed:", error);
-      toast.error("Failed to lookup chassis number");
-    } finally {
-      setLookupLoading(false);
-    }
-  };
 
   // ── Shared input style
   const inputStyle = {
@@ -373,27 +331,24 @@ export default function ManualOrderPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <div className="relative">
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Chassis Number *</label>
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    value={bikeSearchTerm} 
-                    onChange={(e) => { 
-                      setBikeSearchTerm(e.target.value); 
-                      if (formData.chassisNumber) { 
-                        handleInputChange("chassisNumber", "");
-                        setBikeDetails(null);
-                      } 
-                      setShowBikeDropdown(true); 
-                    }} 
-                    onFocus={() => setShowBikeDropdown(true)} 
-                    onBlur={() => setTimeout(() => setShowBikeDropdown(false), 200)} 
-                    disabled={lookupLoading || isSubmitting} 
-                    className="flex-1 px-3 py-2 rounded text-sm" 
-                    style={inputStyle} 
-                    placeholder="Search chassis number..." 
-                  />
-                  <AsyncButton onClick={handleChassisLookup} loading={lookupLoading} loadingLabel="Looking up..." disabled={isSubmitting}>Lookup</AsyncButton>
-                </div>
+                <input 
+                  type="text" 
+                  value={bikeSearchTerm} 
+                  onChange={(e) => { 
+                    setBikeSearchTerm(e.target.value); 
+                    if (formData.chassisNumber) { 
+                      handleInputChange("chassisNumber", "");
+                      setBikeDetails(null);
+                    } 
+                    setShowBikeDropdown(true); 
+                  }} 
+                  onFocus={() => setShowBikeDropdown(true)} 
+                  onBlur={() => setTimeout(() => setShowBikeDropdown(false), 200)} 
+                  disabled={isSubmitting} 
+                  className="w-full px-3 py-2 rounded text-sm" 
+                  style={inputStyle} 
+                  placeholder="Search chassis number..." 
+                />
                 {showBikeDropdown && (
                   <div className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}` }}>
                     {isFetchingBikes ? (
