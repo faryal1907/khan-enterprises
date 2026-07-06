@@ -283,8 +283,20 @@ export class VendorService {
         id: a.id,
         totalAmount: Number(a.totalAmount),
         notes: a.notes,
-        bikes: a.bikes,
-        partLines: a.partLines,
+        bikes: a.bikes.map((b) => ({
+          id: b.id,
+          chassisNumber: b.chassisNumber,
+          model: { brand: b.model.brand, modelName: b.model.modelName },
+          purchaseCost: b.purchaseCost != null ? Number(b.purchaseCost) : null,
+        })),
+        partLines: a.partLines.map((pl) => ({
+          id: pl.id,
+          quantity: pl.quantity,
+          unitCost: Number(pl.unitCost),
+          totalCost: Number(pl.totalCost),
+          part: pl.part,
+          branch: pl.branch,
+        })),
         recordedBy: a.recordedBy,
       })),
       ...defectiveReturns.map((r) => ({
@@ -419,7 +431,7 @@ export class VendorService {
       parts: partsWithCosts.map((p) => ({
         id: p.id,
         quantity: p.quantity,
-        part: p.part,
+        part: { id: p.part.id, name: p.part.name, sku: p.part.sku, sellingPrice: Number(p.part.sellingPrice) },
         branch: p.branch,
         unitCost: p.unitCost,
       })),
@@ -503,7 +515,20 @@ export class VendorService {
 
       const newBalance = await this.getVendorBalance(vendorId);
       return {
-        payment,
+        payment: {
+          id: payment.id,
+          vendorId: payment.vendorId,
+          fromAccountId: payment.fromAccountId,
+          amount: Number(payment.amount),
+          date: payment.date,
+          notes: payment.notes,
+          journalEntryId: payment.journalEntryId,
+          recordedById: payment.recordedById,
+          createdAt: payment.createdAt,
+          updatedAt: payment.updatedAt,
+          vendor: payment.vendor,
+          fromAccount: payment.fromAccount,
+        },
         journalEntry: { id: journalEntry.id, entryNo: journalEntry.entryNo },
         newPrepaidBalance: newBalance,
       };

@@ -30,7 +30,7 @@ type LedgerEntry =
       date: string;
       totalAmount: number;
       notes: string | null;
-      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; purchaseCost?: number | null; unitCost: number | null }[];
+      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; purchaseCost?: number | null }[];
       partLines: { id: string; quantity: number; unitCost: number; totalCost: number; part: { name: string; sku: string }; branch: { name: string } }[];
       recordedBy: { fullName: string } | null;
       balance: number;
@@ -357,7 +357,7 @@ export default function VendorDetailPage() {
                           <span className="font-medium" style={{ color: theme.text.primary }}>Bikes: </span>
                           {entry.bikes.map((b) => (
                             <span key={b.id} className="mr-2">
-                              {b.model.brand} {b.model.modelName} ({b.chassisNumber}) — {fmt(b.purchaseCost ?? b.unitCost ?? 0)}
+                               {b.model.brand} {b.model.modelName} ({b.chassisNumber}) — {fmt((b as any).purchaseCost ?? (b as any).unitCost ?? 0)}
                             </span>
                           ))}
                         </div>
