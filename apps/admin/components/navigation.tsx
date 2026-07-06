@@ -87,6 +87,12 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
     href === "/accounts" ? pathname.startsWith("/accounts") || pathname.startsWith("/vendors") :
     pathname.startsWith(href);
 
+  const handleNavClick = () => {
+    if (sidebarOpen) {
+      setSidebarOpen(false);
+    }
+  };
+
   const linkClass = (href: string, extra = "") =>
     `flex items-center rounded-lg text-sm font-medium transition-colors mb-1 ${extra}`;
 
@@ -134,6 +140,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
           >
             <Link
               href="/"
+              onClick={handleNavClick}
               className={`flex items-center min-w-0 ${
                 collapsed ? "md:justify-center" : "md:flex-col md:items-start"
               }`}
@@ -179,6 +186,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
                 <Link
                   key={href}
                   href={href}
+                  onClick={handleNavClick}
                   className={linkClass(
                     href,
                     collapsed
@@ -201,6 +209,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
                   <Link
                     key={href}
                     href={href}
+                    onClick={handleNavClick}
                     className={linkClass(
                       href,
                       collapsed
@@ -235,6 +244,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
                   <Link
                     key={href}
                     href={href}
+                    onClick={handleNavClick}
                     className={linkClass(
                       href,
                       collapsed
@@ -255,6 +265,7 @@ export function Navigation({ children }: { children?: React.ReactNode }) {
               <div>
                 <Link
                   href="/branches"
+                  onClick={handleNavClick}
                   className={linkClass(
                     "/branches",
                     collapsed
