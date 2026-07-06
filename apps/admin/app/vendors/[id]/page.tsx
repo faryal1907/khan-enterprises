@@ -30,7 +30,7 @@ type LedgerEntry =
       date: string;
       totalAmount: number;
       notes: string | null;
-      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; unitCost: number | null }[];
+      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; purchaseCost?: number | null; unitCost: number | null }[];
       partLines: { id: string; quantity: number; unitCost: number; totalCost: number; part: { name: string; sku: string }; branch: { name: string } }[];
       recordedBy: { fullName: string } | null;
       balance: number;
@@ -41,7 +41,7 @@ type LedgerEntry =
       date: string;
       totalAmount: number;
       notes: string | null;
-      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; unitCost: number }[];
+      bikes: { id: string; chassisNumber: string; model: { brand: string; modelName: string }; purchaseCost?: number | null; unitCost: number }[];
       partLines: { id: string; quantity: number; unitCost: number; totalCost: number; part: { name: string; sku: string }; branch: { name: string } }[];
       recordedBy: { fullName: string } | null;
       balance: number;
