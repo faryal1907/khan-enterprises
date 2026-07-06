@@ -373,7 +373,7 @@ export class OrdersService {
         data: {
           userId: user.id, userRole: user.role, action: AuditAction.CREATE,
           entityType: "ORDER", entityId: order.id,
-          newValue: JSON.stringify({ ...dto, finalSalePrice: salePrice, discountApplied: discountAmount, advanceAmount }),
+          newValue: { ...dto, finalSalePrice: salePrice, discountApplied: discountAmount, advanceAmount, orderNumber },
         },
       });
 
@@ -581,6 +581,19 @@ export class OrdersService {
         });
       }
 
+      // Create audit log entry for status change
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          userRole: user.role,
+          action: AuditAction.UPDATE,
+          entityType: "ORDER",
+          entityId: id,
+          oldValue: { status: currentStatus },
+          newValue: { status: newStatus, orderNumber: order.orderNumber },
+        },
+      });
+
       return updatedOrder;
     });
 
@@ -723,8 +736,8 @@ export class OrdersService {
           action: AuditAction.UPDATE,
           entityType: "ORDER",
           entityId: order.id,
-          oldValue: JSON.stringify({ status: order.status }),
-          newValue: JSON.stringify({ status: OrderStatus.CANCELLED }),
+          oldValue: { status: order.status },
+          newValue: { status: OrderStatus.CANCELLED, orderNumber: order.orderNumber },
         },
       });
 
@@ -911,7 +924,7 @@ export class OrdersService {
           action: AuditAction.PAYMENT,
           entityType: "ORDER",
           entityId: orderId,
-          newValue: JSON.stringify(dto),
+          newValue: { ...dto, orderNumber: order.orderNumber },
         },
       });
 
@@ -1204,7 +1217,7 @@ export class OrdersService {
           action: AuditAction.CREATE,
           entityType: "ORDER",
           entityId: order.id,
-          newValue: JSON.stringify({ ...dto, finalSalePrice, orderType }),
+          newValue: { ...dto, finalSalePrice, orderType, orderNumber },
         },
       });
 
@@ -1303,8 +1316,8 @@ export class OrdersService {
           action: AuditAction.UPDATE,
           entityType: "ORDER",
           entityId: orderId,
-          oldValue: JSON.stringify({ status: order.status }),
-          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, completedOnsite: true }),
+          oldValue: { status: order.status },
+          newValue: { status: OrderStatus.DELIVERED, completedOnsite: true, orderNumber: order.orderNumber },
         },
       });
 
@@ -1374,8 +1387,8 @@ export class OrdersService {
           action: AuditAction.UPDATE,
           entityType: "ORDER",
           entityId: orderId,
-          oldValue: JSON.stringify({ status: order.status }),
-          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, pickedByCustomer: true }),
+          oldValue: { status: order.status },
+          newValue: { status: OrderStatus.DELIVERED, pickedByCustomer: true, orderNumber: order.orderNumber },
         },
       });
 
@@ -1619,7 +1632,7 @@ export class OrdersService {
             action: AuditAction.PAYMENT,
             entityType: "ORDER",
             entityId: orderId,
-            newValue: JSON.stringify({ paymentVerified: true }),
+            newValue: { paymentVerified: true, orderNumber: order.orderNumber },
           },
         });
       } else {
@@ -1682,7 +1695,7 @@ export class OrdersService {
             action: AuditAction.PAYMENT,
             entityType: "ORDER",
             entityId: orderId,
-            newValue: JSON.stringify({ paymentVerified: false, reason: dto.reason }),
+            newValue: { paymentVerified: false, reason: dto.reason, orderNumber: order.orderNumber },
           },
         });
       }

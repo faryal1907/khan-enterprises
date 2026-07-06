@@ -213,8 +213,8 @@ export default function OrdersListPage() {
                 }}
               >
                 <option value="">All Statuses</option>
-                <option value={OrderStatus.PENDING_PAYMENT}>Pending Payment</option>
-                <option value={OrderStatus.PAID}>Paid</option>
+                {/* <option value={OrderStatus.PENDING_PAYMENT}>Pending Payment</option> */}
+                {/* <option value={OrderStatus.PAID}>Paid</option> */}
                 <option value={OrderStatus.CONFIRMED}>Confirmed</option>
                 <option value={OrderStatus.READY_FOR_DELIVERY}>Ready for Delivery</option>
                 <option value={OrderStatus.DELIVERED}>Delivered</option>
@@ -391,7 +391,7 @@ export default function OrdersListPage() {
                       >
                         {order.orderNumber}
                       </Link>
-                      {Number((order as any).balanceDue) > 0 && (
+                      {Number((order as any).balanceDue) > 0 && order.status !== OrderStatus.CANCELLED && [OrderStatus.CONFIRMED, OrderStatus.READY_FOR_DELIVERY, OrderStatus.DELIVERED].includes(order.status) && (
                         <span className="text-yellow-500" title="Outstanding balance">
                           ★
                         </span>

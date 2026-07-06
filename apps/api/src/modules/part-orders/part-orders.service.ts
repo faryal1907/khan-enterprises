@@ -546,8 +546,8 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.UPDATE,
           entityType: "PART_ORDER",
           entityId: id,
-          oldValue: JSON.stringify({ status: currentStatus }),
-          newValue: JSON.stringify({ status }),
+          oldValue: { status: currentStatus },
+          newValue: { status, orderNumber: order.orderNumber },
         },
       });
 
@@ -678,8 +678,8 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.UPDATE,
           entityType: "PART_ORDER",
           entityId: order.id,
-          oldValue: JSON.stringify({ status: order.status }),
-          newValue: JSON.stringify({ status: OrderStatus.CANCELLED }),
+          oldValue: { status: order.status },
+          newValue: { status: OrderStatus.CANCELLED, orderNumber: order.orderNumber },
         },
       });
 
@@ -868,7 +868,7 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.CREATE,
           entityType: "PART_ORDER",
           entityId: partOrder.id,
-          newValue: JSON.stringify(dto),
+          newValue: { ...dto, orderNumber: partOrder.orderNumber },
         },
       });
 
@@ -985,8 +985,8 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.UPDATE,
           entityType: "PART_ORDER",
           entityId: orderId,
-          oldValue: JSON.stringify({ status: order.status }),
-          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, completedOnsite: true }),
+          oldValue: { status: order.status },
+          newValue: { status: OrderStatus.DELIVERED, completedOnsite: true, orderNumber: order.orderNumber },
         },
       });
 
@@ -1044,8 +1044,8 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.UPDATE,
           entityType: "PART_ORDER",
           entityId: orderId,
-          oldValue: JSON.stringify({ status: order.status }),
-          newValue: JSON.stringify({ status: OrderStatus.DELIVERED, pickedByCustomer: true }),
+          oldValue: { status: order.status },
+          newValue: { status: OrderStatus.DELIVERED, pickedByCustomer: true, orderNumber: order.orderNumber },
         },
       });
 
@@ -1100,7 +1100,7 @@ const partOrder = await tx.partOrder.create({
         action: AuditAction.UPDATE,
         entityType: "PART_PAYMENT_TRANSACTION",
         entityId: transaction.id,
-        newValue: JSON.stringify({ paymentProofUrl }),
+        newValue: { paymentProofUrl, orderNumber: order.orderNumber },
       },
     });
 
@@ -1239,8 +1239,8 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.UPDATE,
           entityType: "PART_PAYMENT_TRANSACTION",
           entityId: transaction.id,
-          oldValue: JSON.stringify({ status: PaymentStatus.VERIFICATION_PENDING }),
-          newValue: JSON.stringify({ status: newStatus, verified }),
+          oldValue: { status: PaymentStatus.VERIFICATION_PENDING },
+          newValue: { status: newStatus, verified, orderNumber: order.orderNumber },
         },
       });
 
@@ -1383,7 +1383,7 @@ const partOrder = await tx.partOrder.create({
           action: AuditAction.PAYMENT,
           entityType: "PART_ORDER",
           entityId: partOrderId,
-          newValue: JSON.stringify(dto),
+          newValue: { ...dto, orderNumber: order.orderNumber },
         },
       });
 
