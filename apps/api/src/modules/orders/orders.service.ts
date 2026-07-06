@@ -578,6 +578,7 @@ export class OrdersService {
       const order = await tx.order.findUnique({
         where: { id },
         include: {
+          bike: true,
           transactions: true,
           processedBy: {
             select: {
