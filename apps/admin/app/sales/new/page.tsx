@@ -130,11 +130,15 @@ export default function ManualOrderPage() {
   const partSearchResults =
     partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
       ? allParts.filter(
-          (p: PartInventory) =>
-            p.part?.name?.toLowerCase().includes(partSearchTerm.toLowerCase()) ||
-            p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
+          (p: PartInventory) => {
+            const available = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0));
+            return available > 0 && (
+              p.part?.name?.toLowerCase().includes(partSearchTerm.toLowerCase()) ||
+              p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
+            );
+          }
         )
-      : allParts;
+      : allParts.filter((p: PartInventory) => Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0)) > 0);
 
   const bikeSearchResults =
     bikeSearchTerm.trim() && (!formData.chassisNumber || !bikeSearchTerm.includes(formData.chassisNumber))
