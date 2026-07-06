@@ -20,8 +20,17 @@ export class VendorService {
 
     const withBalances = await Promise.all(
       vendors.map(async (v) => ({
-        ...v,
+        id: v.id,
+        name: v.name,
+        contactPerson: v.contactPerson,
+        phoneNumber: v.phoneNumber,
+        email: v.email,
+        address: v.address,
+        isActive: v.isActive,
+        commissionRate: Number(v.commissionRate),
         prepaidBalance: await this.getVendorBalance(v.id),
+        createdAt: v.createdAt,
+        updatedAt: v.updatedAt,
       })),
     );
 
@@ -47,7 +56,14 @@ export class VendorService {
     });
 
     return {
-      ...vendor,
+      id: vendor.id,
+      name: vendor.name,
+      contactPerson: vendor.contactPerson,
+      phoneNumber: vendor.phoneNumber,
+      email: vendor.email,
+      address: vendor.address,
+      isActive: vendor.isActive,
+      commissionRate: Number(vendor.commissionRate),
       prepaidBalance,
       totalPaid: Number(totalPaid._sum.amount ?? 0),
       totalAllocated: Number(totalAllocated._sum.totalAmount ?? 0),
@@ -62,7 +78,19 @@ export class VendorService {
     address?: string;
     commissionRate?: number;
   }) {
-    return this.prisma.client.vendor.create({ data });
+    const vendor = await this.prisma.client.vendor.create({ data });
+    return {
+      id: vendor.id,
+      name: vendor.name,
+      contactPerson: vendor.contactPerson,
+      phoneNumber: vendor.phoneNumber,
+      email: vendor.email,
+      address: vendor.address,
+      isActive: vendor.isActive,
+      commissionRate: Number(vendor.commissionRate),
+      createdAt: vendor.createdAt,
+      updatedAt: vendor.updatedAt,
+    };
   }
 
   async updateVendor(
@@ -81,10 +109,23 @@ export class VendorService {
     });
     if (!vendor) throw new NotFoundException("Vendor not found");
 
-    return this.prisma.client.vendor.update({
+    const updated = await this.prisma.client.vendor.update({
       where: { id: vendorId },
       data,
     });
+
+    return {
+      id: updated.id,
+      name: updated.name,
+      contactPerson: updated.contactPerson,
+      phoneNumber: updated.phoneNumber,
+      email: updated.email,
+      address: updated.address,
+      isActive: updated.isActive,
+      commissionRate: Number(updated.commissionRate),
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    };
   }
 
   async deleteVendor(vendorId: string) {
@@ -101,10 +142,23 @@ export class VendorService {
       );
     }
 
-    return this.prisma.client.vendor.update({
+    const updated = await this.prisma.client.vendor.update({
       where: { id: vendorId },
       data: { isActive: false },
     });
+
+    return {
+      id: updated.id,
+      name: updated.name,
+      contactPerson: updated.contactPerson,
+      phoneNumber: updated.phoneNumber,
+      email: updated.email,
+      address: updated.address,
+      isActive: updated.isActive,
+      commissionRate: Number(updated.commissionRate),
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    };
   }
 
   // ─── Balance ───────────────────────────────────────────────────────────────
