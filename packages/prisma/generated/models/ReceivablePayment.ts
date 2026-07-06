@@ -259,6 +259,7 @@ export type ReceivablePaymentWhereInput = {
   entry?: Prisma.XOR<Prisma.ReceivableEntryScalarRelationFilter, Prisma.ReceivableEntryWhereInput>
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
   journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
+  recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type ReceivablePaymentOrderByWithRelationInput = {
@@ -275,6 +276,7 @@ export type ReceivablePaymentOrderByWithRelationInput = {
   entry?: Prisma.ReceivableEntryOrderByWithRelationInput
   account?: Prisma.AccountOrderByWithRelationInput
   journalEntry?: Prisma.JournalEntryOrderByWithRelationInput
+  recordedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ReceivablePaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -294,6 +296,7 @@ export type ReceivablePaymentWhereUniqueInput = Prisma.AtLeast<{
   entry?: Prisma.XOR<Prisma.ReceivableEntryScalarRelationFilter, Prisma.ReceivableEntryWhereInput>
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
   journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
+  recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "journalEntryId">
 
 export type ReceivablePaymentOrderByWithAggregationInput = {
@@ -335,12 +338,12 @@ export type ReceivablePaymentCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   method: $Enums.PaymentMethod
   notes?: string | null
-  recordedById?: string | null
   collectedAt?: Date | string
   createdAt?: Date | string
   entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
+  recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
 }
 
 export type ReceivablePaymentUncheckedCreateInput = {
@@ -361,12 +364,12 @@ export type ReceivablePaymentUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
+  recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
 }
 
 export type ReceivablePaymentUncheckedUpdateInput = {
@@ -400,7 +403,6 @@ export type ReceivablePaymentUpdateManyMutationInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -478,6 +480,48 @@ export type ReceivablePaymentMinOrderByAggregateInput = {
 
 export type ReceivablePaymentSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+}
+
+export type ReceivablePaymentCreateNestedManyWithoutRecordedByInput = {
+  create?: Prisma.XOR<Prisma.ReceivablePaymentCreateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput> | Prisma.ReceivablePaymentCreateWithoutRecordedByInput[] | Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput[]
+  connectOrCreate?: Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput | Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput[]
+  createMany?: Prisma.ReceivablePaymentCreateManyRecordedByInputEnvelope
+  connect?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+}
+
+export type ReceivablePaymentUncheckedCreateNestedManyWithoutRecordedByInput = {
+  create?: Prisma.XOR<Prisma.ReceivablePaymentCreateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput> | Prisma.ReceivablePaymentCreateWithoutRecordedByInput[] | Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput[]
+  connectOrCreate?: Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput | Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput[]
+  createMany?: Prisma.ReceivablePaymentCreateManyRecordedByInputEnvelope
+  connect?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+}
+
+export type ReceivablePaymentUpdateManyWithoutRecordedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ReceivablePaymentCreateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput> | Prisma.ReceivablePaymentCreateWithoutRecordedByInput[] | Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput[]
+  connectOrCreate?: Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput | Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput[]
+  upsert?: Prisma.ReceivablePaymentUpsertWithWhereUniqueWithoutRecordedByInput | Prisma.ReceivablePaymentUpsertWithWhereUniqueWithoutRecordedByInput[]
+  createMany?: Prisma.ReceivablePaymentCreateManyRecordedByInputEnvelope
+  set?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  disconnect?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  delete?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  connect?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  update?: Prisma.ReceivablePaymentUpdateWithWhereUniqueWithoutRecordedByInput | Prisma.ReceivablePaymentUpdateWithWhereUniqueWithoutRecordedByInput[]
+  updateMany?: Prisma.ReceivablePaymentUpdateManyWithWhereWithoutRecordedByInput | Prisma.ReceivablePaymentUpdateManyWithWhereWithoutRecordedByInput[]
+  deleteMany?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
+}
+
+export type ReceivablePaymentUncheckedUpdateManyWithoutRecordedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ReceivablePaymentCreateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput> | Prisma.ReceivablePaymentCreateWithoutRecordedByInput[] | Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput[]
+  connectOrCreate?: Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput | Prisma.ReceivablePaymentCreateOrConnectWithoutRecordedByInput[]
+  upsert?: Prisma.ReceivablePaymentUpsertWithWhereUniqueWithoutRecordedByInput | Prisma.ReceivablePaymentUpsertWithWhereUniqueWithoutRecordedByInput[]
+  createMany?: Prisma.ReceivablePaymentCreateManyRecordedByInputEnvelope
+  set?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  disconnect?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  delete?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  connect?: Prisma.ReceivablePaymentWhereUniqueInput | Prisma.ReceivablePaymentWhereUniqueInput[]
+  update?: Prisma.ReceivablePaymentUpdateWithWhereUniqueWithoutRecordedByInput | Prisma.ReceivablePaymentUpdateWithWhereUniqueWithoutRecordedByInput[]
+  updateMany?: Prisma.ReceivablePaymentUpdateManyWithWhereWithoutRecordedByInput | Prisma.ReceivablePaymentUpdateManyWithWhereWithoutRecordedByInput[]
+  deleteMany?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
 }
 
 export type ReceivablePaymentCreateNestedManyWithoutAccountInput = {
@@ -596,16 +640,82 @@ export type ReceivablePaymentUncheckedUpdateManyWithoutEntryNestedInput = {
   deleteMany?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
 }
 
+export type ReceivablePaymentCreateWithoutRecordedByInput = {
+  id?: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  notes?: string | null
+  collectedAt?: Date | string
+  createdAt?: Date | string
+  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
+  account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
+}
+
+export type ReceivablePaymentUncheckedCreateWithoutRecordedByInput = {
+  id?: string
+  entryId: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  accountId?: string | null
+  notes?: string | null
+  journalEntryId?: string | null
+  collectedAt?: Date | string
+  createdAt?: Date | string
+}
+
+export type ReceivablePaymentCreateOrConnectWithoutRecordedByInput = {
+  where: Prisma.ReceivablePaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReceivablePaymentCreateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput>
+}
+
+export type ReceivablePaymentCreateManyRecordedByInputEnvelope = {
+  data: Prisma.ReceivablePaymentCreateManyRecordedByInput | Prisma.ReceivablePaymentCreateManyRecordedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type ReceivablePaymentUpsertWithWhereUniqueWithoutRecordedByInput = {
+  where: Prisma.ReceivablePaymentWhereUniqueInput
+  update: Prisma.XOR<Prisma.ReceivablePaymentUpdateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedUpdateWithoutRecordedByInput>
+  create: Prisma.XOR<Prisma.ReceivablePaymentCreateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedCreateWithoutRecordedByInput>
+}
+
+export type ReceivablePaymentUpdateWithWhereUniqueWithoutRecordedByInput = {
+  where: Prisma.ReceivablePaymentWhereUniqueInput
+  data: Prisma.XOR<Prisma.ReceivablePaymentUpdateWithoutRecordedByInput, Prisma.ReceivablePaymentUncheckedUpdateWithoutRecordedByInput>
+}
+
+export type ReceivablePaymentUpdateManyWithWhereWithoutRecordedByInput = {
+  where: Prisma.ReceivablePaymentScalarWhereInput
+  data: Prisma.XOR<Prisma.ReceivablePaymentUpdateManyMutationInput, Prisma.ReceivablePaymentUncheckedUpdateManyWithoutRecordedByInput>
+}
+
+export type ReceivablePaymentScalarWhereInput = {
+  AND?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
+  OR?: Prisma.ReceivablePaymentScalarWhereInput[]
+  NOT?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
+  id?: Prisma.StringFilter<"ReceivablePayment"> | string
+  entryId?: Prisma.StringFilter<"ReceivablePayment"> | string
+  amount?: Prisma.DecimalFilter<"ReceivablePayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFilter<"ReceivablePayment"> | $Enums.PaymentMethod
+  accountId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
+  notes?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
+  journalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
+  recordedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
+  collectedAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
+}
+
 export type ReceivablePaymentCreateWithoutAccountInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   method: $Enums.PaymentMethod
   notes?: string | null
-  recordedById?: string | null
   collectedAt?: Date | string
   createdAt?: Date | string
   entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
+  recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
 }
 
 export type ReceivablePaymentUncheckedCreateWithoutAccountInput = {
@@ -646,32 +756,16 @@ export type ReceivablePaymentUpdateManyWithWhereWithoutAccountInput = {
   data: Prisma.XOR<Prisma.ReceivablePaymentUpdateManyMutationInput, Prisma.ReceivablePaymentUncheckedUpdateManyWithoutAccountInput>
 }
 
-export type ReceivablePaymentScalarWhereInput = {
-  AND?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
-  OR?: Prisma.ReceivablePaymentScalarWhereInput[]
-  NOT?: Prisma.ReceivablePaymentScalarWhereInput | Prisma.ReceivablePaymentScalarWhereInput[]
-  id?: Prisma.StringFilter<"ReceivablePayment"> | string
-  entryId?: Prisma.StringFilter<"ReceivablePayment"> | string
-  amount?: Prisma.DecimalFilter<"ReceivablePayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  method?: Prisma.EnumPaymentMethodFilter<"ReceivablePayment"> | $Enums.PaymentMethod
-  accountId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  notes?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  journalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  recordedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  collectedAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
-  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
-}
-
 export type ReceivablePaymentCreateWithoutJournalEntryInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   method: $Enums.PaymentMethod
   notes?: string | null
-  recordedById?: string | null
   collectedAt?: Date | string
   createdAt?: Date | string
   entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
+  recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
 }
 
 export type ReceivablePaymentUncheckedCreateWithoutJournalEntryInput = {
@@ -707,11 +801,11 @@ export type ReceivablePaymentUpdateWithoutJournalEntryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
+  recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
 }
 
 export type ReceivablePaymentUncheckedUpdateWithoutJournalEntryInput = {
@@ -731,11 +825,11 @@ export type ReceivablePaymentCreateWithoutEntryInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   method: $Enums.PaymentMethod
   notes?: string | null
-  recordedById?: string | null
   collectedAt?: Date | string
   createdAt?: Date | string
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
+  recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
 }
 
 export type ReceivablePaymentUncheckedCreateWithoutEntryInput = {
@@ -776,6 +870,54 @@ export type ReceivablePaymentUpdateManyWithWhereWithoutEntryInput = {
   data: Prisma.XOR<Prisma.ReceivablePaymentUpdateManyMutationInput, Prisma.ReceivablePaymentUncheckedUpdateManyWithoutEntryInput>
 }
 
+export type ReceivablePaymentCreateManyRecordedByInput = {
+  id?: string
+  entryId: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  method: $Enums.PaymentMethod
+  accountId?: string | null
+  notes?: string | null
+  journalEntryId?: string | null
+  collectedAt?: Date | string
+  createdAt?: Date | string
+}
+
+export type ReceivablePaymentUpdateWithoutRecordedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
+}
+
+export type ReceivablePaymentUncheckedUpdateWithoutRecordedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  entryId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ReceivablePaymentUncheckedUpdateManyWithoutRecordedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  entryId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ReceivablePaymentCreateManyAccountInput = {
   id?: string
   entryId: string
@@ -793,11 +935,11 @@ export type ReceivablePaymentUpdateWithoutAccountInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
+  recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
 }
 
 export type ReceivablePaymentUncheckedUpdateWithoutAccountInput = {
@@ -841,11 +983,11 @@ export type ReceivablePaymentUpdateWithoutEntryInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
+  recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
 }
 
 export type ReceivablePaymentUncheckedUpdateWithoutEntryInput = {
@@ -888,6 +1030,7 @@ export type ReceivablePaymentSelect<ExtArgs extends runtime.Types.Extensions.Int
   entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }, ExtArgs["result"]["receivablePayment"]>
 
 export type ReceivablePaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -904,6 +1047,7 @@ export type ReceivablePaymentSelectCreateManyAndReturn<ExtArgs extends runtime.T
   entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }, ExtArgs["result"]["receivablePayment"]>
 
 export type ReceivablePaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -920,6 +1064,7 @@ export type ReceivablePaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }, ExtArgs["result"]["receivablePayment"]>
 
 export type ReceivablePaymentSelectScalar = {
@@ -940,16 +1085,19 @@ export type ReceivablePaymentInclude<ExtArgs extends runtime.Types.Extensions.In
   entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }
 export type ReceivablePaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }
 export type ReceivablePaymentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }
 
 export type $ReceivablePaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -958,6 +1106,7 @@ export type $ReceivablePaymentPayload<ExtArgs extends runtime.Types.Extensions.I
     entry: Prisma.$ReceivableEntryPayload<ExtArgs>
     account: Prisma.$AccountPayload<ExtArgs> | null
     journalEntry: Prisma.$JournalEntryPayload<ExtArgs> | null
+    recordedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1367,6 +1516,7 @@ export interface Prisma__ReceivablePaymentClient<T, Null = never, ExtArgs extend
   entry<T extends Prisma.ReceivableEntryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivableEntryDefaultArgs<ExtArgs>>): Prisma.Prisma__ReceivableEntryClient<runtime.Types.Result.GetResult<Prisma.$ReceivableEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   account<T extends Prisma.ReceivablePayment$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePayment$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   journalEntry<T extends Prisma.ReceivablePayment$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recordedBy<T extends Prisma.ReceivablePayment$recordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePayment$recordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1842,6 +1992,25 @@ export type ReceivablePayment$journalEntryArgs<ExtArgs extends runtime.Types.Ext
    */
   include?: Prisma.JournalEntryInclude<ExtArgs> | null
   where?: Prisma.JournalEntryWhereInput
+}
+
+/**
+ * ReceivablePayment.recordedBy
+ */
+export type ReceivablePayment$recordedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

@@ -187,7 +187,7 @@ export default function TransactionsPage() {
 
 
   const handleExportCSV = () => {
-    const headers = ["Transaction ID", "Ref / Description", "Type", "Counterparty", "Branch", "Amount", "Method", "Status", "Date"];
+    const headers = ["Transaction ID", "Ref / Description", "Type", "Counterparty", "Branch", "Amount", "Method", "Status", "Processed By", "Date"];
     const rows = transactions.map((transaction) => [
       transaction.id,
       transaction.order?.orderNumber || transaction.party?.ref || transaction.party?.description || "",
@@ -197,6 +197,7 @@ export default function TransactionsPage() {
       Number(transaction.amount || 0),
       transaction.method,
       transaction.status,
+      transaction.processedBy?.fullName || "",
       new Date(transaction.createdAt).toLocaleString(),
     ]);
 
@@ -396,7 +397,7 @@ export default function TransactionsPage() {
           <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                {["Transaction ID", "Ref / Description", "Type", "Counterparty", "Branch", "Amount", "Method", "Status", "Date", "Actions"].map((header) => (
+                {["Transaction ID", "Ref / Description", "Type", "Counterparty", "Branch", "Amount", "Method", "Status", "Processed By", "Date", "Actions"].map((header) => (
                   <th key={header} className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
@@ -406,13 +407,13 @@ export default function TransactionsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={10} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                  <td colSpan={11} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     Loading transactions...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={10} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                  <td colSpan={11} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     <div className="flex flex-col items-center gap-3">
                       <span>{error}</span>
                       <AsyncButton onClick={fetchTransactions}>Retry</AsyncButton>
@@ -421,7 +422,7 @@ export default function TransactionsPage() {
                 </tr>
               ) : visibleTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                  <td colSpan={11} className="px-3 md:px-6 py-6 md:py-12 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     No transactions found
                   </td>
                 </tr>
@@ -477,6 +478,9 @@ export default function TransactionsPage() {
                       >
                         {transaction.status}
                       </span>
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
+                      {transaction.processedBy?.fullName || "—"}
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 text-sm" style={{ color: theme.text.primary }}>
                       {new Date(transaction.createdAt).toLocaleString()}

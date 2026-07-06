@@ -151,7 +151,17 @@ export class OrdersService {
               email: true,
             },
           },
-          transactions: true,
+          transactions: {
+            include: {
+              processedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
+            },
+          },
           delivery: true,
         },
         orderBy: { createdAt: "desc" },
@@ -184,7 +194,17 @@ export class OrdersService {
           },
         },
         branch: true,
-        transactions: true,
+        transactions: {
+          include: {
+            processedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+        },
         delivery: true,
         processedBy: {
           select: {
@@ -230,10 +250,9 @@ export class OrdersService {
       const basePrice = Number(bike.model.basePrice);
       const salePrice = basePrice * (1 - effectiveDiscount / 100);
       const discountAmount = basePrice - salePrice;
-      const minimumPayment = Math.ceil(salePrice * 0.5);
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-      // For online (non-cash) orders: customer pays an advance of at least 50%
+      // For online (non-cash) orders: customer pays an advance
       let advanceAmount: number;
       if (isCash) {
         advanceAmount = salePrice; // cash = full amount at store
@@ -241,12 +260,7 @@ export class OrdersService {
         if (!dto.paymentProofUrl) {
           throw new BadRequestException(`Payment proof URL is required for online orders`);
         }
-        advanceAmount = dto.initialPaymentAmount ?? minimumPayment;
-        if (advanceAmount < minimumPayment) {
-          throw new BadRequestException(
-            `Minimum advance payment is Rs. ${minimumPayment.toLocaleString()} (50% of Rs. ${salePrice.toLocaleString()})`
-          );
-        }
+        advanceAmount = dto.initialPaymentAmount ?? salePrice;
         if (advanceAmount > salePrice) {
           advanceAmount = salePrice; // cap at full price
         }
@@ -309,6 +323,7 @@ export class OrdersService {
           method: dto.paymentMethod,
           status: !isCash ? PaymentStatus.VERIFICATION_PENDING : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
+          processedById: user.id,
         },
       });
 
@@ -364,7 +379,17 @@ export class OrdersService {
 
       return tx.order.findUnique({
         where: { id: order.id },
-        include: { bike: { include: { model: true, branch: true } }, branch: true, transactions: true },
+        include: { bike: { include: { model: true, branch: true } }, branch: true, transactions: {
+          include: {
+            processedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+        } },
       });
     });
 
@@ -388,7 +413,17 @@ export class OrdersService {
           },
         },
         branch: true,
-        transactions: true,
+        transactions: {
+          include: {
+            processedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+        },
         delivery: true,
         documents: true,
         processedBy: {
@@ -579,7 +614,17 @@ export class OrdersService {
         where: { id },
         include: {
           bike: true,
-          transactions: true,
+          transactions: {
+            include: {
+              processedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
+            },
+          },
           processedBy: {
             select: {
               role: true,
@@ -712,9 +757,9 @@ export class OrdersService {
 
       this.assertOrderAccess(order, user);
 
-      if (order.status !== OrderStatus.PENDING_PAYMENT) {
+      if (order.status !== OrderStatus.PENDING_PAYMENT && order.status !== OrderStatus.CONFIRMED) {
         throw new BadRequestException(
-          `Order is not in PENDING_PAYMENT status. Current status: ${order.status}`
+          `Order is not in PENDING_PAYMENT or CONFIRMED status. Current status: ${order.status}`
         );
       }
 
@@ -740,11 +785,6 @@ export class OrdersService {
       });
 
       let transaction: any = existingTx;
-      
-      const isInitialPayment = Number(order.paidAmount) === 0;
-      if (order.isInstallmentPlan && isInitialPayment && dto.amount < Number(order.totalAmount) * 0.5) {
-        throw new BadRequestException(`Initial payment for an installment plan must be at least 50% of the total amount`);
-      }
 
       if (existingTx) {
         transaction = await tx.paymentTransaction.update({
@@ -768,6 +808,7 @@ export class OrdersService {
             status: PaymentStatus.SUCCESS,
             verifiedAt: new Date(),
             verifiedById: user.id,
+            processedById: user.id,
           },
         });
       }
@@ -837,10 +878,14 @@ export class OrdersService {
         reservationExpiry = null;
       }
 
+      // Only update status if it's actually changing
+      const newStatus = newPaymentState === PaymentState.PAID ? OrderStatus.PAID : order.status;
+      const statusData = newStatus !== order.status ? { status: newStatus } : {};
+
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
-          status: newPaymentState === PaymentState.PAID ? OrderStatus.PAID : order.status,
+          ...statusData,
           paymentVerified: true,
           reservationExpiry,
           processedById: user.id,
@@ -1009,10 +1054,6 @@ export class OrdersService {
       const isInstallment = dto.isInstallmentPlan || false;
       const initialPayment = dto.initialPaymentAmount !== undefined ? dto.initialPaymentAmount : finalSalePrice;
 
-      if (isInstallment && initialPayment < finalSalePrice * 0.5) {
-        throw new BadRequestException(`Initial payment for an installment plan must be at least 50% of the total amount`);
-      }
-
       const balance = finalSalePrice - initialPayment;
       let paymentState: PaymentState = PaymentState.DUE;
       if (initialPayment >= finalSalePrice) paymentState = PaymentState.PAID;
@@ -1087,6 +1128,7 @@ export class OrdersService {
             verifiedAt: new Date(),
             verifiedById: user.id,
             accountId: paymentAcc?.id,
+            processedById: user.id,
           },
         });
         await tx.paymentAllocation.create({

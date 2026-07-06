@@ -234,6 +234,10 @@ model User {
   vendorAllocationsRecorded      VendorAllocation[]      @relation("VendorAllocationRecordedBy")
   vendorDefectiveReturnsRecorded VendorDefectiveReturn[] @relation("VendorDefectiveReturnRecordedBy")
 
+  processedPaymentTransactions       PaymentTransaction[]       @relation("PaymentTransactionProcessedBy")
+  processedPartPaymentTransactions   PartPaymentTransaction[]   @relation("PartPaymentTransactionProcessedBy")
+  receivablePaymentsRecorded         ReceivablePayment[]         @relation("ReceivablePaymentRecordedBy")
+
   @@index([email])
   @@index([role])
   @@index([branchId])
@@ -643,6 +647,9 @@ model PaymentTransaction {
   verifiedAt      DateTime?
   verifiedById    String?
 
+  processedById String?
+  processedBy   User?   @relation("PaymentTransactionProcessedBy", fields: [processedById], references: [id])
+
   webhookReceivedAt DateTime?
 
   createdAt DateTime @default(now())
@@ -680,6 +687,9 @@ model PartPaymentTransaction {
   paymentProofUrl String?
   verifiedAt      DateTime?
   verifiedById    String?
+
+  processedById String?
+  processedBy   User?   @relation("PartPaymentTransactionProcessedBy", fields: [processedById], references: [id])
 
   webhookReceivedAt DateTime?
 
@@ -1209,6 +1219,7 @@ model ReceivablePayment {
   journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
 
   recordedById String?
+  recordedBy   User?         @relation("ReceivablePaymentRecordedBy", fields: [recordedById], references: [id])
   collectedAt  DateTime @default(now())
 
   createdAt DateTime @default(now())

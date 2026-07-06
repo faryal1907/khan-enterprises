@@ -54,6 +54,7 @@ export class PayablesService {
           verifiedAt: new Date(),
           verifiedById: userId,
           accountId: sourceAcc?.id,
+          processedById: userId,
         }
       });
 

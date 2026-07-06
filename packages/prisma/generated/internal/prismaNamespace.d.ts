@@ -3263,6 +3263,7 @@ export declare const PaymentTransactionScalarFieldEnum: {
     readonly paymentProofUrl: "paymentProofUrl";
     readonly verifiedAt: "verifiedAt";
     readonly verifiedById: "verifiedById";
+    readonly processedById: "processedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
@@ -3282,6 +3283,7 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly paymentProofUrl: "paymentProofUrl";
     readonly verifiedAt: "verifiedAt";
     readonly verifiedById: "verifiedById";
+    readonly processedById: "processedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";

@@ -176,6 +176,7 @@ const partOrder = await tx.partOrder.create({
             ? PaymentStatus.VERIFICATION_PENDING
             : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
+          processedById: user.id,
         },
       });
 
@@ -225,7 +226,17 @@ const partOrder = await tx.partOrder.create({
           },
         },
         branch: true,
-        transactions: true,
+        transactions: {
+          include: {
+            processedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+        },
         delivery: true,
         processedBy: {
           select: {
@@ -364,7 +375,17 @@ const partOrder = await tx.partOrder.create({
               email: true,
             },
           },
-          transactions: true,
+          transactions: {
+            include: {
+              processedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       }),
@@ -396,7 +417,17 @@ const partOrder = await tx.partOrder.create({
           },
         },
         branch: true,
-        transactions: true,
+        transactions: {
+          include: {
+            processedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+        },
         delivery: true,
       },
       orderBy: { createdAt: "desc" },
@@ -551,7 +582,17 @@ const partOrder = await tx.partOrder.create({
       const order = await tx.partOrder.findUnique({
         where: { id },
         include: {
-          transactions: true,
+          transactions: {
+            include: {
+              processedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -758,6 +799,7 @@ const partOrder = await tx.partOrder.create({
             verifiedAt: new Date(),
             verifiedById: user.id,
             accountId: paymentAcc?.id,
+            processedById: user.id,
           },
         });
 
@@ -1274,6 +1316,7 @@ const partOrder = await tx.partOrder.create({
             status: txStatus,
             verifiedAt: txStatus === PaymentStatus.SUCCESS ? new Date() : null,
             verifiedById: txStatus === PaymentStatus.SUCCESS ? user.id : null,
+            processedById: user.id,
           },
         });
       }

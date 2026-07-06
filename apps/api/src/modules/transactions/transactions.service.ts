@@ -166,12 +166,30 @@ export class TransactionsService {
     const [bikeTx, partTx, payableTx, receivablePmts, vendorPmts] = await Promise.all([
       this.prisma.client.paymentTransaction.findMany({
         where: paymentWhere,
-        include: { order: { include: { branch: true } } },
+        include: { 
+          order: { include: { branch: true } },
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.client.partPaymentTransaction.findMany({
         where: partPaymentWhere,
-        include: { partOrder: { include: { branch: true } } },
+        include: { 
+          partOrder: { include: { branch: true } },
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.client.paymentTransaction.findMany({
@@ -180,6 +198,13 @@ export class TransactionsService {
           allocations: {
             include: {
               payable: { select: { id: true, ref: true, partyName: true, type: true, description: true } },
+            },
+          },
+          processedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
             },
           },
         },
@@ -197,6 +222,13 @@ export class TransactionsService {
                 },
               },
               account: { select: { id: true, name: true } },
+              recordedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
             },
             orderBy: { createdAt: "desc" },
           })
@@ -207,6 +239,13 @@ export class TransactionsService {
             include: {
               vendor: { select: { id: true, name: true } },
               fromAccount: { select: { id: true, name: true, subtype: true } },
+              recordedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
             },
             orderBy: { createdAt: "desc" },
           })
@@ -223,6 +262,11 @@ export class TransactionsService {
       createdAt: tx.createdAt.toISOString(),
       updatedAt: tx.updatedAt.toISOString(),
       type: "BIKE" as const,
+      processedBy: (tx as any).processedBy ? {
+        id: (tx as any).processedBy.id,
+        fullName: (tx as any).processedBy.fullName,
+        email: (tx as any).processedBy.email,
+      } : null,
       order: tx.order ? {
         id: tx.order.id,
         orderNumber: tx.order.orderNumber,
@@ -246,6 +290,11 @@ export class TransactionsService {
       createdAt: tx.createdAt.toISOString(),
       updatedAt: tx.updatedAt.toISOString(),
       type: "PART" as const,
+      processedBy: (tx as any).processedBy ? {
+        id: (tx as any).processedBy.id,
+        fullName: (tx as any).processedBy.fullName,
+        email: (tx as any).processedBy.email,
+      } : null,
       order: tx.partOrder ? {
         id: tx.partOrder.id,
         orderNumber: tx.partOrder.orderNumber,
@@ -272,6 +321,11 @@ export class TransactionsService {
         createdAt: tx.createdAt.toISOString(),
         updatedAt: tx.updatedAt.toISOString(),
         type: "PAYABLE" as const,
+        processedBy: (tx as any).processedBy ? {
+          id: (tx as any).processedBy.id,
+          fullName: (tx as any).processedBy.fullName,
+          email: (tx as any).processedBy.email,
+        } : null,
         party: payable ? {
           name: payable.partyName,
           ref: payable.ref,
@@ -291,6 +345,11 @@ export class TransactionsService {
       createdAt: pmt.createdAt.toISOString(),
       updatedAt: pmt.createdAt.toISOString(),
       type: "RECEIVABLE" as const,
+      processedBy: pmt.recordedBy ? {
+        id: pmt.recordedBy.id,
+        fullName: pmt.recordedBy.fullName,
+        email: pmt.recordedBy.email,
+      } : null,
       party: pmt.entry ? {
         name: pmt.entry.party?.name ?? "—",
         partyType: pmt.entry.party?.partyType ?? null,
@@ -313,6 +372,11 @@ export class TransactionsService {
         createdAt: pmt.createdAt.toISOString(),
         updatedAt: pmt.updatedAt.toISOString(),
         type: "VENDOR_PAYMENT" as const,
+        processedBy: pmt.recordedBy ? {
+          id: pmt.recordedBy.id,
+          fullName: pmt.recordedBy.fullName,
+          email: pmt.recordedBy.email,
+        } : null,
         party: {
           name: pmt.vendor?.name ?? "—",
           ref: `VND-${pmt.id.substring(0, 8).toUpperCase()}`,

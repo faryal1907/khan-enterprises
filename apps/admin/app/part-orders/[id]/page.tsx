@@ -587,6 +587,9 @@ export default function PartOrderDetailPage() {
                       Gateway Reference
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                      Processed By
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                       Timestamp
                     </th>
                   </tr>
@@ -605,6 +608,9 @@ export default function PartOrderDetailPage() {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {transaction.gatewayReference || "—"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
+                        {transaction.processedBy?.fullName || "—"}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {new Date(transaction.createdAt).toLocaleString()}

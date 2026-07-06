@@ -509,6 +509,7 @@ export class ReceivablesService {
         const txRecord = await tx.partPaymentTransaction.create({ data: {
           partOrderId: alloc.orderId, amount: alloc.allocated, method: paymentMethod as any,
           status: "SUCCESS", verifiedAt: new Date(), verifiedById: userId, accountId: paymentAcc.id,
+          processedById: userId,
         }});
         const newPaid = Number(po.paidAmount) + alloc.allocated;
         const newBalance = Number(po.amount) - newPaid;
@@ -530,6 +531,7 @@ export class ReceivablesService {
         const txRecord = await tx.paymentTransaction.create({ data: {
           orderId: alloc.orderId, amount: alloc.allocated, method: paymentMethod as any,
           status: "SUCCESS", verifiedAt: new Date(), verifiedById: userId, accountId: paymentAcc.id,
+          processedById: userId,
         }});
         await tx.paymentAllocation.create({ data: { paymentId: txRecord.id, orderId: alloc.orderId, allocatedAmount: alloc.allocated }});
         const newPaid = Number(o.paidAmount) + alloc.allocated;

@@ -355,6 +355,7 @@ export const PaymentTransactionScalarFieldEnum = {
   paymentProofUrl: 'paymentProofUrl',
   verifiedAt: 'verifiedAt',
   verifiedById: 'verifiedById',
+  processedById: 'processedById',
   webhookReceivedAt: 'webhookReceivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -377,6 +378,7 @@ export const PartPaymentTransactionScalarFieldEnum = {
   paymentProofUrl: 'paymentProofUrl',
   verifiedAt: 'verifiedAt',
   verifiedById: 'verifiedById',
+  processedById: 'processedById',
   webhookReceivedAt: 'webhookReceivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

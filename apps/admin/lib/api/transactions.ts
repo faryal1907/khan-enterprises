@@ -42,6 +42,12 @@ export type TransactionRecord = {
   } | null;
   /** Present for PAYABLE, RECEIVABLE, and VENDOR_PAYMENT transactions */
   party?: TransactionParty | null;
+  /** User who processed the transaction */
+  processedBy?: {
+    id: string;
+    fullName: string;
+    email: string;
+  } | null;
 };
 
 export async function getTransactions(filters: TransactionFilters = {}) {

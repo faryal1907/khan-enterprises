@@ -215,10 +215,6 @@ export default function ManualOrderPage() {
           toast.error("Initial payment must be greater than zero");
           return;
         }
-        if (isPartial && initialPaymentNum < salePriceNum * 0.5) {
-          toast.error("Initial payment must be at least 50% of the sale price");
-          return;
-        }
 
         const payload = {
           chassisNumber: formData.chassisNumber,
@@ -518,11 +514,6 @@ export default function ManualOrderPage() {
                 {balanceDue > 0 && <p className="text-xs mt-1" style={{ color: theme.text.muted }}>{numberToWords(balanceDue)}</p>}
               </div>
               <div className="flex items-end">
-                {saleType === "BIKE" && salePriceNum > 0 && (
-                  <p className="text-xs" style={{ color: theme.text.muted }}>
-                    Min. advance: Rs. {Math.ceil(salePriceNum * 0.5).toLocaleString()} (50%)
-                  </p>
-                )}
               </div>
             </div>
           )}

@@ -29,7 +29,7 @@ export default function OrderDetailPage() {
   const [rejectPaymentReason, setRejectPaymentReason] = useState("");
   const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
   const [paymentData, setPaymentData] = useState({
-    method: PaymentMethod.CASH,
+    method: PaymentMethod.ONLINE_TRANSFER,
     amount: 0,
     referenceNumber: "",
     accountId: "",
@@ -99,8 +99,6 @@ export default function OrderDetailPage() {
         accountId: paymentData.accountId || undefined,
       };
       await recordPayment(orderId, paymentPayload);
-      // Auto-confirm after payment
-      await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
       const updatedOrder = await getOrderById(orderId);
       setOrder(updatedOrder);
       setShowPaymentModal(false);
@@ -591,6 +589,9 @@ export default function OrderDetailPage() {
                       Gateway Reference
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                      Processed By
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                       Timestamp
                     </th>
                   </tr>
@@ -622,6 +623,9 @@ export default function OrderDetailPage() {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {transaction.gatewayReference || "—"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
+                        {(transaction as any).processedBy?.fullName || "—"}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {new Date(transaction.createdAt).toLocaleString()}
@@ -776,11 +780,11 @@ export default function OrderDetailPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                Payment Method
+                Bank/E-Wallet Account
               </label>
               <select
-                value={paymentData.method}
-                onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value as PaymentMethod })}
+                value={paymentData.accountId}
+                onChange={(e) => setPaymentData({ ...paymentData, accountId: e.target.value })}
                 disabled={actionLoading}
                 className="w-full px-3 py-2 rounded text-sm"
                 style={{
@@ -789,35 +793,14 @@ export default function OrderDetailPage() {
                   color: theme.text.primary,
                 }}
               >
-                <option value={PaymentMethod.CASH}>Cash</option>
-                <option value={PaymentMethod.ONLINE_TRANSFER}>Online Transfer</option>
+                <option value="">Select an account</option>
+                {paymentAccounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.subtype === "BANK" ? "🏦" : "💳"} {acc.name} {acc.accountNumber ? `(${acc.accountNumber})` : ""}
+                  </option>
+                ))}
               </select>
             </div>
-            {paymentData.method === PaymentMethod.ONLINE_TRANSFER && (
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
-                  Bank/E-Wallet Account
-                </label>
-                <select
-                  value={paymentData.accountId}
-                  onChange={(e) => setPaymentData({ ...paymentData, accountId: e.target.value })}
-                  disabled={actionLoading}
-                  className="w-full px-3 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: theme.backgrounds.tertiary,
-                    border: `1px solid ${theme.borders.medium}`,
-                    color: theme.text.primary,
-                  }}
-                >
-                  <option value="">Select an account</option>
-                  {paymentAccounts.map((acc) => (
-                    <option key={acc.id} value={acc.id}>
-                      {acc.subtype === "BANK" ? "🏦" : "💳"} {acc.name} {acc.accountNumber ? `(${acc.accountNumber})` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
                 Amount
@@ -880,7 +863,7 @@ export default function OrderDetailPage() {
              </button>
              <AsyncButton
                onClick={handleRecordPayment}
-               disabled={paymentData.amount <= 0 || actionLoading || (paymentData.method === PaymentMethod.ONLINE_TRANSFER && !paymentData.accountId)}
+               disabled={paymentData.amount <= 0 || actionLoading || !paymentData.accountId}
                loading={actionLoading}
                loadingLabel="Recording..."
              >
