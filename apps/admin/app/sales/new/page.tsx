@@ -71,6 +71,22 @@ export default function ManualOrderPage() {
   const [isFetchingParts, setIsFetchingParts] = useState(false);
   const [showPartDropdown, setShowPartDropdown] = useState(false);
 
+  interface BikeInventory {
+    id: string;
+    chassisNumber: string;
+    status: string;
+    model?: {
+      brand: string;
+      modelName: string;
+      basePrice?: number | null;
+    };
+    price?: number | null;
+  }
+  const [allBikes, setAllBikes] = useState<BikeInventory[]>([]);
+  const [bikeSearchTerm, setBikeSearchTerm] = useState("");
+  const [isFetchingBikes, setIsFetchingBikes] = useState(false);
+  const [showBikeDropdown, setShowBikeDropdown] = useState(false);
+
   useEffect(() => {
     getPaymentAccounts().then(setPaymentAccounts).catch(() => {});
   }, []);
@@ -91,6 +107,26 @@ export default function ManualOrderPage() {
     if (allParts.length === 0) fetchAllParts();
   }, [allParts.length, isBranchScoped, saleType, user?.branchId]);
 
+  useEffect(() => {
+    if (saleType !== "BIKE") return;
+    const fetchAllBikes = async () => {
+      setIsFetchingBikes(true);
+      try {
+        const res = await getBikes({
+          status: "AVAILABLE",
+          ...(isBranchScoped && user?.branchId ? { branchId: user.branchId } : {}),
+          limit: 100,
+        });
+        setAllBikes(res.bikes || []);
+      } catch (error) {
+        console.error("Failed to fetch bikes:", error);
+      } finally {
+        setIsFetchingBikes(false);
+      }
+    };
+    if (allBikes.length === 0) fetchAllBikes();
+  }, [allBikes.length, isBranchScoped, saleType, user?.branchId]);
+
   const partSearchResults =
     partSearchTerm.trim() && (!formData.partName || !partSearchTerm.includes(formData.partName))
       ? allParts.filter(
@@ -99,6 +135,15 @@ export default function ManualOrderPage() {
             p.part?.sku?.toLowerCase().includes(partSearchTerm.toLowerCase())
         )
       : allParts;
+
+  const bikeSearchResults =
+    bikeSearchTerm.trim() && (!formData.chassisNumber || !bikeSearchTerm.includes(formData.chassisNumber))
+      ? allBikes.filter(
+          (b: BikeInventory) =>
+            b.chassisNumber?.toLowerCase().includes(bikeSearchTerm.toLowerCase()) ||
+            `${b.model?.brand} ${b.model?.modelName}`.toLowerCase().includes(bikeSearchTerm.toLowerCase())
+        )
+      : allBikes;
 
   const handleInputChange = (key: string, value: string) => {
     setFormData((prev) => {
@@ -326,12 +371,63 @@ export default function ManualOrderPage() {
           <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
             <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Bike Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Chassis Number *</label>
                 <div className="flex gap-2">
-                  <input type="text" value={formData.chassisNumber} onChange={(e) => handleInputChange("chassisNumber", e.target.value)} disabled={lookupLoading || isSubmitting} className="flex-1 px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Enter chassis number" />
+                  <input 
+                    type="text" 
+                    value={bikeSearchTerm} 
+                    onChange={(e) => { 
+                      setBikeSearchTerm(e.target.value); 
+                      if (formData.chassisNumber) { 
+                        handleInputChange("chassisNumber", "");
+                        setBikeDetails(null);
+                      } 
+                      setShowBikeDropdown(true); 
+                    }} 
+                    onFocus={() => setShowBikeDropdown(true)} 
+                    onBlur={() => setTimeout(() => setShowBikeDropdown(false), 200)} 
+                    disabled={lookupLoading || isSubmitting} 
+                    className="flex-1 px-3 py-2 rounded text-sm" 
+                    style={inputStyle} 
+                    placeholder="Search chassis number..." 
+                  />
                   <AsyncButton onClick={handleChassisLookup} loading={lookupLoading} loadingLabel="Looking up..." disabled={isSubmitting}>Lookup</AsyncButton>
                 </div>
+                {showBikeDropdown && (
+                  <div className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}` }}>
+                    {isFetchingBikes ? (
+                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>Loading bikes...</div>
+                    ) : bikeSearchResults.length > 0 ? (
+                      bikeSearchResults.map((b: BikeInventory) => (
+                        <div 
+                          key={b.id} 
+                          className="px-3 py-2 text-sm cursor-pointer hover:opacity-80" 
+                          style={{ color: theme.text.primary, backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }} 
+                          onClick={() => { 
+                            const modelName = `${b.model?.brand} ${b.model?.modelName}`;
+                            const price = b.price || b.model?.basePrice || 0;
+                            setBikeSearchTerm(b.chassisNumber);
+                            handleInputChange("chassisNumber", b.chassisNumber);
+                            setBikeDetails({ id: b.id, model: modelName, price: price.toString() });
+                            setFormData((prev) => ({
+                              ...prev,
+                              bikeModel: modelName,
+                              bikePrice: Number(price).toLocaleString(),
+                              salePrice: Number(price).toLocaleString(),
+                            }));
+                            setShowBikeDropdown(false);
+                          }}
+                        >
+                          <div className="font-medium">{b.chassisNumber}</div>
+                          <div className="text-xs" style={{ color: theme.text.secondary }}>{b.model?.brand} {b.model?.modelName} | Rs. {Number(b.price || b.model?.basePrice || 0).toLocaleString()}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>No bike found</div>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Model</label>
