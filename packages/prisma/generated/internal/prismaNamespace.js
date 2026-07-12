@@ -167,6 +167,7 @@ exports.PartScalarFieldEnum = {
     category: 'category',
     description: 'description',
     sellingPrice: 'sellingPrice',
+    purchaseCost: 'purchaseCost',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };

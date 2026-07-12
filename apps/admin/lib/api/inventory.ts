@@ -125,6 +125,7 @@ export async function updatePart(
     category?: string;
     description?: string;
     sellingPrice?: number;
+    purchaseCost?: number;
   },
 ) {
   const response = await api.put(`/inventory/parts/${id}`, data);

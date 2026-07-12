@@ -10,7 +10,7 @@ import { AttachDocumentDto } from "./dto/attach-document.dto";
 import { CreatePartDto } from "./dto/create-part.dto";
 import { UpdatePartDto } from "./dto/update-part.dto";
 import { AdjustStockDto } from "./dto/adjust-stock.dto";
-import { AuditAction, BikeStatus, InventoryMovementType, OrderStatus, UserRole } from "@khan/prisma";
+import { AuditAction, BikeStatus, InventoryMovementType, OrderStatus, UserRole, AccountSubtype } from "@khan/prisma";
 
 type InventoryUser = {
   id: string;
@@ -687,6 +687,9 @@ export class InventoryService {
       }
     }
 
+    // Handle purchaseCost changes with journal entries
+    const costChanged = dto.purchaseCost !== undefined && Number(dto.purchaseCost) !== Number(oldPart.purchaseCost || 0);
+
     return this.prisma.client.$transaction(async (tx) => {
       const part = await tx.part.update({
         where: { id },
@@ -700,6 +703,48 @@ export class InventoryService {
         },
       });
 
+      // Create journal entry if purchaseCost changed
+      if (costChanged && dto.purchaseCost !== undefined) {
+        const inventoryAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.INVENTORY } });
+        const prepaidAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.VENDOR_PREPAID } });
+
+        if (!inventoryAcc || !prepaidAcc) {
+          throw new BadRequestException("Required accounts (Inventory, Vendor Prepaid) not found");
+        }
+
+        const oldCost = Number(oldPart.purchaseCost || 0);
+        const newCost = Number(dto.purchaseCost);
+        const difference = newCost - oldCost;
+
+        // If cost increased, CR Inventory / DR Vendor Prepaid (increase inventory value, decrease prepaid balance)
+        // If cost decreased, DR Inventory / CR Vendor Prepaid (decrease inventory value, increase prepaid balance)
+        const journalEntryLines = [
+          {
+            accountId: inventoryAcc.id,
+            debit: difference > 0 ? difference : 0,
+            credit: difference < 0 ? Math.abs(difference) : 0,
+          },
+          {
+            accountId: prepaidAcc.id,
+            debit: difference < 0 ? Math.abs(difference) : 0,
+            credit: difference > 0 ? difference : 0,
+          },
+        ];
+
+        const entryNo = `JV-PC-${Date.now()}`;
+
+        await tx.journalEntry.create({
+          data: {
+            entryNo,
+            date: new Date(),
+            description: `Part cost adjustment: ${oldPart.name} (${oldPart.sku}) from Rs ${oldCost} to Rs ${newCost}`,
+            lines: {
+              create: journalEntryLines,
+            },
+          },
+        });
+      }
+
       await tx.auditLog.create({
         data: {
           userId: user.id,
@@ -712,6 +757,7 @@ export class InventoryService {
             sku: oldPart.sku,
             category: oldPart.category,
             sellingPrice: oldPart.sellingPrice,
+            purchaseCost: oldPart.purchaseCost,
           }),
           newValue: JSON.stringify(dto),
         },

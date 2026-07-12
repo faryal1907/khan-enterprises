@@ -3155,6 +3155,7 @@ export declare const PartScalarFieldEnum: {
     readonly category: "category";
     readonly description: "description";
     readonly sellingPrice: "sellingPrice";
+    readonly purchaseCost: "purchaseCost";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };

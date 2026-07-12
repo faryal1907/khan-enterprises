@@ -24,6 +24,12 @@ export class UpdatePartDto {
   @Type(() => Number)
   sellingPrice?: number;
 
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  purchaseCost?: number;
+
   @IsInt()
   @Min(0)
   @IsOptional()
