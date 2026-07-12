@@ -156,6 +156,7 @@ export default function EditBikePage() {
   const [modelId, setModelId] = useState("");
   const [vendorId, setVendorId] = useState("");
   const [status, setStatus] = useState("AVAILABLE");
+  const [bikeData, setBikeData] = useState<any>(null);
 
   // Reference data
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -169,6 +170,7 @@ export default function EditBikePage() {
 
   // New fields
   const [price, setPrice] = useState("");
+  const [purchaseCost, setPurchaseCost] = useState("");
   const [onlineDiscountPercent, setOnlineDiscountPercent] = useState("");
   const [color, setColor] = useState("");
   const [media, setMedia] = useState<string[]>([]);
@@ -178,6 +180,8 @@ export default function EditBikePage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showCostWarning, setShowCostWarning] = useState(false);
+  const [pendingCostChange, setPendingCostChange] = useState(false);
 
   useEffect(() => {
     if (user && user.role !== UserRole.ADMIN) router.replace("/bikes");
@@ -198,6 +202,7 @@ export default function EditBikePage() {
         setBranches(branchesRes.branches);
         setVendors(vendorsRes.vendors);
         setBikeModels(modelsRes.bikeModels);
+        setBikeData(bike);
 
         // Populate bike state
         setChassisNumber(bike.chassisNumber);
@@ -208,6 +213,7 @@ export default function EditBikePage() {
         setVendorId(bike.vendor?.id || "");
         setStatus(bike.status || "AVAILABLE");
         setPrice(bike.price ? bike.price.toString() : "");
+        setPurchaseCost(bike.purchaseCost ? bike.purchaseCost.toString() : "");
         setOnlineDiscountPercent(bike.onlineDiscountPercent !== undefined && bike.onlineDiscountPercent !== null ? bike.onlineDiscountPercent.toString() : "");
         setColor(bike.color || "");
         setMedia(bike.media || []);
@@ -290,12 +296,29 @@ export default function EditBikePage() {
       return;
     }
 
+    // Check if cost price is changing
+    const oldCost = bikeData?.purchaseCost ? Number(bikeData.purchaseCost) : 0;
+    const newCost = purchaseCost ? parseFloat(purchaseCost) : 0;
+    const costChanged = oldCost !== newCost;
+
+    if (costChanged && bikeData?.vendorAllocationId) {
+      setPendingCostChange(true);
+      setShowCostWarning(true);
+      return;
+    }
+
+    await performSubmit();
+  };
+
+  const performSubmit = async () => {
     setSubmitting(true);
+    setShowCostWarning(false);
     try {
       // Update bike
       await updateBike(id, {
         vendorId,
         price: price ? parseFloat(price) : undefined,
+        purchaseCost: purchaseCost ? parseFloat(purchaseCost) : undefined,
         onlineDiscountPercent: onlineDiscountPercent ? parseFloat(onlineDiscountPercent) : undefined,
         color: color || undefined,
         media,
@@ -502,6 +525,39 @@ export default function EditBikePage() {
                   onChange={(e) => setPrice(e.target.value)}
                   disabled={!modelId}
                 />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Cost Price (PKR)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 rounded text-sm disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Cost from vendor allocation"
+                  value={purchaseCost}
+                  onChange={(e) => setPurchaseCost(e.target.value)}
+                  disabled={!bikeData?.vendorAllocationId}
+                />
+                {bikeData?.vendorAllocationId && (
+                  <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                    Editing cost price will update vendor allocation and prepaid balance
+                  </p>
+                )}
+                {!bikeData?.vendorAllocationId && (
+                  <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                    Cost price cannot be edited for manually created bikes
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -792,6 +848,97 @@ export default function EditBikePage() {
                    {deleting ? "Deleting..." : "Delete"}
                  </button>
                </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cost Price Change Warning Modal */}
+        {showCostWarning && (
+          <div
+            className="fixed inset-0 flex items-center justify-center z-50"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+          >
+            <div
+              className="rounded-lg p-4 md:p-6 max-w-md w-full mx-4"
+              style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+            >
+              <h3
+                className="text-lg font-semibold mb-4"
+                style={{ color: theme.text.primary }}
+              >
+                Cost Price Change Warning
+              </h3>
+              <div className="mb-4 md:mb-6">
+                <p className="text-sm mb-3" style={{ color: theme.text.secondary }}>
+                  You are changing the cost price for this bike. This will affect:
+                </p>
+                <ul className="text-sm space-y-2 mb-4" style={{ color: theme.text.secondary }}>
+                  <li>• Vendor allocation total amount</li>
+                  <li>• Vendor prepaid balance</li>
+                  <li>• Accounting journal entries</li>
+                </ul>
+                <div className="p-3 rounded" style={{ backgroundColor: theme.backgrounds.tertiary }}>
+                  <p className="text-sm font-medium mb-2" style={{ color: theme.text.primary }}>
+                    Cost Price Change:
+                  </p>
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: theme.text.secondary }}>Current:</span>
+                    <span style={{ color: theme.text.primary }}>
+                      Rs {(bikeData?.purchaseCost ? Number(bikeData.purchaseCost) : 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: theme.text.secondary }}>New:</span>
+                    <span style={{ color: theme.text.primary }}>
+                      Rs {(purchaseCost ? parseFloat(purchaseCost) : 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold mt-2 pt-2" style={{ borderTop: `1px solid ${theme.borders.light}` }}>
+                    <span style={{ color: theme.text.secondary }}>Difference:</span>
+                    <span style={{ 
+                      color: (parseFloat(purchaseCost || "0") - (bikeData?.purchaseCost ? Number(bikeData.purchaseCost) : 0)) > 0 
+                        ? theme.accents.secondary 
+                        : theme.accents.tertiary 
+                    }}>
+                      Rs {(parseFloat(purchaseCost || "0") - (bikeData?.purchaseCost ? Number(bikeData.purchaseCost) : 0)).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+                {bikeData?.vendorAllocationId && (
+                  <p className="text-xs mt-3" style={{ color: theme.text.muted }}>
+                    Vendor Allocation ID: {bikeData.vendorAllocationId}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCostWarning(false);
+                    setPendingCostChange(false);
+                  }}
+                  disabled={submitting}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={performSubmit}
+                  disabled={submitting}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  {submitting ? "Saving..." : "Confirm & Save"}
+                </button>
+              </div>
             </div>
           </div>
         )}

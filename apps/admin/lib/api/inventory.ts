@@ -49,6 +49,7 @@ export async function updateBike(id: string, data: {
   vendorId?: string;
   status?: string;
   price?: number;
+  purchaseCost?: number;
   color?: string;
   media?: string[];
   onlineDiscountPercent?: number;

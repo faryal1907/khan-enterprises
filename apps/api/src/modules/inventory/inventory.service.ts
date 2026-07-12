@@ -228,6 +228,18 @@ export class InventoryService {
   async updateBike(id: string, dto: UpdateBikeUnitDto, user: any) {
     const oldBike = await this.getBikeById(id, user);
 
+    // Validate purchaseCost changes - only allowed if bike has a vendor allocation
+    if (dto.purchaseCost !== undefined && dto.purchaseCost !== null) {
+      if (!oldBike.vendorAllocationId) {
+        throw new BadRequestException(
+          "Cost price can only be edited for bikes that were allocated from a vendor. This bike was manually created."
+        );
+      }
+      if (dto.purchaseCost < 0) {
+        throw new BadRequestException("Cost price cannot be negative.");
+      }
+    }
+
     return this.prisma.client.$transaction(async (tx) => {
       // Determine if status should transition from PENDING_SETUP to AVAILABLE
       let newStatus = oldBike.status;
@@ -244,6 +256,7 @@ export class InventoryService {
         data: {
           vendorId: dto.vendorId,
           price: dto.price,
+          purchaseCost: dto.purchaseCost,
           color: dto.color,
           media: dto.media,
           onlineDiscountPercent: dto.onlineDiscountPercent,
@@ -255,8 +268,96 @@ export class InventoryService {
           model: true,
           vendor: true,
           branch: true,
+          vendorAllocation: true,
         },
       });
+
+      // Handle purchaseCost changes with journal entry and allocation update
+      if (dto.purchaseCost !== undefined && dto.purchaseCost !== null && oldBike.vendorAllocationId) {
+        const oldCost = oldBike.purchaseCost ? Number(oldBike.purchaseCost) : 0;
+        const newCost = dto.purchaseCost;
+        const costDelta = newCost - oldCost;
+
+        if (costDelta !== 0) {
+          // Recalculate VendorAllocation totalAmount
+          const allocation = await tx.vendorAllocation.findUnique({
+            where: { id: oldBike.vendorAllocationId },
+            include: { bikes: true, vendor: true },
+          });
+
+          if (allocation) {
+            const newAllocationTotal = allocation.bikes.reduce((sum, b) => {
+              const bikeCost = b.id === id ? newCost : (b.purchaseCost ? Number(b.purchaseCost) : 0);
+              return sum + bikeCost;
+            }, 0) + (await this.getAllocationPartsTotal(tx, allocation.id));
+
+            await tx.vendorAllocation.update({
+              where: { id: allocation.id },
+              data: { totalAmount: newAllocationTotal },
+            });
+
+            // Look up required accounts
+            const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
+            const prepaidAcc = await tx.account.findFirst({ where: { subtype: 'VENDOR_PREPAID' } });
+
+            if (!inventoryAcc || !prepaidAcc) {
+              throw new BadRequestException(
+                "Required accounts not found. Please ensure Inventory (1003) and Vendor Prepaid accounts exist in the Chart of Accounts."
+              );
+            }
+
+            // Create adjusting journal entry
+            const journalEntry = await tx.journalEntry.create({
+              data: {
+                entryNo: await this.generateJournalEntryNumber(tx),
+                date: new Date(),
+                description: `Cost price adjustment for bike ${oldBike.chassisNumber} in allocation ${allocation.id}`,
+                sourceRef: `BIKE_COST_ADJUSTMENT:${id}`,
+                status: "POSTED",
+                isManual: false,
+              },
+            });
+
+            if (costDelta > 0) {
+              // Cost increased: DR Inventory, CR Vendor Prepaid
+              await tx.journalEntryLine.create({
+                data: {
+                  journalEntryId: journalEntry.id,
+                  accountId: inventoryAcc.id,
+                  debit: costDelta,
+                  credit: 0,
+                },
+              });
+              await tx.journalEntryLine.create({
+                data: {
+                  journalEntryId: journalEntry.id,
+                  accountId: prepaidAcc.id,
+                  debit: 0,
+                  credit: costDelta,
+                },
+              });
+            } else {
+              // Cost decreased: CR Inventory, DR Vendor Prepaid
+              await tx.journalEntryLine.create({
+                data: {
+                  journalEntryId: journalEntry.id,
+                  accountId: inventoryAcc.id,
+                  debit: 0,
+                  credit: Math.abs(costDelta),
+                },
+              });
+              await tx.journalEntryLine.create({
+                data: {
+                  journalEntryId: journalEntry.id,
+                  accountId: prepaidAcc.id,
+                  debit: Math.abs(costDelta),
+                  credit: 0,
+                },
+              });
+            }
+          }
+        }
+      }
 
       await tx.auditLog.create({
         data: {
@@ -272,6 +373,31 @@ export class InventoryService {
 
       return bike;
     });
+  }
+
+  private async getAllocationPartsTotal(tx: any, allocationId: string): Promise<number> {
+    const partLines = await tx.vendorAllocationPartLine.findMany({
+      where: { allocationId },
+    });
+    return partLines.reduce((sum, line) => sum + Number(line.totalCost), 0);
+  }
+
+  private async generateJournalEntryNumber(tx: any): Promise<string> {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    
+    // Count existing entries for this month
+    const count = await tx.journalEntry.count({
+      where: {
+        createdAt: {
+          gte: new Date(year, now.getMonth(), 1),
+          lt: new Date(year, now.getMonth() + 1, 1),
+        },
+      },
+    });
+    
+    return `JE${year}${month}${String(count + 1).padStart(4, '0')}`;
   }
 
   /** Delete a bike unit. */

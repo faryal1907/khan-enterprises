@@ -9,6 +9,10 @@ export class UpdateBikeUnitDto {
   @IsOptional()
   price?: number;
 
+  @IsNumber()
+  @IsOptional()
+  purchaseCost?: number;
+
   @IsString()
   @IsOptional()
   color?: string;
