@@ -40,8 +40,8 @@ export class PdfService {
 
     // Company Header Info
     doc.font('Helvetica-Bold').fontSize(18).fillColor('#74950A').text("ALI & KHAN'S GREEN WHEELS", 195, 60);
-    doc.font('Helvetica-Oblique').fontSize(11).fillColor('#5E1414').text("Authorized Motorcycle Dealership", 195, 80);
-    doc.font('Helvetica').fontSize(10).fillColor('gray').text("Pakistan | ghulam.ali9366@gmail.com | +92 333443 7840", 195, 96);
+    doc.font('Helvetica-Oblique').fontSize(11).fillColor('#5E1414').text("Electric Vehicle Dealers", 195, 80);
+    doc.font('Helvetica').fontSize(10).fillColor('gray').text("Pakistan | ghulam.ali9366@gmail.com | +92 323 9143977 | +92 311 9143977", 195, 96);
 
     // Banner
     doc.rect(50, 150, 512, 35).fill('#5E1414');
@@ -192,8 +192,8 @@ export class PdfService {
 
     // Company Header Info
     doc.font('Helvetica-Bold').fontSize(18).fillColor('#74950A').text("ALI & KHAN'S GREEN WHEELS", 195, 60);
-    doc.font('Helvetica-Oblique').fontSize(11).fillColor('#5E1414').text("Authorized Motorcycle Dealership", 195, 80);
-    doc.font('Helvetica').fontSize(10).fillColor('gray').text("Pakistan | ghulam.ali9366@gmail.com | +92 333443 7840", 195, 96);
+    doc.font('Helvetica-Oblique').fontSize(11).fillColor('#5E1414').text("Electric Vehicle Dealers", 195, 80);
+    doc.font('Helvetica').fontSize(10).fillColor('gray').text("Pakistan | ghulam.ali9366@gmail.com | +92 311 9143977  | +92 323 9143977", 195, 96);
 
     // Banner
     doc.rect(50, 150, 512, 35).fill('#5E1414');
