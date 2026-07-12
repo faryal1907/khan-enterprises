@@ -756,7 +756,7 @@ export class VendorService {
         where: {
           id: { in: data.bikeIds },
           vendorId,
-          status: "AVAILABLE",
+          status: { in: ["AVAILABLE", "PENDING_SETUP"] },
         },
         include: { model: true },
       });

@@ -17,6 +17,7 @@ import {
   transferBike,
   updateBikeStatus,
 } from "@/lib/api/inventory";
+import { returnDefectiveInventory } from "@/lib/api/vendors";
 import { useAuthStore } from "@/lib/auth-store";
 import { theme } from "@/lib/colors";
 import {
@@ -86,6 +87,13 @@ export default function BikesListPage() {
   const [isTransferring, setIsTransferring] = useState(false);
   const [isReleasing, setIsReleasing] = useState(false);
   const requestId = useRef(0);
+
+  // Bulk return state
+  const [selectedBikeIds, setSelectedBikeIds] = useState<string[]>([]);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnDate, setReturnDate] = useState(new Date().toISOString().split("T")[0]);
+  const [returnNotes, setReturnNotes] = useState("");
+  const [returning, setReturning] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -170,6 +178,49 @@ export default function BikesListPage() {
     }
   };
 
+  const handleBulkReturn = async () => {
+    if (selectedBikeIds.length === 0) {
+      toast.error("No bikes selected for return");
+      return;
+    }
+
+    // Check if all selected bikes belong to the same vendor
+    const selectedBikes = result.bikes.filter(b => selectedBikeIds.includes(b.id));
+    const vendors = [...new Set(selectedBikes.map(b => b.vendor.id))];
+    
+    if (vendors.length > 1) {
+      toast.error("Cannot return bikes from multiple vendors at once");
+      return;
+    }
+
+    const vendorId = vendors[0];
+    if (!vendorId) {
+      toast.error("Selected bikes must have a vendor");
+      return;
+    }
+
+    setReturning(true);
+    try {
+      await returnDefectiveInventory(vendorId, {
+        bikeIds: selectedBikeIds,
+        partReturns: [],
+        date: returnDate,
+        notes: returnNotes.trim() || undefined,
+      });
+      toast.success(`${selectedBikeIds.length} bike(s) returned to vendor successfully`);
+      setSelectedBikeIds([]);
+      setShowReturnModal(false);
+      setReturnNotes("");
+      setReturnDate(new Date().toISOString().split("T")[0]);
+      setRefreshKey(prev => prev + 1);
+    } catch (error: any) {
+      console.error("Failed to return bikes:", error);
+      toast.error(error.response?.data?.message || "Failed to return bikes");
+    } finally {
+      setReturning(false);
+    }
+  };
+
   const submitRelease = async () => {
     if (!selectedBike) return;
     setIsReleasing(true);
@@ -200,7 +251,18 @@ export default function BikesListPage() {
           </div>
           {isAdmin && (
             <div className="flex gap-2">
-              
+              {selectedBikeIds.length > 0 && (
+                <button
+                  onClick={() => setShowReturnModal(true)}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                  style={{
+                    backgroundColor: "#f59e0b",
+                    color: "white",
+                  }}
+                >
+                  Return Selected ({selectedBikeIds.length})
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -318,6 +380,8 @@ export default function BikesListPage() {
             bikes={result.bikes}
             loading={loading}
             isAdmin={isAdmin}
+            selectedBikeIds={selectedBikeIds}
+            onSelectionChange={setSelectedBikeIds}
             onTransfer={(bike) => {
               setSelectedBike(bike);
               setTransferBranchId("");
@@ -398,6 +462,117 @@ export default function BikesListPage() {
           </ModalActions>
         </ActionModal>
       )}
+
+      {/* Bulk Return Modal */}
+      {showReturnModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div
+            className="rounded-lg p-4 md:p-6 max-w-md w-full mx-4"
+            style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
+          >
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: theme.text.primary }}
+            >
+              Return Bikes to Vendor
+            </h3>
+            <div className="mb-4 md:mb-6">
+              <div className="mb-4">
+                <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                  <strong>Bikes to return:</strong> {selectedBikeIds.length}
+                </p>
+                {(() => {
+                  const selectedBikes = result.bikes.filter(b => selectedBikeIds.includes(b.id));
+                  const totalValue = selectedBikes.reduce((sum, b) => sum + (b.purchaseCost ? Number(b.purchaseCost) : 0), 0);
+                  const vendor = selectedBikes[0]?.vendor;
+                  return (
+                    <>
+                      <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                        <strong>Vendor:</strong> {vendor?.name || "Unknown"}
+                      </p>
+                      <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                        <strong>Total Return Value:</strong> Rs {totalValue.toLocaleString()}
+                      </p>
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                    Return Date *
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full border rounded-md px-3 py-2 text-sm outline-none"
+                    style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
+                    value={returnDate}
+                    onChange={(e) => setReturnDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                    Notes (optional)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full border rounded-md px-3 py-2 text-sm outline-none"
+                    style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
+                    placeholder="e.g. Reason for return"
+                    value={returnNotes}
+                    onChange={(e) => setReturnNotes(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div
+                className="mt-4 p-3 rounded text-xs"
+                style={{ backgroundColor: "#fef3c7", border: "1px solid #fcd34d" }}
+              >
+                <p className="font-semibold text-amber-800 mb-1">After confirmation:</p>
+                <ul className="space-y-1 text-amber-700 list-disc list-inside">
+                  <li>{selectedBikeIds.length} bike(s) will be removed from inventory</li>
+                  <li>Vendor's prepaid balance will increase accordingly</li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowReturnModal(false);
+                  setReturnNotes("");
+                  setReturnDate(new Date().toISOString().split("T")[0]);
+                }}
+                disabled={returning}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 disabled:opacity-50"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  color: theme.text.secondary,
+                  border: `1px solid ${theme.borders.medium}`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkReturn}
+                disabled={returning}
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: "#f59e0b",
+                  color: "white",
+                }}
+              >
+                {returning ? "Returning..." : "Confirm Return"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -455,12 +630,16 @@ function BikeTable({
   bikes,
   loading,
   isAdmin,
+  selectedBikeIds,
+  onSelectionChange,
   onTransfer,
   onRelease,
 }: {
   bikes: BikeUnit[];
   loading: boolean;
   isAdmin: boolean;
+  selectedBikeIds: string[];
+  onSelectionChange: (ids: string[]) => void;
   onTransfer: (bike: BikeUnit) => void;
   onRelease: (bike: BikeUnit) => void;
 }) {
@@ -472,6 +651,22 @@ function BikeTable({
       <table className="w-full">
         <thead>
           <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
+            {isAdmin && (
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
+                <input
+                  type="checkbox"
+                  className="w-4 h-4"
+                  checked={selectedBikeIds.length > 0 && bikes.every(b => selectedBikeIds.includes(b.id))}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      onSelectionChange(bikes.filter(b => b.status === BikeStatus.AVAILABLE || b.status === BikeStatus.PENDING_SETUP).map(b => b.id));
+                    } else {
+                      onSelectionChange([]);
+                    }
+                  }}
+                />
+              </th>
+            )}
             {["Chassis No.", "Motor No.", "Model", "Branch", "Vendor", "Status", "Actions"].map((heading) => (
               <th
                 key={heading}
@@ -510,6 +705,24 @@ function BikeTable({
                   backgroundColor: bike.status === BikeStatus.PENDING_SETUP ? "#fffbeb" : undefined,
                 }}
               >
+                {isAdmin && (
+                  <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    {(bike.status === BikeStatus.AVAILABLE || bike.status === BikeStatus.PENDING_SETUP) && (
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4"
+                        checked={selectedBikeIds.includes(bike.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            onSelectionChange([...selectedBikeIds, bike.id]);
+                          } else {
+                            onSelectionChange(selectedBikeIds.filter(id => id !== bike.id));
+                          }
+                        }}
+                      />
+                    )}
+                  </td>
+                )}
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                   {bike.status === BikeStatus.PENDING_SETUP && bike.chassisNumber.startsWith("PENDING-") ? (
                     <span className="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">

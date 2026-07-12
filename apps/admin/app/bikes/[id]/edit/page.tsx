@@ -14,6 +14,7 @@ import {
   attachDocument,
   uploadFile,
 } from "@/lib/api/inventory";
+import { returnDefectiveInventory } from "@/lib/api/vendors";
 import { UserRole, type Branch, type Vendor, type BikeModel } from "@/lib/types";
 
 interface UploadedFile {
@@ -182,6 +183,12 @@ export default function EditBikePage() {
   const [deleting, setDeleting] = useState(false);
   const [showCostWarning, setShowCostWarning] = useState(false);
   const [pendingCostChange, setPendingCostChange] = useState(false);
+
+  // Return bike modal state
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnDate, setReturnDate] = useState(new Date().toISOString().split("T")[0]);
+  const [returnNotes, setReturnNotes] = useState("");
+  const [returning, setReturning] = useState(false);
 
   useEffect(() => {
     if (user && user.role !== UserRole.ADMIN) router.replace("/bikes");
@@ -361,17 +368,30 @@ export default function EditBikePage() {
   };
 
   const handleDelete = async () => {
-    setDeleting(true);
+    setShowReturnModal(true);
+  };
+
+  const handleReturnBike = async () => {
+    if (!bikeData?.vendorId) {
+      toast.error("Bike must have a vendor to return");
+      return;
+    }
+
+    setReturning(true);
     try {
-      await deleteBike(id);
-      toast.success("Bike deleted successfully");
+      await returnDefectiveInventory(bikeData.vendorId, {
+        bikeIds: [id],
+        partReturns: [],
+        date: returnDate,
+        notes: returnNotes.trim() || undefined,
+      });
+      toast.success("Bike returned to vendor successfully");
       router.push("/bikes");
     } catch (error: any) {
-      console.error("Failed to delete bike:", error);
-      toast.error(error.response?.data?.message || "Failed to delete bike");
-      setShowDeleteModal(false);
+      console.error("Failed to return bike:", error);
+      toast.error(error.response?.data?.message || "Failed to return bike");
     } finally {
-      setDeleting(false);
+      setReturning(false);
     }
   };
 
@@ -765,14 +785,14 @@ export default function EditBikePage() {
             <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 sm:gap-3 pt-4 md:pt-6">
               <button
                 type="button"
-                onClick={() => setShowDeleteModal(true)}
+                onClick={handleDelete}
                 className="px-4 md:px-6 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
                 style={{
-                  backgroundColor: "red",
+                  backgroundColor: "#f59e0b",
                   color: "white",
                 }}
               >
-                Delete Bike
+                Return Bike
               </button>
               <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
                 <button
@@ -803,8 +823,8 @@ export default function EditBikePage() {
           </form>
         </div>
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
+        {/* Return Bike Modal */}
+        {showReturnModal && (
           <div
             className="fixed inset-0 flex items-center justify-center z-50"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
@@ -817,37 +837,93 @@ export default function EditBikePage() {
                 className="text-lg font-semibold mb-4"
                 style={{ color: theme.text.primary }}
               >
-                Delete Bike Unit
+                Return Bike to Vendor
               </h3>
-               <p className="text-sm mb-4 md:mb-6" style={{ color: theme.text.secondary }}>
-                 Are you sure you want to delete this bike unit (Chassis: <strong>{chassisNumber}</strong>)? This action cannot be undone.
-               </p>
-               <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
-                 <button
-                   type="button"
-                   onClick={() => setShowDeleteModal(false)}
-                   disabled={deleting}
-                   className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
-                   style={{
-                     backgroundColor: theme.backgrounds.tertiary,
-                     color: theme.text.secondary,
-                     border: `1px solid ${theme.borders.medium}`,
-                   }}
-                 >
-                   Cancel
-                 </button>
-                 <button
-                   onClick={handleDelete}
-                   disabled={deleting}
-                   className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
-                   style={{
-                     backgroundColor: "red",
-                     color: "white",
-                   }}
-                 >
-                   {deleting ? "Deleting..." : "Delete"}
-                 </button>
-               </div>
+              <div className="mb-4 md:mb-6">
+                <div className="mb-4">
+                  <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                    <strong>Bike:</strong> {bikeData?.model?.brand} {bikeData?.model?.modelName}
+                  </p>
+                  <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                    <strong>Chassis:</strong> {chassisNumber}
+                  </p>
+                  <p className="text-sm mb-2" style={{ color: theme.text.secondary }}>
+                    <strong>Vendor:</strong> {bikeData?.vendor?.name}
+                  </p>
+                  <p className="text-sm mb-4" style={{ color: theme.text.secondary }}>
+                    <strong>Return Value:</strong> Rs {(bikeData?.purchaseCost ? Number(bikeData.purchaseCost) : 0).toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                      Return Date *
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full border rounded-md px-3 py-2 text-sm outline-none"
+                      style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
+                      value={returnDate}
+                      onChange={(e) => setReturnDate(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>
+                      Notes (optional)
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-md px-3 py-2 text-sm outline-none"
+                      style={{ borderColor: theme.borders.medium, color: theme.text.primary }}
+                      placeholder="e.g. Reason for return"
+                      value={returnNotes}
+                      onChange={(e) => setReturnNotes(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="mt-4 p-3 rounded text-xs"
+                  style={{ backgroundColor: "#fef3c7", border: "1px solid #fcd34d" }}
+                >
+                  <p className="font-semibold text-amber-800 mb-1">After confirmation:</p>
+                  <ul className="space-y-1 text-amber-700 list-disc list-inside">
+                    <li>Bike will be removed from inventory</li>
+                    <li>Vendor's prepaid balance will increase by Rs {(bikeData?.purchaseCost ? Number(bikeData.purchaseCost) : 0).toLocaleString()}</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowReturnModal(false);
+                    setReturnNotes("");
+                    setReturnDate(new Date().toISOString().split("T")[0]);
+                  }}
+                  disabled={returning}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReturnBike}
+                  disabled={returning}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: "#f59e0b",
+                    color: "white",
+                  }}
+                >
+                  {returning ? "Returning..." : "Confirm Return"}
+                </button>
+              </div>
             </div>
           </div>
         )}
