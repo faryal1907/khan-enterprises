@@ -126,14 +126,15 @@ export class TransactionsService {
 
     // ── Bike order payments ────────────────────────────────────────────────
     const paymentWhere: any = { orderId: { not: null } };
-    if (status) paymentWhere.status = status;
+    // "REVERSED" is a virtual status only for receivable payments; don't pass it to bike/part queries
+    if (status && status !== "REVERSED") paymentWhere.status = status;
     if (method) paymentWhere.method = method;
     if (branchId) paymentWhere.order = { branchId };
     if (hasDateFilter) paymentWhere.createdAt = dateFilter;
 
     // ── Part order payments ────────────────────────────────────────────────
     const partPaymentWhere: any = { partOrderId: { not: null } };
-    if (status) partPaymentWhere.status = status;
+    if (status && status !== "REVERSED") partPaymentWhere.status = status;
     if (method) partPaymentWhere.method = method;
     if (branchId) partPaymentWhere.partOrder = { branchId };
     if (hasDateFilter) partPaymentWhere.createdAt = dateFilter;
@@ -143,17 +144,19 @@ export class TransactionsService {
       orderId: null,
       allocations: { some: { payableId: { not: null } } },
     };
-    if (status) payableTxWhere.status = status;
+    if (status && status !== "REVERSED") payableTxWhere.status = status;
     if (method) payableTxWhere.method = method;
     if (hasDateFilter) payableTxWhere.createdAt = dateFilter;
     // branchId filter not applicable for payable payments (they have no branch link)
 
     // ── Receivable payments (manual ReceivableEntry collections) ──────────
+    // Always fetch ALL receivable payments (including reversed) so the audit trail stays visible.
+    // We map isReversed → status="REVERSED" on the client side.
     const receivablePaymentWhere: any = {};
     if (hasDateFilter) receivablePaymentWhere.createdAt = dateFilter;
     if (method) receivablePaymentWhere.method = method;
-    // status filter: ReceivablePayments are always "SUCCESS" equivalent; skip if filtering for other statuses
-    const includeReceivablePayments = !status || status === "SUCCESS";
+    // If the user is filtering by a specific status that is not SUCCESS/REVERSED, skip receivable payments
+    const includeReceivablePayments = !status || status === "SUCCESS" || status === "REVERSED";
 
     // ── Vendor payments ────────────────────────────────────────────────────
     const vendorPaymentWhere: any = {};
@@ -231,6 +234,12 @@ export class TransactionsService {
               },
             },
             orderBy: { createdAt: "desc" },
+          }).then((pmts) => {
+            // Post-filter: if the user requested "SUCCESS", exclude reversed ones;
+            // if they requested "REVERSED", only return reversed ones.
+            if (status === "SUCCESS") return pmts.filter((p: any) => !p.isReversed);
+            if (status === "REVERSED") return pmts.filter((p: any) => p.isReversed);
+            return pmts;
           })
         : Promise.resolve([]),
       includeVendorPayments
@@ -339,7 +348,8 @@ export class TransactionsService {
       id: pmt.id,
       amount: Number(pmt.amount),
       method: pmt.method,
-      status: "SUCCESS" as const,
+      status: pmt.isReversed ? ("REVERSED" as const) : ("SUCCESS" as const),
+      isReversed: pmt.isReversed ?? false,
       gatewayReference: null,
       failureReason: null,
       createdAt: pmt.createdAt.toISOString(),

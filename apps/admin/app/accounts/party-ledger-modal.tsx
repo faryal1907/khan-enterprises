@@ -115,41 +115,45 @@ export function PartyLedgerModal({ isOpen, onClose, partyId, partyName, partyTyp
                     {ledger.entries.length === 0 && (
                       <tr><td colSpan={6} className="p-6 text-center" style={{ color: theme.text.muted }}>No transactions found.</td></tr>
                     )}
-                    {ledger.entries.map((entry: any, idx: number) => (
-                      <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
-                        <td className="p-3 whitespace-nowrap text-xs" style={{ color: theme.text.secondary }}>{fmtDate(entry.date)}</td>
-                        <td className="p-3 font-medium text-xs whitespace-nowrap" style={{ color: theme.text.primary }}>
-                          {entry.ref}
-                        </td>
-                        <td className="p-3 text-xs" style={{ color: theme.text.secondary }}>{entry.description}</td>
-                        <td className="p-3 text-right text-emerald-600 font-semibold">
-                          {fmt(entry.credit)}
-                        </td>
-                        <td className="p-3 text-right font-semibold" style={{ color: entry.balance > 0 ? "#ef4444" : "#22c55e" }}>
-                          {fmt(Math.max(0, entry.balance))}
-                        </td>
-                        <td className="p-3 text-right">
-                          {entry.type === "COLLECTION" && entry.paymentId && (
-                            <button
-                              onClick={() => handleUndoPayment(entry)}
-                              disabled={undoingPaymentId === entry.paymentId}
-                              className="text-xs px-2 py-1 rounded border bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50"
-                              style={{ borderColor: "#fecaca" }}
-                            >
-                              {undoingPaymentId === entry.paymentId ? "Undoing..." : "Undo"}
-                            </button>
-                          )}
-                          {entry.type === "COLLECTION" && entry.orderId && (
-                            <a href={entry.description?.includes("Part Sale") ? `/part-orders/${entry.orderId}` : `/orders/${entry.orderId}`}
-                              target="_blank" rel="noreferrer"
-                              className="text-xs px-2 py-1 rounded border ml-2"
-                              style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#d1d5db" }}>
-                              View Order
-                            </a>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {ledger.entries.map((entry: any, idx: number) => {
+                      const isInvoice = entry.type === "INVOICE";
+                      const amount = isInvoice ? Number(entry.debit || 0) : Number(entry.credit || 0);
+                      return (
+                        <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
+                          <td className="p-3 whitespace-nowrap text-xs" style={{ color: theme.text.secondary }}>{fmtDate(entry.date)}</td>
+                          <td className="p-3 font-medium text-xs whitespace-nowrap" style={{ color: theme.text.primary }}>
+                            {entry.ref}
+                          </td>
+                          <td className="p-3 text-xs" style={{ color: theme.text.secondary }}>{entry.description}</td>
+                          <td className="p-3 text-right font-semibold" style={{ color: isInvoice ? theme.text.primary : "#22c55e" }}>
+                            {isInvoice ? fmt(amount) : `-${fmt(amount)}`}
+                          </td>
+                          <td className="p-3 text-right font-semibold" style={{ color: entry.balance > 0 ? "#ef4444" : "#22c55e" }}>
+                            {fmt(entry.balance)}
+                          </td>
+                          <td className="p-3 text-right">
+                            {entry.type === "COLLECTION" && entry.paymentId && (
+                              <button
+                                onClick={() => handleUndoPayment(entry)}
+                                disabled={undoingPaymentId === entry.paymentId}
+                                className="text-xs px-2 py-1 rounded border bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50"
+                                style={{ borderColor: "#fecaca" }}
+                              >
+                                {undoingPaymentId === entry.paymentId ? "Undoing..." : "Undo"}
+                              </button>
+                            )}
+                            {entry.orderId && (
+                              <a href={entry.isPartOrder ? `/part-orders/${entry.orderId}` : `/orders/${entry.orderId}`}
+                                target="_blank" rel="noreferrer"
+                                className="text-xs px-2 py-1 rounded border ml-2"
+                                style={{ color: theme.text.primary, borderColor: theme.borders?.medium || "#d1d5db" }}>
+                                View Order
+                              </a>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

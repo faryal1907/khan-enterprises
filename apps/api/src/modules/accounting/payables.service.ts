@@ -139,6 +139,54 @@ export class PayablesService {
     });
   }
 
+  /**
+   * Pay a payee by distributing an amount across their outstanding payables
+   * (oldest first). Mirrors how receivable collections are distributed.
+   */
+  async payPayablesByPayeeAccountId(
+    payeeAccountId: string,
+    amount: number,
+    paymentMethod: any,
+    userId: string,
+    accountId?: string,
+  ) {
+    if (amount <= 0) throw new BadRequestException('Amount must be greater than 0');
+
+    // Validate source account up-front if provided
+    if (accountId) {
+      const acc = await this.prisma.client.account.findUnique({ where: { id: accountId } });
+      if (!acc) throw new NotFoundException('Payment account not found');
+    }
+
+    // Traverse: PayeeAccount → Expense[] → Payable[] (outstanding, oldest first)
+    const expenses = await this.prisma.client.expense.findMany({
+      where: { payeeAccountId },
+      select: { id: true },
+    });
+    const expenseIds = expenses.map((e) => e.id);
+
+    const payables = await this.prisma.client.payable.findMany({
+      where: { expenseId: { in: expenseIds }, remaining: { gt: 0 } },
+      orderBy: { ref: 'asc' },
+    });
+
+    const totalOutstanding = payables.reduce((s, p) => s + Number(p.remaining), 0);
+    if (totalOutstanding <= 0) throw new BadRequestException('No outstanding payables for this payee');
+    if (amount > totalOutstanding) {
+      throw new BadRequestException('Amount exceeds the total outstanding balance');
+    }
+
+    let remainingToPay = amount;
+    for (const payable of payables) {
+      if (remainingToPay <= 0) break;
+      const payAmount = Math.min(Number(payable.remaining), remainingToPay);
+      await this.payPayable(payable.id, payAmount, paymentMethod, userId, accountId);
+      remainingToPay -= payAmount;
+    }
+
+    return { success: true, paid: amount };
+  }
+
   async undoPayablePayment(paymentId: string, userId: string) {
     // Check if user is admin
     const user = await this.prisma.client.user.findUnique({ where: { id: userId } });

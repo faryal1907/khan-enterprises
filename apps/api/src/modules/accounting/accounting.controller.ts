@@ -214,6 +214,22 @@ export class AccountingController {
     );
   }
 
+  @Post("payables/payee/:payeeAccountId/pay")
+  @Roles(UserRole.ADMIN)
+  async payPayablesByPayeeAccountId(
+    @Param("payeeAccountId") payeeAccountId: string,
+    @Body() data: { amount: number; paymentMethod: any; accountId?: string },
+    @Request() req: any,
+  ) {
+    return this.payablesService.payPayablesByPayeeAccountId(
+      payeeAccountId,
+      data.amount,
+      data.paymentMethod,
+      req.user.id,
+      data.accountId,
+    );
+  }
+
   @Post("payables/payments/:paymentId/undo")
   @Roles(UserRole.ADMIN)
   async undoPayablePayment(

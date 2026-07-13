@@ -23,6 +23,7 @@ export type TransactionRecord = {
   amount: number;
   method: string;
   status: string;
+  isReversed?: boolean;
   gatewayReference?: string | null;
   failureReason?: string | null;
   createdAt: string;

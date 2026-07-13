@@ -1,4 +1,3 @@
-npm warn Unknown env config "filter". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
 
 > admin@0.1.0 build
 > next build
@@ -10,51 +9,48 @@ Firebase service worker generated successfully
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
 Firebase service worker generated successfully
-✓ Compiled successfully in 14.5s
+✓ Compiled successfully in 12.2s
   Running TypeScript ...
-  Finished TypeScript in 34.7s ...
-  Collecting page data using 15 workers ...
-  Generating static pages using 15 workers (0/20) ...
-  Generating static pages using 15 workers (5/20) 
-  Generating static pages using 15 workers (10/20) 
-  Generating static pages using 15 workers (15/20) 
-✓ Generating static pages using 15 workers (20/20) in 1217ms
-  Finalizing page optimization ...
 
-Route (app)
-┌ ○ /
-├ ○ /_not-found
-├ ○ /accounts
-├ ○ /audit-logs
-├ ○ /bikes
-├ ƒ /bikes/[id]
-├ ƒ /bikes/[id]/edit
-├ ○ /branches
-├ ƒ /branches/[id]
-├ ○ /branches/new
-├ ○ /deliveries
-├ ƒ /deliveries/[id]
-├ ○ /login
-├ ○ /models
-├ ƒ /models/[id]/edit
-├ ○ /models/new
-├ ○ /orders
-├ ƒ /orders/[id]
-├ ƒ /part-orders/[id]
-├ ○ /parts
-├ ƒ /parts/[id]
-├ ƒ /parts/[id]/edit
-├ ○ /sales
-├ ○ /sales/new
-├ ○ /transactions
-├ ○ /users
-├ ƒ /users/[id]
-├ ○ /users/new
-└ ƒ /vendors/[id]
+<--- Last few GCs --->
 
+[11760:0000012D3E40A000]    24205 ms: Scavenge (interleaved) 399.1 (465.0) -> 338.9 (467.7) MB, pooled: 0 MB, 3.94 / 0.01 ms  (average mu = 0.996, current mu = 0.996) allocation failure; 
+[11760:0000012D3E40A000]    27441 ms: Scavenge (interleaved) 401.7 (467.7) -> 340.1 (469.2) MB, pooled: 0 MB, 1006.17 / 0.00 ms  (average mu = 0.996, current mu = 0.996) allocation failure; 
 
-ƒ Proxy (Middleware)
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
 
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
-
+ 1: 00007FF753F3C44F node::OnFatalError+1343
+ 2: 00007FF754B86217 v8::Function::NewInstance+423
+ 3: 00007FF7544FFC46 v8::SnapshotCreator::GetIsolate+56566
+ 4: 00007FF7540BEB3A X509_get0_tbs_sigalg+74
+ 5: 00007FF755294A86 v8::base::CPU::has_mte+1558806
+ 6: 00007FF75533ABD7 v8::internal::compiler::CompilationDependencies::FieldTypeDependencyOffTheRecord+91079
+ 7: 00007FF75533A9C3 v8::internal::compiler::CompilationDependencies::FieldTypeDependencyOffTheRecord+90547
+ 8: 00007FF755339FB4 v8::internal::compiler::CompilationDependencies::FieldTypeDependencyOffTheRecord+87972
+ 9: 00007FF755B29A7A v8::platform::DelayedTaskQueue::Terminate+5584682
+10: 00007FF755B24900 v8::platform::DelayedTaskQueue::Terminate+5563824
+11: 00007FF755B24095 v8::platform::DelayedTaskQueue::Terminate+5561669
+12: 00007FF755B330E0 v8::platform::DelayedTaskQueue::Terminate+5623184
+13: 00007FF7559F34ED v8::platform::DelayedTaskQueue::Terminate+4313501
+14: 00007FF75559F3B4 v8::base::DiyFp::Multiply+541044
+15: 00007FF7555826C4 v8::base::DiyFp::Multiply+423044
+16: 00007FF75557907B v8::base::DiyFp::Multiply+384571
+17: 00007FF755578453 v8::base::DiyFp::Multiply+381459
+18: 00007FF754AF9ECF X509_STORE_set_get_issuer+200559
+19: 00007FF754ABEF5D v8::internal::OptimizingCompileInputQueue::Prioritize+1773
+20: 00007FF754ABEC55 v8::internal::OptimizingCompileInputQueue::Prioritize+997
+21: 00007FF75536684F v8::platform::DefaultJobHandle::UpdatePriority+591
+22: 00007FF753E8CD8E node::GetNodeReport+90334
+23: 00007FF754BDB1A6 uv_thread_detach+150
+24: 00007FF755E3B0B3 v8::base::UnsignedDivisionByConstant<unsigned __int64>+2907267
+25: 00007FFBC30EE957 BaseThreadInitThunk+23
+26: 00007FFBC53A7C1C RtlUserThreadStart+44
+Next.js build worker exited with code: 134 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 134
+npm error path C:\Users\Laptop\Desktop\khan-enterprises\apps\admin
+npm error workspace admin@0.1.0
+npm error location C:\Users\Laptop\Desktop\khan-enterprises\apps\admin
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

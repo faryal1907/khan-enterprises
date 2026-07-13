@@ -12,6 +12,7 @@ import { AsyncButton } from "@/components/async-button";
 import { SummaryCard } from "@/components/summary-card";
 import { AddExpenseModal } from "@/components/add-expense-modal";
 import { PayeeLedgerModal } from "./payee-ledger-modal";
+import { PayPayableModal } from "./pay-payable-modal";
 import { CreateJournalEntryModal } from "./create-journal-entry-modal";
 import { AccountLedgerModal } from "./account-ledger-modal";
 import { CapitalContributionModal } from "./capital-contribution-modal";
@@ -260,6 +261,10 @@ export default function AccountsPage() {
   const [payeeLedgerModalData, setPayeeLedgerModalData] = useState<{
     isOpen: boolean; payeeAccountId: string; payeeName: string;
   }>({ isOpen: false, payeeAccountId: '', payeeName: '' });
+  const [payPayableModalData, setPayPayableModalData] = useState<{
+    isOpen: boolean;
+    payee: { payeeAccountId: string; payeeName: string; payeeType: string; totalOutstanding: number } | null;
+  }>({ isOpen: false, payee: null });
 
   // ── Undo modal state ─────────────────────────────────────────────────────────
   const [undoModal, setUndoModal] = useState<{
@@ -1116,7 +1121,24 @@ export default function AccountsPage() {
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${paymentStateBadge(status)}`}>{status}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-wrap">
+                            {isAdmin && outstanding > 0 && (
+                              <button
+                                onClick={() => setPayPayableModalData({
+                                  isOpen: true,
+                                  payee: {
+                                    payeeAccountId: group.payeeId,
+                                    payeeName: group.payeeName,
+                                    payeeType: group.payeeType,
+                                    totalOutstanding: outstanding,
+                                  },
+                                })}
+                                className="px-3 py-1 rounded-md text-xs font-semibold text-white shadow-sm"
+                                style={{ backgroundColor: theme.accents.primary }}
+                              >
+                                Pay
+                              </button>
+                            )}
                             <button
                               onClick={() => setPayeeLedgerModalData({ isOpen: true, payeeAccountId: group.payeeId, payeeName: group.payeeName })}
                               className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
@@ -1932,6 +1954,13 @@ export default function AccountsPage() {
         onSuccess={async () => { await fetchExpenses(); await fetchData(); }}
         payeeAccountId={payeeLedgerModalData.payeeAccountId}
         payeeName={payeeLedgerModalData.payeeName}
+      />
+
+      <PayPayableModal
+        isOpen={payPayableModalData.isOpen}
+        onClose={() => setPayPayableModalData({ ...payPayableModalData, isOpen: false })}
+        onSuccess={async () => { await fetchExpenses(); await fetchData(); }}
+        payee={payPayableModalData.payee}
       />
 
       <CreateJournalEntryModal

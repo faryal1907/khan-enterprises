@@ -405,7 +405,6 @@ export class ReceivablesService {
     const party = await this.prisma.client.receivableParty.findUnique({ where: { id: partyId } });
     if (!party) throw new NotFoundException("Party not found");
 
-    let runningBalance = 0;
     const entries: any[] = [];
 
     if (party.partyType === ReceivablePartyType.CUSTOMER && party.customerPhone) {
@@ -433,31 +432,28 @@ export class ReceivablesService {
         orderBy: { createdAt: "asc" },
       });
 
-      // Calculate total billed from orders
       for (const o of orders) {
-        runningBalance += Number(o.totalAmount);
-      }
-      for (const po of partOrders) {
-        runningBalance += Number(po.amount);
-      }
-
-      // Only add payment entries (no invoice entries)
-      for (const o of orders) {
+        entries.push({ date: o.createdAt, type: "INVOICE",
+          ref: o.orderNumber,
+          description: `Bike sale${o.bike?.model ? ` - ${o.bike.model.brand} ${o.bike.model.modelName} ${o.bike.model.year}` : ""}`,
+          debit: Number(o.totalAmount), credit: 0, balance: 0, orderId: o.id, isPartOrder: false });
         for (const t of o.transactions) {
-          runningBalance -= Number(t.amount);
           entries.push({ date: t.verifiedAt ?? t.createdAt, type: "COLLECTION",
             ref: `PMT-${t.id.substring(0, 8)}`,
             description: `Payment via ${t.method} for ${o.orderNumber}`,
-            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: o.id, paymentId: t.id, isPartOrder: false });
+            debit: 0, credit: Number(t.amount), balance: 0, orderId: o.id, paymentId: t.id, isPartOrder: false });
         }
       }
       for (const po of partOrders) {
+        entries.push({ date: po.createdAt, type: "INVOICE",
+          ref: po.orderNumber,
+          description: `Part sale${po.part?.name ? ` - ${po.part.name}` : ""}`,
+          debit: Number(po.amount), credit: 0, balance: 0, orderId: po.id, isPartOrder: true });
         for (const t of po.transactions) {
-          runningBalance -= Number(t.amount);
           entries.push({ date: t.verifiedAt ?? t.createdAt, type: "COLLECTION",
             ref: `PMT-${t.id.substring(0, 8)}`,
             description: `Payment via ${t.method} for ${po.orderNumber}`,
-            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: po.id, paymentId: t.id, isPartOrder: true });
+            debit: 0, credit: Number(t.amount), balance: 0, orderId: po.id, paymentId: t.id, isPartOrder: true });
         }
       }
     } else {
@@ -473,23 +469,32 @@ export class ReceivablesService {
         },
         orderBy: { date: "asc" },
       });
-      // Calculate total billed from entries
       for (const e of dbEntries) {
-        runningBalance += Number(e.amount);
-      }
-      // Only add payment entries (no invoice entries)
-      for (const e of dbEntries) {
+        entries.push({ date: e.date, type: "INVOICE",
+          ref: `RCV-${e.id.substring(0, 8).toUpperCase()}`,
+          description: e.description,
+          debit: Number(e.amount), credit: 0, balance: 0, entryId: e.id, isManualReceivable: true });
         for (const p of e.payments) {
-          runningBalance -= Number(p.amount);
           entries.push({ date: p.collectedAt, type: "COLLECTION",
             ref: `PMT-${p.id.substring(0, 8).toUpperCase()}`,
             description: `Payment via ${p.method === "ONLINE_TRANSFER" ? "Bank Transfer" : "Cash"}${p.account ? ` (${p.account.name})` : ""}`,
-            debit: 0, credit: Number(p.amount), balance: runningBalance, entryId: e.id, paymentId: p.id, isManualReceivable: true });
+            debit: 0, credit: Number(p.amount), balance: 0, entryId: e.id, paymentId: p.id, isManualReceivable: true });
         }
       }
     }
 
-    entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    entries.sort((a, b) => {
+      const dateDiff = new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (dateDiff !== 0) return dateDiff;
+      if (a.type !== b.type) return a.type === "INVOICE" ? -1 : 1;
+      return String(a.ref).localeCompare(String(b.ref));
+    });
+
+    let runningBalance = 0;
+    for (const entry of entries) {
+      runningBalance += Number(entry.debit) - Number(entry.credit);
+      entry.balance = runningBalance;
+    }
 
     const totalBilled = entries.filter((e) => e.type === "INVOICE").reduce((s, e) => s + e.debit, 0);
     const totalPaid = entries.filter((e) => e.type === "COLLECTION").reduce((s, e) => s + e.credit, 0);

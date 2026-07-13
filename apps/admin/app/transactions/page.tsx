@@ -25,6 +25,7 @@ function getStatusColor(status: string) {
   if (status === PaymentStatus.SUCCESS) return "#22c55e";
   if (status === PaymentStatus.FAILED) return "#ef4444";
   if (status === PaymentStatus.CANCELLED) return theme.text.secondary;
+  if (status === "REVERSED") return "#8b5cf6";
   return theme.text.secondary;
 }
 
@@ -301,6 +302,7 @@ export default function TransactionsPage() {
                 <option value={PaymentStatus.PENDING}>Pending</option>
                 <option value={PaymentStatus.FAILED}>Failed</option>
                 <option value={PaymentStatus.CANCELLED}>Cancelled</option>
+                <option value="REVERSED">Reversed</option>
               </select>
             </div>
 
@@ -434,7 +436,13 @@ export default function TransactionsPage() {
                 const branchName = transaction.order?.branch?.name ?? "—";
 
                 return (
-                  <tr key={`${transaction.type}-${transaction.id}`} style={{ borderBottom: `1px solid ${theme.borders.light}` }}>
+                  <tr
+                    key={`${transaction.type}-${transaction.id}`}
+                    style={{
+                      borderBottom: `1px solid ${theme.borders.light}`,
+                      opacity: transaction.isReversed ? 0.6 : 1,
+                    }}
+                  >
                     <td className="px-3 md:px-6 py-3 md:py-4 text-sm font-medium" style={{ color: theme.text.primary }}>
                       <span className="font-mono text-xs">{transaction.id.substring(0, 8).toUpperCase()}</span>
                     </td>

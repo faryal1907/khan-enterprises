@@ -623,26 +623,19 @@ export class OrdersService {
    */
   async cancelOrder(id: string, dto: CancelOrderDto, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
-      // 1. Fetch order, verify not already DELIVERED or CANCELLED
+      // 1. Fetch order with all successful payment transactions (and their accounts)
       const order = await tx.order.findUnique({
         where: { id },
         include: {
           bike: true,
           transactions: {
+            where: { status: { not: PaymentStatus.FAILED } },
             include: {
-              processedBy: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  email: true,
-                },
-              },
+              account: { select: { id: true, name: true, subtype: true } },
             },
           },
           processedBy: {
-            select: {
-              role: true,
-            },
+            select: { role: true },
           },
         },
       });
@@ -652,10 +645,6 @@ export class OrdersService {
       }
 
       this.assertOrderAccess(order, user);
-
-      if (order.status === OrderStatus.DELIVERED) {
-        throw new BadRequestException(`Cannot cancel a delivered order`);
-      }
 
       if (order.status === OrderStatus.CANCELLED) {
         throw new BadRequestException(`Order is already cancelled`);
@@ -670,65 +659,36 @@ export class OrdersService {
         },
       });
 
-      // 3. Update bike: status → AVAILABLE, reservedUntil → null, soldAt → null
+      // 3. Update bike: status → AVAILABLE, reservedUntil → null, soldAt → null, clear sale price
       await tx.bikeUnit.update({
         where: { id: order.bikeId },
         data: {
           status: BikeStatus.AVAILABLE,
           reservedUntil: null,
           soldAt: null,
+          actualSalePrice: null,
         },
       });
 
-      // 4. Update any associated payment transactions to CANCELLED
-      await tx.paymentTransaction.updateMany({
-        where: {
-          orderId: id,
-          status: { not: PaymentStatus.FAILED }
-        },
-        data: {
-          status: PaymentStatus.CANCELLED,
-        },
-      });
+      const paymentTransactionsToReverse = order.transactions.filter(
+        (txn) => txn.status === PaymentStatus.SUCCESS && !txn.isReversed,
+      );
 
-      // 5. Reverse Accounting Entries
-      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
-      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-      
-      if (arAcc && revAcc) {
-        await tx.journalEntry.create({
+      // 4. Mark each non-failed payment transaction as CANCELLED/reversed individually
+      for (const txn of order.transactions) {
+        await tx.paymentTransaction.update({
+          where: { id: txn.id },
           data: {
-            entryNo: `JV-REV-${order.orderNumber}`,
-            description: `Reversal of sale for ${order.orderNumber}`,
-            sourceRef: order.orderNumber,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: revAcc.id, debit: Number(order.totalAmount), credit: 0 },
-                { accountId: arAcc.id, debit: 0, credit: Number(order.totalAmount) },
-              ]
-            }
-          }
+            status: PaymentStatus.CANCELLED,
+            isReversed: true,
+            reversedAt: new Date(),
+            reversedById: user.id,
+          },
         });
       }
 
-      if (Number(order.paidAmount) > 0 && cashAcc && arAcc) {
-        await tx.journalEntry.create({
-          data: {
-            entryNo: `JV-REVPAY-${order.orderNumber}`,
-            description: `Reversal of payment for ${order.orderNumber}`,
-            sourceRef: order.orderNumber,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: arAcc.id, debit: Number(order.paidAmount), credit: 0 },
-                { accountId: cashAcc.id, debit: 0, credit: Number(order.paidAmount) },
-              ]
-            }
-          }
-        });
-      }
+      // 5. Reverse Accounting Entries (sale + payments + COGS/inventory)
+      await this.reverseBikeSaleAccounting(tx, order, paymentTransactionsToReverse);
 
       await tx.auditLog.create({
         data: {
@@ -746,8 +706,67 @@ export class OrdersService {
         order: updatedOrder,
         message: "Order cancelled successfully",
       };
-    });
+    }, { timeout: 15000 });
   }
+
+  /**
+   * Reverse all accounting entries posted when a bike sale was registered:
+   *  - original sale (DR Revenue, CR A/R)
+   *  - each successful payment (DR A/R, CR payment account)
+   *  - COGS + Inventory (DR Inventory, CR COGS)
+   * Mirrored for both manual cancellation and expired-reservation auto-cancel.
+   * Uses the in-memory `order.transactions` snapshot so it reverses exactly what was booked.
+   */
+  private async reverseBikeSaleAccounting(tx: any, order: any, paymentTransactionsToReverse: any[]) {
+    const sourceRefs = [
+      order.orderNumber,
+      ...paymentTransactionsToReverse.map((txn) => txn.id),
+    ];
+
+    const originalEntries = await tx.journalEntry.findMany({
+      where: {
+        sourceRef: { in: sourceRefs },
+        status: JournalStatus.POSTED,
+        isReversal: false,
+      },
+      include: { lines: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const reversalEntryNos = originalEntries.map((entry) => `REV-${entry.entryNo}`);
+    const existingReversals = await tx.journalEntry.findMany({
+      where: { entryNo: { in: reversalEntryNos } },
+      select: { entryNo: true },
+    });
+    const existingReversalNos = new Set(existingReversals.map((entry) => entry.entryNo));
+
+    for (const originalEntry of originalEntries) {
+      const reversalEntryNo = `REV-${originalEntry.entryNo}`;
+
+      if (existingReversalNos.has(reversalEntryNo)) continue;
+
+      await tx.journalEntry.create({
+        data: {
+          entryNo: reversalEntryNo,
+          date: new Date(),
+          description: `Reversal of ${originalEntry.description}`,
+          sourceRef: originalEntry.sourceRef,
+          status: JournalStatus.POSTED,
+          isManual: true,
+          isReversal: true,
+          reversesJournalEntryId: originalEntry.id,
+          lines: {
+            create: originalEntry.lines.map((line: any) => ({
+              accountId: line.accountId,
+              debit: line.credit,
+              credit: line.debit,
+            })),
+          },
+        },
+      });
+    }
+  }
+
 
   /**
    * Create PaymentTransaction, if method is CASH → immediately set transaction SUCCESS
@@ -1744,6 +1763,12 @@ export class OrdersService {
       },
       include: {
         bike: true,
+        transactions: {
+          where: { status: { not: PaymentStatus.FAILED } },
+          include: {
+            account: { select: { id: true, name: true, subtype: true } },
+          },
+        },
       },
     });
 
@@ -1765,26 +1790,35 @@ export class OrdersService {
             },
           });
 
-          // Update bike back to AVAILABLE
+          // Return bike to inventory and clear its sale price
           await tx.bikeUnit.update({
             where: { id: order.bikeId },
             data: {
               status: BikeStatus.AVAILABLE,
               soldAt: null,
               reservedUntil: null,
+              actualSalePrice: null,
             },
           });
 
-          // Update any associated payment transactions to FAILED
-          await tx.paymentTransaction.updateMany({
-            where: {
-              orderId: order.id,
-              status: { not: PaymentStatus.FAILED }
-            },
-            data: {
-              status: PaymentStatus.FAILED,
-            },
-          });
+          // Mark each non-failed payment transaction as CANCELLED/reversed
+          for (const txn of order.transactions) {
+            await tx.paymentTransaction.update({
+              where: { id: txn.id },
+              data: {
+                status: PaymentStatus.CANCELLED,
+                isReversed: true,
+                reversedAt: new Date(),
+              },
+            });
+          }
+
+          const paymentTransactionsToReverse = order.transactions.filter(
+            (txn) => txn.status === PaymentStatus.SUCCESS && !txn.isReversed,
+          );
+
+          // Reverse the sale + payment + COGS/inventory accounting entries
+          await this.reverseBikeSaleAccounting(tx, order, paymentTransactionsToReverse);
 
           // Create audit log
           await tx.auditLog.create({

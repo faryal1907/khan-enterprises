@@ -153,18 +153,24 @@ export function PayeeLedgerModal({
       >
         {/* Header */}
         <div
-          className="flex justify-between items-center p-6 pb-4 border-b"
+          className="flex justify-between items-start gap-4 p-6 pb-4 border-b"
           style={{ borderColor: theme.borders.light }}
         >
-          <div>
-            <h2 className="text-xl font-bold" style={{ color: theme.text.primary }}>
+          <div className="min-w-0">
+            <h2 className="text-xl font-bold truncate" style={{ color: theme.text.primary }}>
               Payable Ledger
             </h2>
-            <p className="text-sm mt-0.5" style={{ color: theme.text.secondary }}>
+            <p className="text-sm mt-0.5 truncate" style={{ color: theme.text.secondary }}>
               {payeeName}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="shrink-0 -mt-1 -mr-1 w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-2xl leading-none"
+          >
+            ×
+          </button>
         </div>
 
         {loading ? (
@@ -174,19 +180,28 @@ export function PayeeLedgerModal({
         ) : ledgerData ? (
           <>
             {/* Summary */}
-            <div className="grid grid-cols-3 gap-3 p-6 pb-4">
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.backgrounds.secondary }}>
-                <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>Total Expenses</div>
-                <div className="text-sm font-bold text-red-500">{formatCurrency(summary.totalExpenses)}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-6 pb-4">
+              <div
+                className="rounded-lg p-4 flex flex-col items-center justify-center text-center border"
+                style={{ backgroundColor: theme.backgrounds.secondary, borderColor: theme.borders.light }}
+              >
+                <div className="text-xs mb-1.5" style={{ color: theme.text.secondary }}>Total Expenses</div>
+                <div className="text-base font-bold text-red-500">{formatCurrency(summary.totalExpenses)}</div>
               </div>
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.backgrounds.secondary }}>
-                <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>Total Paid</div>
-                <div className="text-sm font-bold text-emerald-600">{formatCurrency(summary.totalPaid)}</div>
+              <div
+                className="rounded-lg p-4 flex flex-col items-center justify-center text-center border"
+                style={{ backgroundColor: theme.backgrounds.secondary, borderColor: theme.borders.light }}
+              >
+                <div className="text-xs mb-1.5" style={{ color: theme.text.secondary }}>Total Paid</div>
+                <div className="text-base font-bold text-emerald-600">{formatCurrency(summary.totalPaid)}</div>
               </div>
-              <div className="rounded-lg p-3 text-center" style={{ backgroundColor: theme.backgrounds.secondary }}>
-                <div className="text-xs mb-1" style={{ color: theme.text.secondary }}>Outstanding</div>
+              <div
+                className="rounded-lg p-4 flex flex-col items-center justify-center text-center border"
+                style={{ backgroundColor: theme.backgrounds.secondary, borderColor: theme.borders.light }}
+              >
+                <div className="text-xs mb-1.5" style={{ color: theme.text.secondary }}>Outstanding</div>
                 <div
-                  className="text-sm font-bold"
+                  className="text-base font-bold"
                   style={{ color: summary.totalOutstanding > 0 ? "#ef4444" : "#22c55e" }}
                 >
                   {formatCurrency(summary.totalOutstanding)}
@@ -274,13 +289,14 @@ export function PayeeLedgerModal({
                       <th className="p-3 text-xs font-medium uppercase tracking-wider text-right" style={{ color: theme.text.secondary }}>Expense</th>
                       <th className="p-3 text-xs font-medium uppercase tracking-wider text-right" style={{ color: theme.text.secondary }}>Payment</th>
                       <th className="p-3 text-xs font-medium uppercase tracking-wider text-right" style={{ color: theme.text.secondary }}>Outstanding</th>
+                      <th className="p-3 text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>Status</th>
                       <th className="p-3 text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {entries.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="p-6 text-center" style={{ color: theme.text.muted }}>
+                        <td colSpan={8} className="p-6 text-center" style={{ color: theme.text.muted }}>
                           No transactions yet.
                         </td>
                       </tr>
@@ -332,30 +348,36 @@ export function PayeeLedgerModal({
                             {formatCurrency(Math.max(0, entry.balance))}
                           </td>
                           <td className="p-3">
-                            {canPay && (
-                              <button
-                                onClick={() => openPayPanel(expDetail)}
-                                className="text-white px-3 py-1 rounded text-xs font-semibold"
-                                style={{ backgroundColor: theme.accents.primary }}
-                              >
-                                Pay
-                              </button>
-                            )}
-                            {!isExpenseEntry && entry.paymentId && (
-                              <button
-                                onClick={() => handleUndoPayment(entry.paymentId)}
-                                disabled={undoingPaymentId === entry.paymentId}
-                                className="text-xs px-2 py-1 rounded border bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50"
-                                style={{ borderColor: "#fecaca" }}
-                              >
-                                {undoingPaymentId === entry.paymentId ? "Undoing..." : "Undo"}
-                              </button>
-                            )}
-                            {isExpenseEntry && expDetail?.status && (
-                              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${statusBadge(expDetail.status)}`}>
+                            {isExpenseEntry && expDetail?.status ? (
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusBadge(expDetail.status)}`}>
                                 {expDetail.status}
                               </span>
+                            ) : (
+                              <span className="text-xs" style={{ color: theme.text.muted }}>—</span>
                             )}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {canPay && (
+                                <button
+                                  onClick={() => openPayPanel(expDetail)}
+                                  className="text-white px-3 py-1 rounded text-xs font-semibold whitespace-nowrap"
+                                  style={{ backgroundColor: theme.accents.primary }}
+                                >
+                                  Pay
+                                </button>
+                              )}
+                              {!isExpenseEntry && entry.paymentId && (
+                                <button
+                                  onClick={() => handleUndoPayment(entry.paymentId)}
+                                  disabled={undoingPaymentId === entry.paymentId}
+                                  className="text-xs px-2 py-1 rounded border bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 whitespace-nowrap"
+                                  style={{ borderColor: "#fecaca" }}
+                                >
+                                  {undoingPaymentId === entry.paymentId ? "Undoing..." : "Undo"}
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );

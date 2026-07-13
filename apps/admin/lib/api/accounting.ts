@@ -55,6 +55,14 @@ export const payPayable = async (id: string, payload: { amount: number; paymentM
   return data;
 };
 
+export const payPayablesByPayee = async (
+  payeeAccountId: string,
+  payload: { amount: number; paymentMethod: string; accountId?: string }
+) => {
+  const { data } = await api.post(`/accounting/payables/payee/${payeeAccountId}/pay`, payload);
+  return data;
+};
+
 export const createAccount = async (payload: { code: string; name: string; category: string; subtype: string; accountNumber?: string; openingBalance?: number }) => {
   const { data } = await api.post('/accounting/accounts', payload);
   return data;

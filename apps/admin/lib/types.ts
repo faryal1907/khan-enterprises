@@ -230,6 +230,9 @@ export interface PaymentTransaction {
   failureReason: string | null;
   webhookReceivedAt: string | null;
   paymentProofUrl?: string | null;
+  isReversed?: boolean;
+  reversedAt?: string | null;
+  reversedById?: string | null;
   createdAt: string;
   updatedAt: string;
 }

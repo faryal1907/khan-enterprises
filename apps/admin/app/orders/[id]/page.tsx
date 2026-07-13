@@ -276,6 +276,42 @@ export default function OrderDetailPage() {
   const pendingVerificationTx = order?.transactions?.find((tx) => tx.status === "VERIFICATION_PENDING");
   const latestTxWithProof = order?.transactions?.slice().reverse().find((tx) => tx.paymentProofUrl);
 
+  const anyReversedPayment = order?.transactions?.some((tx: PaymentTransaction) => tx.isReversed);
+
+  const renderTxStatus = (tx: PaymentTransaction) => {
+    if (tx.isReversed) {
+      return (
+        <div className="flex flex-col gap-0.5">
+          <span
+            className="px-2 py-1 text-xs font-semibold rounded"
+            style={{ backgroundColor: "#FEE2E2", color: "#991B1B", border: "1px solid #fca5a5" }}
+          >
+            Reversed
+          </span>
+          {tx.reversedAt && (
+            <span className="text-[10px]" style={{ color: theme.text.muted }}>
+              {new Date(tx.reversedAt).toLocaleDateString("en-PK", { day: "2-digit", month: "short", year: "numeric" })}
+            </span>
+          )}
+        </div>
+      );
+    }
+    const bg = tx.status === "SUCCESS" ? "#D1FAE5" :
+      tx.status === "PENDING" ? "#FEF3C7" :
+        tx.status === "CANCELLED" ? theme.backgrounds.tertiary : "#FEE2E2";
+    const fg = tx.status === "SUCCESS" ? "#065F46" :
+      tx.status === "PENDING" ? "#92400E" :
+        tx.status === "CANCELLED" ? theme.text.secondary : "#991B1B";
+    return (
+      <span
+        className="px-2 py-1 text-xs font-medium rounded"
+        style={{ backgroundColor: bg, color: fg, border: tx.status === "CANCELLED" ? `1px solid ${theme.borders.medium}` : undefined }}
+      >
+        {tx.status}
+      </span>
+    );
+  };
+
   const handleDownloadInvoice = async () => {
     try {
       setActionLoading(true);
@@ -569,6 +605,14 @@ export default function OrderDetailPage() {
             >
               Payment Transactions
             </h3>
+            {anyReversedPayment && (
+              <div
+                className="mb-4 px-3 py-2 rounded-md text-xs font-medium"
+                style={{ backgroundColor: "#FEF3C7", color: "#92400E", border: "1px solid #fcd34d" }}
+              >
+                Note: A part of this order's payment has been reversed (undone). Reversed transactions are marked below.
+              </div>
+            )}
             <div
               className="rounded-lg overflow-hidden min-w-[640px]"
               style={{ backgroundColor: theme.backgrounds.tertiary }}
@@ -606,20 +650,7 @@ export default function OrderDetailPage() {
                         {transaction.method}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs">
-                        <span
-                          className="px-2 py-1 text-xs font-medium rounded"
-                          style={{
-                            backgroundColor: transaction.status === "SUCCESS" ? "#D1FAE5" : 
-                              transaction.status === "PENDING" ? "#FEF3C7" : 
-                              transaction.status === "CANCELLED" ? theme.backgrounds.tertiary : "#FEE2E2",
-                            color: transaction.status === "SUCCESS" ? "#065F46" : 
-                              transaction.status === "PENDING" ? "#92400E" : 
-                              transaction.status === "CANCELLED" ? theme.text.secondary : "#991B1B",
-                            border: transaction.status === "CANCELLED" ? `1px solid ${theme.borders.medium}` : undefined,
-                          }}
-                        >
-                          {transaction.status}
-                        </span>
+                        {renderTxStatus(transaction)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: theme.text.primary }}>
                         {transaction.gatewayReference || "—"}
@@ -639,7 +670,7 @@ export default function OrderDetailPage() {
         )}
 
         {/* Status Action Bar */}
-        {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
+        {order.status !== OrderStatus.CANCELLED && (
           <div
             className="rounded-lg p-4 md:p-6 mb-4 md:mb-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
@@ -663,7 +694,7 @@ export default function OrderDetailPage() {
                     color: theme.text.inverse,
                   }}
                 >
-                  Cancel Order
+                  {order.orderType === "ONSITE" ? "Cancel Sale" : "Cancel Order"}
                 </button>
               )}
             </div>

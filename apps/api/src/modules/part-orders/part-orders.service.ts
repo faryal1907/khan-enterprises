@@ -480,6 +480,10 @@ const partOrder = await tx.partOrder.create({
 
       if (status === OrderStatus.CANCELLED) {
         await this.restorePartOrderStock(tx, order);
+        // Reverse COGS + restore Inventory GL only if stock was actually deducted
+        if (this.isStockDeductedStatus(order.status)) {
+          await this.reversePartCogs(tx, order.orderNumber, order.partId, order.quantity);
+        }
       }
 
       const updatedOrder = await tx.partOrder.update({
@@ -538,6 +542,9 @@ const partOrder = await tx.partOrder.create({
             performedById: user.id,
           },
         });
+
+        // Post COGS + reduce Inventory GL now that stock is deducted
+        await this.postPartCogs(tx, updatedOrder.orderNumber, order.partId, order.quantity);
       }
 
       await tx.auditLog.create({
@@ -580,18 +587,14 @@ const partOrder = await tx.partOrder.create({
    */
   async cancelPartOrder(id: string, user: any) {
     return this.prisma.client.$transaction(async (tx) => {
+      // Fetch order with all non-failed payment transactions and their linked accounts
       const order = await tx.partOrder.findUnique({
         where: { id },
         include: {
           transactions: {
+            where: { status: { not: PaymentStatus.FAILED } },
             include: {
-              processedBy: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  email: true,
-                },
-              },
+              account: { select: { id: true, name: true, subtype: true } },
             },
           },
         },
@@ -602,10 +605,6 @@ const partOrder = await tx.partOrder.create({
       }
 
       this.assertPartOrderAccess(order, user);
-
-      if (order.status === OrderStatus.DELIVERED) {
-        throw new BadRequestException(`Cannot cancel a delivered order`);
-      }
 
       if (order.status === OrderStatus.CANCELLED) {
         throw new BadRequestException(`Order is already cancelled`);
@@ -620,24 +619,32 @@ const partOrder = await tx.partOrder.create({
         },
       });
 
-      // Update associated payment transactions to CANCELLED
-      await tx.partPaymentTransaction.updateMany({
-        where: {
-          partOrderId: id,
-          status: { not: PaymentStatus.FAILED }
-        },
-        data: {
-          status: PaymentStatus.CANCELLED,
-        },
-      });
+      // Mark each non-failed payment transaction as CANCELLED/reversed individually
+      for (const txn of order.transactions) {
+        await tx.partPaymentTransaction.update({
+          where: { id: txn.id },
+          data: {
+            status: PaymentStatus.CANCELLED,
+            isReversed: true,
+            reversedAt: new Date(),
+            reversedById: user.id,
+          },
+        });
+      }
 
       await this.restorePartOrderStock(tx, order);
+
+      // 3. Reverse COGS and restore Inventory value (only if stock was actually deducted)
+      const stockDeducted = order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY || order.status === OrderStatus.DELIVERED;
+      if (stockDeducted) {
+        await this.reversePartCogs(tx, order.orderNumber, order.partId, order.quantity);
+      }
 
       // Reverse Accounting Entries
       const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
       const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
-      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-      
+
+      // 1. Reverse the original sale entry: DR Revenue, CR A/R
       if (arAcc && revAcc) {
         await tx.journalEntry.create({
           data: {
@@ -645,6 +652,7 @@ const partOrder = await tx.partOrder.create({
             description: `Reversal of part sale for ${order.orderNumber}`,
             sourceRef: order.orderNumber,
             status: JournalStatus.POSTED,
+            isReversal: true,
             lines: {
               create: [
                 { accountId: revAcc.id, debit: Number(order.amount), credit: 0 },
@@ -655,21 +663,45 @@ const partOrder = await tx.partOrder.create({
         });
       }
 
-      if (Number(order.paidAmount) > 0 && cashAcc && arAcc) {
-        await tx.journalEntry.create({
-          data: {
-            entryNo: `JV-REVPAY-${order.orderNumber}`,
-            description: `Reversal of payment for ${order.orderNumber}`,
-            sourceRef: order.orderNumber,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: arAcc.id, debit: Number(order.paidAmount), credit: 0 },
-                { accountId: cashAcc.id, debit: 0, credit: Number(order.paidAmount) },
-              ]
-            }
+      // 2. Per-payment reversal: for each collected payment, DR A/R, CR the payment account
+      //    Handles multiple partial payments and any mix of payment methods correctly.
+      if (arAcc) {
+        const successfulTxns = order.transactions.filter(
+          (txn) => txn.status === PaymentStatus.SUCCESS || txn.status === PaymentStatus.CANCELLED
+        );
+
+        for (const txn of successfulTxns) {
+          const txnAmount = Number(txn.amount);
+          if (txnAmount <= 0) continue;
+
+          // Resolve payment account: use linked account, fallback by method
+          let paymentAccId: string | null = (txn as any).account?.id ?? null;
+          if (!paymentAccId) {
+            const fallbackSubtype = (txn.method as string) === 'CASH'
+              ? AccountSubtype.CASH
+              : AccountSubtype.BANK;
+            const fallback = await tx.account.findFirst({ where: { subtype: fallbackSubtype } });
+            paymentAccId = fallback?.id ?? null;
           }
-        });
+
+          if (!paymentAccId) continue;
+
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `JV-REVPAY-${txn.id.substring(0, 8)}`,
+              description: `Reversal of ${txn.method} payment (${txn.id.substring(0, 8)}) for ${order.orderNumber}`,
+              sourceRef: txn.id,
+              status: JournalStatus.POSTED,
+              isReversal: true,
+              lines: {
+                create: [
+                  { accountId: arAcc.id, debit: txnAmount, credit: 0 },
+                  { accountId: paymentAccId, debit: 0, credit: txnAmount },
+                ]
+              }
+            }
+          });
+        }
       }
 
       await tx.auditLog.create({
@@ -690,6 +722,7 @@ const partOrder = await tx.partOrder.create({
       };
     });
   }
+
 
   /**
    * Manual part sale registration (admin bypasses offer workflow)
@@ -776,6 +809,9 @@ const partOrder = await tx.partOrder.create({
           performedById: user.id,
         },
       });
+
+      // 6b. Post COGS + reduce Inventory GL for the deducted stock
+      await this.postPartCogs(tx, orderNumber, dto.partId, dto.quantity);
 
       // 7. Create Payment Transaction (only if something was paid upfront)
       let transaction: any = null;
@@ -1516,7 +1552,7 @@ const partOrder = await tx.partOrder.create({
           reservedQuantity: { decrement: order.quantity },
         },
       });
-    } else if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY) {
+    } else if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.READY_FOR_DELIVERY || order.status === OrderStatus.DELIVERED) {
       // Stock was fully deducted and reservation was cleared.
       // Increment quantity back.
       await tx.partInventory.update({
@@ -1537,5 +1573,76 @@ const partOrder = await tx.partOrder.create({
         },
       });
     }
+  }
+
+  /**
+   * Returns true if the order had its physical stock actually deducted
+   * (i.e. COGS + Inventory GL entries were posted at sale time).
+   */
+  private isStockDeductedStatus(status: OrderStatus): boolean {
+    return (
+      status === OrderStatus.CONFIRMED ||
+      status === OrderStatus.READY_FOR_DELIVERY ||
+      status === OrderStatus.DELIVERED
+    );
+  }
+
+  /**
+   * Post COGS + Inventory reduction for a part sale (mirrors bike sales).
+   * DR COGS (5001), CR Inventory (1003) by cost = purchaseCost * quantity.
+   */
+  private async postPartCogs(tx: any, sourceRef: string, partId: string, quantity: number) {
+    const part = await tx.part.findUnique({ where: { id: partId } });
+    const cost = Number(part?.purchaseCost || 0) * quantity;
+    if (cost <= 0) return;
+
+    const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
+    const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
+    if (!cogsAcc || !inventoryAcc) return;
+
+    await tx.journalEntry.create({
+      data: {
+        entryNo: `JV-COGS-${sourceRef}`,
+        description: `Cost of Goods Sold for part sale ${sourceRef}`,
+        sourceRef,
+        status: JournalStatus.POSTED,
+        lines: {
+          create: [
+            { accountId: cogsAcc.id, debit: cost, credit: 0 },
+            { accountId: inventoryAcc.id, debit: 0, credit: cost },
+          ],
+        },
+      },
+    });
+  }
+
+  /**
+   * Reverse the COGS + Inventory entry posted at sale time.
+   * DR Inventory (1003), CR COGS (5001) by cost = purchaseCost * quantity.
+   */
+  private async reversePartCogs(tx: any, sourceRef: string, partId: string, quantity: number) {
+    const part = await tx.part.findUnique({ where: { id: partId } });
+    const cost = Number(part?.purchaseCost || 0) * quantity;
+    if (cost <= 0) return;
+
+    const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
+    const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
+    if (!cogsAcc || !inventoryAcc) return;
+
+    await tx.journalEntry.create({
+      data: {
+        entryNo: `JV-REVCOGS-${sourceRef}`,
+        description: `Reversal of COGS for part sale ${sourceRef}`,
+        sourceRef,
+        status: JournalStatus.POSTED,
+        isReversal: true,
+        lines: {
+          create: [
+            { accountId: inventoryAcc.id, debit: cost, credit: 0 },
+            { accountId: cogsAcc.id, debit: 0, credit: cost },
+          ],
+        },
+      },
+    });
   }
 }

@@ -1,10 +1,10 @@
 import { IsEnum, IsOptional, IsDateString, IsString } from "class-validator";
-import { PaymentStatus, PaymentMethod } from "@khan/prisma";
+import { PaymentMethod } from "@khan/prisma";
 
 export class QueryTransactionsDto {
-  @IsEnum(PaymentStatus)
+  @IsString()
   @IsOptional()
-  status?: PaymentStatus;
+  status?: string;
 
   @IsEnum(PaymentMethod)
   @IsOptional()
