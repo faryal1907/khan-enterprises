@@ -101,6 +101,8 @@ export class ExpensesService {
       payment?: number; // payment amount (credit to payee)
       balance: number;
       paymentId?: string;
+      payableId?: string;
+      isInitialPayment?: boolean;
     };
 
     let runningBalance = 0;
@@ -126,8 +128,10 @@ export class ExpensesService {
       });
 
       if (payable) {
+        let allocatedTotal = 0;
         for (const alloc of payable.allocations) {
           const pmtAmount = Number(alloc.allocatedAmount);
+          allocatedTotal += pmtAmount;
           runningBalance -= pmtAmount;
           entries.push({
             date: alloc.payment.createdAt,
@@ -138,13 +142,35 @@ export class ExpensesService {
             payment: pmtAmount,
             balance: runningBalance,
             paymentId: alloc.payment.id,
+            payableId: payable.id,
+          });
+        }
+
+        const initialPaidAmount = Number(payable.paid) - allocatedTotal;
+        if (initialPaidAmount > 0) {
+          runningBalance -= initialPaidAmount;
+          entries.push({
+            date: exp.date,
+            type: 'PAYMENT',
+            ref: `INIT-${payable.id.substring(0, 8).toUpperCase()}`,
+            description: 'Initial payment recorded with expense',
+            amount: 0,
+            payment: initialPaidAmount,
+            balance: runningBalance,
+            payableId: payable.id,
+            isInitialPayment: true,
           });
         }
       }
     }
 
     // Sort all entries chronologically
-    entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    entries.sort((a, b) => {
+      const dateDiff = new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (dateDiff !== 0) return dateDiff;
+      if (a.type !== b.type) return a.type === 'EXPENSE' ? -1 : 1;
+      return a.ref.localeCompare(b.ref);
+    });
 
     // Recompute running balance after sort
     let bal = 0;

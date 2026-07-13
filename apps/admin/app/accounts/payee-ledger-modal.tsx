@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { theme } from "@/lib/colors";
 import { getPayeeLedger } from "@/lib/api/expenses";
-import { payPayable, getPaymentAccounts, undoPayablePayment } from "@/lib/api/accounting";
+import { payPayable, getPaymentAccounts, undoPayablePayment, undoPayableAllPayments } from "@/lib/api/accounting";
 import { toast } from "sonner";
 import { AsyncButton } from "@/components/async-button";
 import { numberToWords } from "@/lib/number-to-words";
@@ -53,6 +53,7 @@ export function PayeeLedgerModal({
   const [payAccountId, setPayAccountId] = useState("");
   const [isPaySubmitting, setIsPaySubmitting] = useState(false);
   const [undoingPaymentId, setUndoingPaymentId] = useState<string | null>(null);
+  const [undoingInitialPayableId, setUndoingInitialPayableId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && payeeAccountId) {
@@ -128,6 +129,22 @@ export function PayeeLedgerModal({
       toast.error(err.response?.data?.message || "Failed to undo payment");
     } finally {
       setUndoingPaymentId(null);
+    }
+  };
+
+  // Initial "paid-now" payments have no PaymentTransaction/paymentId, so we
+  // reverse them through the payable-level undo endpoint.
+  const handleUndoInitialPayment = async (payableId: string) => {
+    setUndoingInitialPayableId(payableId);
+    try {
+      await undoPayableAllPayments(payableId);
+      toast.success("Payment undone successfully");
+      await fetchLedger();
+      onSuccess?.();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to undo payment");
+    } finally {
+      setUndoingInitialPayableId(null);
     }
   };
 
@@ -375,6 +392,16 @@ export function PayeeLedgerModal({
                                   style={{ borderColor: "#fecaca" }}
                                 >
                                   {undoingPaymentId === entry.paymentId ? "Undoing..." : "Undo"}
+                                </button>
+                              )}
+                              {!isExpenseEntry && !entry.paymentId && entry.isInitialPayment && entry.payableId && (
+                                <button
+                                  onClick={() => handleUndoInitialPayment(entry.payableId)}
+                                  disabled={undoingInitialPayableId === entry.payableId}
+                                  className="text-xs px-2 py-1 rounded border bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50 whitespace-nowrap"
+                                  style={{ borderColor: "#fecaca" }}
+                                >
+                                  {undoingInitialPayableId === entry.payableId ? "Undoing..." : "Undo"}
                                 </button>
                               )}
                             </div>
