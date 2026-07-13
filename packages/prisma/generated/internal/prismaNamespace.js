@@ -272,6 +272,11 @@ exports.PaymentTransactionScalarFieldEnum = {
     verifiedById: 'verifiedById',
     processedById: 'processedById',
     webhookReceivedAt: 'webhookReceivedAt',
+    isReversed: 'isReversed',
+    reversedAt: 'reversedAt',
+    reversedById: 'reversedById',
+    reversalTransactionId: 'reversalTransactionId',
+    originalAmount: 'originalAmount',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -291,6 +296,11 @@ exports.PartPaymentTransactionScalarFieldEnum = {
     verifiedById: 'verifiedById',
     processedById: 'processedById',
     webhookReceivedAt: 'webhookReceivedAt',
+    isReversed: 'isReversed',
+    reversedAt: 'reversedAt',
+    reversedById: 'reversedById',
+    reversalTransactionId: 'reversalTransactionId',
+    originalAmount: 'originalAmount',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -386,7 +396,9 @@ exports.JournalEntryScalarFieldEnum = {
     notes: 'notes',
     status: 'status',
     isManual: 'isManual',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    isReversal: 'isReversal',
+    reversesJournalEntryId: 'reversesJournalEntryId'
 };
 exports.JournalEntryLineScalarFieldEnum = {
     id: 'id',
@@ -532,6 +544,10 @@ exports.ReceivablePaymentScalarFieldEnum = {
     journalEntryId: 'journalEntryId',
     recordedById: 'recordedById',
     collectedAt: 'collectedAt',
+    isReversed: 'isReversed',
+    reversedAt: 'reversedAt',
+    reversedById: 'reversedById',
+    reversalJournalEntryId: 'reversalJournalEntryId',
     createdAt: 'createdAt'
 };
 exports.ReceivablesAlertScalarFieldEnum = {

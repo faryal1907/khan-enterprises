@@ -100,6 +100,7 @@ export class ExpensesService {
       amount: number;   // expense amount (debit to payee)
       payment?: number; // payment amount (credit to payee)
       balance: number;
+      paymentId?: string;
     };
 
     let runningBalance = 0;
@@ -136,6 +137,7 @@ export class ExpensesService {
             amount: 0,
             payment: pmtAmount,
             balance: runningBalance,
+            paymentId: alloc.payment.id,
           });
         }
       }
@@ -233,6 +235,9 @@ export class ExpensesService {
 
     const payableByExpId = new Map(payables.map((p) => [p.expenseId!, p]));
 
+    // Filter out expenses that don't have payables (deleted payables)
+    const expensesWithPayables = expenses.filter(e => payableByExpId.has(e.id));
+
     // Group by payee
     type PayeeGroup = {
       payeeId: string;
@@ -250,7 +255,7 @@ export class ExpensesService {
 
     const payeeMap = new Map<string, PayeeGroup>();
 
-    for (const exp of expenses) {
+    for (const exp of expensesWithPayables) {
       if (!exp.payeeAccount) continue;
       const payable = payableByExpId.get(exp.id);
       const expAmount = Number(exp.amount);

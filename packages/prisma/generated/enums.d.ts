@@ -69,6 +69,9 @@ export declare const AuditAction: {
     readonly REJECT: "REJECT";
     readonly PAYMENT: "PAYMENT";
     readonly DEFECTIVE_RETURN: "DEFECTIVE_RETURN";
+    readonly UNDO_PAYABLE_PAYMENT: "UNDO_PAYABLE_PAYMENT";
+    readonly UNDO_RECEIVABLE_PAYMENT: "UNDO_RECEIVABLE_PAYMENT";
+    readonly UNDO_JOURNAL_ENTRY: "UNDO_JOURNAL_ENTRY";
 };
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export declare const InventoryMovementType: {

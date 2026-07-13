@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { AccountSubtype, JournalStatus, PaymentState, ReceivablePartyType } from "@khan/prisma";
+import { AccountSubtype, JournalStatus, PaymentState, ReceivablePartyType, UserRole, AuditAction } from "@khan/prisma";
 
 @Injectable()
 export class ReceivablesService {
@@ -37,6 +37,66 @@ export class ReceivablesService {
     const party = await this.prisma.client.receivableParty.findUnique({ where: { id } });
     if (!party) throw new NotFoundException("Party not found");
     return this.prisma.client.receivableParty.update({ where: { id }, data });
+  }
+
+  async deleteParty(id: string) {
+    const party = await this.prisma.client.receivableParty.findUnique({
+      where: { id },
+      include: { entries: true }
+    });
+    if (!party) throw new NotFoundException("Party not found");
+
+    // Check if party has any NON-REVERSED payments
+    const entriesWithPayments = await this.prisma.client.receivablePayment.findMany({
+      where: { 
+        entryId: { in: party.entries.map(e => e.id) },
+        isReversed: false
+      }
+    });
+
+    if (entriesWithPayments.length > 0) {
+      throw new BadRequestException("Cannot delete party with payment transactions. Use undo functionality to reverse payments first.");
+    }
+
+    // Since we will delete the entries, we must delete any reversed payment records to satisfy foreign key constraints
+    await this.prisma.client.receivablePayment.deleteMany({
+      where: { entryId: { in: party.entries.map(e => e.id) } }
+    });
+
+    // Delete all entries for this party
+    await this.prisma.client.receivableEntry.deleteMany({
+      where: { partyId: id }
+    });
+
+    // Soft delete by setting isActive to false
+    return this.prisma.client.receivableParty.update({
+      where: { id },
+      data: { isActive: false }
+    });
+  }
+
+  async deleteEntry(entryId: string) {
+    const entry = await this.prisma.client.receivableEntry.findUnique({
+      where: { id: entryId },
+      include: { payments: true }
+    });
+
+    if (!entry) throw new NotFoundException("Receivable entry not found");
+
+    // Check if entry has any NON-REVERSED payments
+    if (entry.payments.some(p => !p.isReversed)) {
+      throw new BadRequestException("Cannot delete receivable with payment transactions. Use undo functionality to reverse payments first.");
+    }
+
+    // Delete reversed payments to satisfy foreign key constraints
+    await this.prisma.client.receivablePayment.deleteMany({
+      where: { entryId: entryId }
+    });
+
+    // Delete the entry
+    await this.prisma.client.receivableEntry.delete({ where: { id: entryId } });
+
+    return { success: true };
   }
 
   // ─── Manual receivable entry ───────────────────────────────────────────────
@@ -291,9 +351,9 @@ export class ReceivablesService {
       }
     }
 
-    // ── Manual-entry receivables (non-CUSTOMER parties) ────────────────────
-    const nonCustomerParties = await this.prisma.client.receivableParty.findMany({
-      where: { partyType: { not: ReceivablePartyType.CUSTOMER }, isActive: true },
+    // ── Manual-entry receivables (all parties with entries) ────────────────────
+    const manualParties = await this.prisma.client.receivableParty.findMany({
+      where: { isActive: true },
       include: {
         entries: {
           select: { amount: true, paidAmount: true, balanceDue: true, status: true, date: true },
@@ -301,7 +361,7 @@ export class ReceivablesService {
       },
     });
 
-    const nonCustomerRows: PartyRow[] = nonCustomerParties
+    const manualRows: PartyRow[] = manualParties
       .filter((p) => p.entries.length > 0)
       .map((p) => {
         const totalBilled = p.entries.reduce((s, e) => s + Number(e.amount), 0);
@@ -332,7 +392,11 @@ export class ReceivablesService {
       status: r.totalOutstanding <= 0 ? "PAID" as const : r.status,
     }));
 
-    return [...customerRows, ...nonCustomerRows];
+    // Merge manual rows with customer rows, avoiding duplicates for CUSTOMER parties
+    const customerPartyIds = new Set(customerRows.map(r => r.partyId));
+    const filteredManualRows = manualRows.filter(r => !customerPartyIds.has(r.partyId));
+
+    return [...customerRows, ...filteredManualRows];
   }
 
   // ─── Party ledger ──────────────────────────────────────────────────────────
@@ -351,7 +415,7 @@ export class ReceivablesService {
         include: {
           bike: { include: { model: { select: { brand: true, modelName: true, year: true } } } },
           branch: { select: { name: true } },
-          transactions: { where: { status: "SUCCESS" },
+          transactions: { where: { status: "SUCCESS", isReversed: false },
             select: { id: true, amount: true, method: true, createdAt: true, verifiedAt: true },
             orderBy: { createdAt: "asc" } },
         },
@@ -362,39 +426,38 @@ export class ReceivablesService {
         include: {
           part: { select: { name: true } },
           branch: { select: { name: true } },
-          transactions: { where: { status: "SUCCESS" },
+          transactions: { where: { status: "SUCCESS", isReversed: false },
             select: { id: true, amount: true, method: true, createdAt: true, verifiedAt: true },
             orderBy: { createdAt: "asc" } },
         },
         orderBy: { createdAt: "asc" },
       });
 
+      // Calculate total billed from orders
       for (const o of orders) {
         runningBalance += Number(o.totalAmount);
-        entries.push({ date: o.createdAt, type: "INVOICE", ref: o.orderNumber,
-          description: `Bike Sale — ${o.bike.model.brand} ${o.bike.model.modelName} (${o.bike.model.year})`,
-          debit: Number(o.totalAmount), credit: 0, balance: runningBalance,
-          orderId: o.id, orderStatus: o.status, paymentState: o.paymentState, branch: o.branch.name });
-        for (const t of o.transactions) {
-          runningBalance -= Number(t.amount);
-          entries.push({ date: t.verifiedAt ?? t.createdAt, type: "PAYMENT",
-            ref: `PAY-${t.id.substring(0, 8)}`,
-            description: `Payment received via ${t.method}`,
-            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: o.id });
-        }
       }
       for (const po of partOrders) {
         runningBalance += Number(po.amount);
-        entries.push({ date: po.createdAt, type: "INVOICE", ref: po.orderNumber,
-          description: `Part Sale — ${po.part.name}`,
-          debit: Number(po.amount), credit: 0, balance: runningBalance,
-          orderId: po.id, orderStatus: po.status, paymentState: po.paymentState, branch: po.branch.name });
+      }
+
+      // Only add payment entries (no invoice entries)
+      for (const o of orders) {
+        for (const t of o.transactions) {
+          runningBalance -= Number(t.amount);
+          entries.push({ date: t.verifiedAt ?? t.createdAt, type: "COLLECTION",
+            ref: `PMT-${t.id.substring(0, 8)}`,
+            description: `Payment via ${t.method} for ${o.orderNumber}`,
+            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: o.id, paymentId: t.id, isPartOrder: false });
+        }
+      }
+      for (const po of partOrders) {
         for (const t of po.transactions) {
           runningBalance -= Number(t.amount);
-          entries.push({ date: t.verifiedAt ?? t.createdAt, type: "PAYMENT",
-            ref: `PAY-${t.id.substring(0, 8)}`,
-            description: `Payment received via ${t.method}`,
-            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: po.id });
+          entries.push({ date: t.verifiedAt ?? t.createdAt, type: "COLLECTION",
+            ref: `PMT-${t.id.substring(0, 8)}`,
+            description: `Payment via ${t.method} for ${po.orderNumber}`,
+            debit: 0, credit: Number(t.amount), balance: runningBalance, orderId: po.id, paymentId: t.id, isPartOrder: true });
         }
       }
     } else {
@@ -403,23 +466,25 @@ export class ReceivablesService {
         where: { partyId },
         include: {
           payments: {
+            where: { isReversed: false },
             include: { account: { select: { name: true, subtype: true } } },
             orderBy: { collectedAt: "asc" },
           },
         },
         orderBy: { date: "asc" },
       });
+      // Calculate total billed from entries
       for (const e of dbEntries) {
         runningBalance += Number(e.amount);
-        entries.push({ date: e.date, type: "INVOICE", ref: `RCV-${e.id.substring(0, 8).toUpperCase()}`,
-          description: e.description, debit: Number(e.amount), credit: 0,
-          balance: runningBalance, entryId: e.id, status: e.status });
+      }
+      // Only add payment entries (no invoice entries)
+      for (const e of dbEntries) {
         for (const p of e.payments) {
           runningBalance -= Number(p.amount);
-          entries.push({ date: p.collectedAt, type: "PAYMENT",
+          entries.push({ date: p.collectedAt, type: "COLLECTION",
             ref: `PMT-${p.id.substring(0, 8).toUpperCase()}`,
             description: `Payment via ${p.method === "ONLINE_TRANSFER" ? "Bank Transfer" : "Cash"}${p.account ? ` (${p.account.name})` : ""}`,
-            debit: 0, credit: Number(p.amount), balance: runningBalance, entryId: e.id });
+            debit: 0, credit: Number(p.amount), balance: runningBalance, entryId: e.id, paymentId: p.id, isManualReceivable: true });
         }
       }
     }
@@ -427,7 +492,7 @@ export class ReceivablesService {
     entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     const totalBilled = entries.filter((e) => e.type === "INVOICE").reduce((s, e) => s + e.debit, 0);
-    const totalPaid = entries.filter((e) => e.type === "PAYMENT").reduce((s, e) => s + e.credit, 0);
+    const totalPaid = entries.filter((e) => e.type === "COLLECTION").reduce((s, e) => s + e.credit, 0);
 
     return {
       party: { id: party.id, name: party.name, partyType: party.partyType,
@@ -645,5 +710,416 @@ export class ReceivablesService {
       });
     }
     return this.collectPayment(party.id, amount, paymentMethod, userId, notes, accountId);
+  }
+
+  // ─── Undo Payment Operations ───────────────────────────────────────────────
+
+  async undoReceivablePayment(receivablePaymentId: string, userId: string) {
+    // Check if user is admin
+    const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can undo payments');
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      const receivablePayment = await tx.receivablePayment.findUnique({
+        where: { id: receivablePaymentId },
+        include: {
+          entry: true,
+          journalEntry: true
+        }
+      });
+
+      if (!receivablePayment) {
+        throw new NotFoundException('Receivable payment not found');
+      }
+
+      if (receivablePayment.isReversed) {
+        throw new BadRequestException('Payment is already reversed');
+      }
+
+      const entry = receivablePayment.entry;
+      if (!entry) {
+        throw new NotFoundException('Receivable entry not found');
+      }
+
+      // Reverse receivable entry: decrease paid, increase balance due
+      const newPaid = Number(entry.paidAmount) - Number(receivablePayment.amount);
+      const newBalance = Number(entry.amount) - newPaid;
+      const newStatus = newPaid >= Number(entry.amount) ? PaymentState.PAID : newPaid > 0 ? PaymentState.PARTIAL : PaymentState.DUE;
+
+      await tx.receivableEntry.update({
+        where: { id: entry.id },
+        data: {
+          paidAmount: newPaid,
+          balanceDue: newBalance,
+          status: newStatus
+        }
+      });
+
+      // Create reversing journal entry if original exists
+      let reversalJournalEntry: any = null;
+      if (receivablePayment.journalEntry && receivablePayment.journalEntryId) {
+        const originalLines = await tx.journalEntryLine.findMany({
+          where: { journalEntryId: receivablePayment.journalEntryId }
+        });
+
+        reversalJournalEntry = await tx.journalEntry.create({
+          data: {
+            entryNo: `REV-${receivablePayment.journalEntry.entryNo}`,
+            date: new Date(),
+            description: `undo payable/receivable - ${receivablePayment.journalEntry.description}`,
+            status: JournalStatus.POSTED,
+            isManual: true,
+            isReversal: true,
+            reversesJournalEntryId: receivablePayment.journalEntryId,
+            lines: {
+              create: originalLines.map(line => ({
+                accountId: line.accountId,
+                debit: line.credit,
+                credit: line.debit
+              }))
+            }
+          }
+        });
+      }
+
+      // Mark receivable payment as reversed
+      await tx.receivablePayment.update({
+        where: { id: receivablePaymentId },
+        data: {
+          isReversed: true,
+          reversedAt: new Date(),
+          reversedById: userId,
+          reversalJournalEntryId: reversalJournalEntry?.id
+        }
+      });
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          userId,
+          userRole: UserRole.ADMIN,
+          action: AuditAction.UNDO_RECEIVABLE_PAYMENT,
+          entityType: 'ReceivablePayment',
+          entityId: receivablePaymentId,
+          oldValue: {
+            amount: Number(receivablePayment.amount),
+            entryId: entry.id,
+            previousPaidAmount: Number(entry.paidAmount)
+          },
+          newValue: {
+            isReversed: true,
+            newPaidAmount: newPaid,
+            newBalanceDue: newBalance,
+            newStatus: newStatus
+          }
+        }
+      });
+
+      return {
+        success: true,
+        message: 'Receivable payment successfully undone',
+        entry: {
+          id: entry.id,
+          newPaid,
+          newBalance,
+          newStatus
+        },
+        reversalJournalEntryId: reversalJournalEntry?.id
+      };
+    });
+  }
+
+  async undoOrderPayment(orderId: string, paymentId: string, userId: string) {
+    // Check if user is admin
+    const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can undo payments');
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      const payment = await tx.paymentTransaction.findUnique({
+        where: { id: paymentId },
+        include: {
+          allocations: {
+            include: {
+              order: true
+            }
+          }
+        }
+      });
+
+      if (!payment) {
+        throw new NotFoundException('Payment not found');
+      }
+
+      if (payment.isReversed) {
+        throw new BadRequestException('Payment is already reversed');
+      }
+
+      if (payment.status !== 'SUCCESS') {
+        throw new BadRequestException('Only successful payments can be undone');
+      }
+
+      const allocation = payment.allocations.find(a => a.orderId === orderId);
+      if (!allocation || !allocation.order) {
+        throw new NotFoundException('Payment allocation not found for this order');
+      }
+
+      const order = allocation.order;
+
+      // Reverse order payment
+      const newPaid = Number(order.paidAmount) - Number(allocation.allocatedAmount);
+      const newBalance = Number(order.totalAmount) - newPaid;
+      const newPaymentState = newPaid >= Number(order.totalAmount) ? PaymentState.PAID : newPaid > 0 ? PaymentState.PARTIAL : PaymentState.DUE;
+
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          paidAmount: newPaid,
+          balanceDue: newBalance,
+          paymentState: newPaymentState
+        }
+      });
+
+      // Delete payment allocation
+      await tx.paymentAllocation.delete({
+        where: { id: allocation.id }
+      });
+
+      // Find and reverse journal entry
+      const originalJournalEntry = await tx.journalEntry.findFirst({
+        where: {
+          sourceRef: paymentId,
+          status: JournalStatus.POSTED,
+          isReversal: false
+        }
+      });
+
+      let reversalJournalEntry: any = null;
+      if (originalJournalEntry) {
+        const originalLines = await tx.journalEntryLine.findMany({
+          where: { journalEntryId: originalJournalEntry.id }
+        });
+
+        reversalJournalEntry = await tx.journalEntry.create({
+          data: {
+            entryNo: `REV-${originalJournalEntry.entryNo}`,
+            date: new Date(),
+            description: `undo payable/receivable - ${originalJournalEntry.description}`,
+            status: JournalStatus.POSTED,
+            isManual: true,
+            isReversal: true,
+            reversesJournalEntryId: originalJournalEntry.id,
+            lines: {
+              create: originalLines.map(line => ({
+                accountId: line.accountId,
+                debit: line.credit,
+                credit: line.debit
+              }))
+            }
+          }
+        });
+      }
+
+      // Mark payment as reversed
+      await tx.paymentTransaction.update({
+        where: { id: paymentId },
+        data: {
+          isReversed: true,
+          reversedAt: new Date(),
+          reversedById: userId
+        }
+      });
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          userId,
+          userRole: UserRole.ADMIN,
+          action: AuditAction.UNDO_RECEIVABLE_PAYMENT,
+          entityType: 'PaymentTransaction',
+          entityId: paymentId,
+          oldValue: {
+            amount: Number(payment.amount),
+            orderId: order.id,
+            previousPaidAmount: Number(order.paidAmount)
+          },
+          newValue: {
+            isReversed: true,
+            newPaidAmount: newPaid,
+            newBalanceDue: newBalance,
+            newPaymentState
+          }
+        }
+      });
+
+      return {
+        success: true,
+        message: 'Order payment successfully undone',
+        order: {
+          id: order.id,
+          orderNumber: order.orderNumber,
+          newPaid,
+          newBalance,
+          newPaymentState
+        },
+        reversalJournalEntryId: reversalJournalEntry?.id
+      };
+    });
+  }
+
+  async undoPartOrderPayment(partOrderId: string, paymentId: string, userId: string) {
+    // Check if user is admin
+    const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can undo payments');
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // PartPaymentTransaction is directly linked to partOrderId — no PaymentAllocation needed
+      const payment = await tx.partPaymentTransaction.findUnique({
+        where: { id: paymentId },
+        include: {
+          partOrder: true,
+          // Also load allocations in case they exist (some paths may create them)
+          allocations: {
+            where: { partOrderId },
+            include: { partOrder: true }
+          }
+        }
+      });
+
+      if (!payment) {
+        throw new NotFoundException('Payment not found');
+      }
+
+      if (payment.isReversed) {
+        throw new BadRequestException('Payment is already reversed');
+      }
+
+      if (payment.status !== 'SUCCESS') {
+        throw new BadRequestException('Only successful payments can be undone');
+      }
+
+      // Determine partOrder and amount to reverse:
+      // Prefer allocation if it exists, fall back to direct partOrderId link
+      let partOrder: any;
+      let allocatedAmount: number;
+      let allocationId: string | null = null;
+
+      const allocation = payment.allocations.find(a => a.partOrderId === partOrderId);
+      if (allocation && allocation.partOrder) {
+        partOrder = allocation.partOrder;
+        allocatedAmount = Number(allocation.allocatedAmount);
+        allocationId = allocation.id;
+      } else if (payment.partOrder && payment.partOrderId === partOrderId) {
+        // Direct link — no allocation record
+        partOrder = payment.partOrder;
+        allocatedAmount = Number(payment.amount);
+      } else {
+        throw new NotFoundException('Payment not linked to this part order');
+      }
+
+      // Reverse part order payment
+      const newPaid = Number(partOrder.paidAmount) - allocatedAmount;
+      const newBalance = Number(partOrder.amount) - newPaid;
+      const newPaymentState = newPaid >= Number(partOrder.amount) ? PaymentState.PAID : newPaid > 0 ? PaymentState.PARTIAL : PaymentState.DUE;
+
+      await tx.partOrder.update({
+        where: { id: partOrderId },
+        data: {
+          paidAmount: newPaid,
+          balanceDue: newBalance,
+          paymentState: newPaymentState
+        }
+      });
+
+      // Delete payment allocation record if it exists
+      if (allocationId) {
+        await tx.paymentAllocation.delete({ where: { id: allocationId } });
+      }
+
+      // Find and reverse journal entry
+      const originalJournalEntry = await tx.journalEntry.findFirst({
+        where: {
+          sourceRef: paymentId,
+          status: JournalStatus.POSTED,
+          isReversal: false
+        }
+      });
+
+      let reversalJournalEntry: any = null;
+      if (originalJournalEntry) {
+        const originalLines = await tx.journalEntryLine.findMany({
+          where: { journalEntryId: originalJournalEntry.id }
+        });
+
+        reversalJournalEntry = await tx.journalEntry.create({
+          data: {
+            entryNo: `REV-${originalJournalEntry.entryNo}`,
+            date: new Date(),
+            description: `undo payable/receivable - ${originalJournalEntry.description}`,
+            status: JournalStatus.POSTED,
+            isManual: true,
+            isReversal: true,
+            reversesJournalEntryId: originalJournalEntry.id,
+            lines: {
+              create: originalLines.map(line => ({
+                accountId: line.accountId,
+                debit: line.credit,
+                credit: line.debit
+              }))
+            }
+          }
+        });
+      }
+
+      // Mark payment as reversed
+      await tx.partPaymentTransaction.update({
+        where: { id: paymentId },
+        data: {
+          isReversed: true,
+          reversedAt: new Date(),
+          reversedById: userId
+        }
+      });
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          userId,
+          userRole: UserRole.ADMIN,
+          action: AuditAction.UNDO_RECEIVABLE_PAYMENT,
+          entityType: 'PartPaymentTransaction',
+          entityId: paymentId,
+          oldValue: {
+            amount: Number(payment.amount),
+            partOrderId: partOrder.id,
+            previousPaidAmount: Number(partOrder.paidAmount)
+          },
+          newValue: {
+            isReversed: true,
+            newPaidAmount: newPaid,
+            newBalanceDue: newBalance,
+            newPaymentState
+          }
+        }
+      });
+
+      return {
+        success: true,
+        message: 'Part order payment successfully undone',
+        partOrder: {
+          id: partOrder.id,
+          orderNumber: partOrder.orderNumber,
+          newPaid,
+          newBalance,
+          newPaymentState
+        },
+        reversalJournalEntryId: reversalJournalEntry?.id
+      };
+    });
   }
 }

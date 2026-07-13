@@ -89,6 +89,9 @@ enum AuditAction {
   REJECT
   PAYMENT
   DEFECTIVE_RETURN
+  UNDO_PAYABLE_PAYMENT
+  UNDO_RECEIVABLE_PAYMENT
+  UNDO_JOURNAL_ENTRY
 }
 
 enum InventoryMovementType {
@@ -653,12 +656,20 @@ model PaymentTransaction {
 
   webhookReceivedAt DateTime?
 
+  // Undo tracking fields
+  isReversed           Boolean   @default(false)
+  reversedAt           DateTime?
+  reversedById         String?
+  reversalTransactionId String?
+  originalAmount       Decimal?  @db.Decimal(12, 2)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([gatewayReference])
   @@index([orderId])
+  @@index([isReversed])
 }
 
 model PartPaymentTransaction {
@@ -694,12 +705,20 @@ model PartPaymentTransaction {
 
   webhookReceivedAt DateTime?
 
+  // Undo tracking fields
+  isReversed           Boolean   @default(false)
+  reversedAt           DateTime?
+  reversedById         String?
+  reversalTransactionId String?
+  originalAmount       Decimal?  @db.Decimal(12, 2)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([gatewayReference])
   @@index([partOrderId])
+  @@index([isReversed])
 }
 
 // ============================================================================
@@ -910,7 +929,12 @@ model JournalEntry {
   vendorDefectiveReturn VendorDefectiveReturn?
   receivablePayment     ReceivablePayment?
 
+  // Undo tracking fields
+  isReversal            Boolean  @default(false)
+  reversesJournalEntryId String?
+
   @@index([createdAt])
+  @@index([isReversal])
 }
 
 model JournalEntryLine {
@@ -1223,9 +1247,16 @@ model ReceivablePayment {
   recordedBy   User?         @relation("ReceivablePaymentRecordedBy", fields: [recordedById], references: [id])
   collectedAt  DateTime @default(now())
 
+  // Undo tracking fields
+  isReversed              Boolean   @default(false)
+  reversedAt              DateTime?
+  reversedById            String?
+  reversalJournalEntryId  String?
+
   createdAt DateTime @default(now())
 
   @@index([entryId])
+  @@index([isReversed])
 }
 
 // ============================================================================

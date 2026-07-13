@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { theme } from "@/lib/colors";
-import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables } from "@/lib/api/accounting";
+import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables, undoPayablePayment, undoPayableAllPayments, undoPayablePaymentsByPayeeAccountId, deletePayable, deletePayablesByPayee, deleteReceivableParty, deleteReceivableEntry } from "@/lib/api/accounting";
 import { getExpenses, getPayablesByPayee } from "@/lib/api/expenses";
 import { getVendors, createVendor, deleteVendor, getVendorLedger, updateVendor } from "@/lib/api/vendors";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ import { InternalTransferModal } from "./internal-transfer-modal";
 import { CollectReceivableModal } from "./collect-receivable-modal";
 import { PartyLedgerModal } from "./party-ledger-modal";
 import { AddReceivableModal } from "./add-receivable-modal";
+import { UndoConfirmationModal } from "./undo-confirmation-modal";
 import { VendorPaymentModal } from "@/app/vendors/vendor-payment-modal";
 import { AllocateInventoryModal } from "@/app/vendors/allocate-inventory-modal";
 import { ReturnDefectiveInventoryModal } from "@/app/vendors/return-defective-inventory-modal";
@@ -259,6 +260,16 @@ export default function AccountsPage() {
   const [payeeLedgerModalData, setPayeeLedgerModalData] = useState<{
     isOpen: boolean; payeeAccountId: string; payeeName: string;
   }>({ isOpen: false, payeeAccountId: '', payeeName: '' });
+
+  // ── Undo modal state ─────────────────────────────────────────────────────────
+  const [undoModal, setUndoModal] = useState<{
+    isOpen: boolean;
+    type: 'payable' | 'receivable';
+    title: string;
+    description: string;
+    details?: { amount?: number; account?: string; date?: string; reference?: string };
+    onConfirm: () => Promise<void>;
+  }>({ isOpen: false, type: 'payable', title: '', description: '', onConfirm: async () => {} });
 
   const expenseRequestFilters = useMemo(() => ({
     branchId: expenseFilters.branch || undefined,
@@ -1105,13 +1116,59 @@ export default function AccountsPage() {
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${paymentStateBadge(status)}`}>{status}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => setPayeeLedgerModalData({ isOpen: true, payeeAccountId: group.payeeId, payeeName: group.payeeName })}
-                            className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
-                            style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}
-                          >
-                            Ledger
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setPayeeLedgerModalData({ isOpen: true, payeeAccountId: group.payeeId, payeeName: group.payeeName })}
+                              className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
+                              style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}
+                            >
+                              Ledger
+                            </button>
+                            {isAdmin && Number(group.totalPaid) > 0 && (
+                              <button
+                                onClick={() => setUndoModal({
+                                  isOpen: true,
+                                  type: 'payable',
+                                  title: 'Undo All Payments',
+                                  description: `This will undo all payments made to ${group.payeeName}. The payable amounts will be restored.`,
+                                  details: {
+                                    amount: Number(group.totalPaid),
+                                    reference: group.payeeName
+                                  },
+                                  onConfirm: async () => {
+                                    await undoPayablePaymentsByPayeeAccountId(group.payeeId);
+                                    await fetchExpenses();
+                                    await fetchData();
+                                  }
+                                })}
+                                className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm bg-red-50 text-red-700 hover:bg-red-100"
+                                style={{ borderColor: '#fecaca' }}
+                              >
+                                Undo All
+                              </button>
+                            )}
+                            {isAdmin && Number(group.totalPaid) === 0 && (
+                              <button
+                                onClick={() => setUndoModal({
+                                  isOpen: true,
+                                  type: 'payable',
+                                  title: 'Delete Payable',
+                                  description: `This will delete all payables for ${group.payeeName}. This action cannot be undone.`,
+                                  details: {
+                                    reference: group.payeeName
+                                  },
+                                  onConfirm: async () => {
+                                    await deletePayablesByPayee(group.payeeId);
+                                    await fetchExpenses();
+                                  }
+                                })}
+                                className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm bg-gray-50 text-gray-700 hover:bg-gray-100"
+                                style={{ borderColor: '#e5e7eb' }}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -1263,6 +1320,34 @@ export default function AccountsPage() {
                                   className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm"
                                   style={{ color: theme.text.primary, borderColor: theme.borders?.medium || '#d1d5db' }}>
                                   Ledger
+                                </button>
+                              )}
+                              {isAdmin && Number(r.totalPaid) > 0 && (
+                                <button
+                                  onClick={() => setLedgerModalReceivable({ isOpen: true, partyId: r.partyId, partyName: r.partyName, partyType: r.partyType })}
+                                  className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm bg-red-50 text-red-700 hover:bg-red-100"
+                                  style={{ borderColor: '#fecaca' }}>
+                                  Undo
+                                </button>
+                              )}
+                              {isAdmin && Number(r.totalPaid) === 0 && r.partyId && (
+                                <button
+                                  onClick={() => setUndoModal({
+                                    isOpen: true,
+                                    type: 'receivable',
+                                    title: 'Delete Receivable',
+                                    description: `This will delete the receivable party ${r.partyName} and all its entries. This action cannot be undone.`,
+                                    details: {
+                                      reference: r.partyName
+                                    },
+                                    onConfirm: async () => {
+                                      await deleteReceivableParty(r.partyId);
+                                      await getReceivables().then(setReceivables);
+                                    }
+                                  })}
+                                  className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm bg-gray-50 text-gray-700 hover:bg-gray-100"
+                                  style={{ borderColor: '#e5e7eb' }}>
+                                  Delete
                                 </button>
                               )}
                             </div>
@@ -1844,7 +1929,7 @@ export default function AccountsPage() {
       <PayeeLedgerModal
         isOpen={payeeLedgerModalData.isOpen}
         onClose={() => setPayeeLedgerModalData({ ...payeeLedgerModalData, isOpen: false })}
-        onSuccess={fetchExpenses}
+        onSuccess={async () => { await fetchExpenses(); await fetchData(); }}
         payeeAccountId={payeeLedgerModalData.payeeAccountId}
         payeeName={payeeLedgerModalData.payeeName}
       />
@@ -1901,6 +1986,11 @@ export default function AccountsPage() {
         partyId={ledgerModalReceivable.partyId}
         partyName={ledgerModalReceivable.partyName}
         partyType={ledgerModalReceivable.partyType}
+        onSuccess={async () => {
+          const updatedReceivables = await getReceivables();
+          setReceivables(updatedReceivables);
+          await fetchData();
+        }}
       />
 
        {deleteConfirmData.isOpen && (
@@ -1982,6 +2072,16 @@ export default function AccountsPage() {
           </div>
         </div>
       )}
+
+      {/* Undo Confirmation Modal */}
+      <UndoConfirmationModal
+        isOpen={undoModal.isOpen}
+        onClose={() => setUndoModal({ ...undoModal, isOpen: false })}
+        onConfirm={undoModal.onConfirm}
+        title={undoModal.title}
+        description={undoModal.description}
+        details={undoModal.details}
+      />
     </div>
   );
 }

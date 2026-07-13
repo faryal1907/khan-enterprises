@@ -672,4 +672,46 @@ async recordInternalTransfer(data: {
 
     return balance;
   }
+
+  async createReversingJournalEntry(originalJournalEntryId: string, userId: string, description: string) {
+    return this.prisma.client.$transaction(async (tx) => {
+      const originalEntry = await tx.journalEntry.findUnique({
+        where: { id: originalJournalEntryId },
+        include: { lines: true }
+      });
+
+      if (!originalEntry) {
+        throw new NotFoundException('Original journal entry not found');
+      }
+
+      if (originalEntry.isReversal) {
+        throw new BadRequestException('Cannot reverse a reversal entry');
+      }
+
+      const reversalEntryNo = `REV-${originalEntry.entryNo}`;
+      const reversalDescription = `undo payable/receivable - ${originalEntry.description}`;
+
+      const reversalEntry = await tx.journalEntry.create({
+        data: {
+          entryNo: reversalEntryNo,
+          date: new Date(),
+          description: reversalDescription,
+          status: 'POSTED',
+          isManual: true,
+          isReversal: true,
+          reversesJournalEntryId: originalJournalEntryId,
+          lines: {
+            create: originalEntry.lines.map(line => ({
+              accountId: line.accountId,
+              debit: line.credit, // Swap debit and credit
+              credit: line.debit
+            }))
+          }
+        },
+        include: { lines: true }
+      });
+
+      return reversalEntry;
+    });
+  }
 }

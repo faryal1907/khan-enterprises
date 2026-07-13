@@ -3266,6 +3266,11 @@ export declare const PaymentTransactionScalarFieldEnum: {
     readonly verifiedById: "verifiedById";
     readonly processedById: "processedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly isReversed: "isReversed";
+    readonly reversedAt: "reversedAt";
+    readonly reversedById: "reversedById";
+    readonly reversalTransactionId: "reversalTransactionId";
+    readonly originalAmount: "originalAmount";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -3286,6 +3291,11 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly verifiedById: "verifiedById";
     readonly processedById: "processedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly isReversed: "isReversed";
+    readonly reversedAt: "reversedAt";
+    readonly reversedById: "reversedById";
+    readonly reversalTransactionId: "reversalTransactionId";
+    readonly originalAmount: "originalAmount";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -3390,6 +3400,8 @@ export declare const JournalEntryScalarFieldEnum: {
     readonly status: "status";
     readonly isManual: "isManual";
     readonly createdAt: "createdAt";
+    readonly isReversal: "isReversal";
+    readonly reversesJournalEntryId: "reversesJournalEntryId";
 };
 export type JournalEntryScalarFieldEnum = (typeof JournalEntryScalarFieldEnum)[keyof typeof JournalEntryScalarFieldEnum];
 export declare const JournalEntryLineScalarFieldEnum: {
@@ -3549,6 +3561,10 @@ export declare const ReceivablePaymentScalarFieldEnum: {
     readonly journalEntryId: "journalEntryId";
     readonly recordedById: "recordedById";
     readonly collectedAt: "collectedAt";
+    readonly isReversed: "isReversed";
+    readonly reversedAt: "reversedAt";
+    readonly reversedById: "reversedById";
+    readonly reversalJournalEntryId: "reversalJournalEntryId";
     readonly createdAt: "createdAt";
 };
 export type ReceivablePaymentScalarFieldEnum = (typeof ReceivablePaymentScalarFieldEnum)[keyof typeof ReceivablePaymentScalarFieldEnum];

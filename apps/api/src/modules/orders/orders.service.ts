@@ -324,6 +324,7 @@ export class OrdersService {
           status: !isCash ? PaymentStatus.VERIFICATION_PENDING : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
           processedById: user.id,
+          originalAmount: isCash ? salePrice : advanceAmount,
         },
       });
 
@@ -822,6 +823,7 @@ export class OrdersService {
             verifiedAt: new Date(),
             verifiedById: user.id,
             processedById: user.id,
+            originalAmount: dto.amount,
           },
         });
       }
@@ -1142,6 +1144,7 @@ export class OrdersService {
             verifiedById: user.id,
             accountId: paymentAcc?.id,
             processedById: user.id,
+            originalAmount: initialPayment,
           },
         });
         await tx.paymentAllocation.create({

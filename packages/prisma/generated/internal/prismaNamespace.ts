@@ -3543,6 +3543,11 @@ export const PaymentTransactionScalarFieldEnum = {
   verifiedById: 'verifiedById',
   processedById: 'processedById',
   webhookReceivedAt: 'webhookReceivedAt',
+  isReversed: 'isReversed',
+  reversedAt: 'reversedAt',
+  reversedById: 'reversedById',
+  reversalTransactionId: 'reversalTransactionId',
+  originalAmount: 'originalAmount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3566,6 +3571,11 @@ export const PartPaymentTransactionScalarFieldEnum = {
   verifiedById: 'verifiedById',
   processedById: 'processedById',
   webhookReceivedAt: 'webhookReceivedAt',
+  isReversed: 'isReversed',
+  reversedAt: 'reversedAt',
+  reversedById: 'reversedById',
+  reversalTransactionId: 'reversalTransactionId',
+  originalAmount: 'originalAmount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3693,7 +3703,9 @@ export const JournalEntryScalarFieldEnum = {
   notes: 'notes',
   status: 'status',
   isManual: 'isManual',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isReversal: 'isReversal',
+  reversesJournalEntryId: 'reversesJournalEntryId'
 } as const
 
 export type JournalEntryScalarFieldEnum = (typeof JournalEntryScalarFieldEnum)[keyof typeof JournalEntryScalarFieldEnum]
@@ -3895,6 +3907,10 @@ export const ReceivablePaymentScalarFieldEnum = {
   journalEntryId: 'journalEntryId',
   recordedById: 'recordedById',
   collectedAt: 'collectedAt',
+  isReversed: 'isReversed',
+  reversedAt: 'reversedAt',
+  reversedById: 'reversedById',
+  reversalJournalEntryId: 'reversalJournalEntryId',
   createdAt: 'createdAt'
 } as const
 

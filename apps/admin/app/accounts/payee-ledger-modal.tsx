@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { theme } from "@/lib/colors";
 import { getPayeeLedger } from "@/lib/api/expenses";
-import { payPayable, getPaymentAccounts } from "@/lib/api/accounting";
+import { payPayable, getPaymentAccounts, undoPayablePayment } from "@/lib/api/accounting";
 import { toast } from "sonner";
 import { AsyncButton } from "@/components/async-button";
 import { numberToWords } from "@/lib/number-to-words";
@@ -52,6 +52,7 @@ export function PayeeLedgerModal({
   const [payDisplayAmount, setPayDisplayAmount] = useState("");
   const [payAccountId, setPayAccountId] = useState("");
   const [isPaySubmitting, setIsPaySubmitting] = useState(false);
+  const [undoingPaymentId, setUndoingPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && payeeAccountId) {
@@ -113,6 +114,20 @@ export function PayeeLedgerModal({
       toast.error(err.response?.data?.message || "Failed to record payment");
     } finally {
       setIsPaySubmitting(false);
+    }
+  };
+
+  const handleUndoPayment = async (paymentId: string) => {
+    setUndoingPaymentId(paymentId);
+    try {
+      await undoPayablePayment(paymentId);
+      toast.success("Payment undone successfully");
+      await fetchLedger();
+      onSuccess?.();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to undo payment");
+    } finally {
+      setUndoingPaymentId(null);
     }
   };
 
@@ -324,6 +339,16 @@ export function PayeeLedgerModal({
                                 style={{ backgroundColor: theme.accents.primary }}
                               >
                                 Pay
+                              </button>
+                            )}
+                            {!isExpenseEntry && entry.paymentId && (
+                              <button
+                                onClick={() => handleUndoPayment(entry.paymentId)}
+                                disabled={undoingPaymentId === entry.paymentId}
+                                className="text-xs px-2 py-1 rounded border bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50"
+                                style={{ borderColor: "#fecaca" }}
+                              >
+                                {undoingPaymentId === entry.paymentId ? "Undoing..." : "Undo"}
                               </button>
                             )}
                             {isExpenseEntry && expDetail?.status && (

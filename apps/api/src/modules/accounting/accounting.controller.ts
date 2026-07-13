@@ -214,6 +214,45 @@ export class AccountingController {
     );
   }
 
+  @Post("payables/payments/:paymentId/undo")
+  @Roles(UserRole.ADMIN)
+  async undoPayablePayment(
+    @Param("paymentId") paymentId: string,
+    @Request() req: any,
+  ) {
+    return this.payablesService.undoPayablePayment(paymentId, req.user.id);
+  }
+
+  @Post("payables/:payableId/undo-all")
+  @Roles(UserRole.ADMIN)
+  async undoPayableAllPayments(
+    @Param("payableId") payableId: string,
+    @Request() req: any,
+  ) {
+    return this.payablesService.undoPayableAllPayments(payableId, req.user.id);
+  }
+
+  @Post("payables/payee/:payeeAccountId/undo-all")
+  @Roles(UserRole.ADMIN)
+  async undoPayablePaymentsByPayeeAccountId(
+    @Param("payeeAccountId") payeeAccountId: string,
+    @Request() req: any,
+  ) {
+    return this.payablesService.undoPayablePaymentsByPayeeAccountId(payeeAccountId, req.user.id);
+  }
+
+  @Delete("payables/:payableId")
+  @Roles(UserRole.ADMIN)
+  async deletePayable(@Param("payableId") payableId: string) {
+    return this.payablesService.deletePayable(payableId);
+  }
+
+  @Delete("payables/payee/:payeeId")
+  @Roles(UserRole.ADMIN)
+  async deletePayablesByPayee(@Param("payeeId") payeeId: string) {
+    return this.payablesService.deletePayablesByPayee(payeeId);
+  }
+
   // ─── Receivables ──────────────────────────────────────────────────────────
 
   @Get("receivables")
@@ -238,6 +277,18 @@ export class AccountingController {
   @Roles(UserRole.ADMIN)
   async createParty(@Body() data: { name: string; partyType?: string; phone?: string; email?: string; address?: string; notes?: string }) {
     return this.receivablesService.createParty(data as any);
+  }
+
+  @Delete("receivables/parties/:partyId")
+  @Roles(UserRole.ADMIN)
+  async deleteParty(@Param("partyId") partyId: string) {
+    return this.receivablesService.deleteParty(partyId);
+  }
+
+  @Delete("receivables/entries/:entryId")
+  @Roles(UserRole.ADMIN)
+  async deleteReceivableEntry(@Param("entryId") entryId: string) {
+    return this.receivablesService.deleteEntry(entryId);
   }
 
   @Post("receivables/entries")
@@ -284,6 +335,37 @@ export class AccountingController {
     @Request() req: any,
   ) {
     return this.receivablesService.collectPaymentByPhone(customerPhone, data.amount, data.paymentMethod, req.user.id, data.notes, data.accountId);
+  }
+
+  // ─── Undo Operations ─────────────────────────────────────────────────────────
+
+  @Post("receivables/payments/:receivablePaymentId/undo")
+  @Roles(UserRole.ADMIN)
+  async undoReceivablePayment(
+    @Param("receivablePaymentId") receivablePaymentId: string,
+    @Request() req: any,
+  ) {
+    return this.receivablesService.undoReceivablePayment(receivablePaymentId, req.user.id);
+  }
+
+  @Post("receivables/orders/:orderId/payments/:paymentId/undo")
+  @Roles(UserRole.ADMIN)
+  async undoOrderPayment(
+    @Param("orderId") orderId: string,
+    @Param("paymentId") paymentId: string,
+    @Request() req: any,
+  ) {
+    return this.receivablesService.undoOrderPayment(orderId, paymentId, req.user.id);
+  }
+
+  @Post("receivables/part-orders/:partOrderId/payments/:paymentId/undo")
+  @Roles(UserRole.ADMIN)
+  async undoPartOrderPayment(
+    @Param("partOrderId") partOrderId: string,
+    @Param("paymentId") paymentId: string,
+    @Request() req: any,
+  ) {
+    return this.receivablesService.undoPartOrderPayment(partOrderId, paymentId, req.user.id);
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────

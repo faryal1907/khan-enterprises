@@ -177,6 +177,7 @@ const partOrder = await tx.partOrder.create({
             : PaymentStatus.PENDING,
           paymentProofUrl: dto.paymentProofUrl || null,
           processedById: user.id,
+          originalAmount: isCash ? amount : advanceAmount,
         },
       });
 
@@ -800,6 +801,7 @@ const partOrder = await tx.partOrder.create({
             verifiedById: user.id,
             accountId: paymentAcc?.id,
             processedById: user.id,
+            originalAmount: initialPayment,
           },
         });
 
@@ -1317,6 +1319,7 @@ const partOrder = await tx.partOrder.create({
             verifiedAt: txStatus === PaymentStatus.SUCCESS ? new Date() : null,
             verifiedById: txStatus === PaymentStatus.SUCCESS ? user.id : null,
             processedById: user.id,
+            originalAmount: dto.amount,
           },
         });
       }

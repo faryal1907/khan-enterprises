@@ -177,3 +177,57 @@ export const collectReceivable = async (
   const { data } = await api.post(`/accounting/receivables/${encodeURIComponent(customerPhone)}/collect`, payload);
   return data;
 };
+
+// ─── Undo Operations ─────────────────────────────────────────────────────────────
+
+export const undoPayablePayment = async (paymentId: string) => {
+  const { data } = await api.post(`/accounting/payables/payments/${paymentId}/undo`);
+  return data;
+};
+
+export const undoPayableAllPayments = async (payableId: string) => {
+  const { data } = await api.post(`/accounting/payables/${payableId}/undo-all`);
+  return data;
+};
+
+export const undoPayablePaymentsByPayeeAccountId = async (payeeAccountId: string) => {
+  const { data } = await api.post(`/accounting/payables/payee/${payeeAccountId}/undo-all`);
+  return data;
+};
+
+export const undoReceivablePayment = async (receivablePaymentId: string) => {
+  const { data } = await api.post(`/accounting/receivables/payments/${receivablePaymentId}/undo`);
+  return data;
+};
+
+export const undoOrderPayment = async (orderId: string, paymentId: string) => {
+  const { data } = await api.post(`/accounting/receivables/orders/${orderId}/payments/${paymentId}/undo`);
+  return data;
+};
+
+export const undoPartOrderPayment = async (partOrderId: string, paymentId: string) => {
+  const { data } = await api.post(`/accounting/receivables/part-orders/${partOrderId}/payments/${paymentId}/undo`);
+  return data;
+};
+
+// ─── Delete Operations ─────────────────────────────────────────────────────────────
+
+export const deletePayable = async (payableId: string) => {
+  const { data } = await api.delete(`/accounting/payables/${payableId}`);
+  return data;
+};
+
+export const deletePayablesByPayee = async (payeeId: string) => {
+  const { data } = await api.delete(`/accounting/payables/payee/${payeeId}`);
+  return data;
+};
+
+export const deleteReceivableParty = async (partyId: string) => {
+  const { data } = await api.delete(`/accounting/receivables/parties/${partyId}`);
+  return data;
+};
+
+export const deleteReceivableEntry = async (entryId: string) => {
+  const { data } = await api.delete(`/accounting/receivables/entries/${entryId}`);
+  return data;
+};
