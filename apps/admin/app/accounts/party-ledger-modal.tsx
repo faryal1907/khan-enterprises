@@ -33,6 +33,10 @@ export function PartyLedgerModal({ isOpen, onClose, partyId, partyName, partyTyp
   const handleUndoPayment = async (entry: any) => {
     if (!entry.paymentId) return;
 
+    if (!window.confirm(
+      "This will reverse the payment and permanently delete the receivable entry.\n\nThe amount will no longer appear as owed. This cannot be undone."
+    )) return;
+
     setUndoingPaymentId(entry.paymentId);
     try {
       if (entry.isManualReceivable) {
@@ -42,7 +46,9 @@ export function PartyLedgerModal({ isOpen, onClose, partyId, partyName, partyTyp
       } else {
         await undoOrderPayment(entry.orderId, entry.paymentId);
       }
-      toast.success("Payment undone successfully");
+      toast.success(entry.isManualReceivable
+        ? "Payment reversed and receivable entry deleted"
+        : "Payment undone successfully");
       // Reload ledger
       const updatedLedger = await getPartyLedger(partyId);
       setLedger(updatedLedger);

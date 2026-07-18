@@ -119,10 +119,14 @@ export function PayeeLedgerModal({
   };
 
   const handleUndoPayment = async (paymentId: string) => {
+    if (!window.confirm(
+      "This will reverse the payment and permanently delete the payable entry.\n\nThe amount will no longer appear as owed. This cannot be undone."
+    )) return;
+
     setUndoingPaymentId(paymentId);
     try {
       await undoPayablePayment(paymentId);
-      toast.success("Payment undone successfully");
+      toast.success("Payment reversed and payable entry deleted");
       await fetchLedger();
       onSuccess?.();
     } catch (err: any) {
@@ -132,13 +136,15 @@ export function PayeeLedgerModal({
     }
   };
 
-  // Initial "paid-now" payments have no PaymentTransaction/paymentId, so we
-  // reverse them through the payable-level undo endpoint.
   const handleUndoInitialPayment = async (payableId: string) => {
+    if (!window.confirm(
+      "This will reverse the payment and permanently delete the payable entry.\n\nThe amount will no longer appear as owed. This cannot be undone."
+    )) return;
+
     setUndoingInitialPayableId(payableId);
     try {
       await undoPayableAllPayments(payableId);
-      toast.success("Payment undone successfully");
+      toast.success("Payment reversed and payable entry deleted");
       await fetchLedger();
       onSuccess?.();
     } catch (err: any) {

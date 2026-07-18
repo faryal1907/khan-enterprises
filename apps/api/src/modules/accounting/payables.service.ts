@@ -225,22 +225,7 @@ export class PayablesService {
 
       const payable = allocation.payable;
 
-      // Reverse payable: decrease paid, increase remaining
-      const newPaid = Number(payable.paid) - Number(allocation.allocatedAmount);
-      const newRemaining = Number(payable.total) - newPaid;
-      let newState: PaymentState = PaymentState.DUE;
-      if (newPaid > 0) newState = PaymentState.PARTIAL;
-
-      await tx.payable.update({
-        where: { id: payable.id },
-        data: {
-          paid: newPaid,
-          remaining: newRemaining,
-          status: newState
-        }
-      });
-
-      // Delete payment allocation
+      // Delete payment allocation (must go before payable delete to avoid FK constraint)
       await tx.paymentAllocation.delete({
         where: { id: allocation.id }
       });
@@ -291,6 +276,38 @@ export class PayablesService {
         }
       });
 
+      // Check if any other non-reversed payments remain on this payable
+      const remainingAllocations = await tx.paymentAllocation.findMany({
+        where: { payableId: payable.id },
+        include: { payment: true },
+      });
+      const remainingPaid = remainingAllocations
+        .filter((a) => a.payment && !a.payment.isReversed && a.payment.status === 'SUCCESS')
+        .reduce((sum, a) => sum + Number(a.allocatedAmount), 0);
+
+      let payableDeleted = false;
+      const expenseId = payable.expenseId;
+
+      if (remainingPaid === 0) {
+        // No payments remain — delete the payable (and its linked expense)
+        await tx.payable.delete({ where: { id: payable.id } });
+        if (expenseId) {
+          await tx.expense.delete({ where: { id: expenseId } });
+        }
+        payableDeleted = true;
+      } else {
+        // Payments still exist — restore the payable balance
+        const newRemaining = Number(payable.total) - remainingPaid;
+        await tx.payable.update({
+          where: { id: payable.id },
+          data: {
+            paid: remainingPaid,
+            remaining: newRemaining,
+            status: newRemaining <= 0 ? 'PAID' : remainingPaid > 0 ? 'PARTIAL' : 'DUE',
+          },
+        });
+      }
+
       // Create audit log
       await tx.auditLog.create({
         data: {
@@ -306,23 +323,18 @@ export class PayablesService {
           },
           newValue: {
             isReversed: true,
-            newPaidAmount: newPaid,
-            newRemainingAmount: newRemaining,
-            newStatus: newState
+            payableDeleted,
+            expenseDeleted: payableDeleted && !!expenseId,
           }
         }
       });
 
       return {
         success: true,
-        message: 'Payment successfully undone',
-        payable: {
-          id: payable.id,
-          ref: payable.ref,
-          newPaid,
-          newRemaining,
-          newStatus: newState
-        },
+        message: payableDeleted
+          ? 'Payment reversed and payable entry deleted'
+          : `Payment reversed. Payable updated — Rs. ${remainingPaid.toLocaleString()} still paid.`,
+        payableDeleted,
         reversalJournalEntryId: reversalJournalEntry?.id
       };
     });
@@ -335,74 +347,82 @@ export class PayablesService {
       throw new ForbiddenException('Only admins can undo payments');
     }
 
-    const allocations = await this.prisma.client.paymentAllocation.findMany({
-      where: { payableId },
-      include: {
-        payment: true
-      },
-      orderBy: { payment: { createdAt: 'desc' } }
-    });
-
-    const results: any[] = [];
-    for (const allocation of allocations) {
-      if (!allocation.payment.isReversed && allocation.payment.status === 'SUCCESS') {
-        try {
-          const result = await this.undoPayablePayment(allocation.paymentId, userId);
-          results.push({ paymentId: allocation.paymentId, success: true, result });
-        } catch (error: any) {
-          results.push({ paymentId: allocation.paymentId, success: false, error: error.message });
-        }
-      }
-    }
-
-    // Check if there is still a paid amount (due to payNow at expense creation)
-    const payable = await this.prisma.client.payable.findUnique({ where: { id: payableId } });
-    if (payable && Number(payable.paid) > 0) {
-      await this.prisma.client.$transaction(async (tx) => {
-        const remainingPaid = Number(payable.paid);
-        const newRemaining = Number(payable.total);
-
-        await tx.payable.update({
-          where: { id: payableId },
-          data: {
-            paid: 0,
-            remaining: newRemaining,
-            status: PaymentState.DUE
+    return this.prisma.client.$transaction(async (tx) => {
+      const payable = await tx.payable.findUnique({
+        where: { id: payableId },
+        include: {
+          allocations: {
+            include: { payment: true },
+            orderBy: { payment: { createdAt: 'desc' } }
           }
+        }
+      });
+
+      if (!payable) throw new NotFoundException('Payable not found');
+
+      const results: any[] = [];
+
+      // Reverse all PaymentTransaction allocations
+      for (const allocation of payable.allocations) {
+        const payment = allocation.payment;
+        if (payment.isReversed || payment.status !== 'SUCCESS') continue;
+
+        // Delete allocation first (FK constraint)
+        await tx.paymentAllocation.delete({ where: { id: allocation.id } });
+
+        // Create reversing journal entry
+        const originalJE = await tx.journalEntry.findFirst({
+          where: { sourceRef: payment.id, status: JournalStatus.POSTED, isReversal: false }
+        });
+        if (originalJE) {
+          const lines = await tx.journalEntryLine.findMany({ where: { journalEntryId: originalJE.id } });
+          await tx.journalEntry.create({
+            data: {
+              entryNo: `REV-${originalJE.entryNo}`,
+              date: new Date(),
+              description: `Reversal: ${originalJE.description}`,
+              status: JournalStatus.POSTED,
+              isManual: true,
+              isReversal: true,
+              reversesJournalEntryId: originalJE.id,
+              lines: { create: lines.map(l => ({ accountId: l.accountId, debit: l.credit, credit: l.debit })) }
+            }
+          });
+        }
+
+        // Mark payment as reversed
+        await tx.paymentTransaction.update({
+          where: { id: payment.id },
+          data: { isReversed: true, reversedAt: new Date(), reversedById: userId }
         });
 
-        // If this payable came from an expense, we need to adjust the original expense journal entry
+        results.push({ paymentId: payment.id, success: true });
+      }
+
+      // Reverse any initial paid-at-creation amount (no PaymentTransaction)
+      if (Number(payable.paid) > 0 && payable.allocations.length === 0) {
         if (payable.expenseId) {
-          const expenseJournalEntry = await tx.journalEntry.findFirst({
-            where: {
-              sourceRef: payable.expenseId,
-              status: JournalStatus.POSTED,
-              isReversal: false
-            },
+          const expenseJE = await tx.journalEntry.findFirst({
+            where: { sourceRef: payable.expenseId, status: JournalStatus.POSTED, isReversal: false },
             include: { lines: true }
           });
-
-          if (expenseJournalEntry) {
+          if (expenseJE) {
             const apAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AP } });
-            // Find the line that credited the payment account
-            const creditLine = expenseJournalEntry.lines.find(l => Number(l.credit) > 0);
-            
+            const creditLine = expenseJE.lines.find(l => Number(l.credit) > 0);
             if (apAcc && creditLine) {
               await tx.journalEntry.create({
                 data: {
-                  entryNo: `REV-EXP-${expenseJournalEntry.entryNo.split('-').pop()}`,
+                  entryNo: `REV-EXP-${expenseJE.entryNo.split('-').pop()}`,
                   date: new Date(),
                   description: `Undo initial payment for ${payable.ref}`,
                   status: JournalStatus.POSTED,
                   isManual: true,
                   isReversal: true,
-                  sourceRef: payable.id, // Mark to avoid duplicate reversals
+                  sourceRef: payable.id,
                   lines: {
                     create: [
-                      // Debit the bank/cash account that was originally credited
-                      { accountId: creditLine.accountId, debit: remainingPaid, credit: 0 },
-                      // Credit the AP account
-                      { accountId: apAcc.id, debit: 0, credit: remainingPaid }
+                      { accountId: creditLine.accountId, debit: Number(payable.paid), credit: 0 },
+                      { accountId: apAcc.id, debit: 0, credit: Number(payable.paid) }
                     ]
                   }
                 }
@@ -410,17 +430,24 @@ export class PayablesService {
             }
           }
         }
-
         results.push({ paymentId: 'initial_payment', success: true, result: { message: 'Initial payment reversed' } });
-      });
-    }
+      }
 
-    return {
-      totalProcessed: results.length,
-      successful: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
-      results
-    };
+      // Delete the payable and its linked expense — this debt no longer needs to be paid
+      const expenseId = payable.expenseId;
+      await tx.payable.delete({ where: { id: payableId } });
+      if (expenseId) {
+        await tx.expense.delete({ where: { id: expenseId } });
+      }
+
+      return {
+        totalProcessed: results.length,
+        successful: results.filter(r => r.success).length,
+        failed: results.filter(r => !r.success).length,
+        results,
+        payableDeleted: true,
+      };
+    });
   }
 
   /**

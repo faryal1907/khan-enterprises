@@ -364,6 +364,15 @@ export class AccountingController {
     return this.receivablesService.undoReceivablePayment(receivablePaymentId, req.user.id);
   }
 
+  @Post("receivables/parties/:partyId/undo-all")
+  @Roles(UserRole.ADMIN)
+  async undoReceivableAllPaymentsByPartyId(
+    @Param("partyId") partyId: string,
+    @Request() req: any,
+  ) {
+    return this.receivablesService.undoReceivableAllPaymentsByPartyId(partyId, req.user.id);
+  }
+
   @Post("receivables/orders/:orderId/payments/:paymentId/undo")
   @Roles(UserRole.ADMIN)
   async undoOrderPayment(

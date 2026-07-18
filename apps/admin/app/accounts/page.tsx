@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { theme } from "@/lib/colors";
-import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables, undoPayablePayment, undoPayableAllPayments, undoPayablePaymentsByPayeeAccountId, deletePayable, deletePayablesByPayee, deleteReceivableParty, deleteReceivableEntry } from "@/lib/api/accounting";
+import { getAccounts, getJournalEntries, createAccount, updateAccount, deleteAccount, getReceivables, undoPayablePayment, undoPayableAllPayments, undoPayablePaymentsByPayeeAccountId, deletePayable, deletePayablesByPayee, deleteReceivableParty, deleteReceivableEntry, undoReceivablePaymentsByPartyId } from "@/lib/api/accounting";
 import { getExpenses, getPayablesByPayee } from "@/lib/api/expenses";
 import { getVendors, createVendor, deleteVendor, getVendorLedger, updateVendor } from "@/lib/api/vendors";
 import { toast } from "sonner";
@@ -981,13 +981,40 @@ export default function AccountsPage() {
               )}
             </div>
 
-            {/* Summary cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-              <SummaryCard label="Total Expenses" value={`PKR ${expenseSummary.total.toLocaleString()}`} color="#ef4444" />
-              <SummaryCard label="Outstanding" value={`PKR ${expenseSummary.unpaid.toLocaleString()}`} color="#f59e0b" />
-              <SummaryCard label="Payees" value={expenseSummary.payeeCount} />
-              <SummaryCard label="Transactions" value={expenseSummary.count} />
-            </div>
+            {/* Summary Cards */}
+            {payablesByPayee.length > 0 && (() => {
+              const totalBilled = payablesByPayee.reduce((s, g) => s + g.totalExpenses, 0);
+              const totalPaid = payablesByPayee.reduce((s, g) => s + g.totalPaid, 0);
+              const totalOutstanding = payablesByPayee.reduce((s, g) => s + g.totalOutstanding, 0);
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-5">
+                  <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Total Billed</div>
+                    <div className="text-xl font-bold" style={{ color: theme.text.primary }}>{formatCurrency(totalBilled)}</div>
+                    <div className="mt-3 h-1 w-full rounded-full" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: theme.accents.primary, width: '100%' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Total Paid</div>
+                    <div className="text-xl font-bold text-emerald-600">{formatCurrency(totalPaid)}</div>
+                    <div className="mt-3 h-1 w-full rounded-full" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: '#10b981', width: totalBilled > 0 ? `${(totalPaid / totalBilled) * 100}%` : '0%' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Total Outstanding</div>
+                    <div className="text-xl font-bold" style={{ color: totalOutstanding > 0 ? theme.accents.error : theme.text.secondary }}>{formatCurrency(totalOutstanding)}</div>
+                    <div className="mt-3 h-1 w-full rounded-full" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: totalOutstanding > 0 ? theme.accents.error : '#10b981', width: totalBilled > 0 ? `${(totalOutstanding / totalBilled) * 100}%` : '0%' }}></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Filters */}
             <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
@@ -1219,17 +1246,43 @@ export default function AccountsPage() {
                     + Add Receivable
                   </button>
                 )}
-                {receivables.length > 0 && (() => {
-                  const totalOutstanding = receivables.reduce((s: number, r: any) => s + Number(r.totalOutstanding), 0);
-                  const hasOutstanding = receivables.some((r: any) => Number(r.totalOutstanding) > 0);
-                  return (
-                    <div className={`text-xs font-semibold px-3 py-1.5 rounded-full ${hasOutstanding ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
-                      {receivables.length} part{receivables.length !== 1 ? 'ies' : 'y'}{hasOutstanding ? ` · Rs. ${totalOutstanding.toLocaleString()} outstanding` : ' · fully settled'}
-                    </div>
-                  );
-                })()}
               </div>
             </div>
+
+            {/* Summary Cards */}
+            {receivables.length > 0 && (() => {
+              const totalBilled = receivables.reduce((s: number, r: any) => s + Number(r.totalBilled), 0);
+              const totalCollected = receivables.reduce((s: number, r: any) => s + Number(r.totalPaid), 0);
+              const totalOutstanding = receivables.reduce((s: number, r: any) => s + Number(r.totalOutstanding), 0);
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-5">
+                  <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Total Billed</div>
+                    <div className="text-xl font-bold" style={{ color: theme.text.primary }}>{formatCurrency(totalBilled)}</div>
+                    <div className="mt-3 h-1 w-full rounded-full" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: theme.accents.primary, width: '100%' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Total Collected</div>
+                    <div className="text-xl font-bold text-emerald-600">{formatCurrency(totalCollected)}</div>
+                    <div className="mt-3 h-1 w-full rounded-full" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: '#10b981', width: totalBilled > 0 ? `${(totalCollected / totalBilled) * 100}%` : '0%' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: theme.borders.light }}>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: theme.text.secondary }}>Total Outstanding</div>
+                    <div className="text-xl font-bold" style={{ color: totalOutstanding > 0 ? theme.accents.error : theme.text.secondary }}>{formatCurrency(totalOutstanding)}</div>
+                    <div className="mt-3 h-1 w-full rounded-full" style={{ backgroundColor: theme.backgrounds.secondary }}>
+                      <div className="h-1 rounded-full" style={{ backgroundColor: totalOutstanding > 0 ? theme.accents.error : '#10b981', width: totalBilled > 0 ? `${(totalOutstanding / totalBilled) * 100}%` : '0%' }}></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Filters */}
             <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
@@ -1346,10 +1399,24 @@ export default function AccountsPage() {
                               )}
                               {isAdmin && Number(r.totalPaid) > 0 && (
                                 <button
-                                  onClick={() => setLedgerModalReceivable({ isOpen: true, partyId: r.partyId, partyName: r.partyName, partyType: r.partyType })}
+                                  onClick={() => setUndoModal({
+                                    isOpen: true,
+                                    type: 'receivable',
+                                    title: 'Undo All Payments',
+                                    description: `This will undo all payments collected from ${r.partyName}. The receivable amounts will be restored.`,
+                                    details: {
+                                      amount: Number(r.totalPaid),
+                                      reference: r.partyName
+                                    },
+                                    onConfirm: async () => {
+                                      await undoReceivablePaymentsByPartyId(r.partyId);
+                                      await getReceivables().then(setReceivables);
+                                      await fetchData();
+                                    }
+                                  })}
                                   className="px-3 py-1 rounded-md text-xs font-semibold border shadow-sm bg-red-50 text-red-700 hover:bg-red-100"
                                   style={{ borderColor: '#fecaca' }}>
-                                  Undo
+                                  Undo All
                                 </button>
                               )}
                               {isAdmin && Number(r.totalPaid) === 0 && r.partyId && (

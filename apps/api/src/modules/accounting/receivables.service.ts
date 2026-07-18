@@ -719,6 +719,128 @@ export class ReceivablesService {
 
   // ─── Undo Payment Operations ───────────────────────────────────────────────
 
+  async undoReceivableAllPaymentsByPartyId(partyId: string, userId: string) {
+    // Check if user is admin
+    const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can undo payments');
+    }
+
+    const party = await this.prisma.client.receivableParty.findUnique({
+      where: { id: partyId },
+      include: { entries: { include: { payments: true } } }
+    });
+
+    if (!party) {
+      throw new NotFoundException('Party not found');
+    }
+
+    if (party.entries.length === 0) {
+      throw new BadRequestException('No entries found for this party');
+    }
+
+    return this.prisma.client.$transaction(async (tx) => {
+      // Get all non-reversed payments for this party
+      const allPayments = await tx.receivablePayment.findMany({
+        where: {
+          entryId: { in: party.entries.map(e => e.id) },
+          isReversed: false
+        },
+        include: {
+          entry: true,
+          journalEntry: true
+        }
+      });
+
+      if (allPayments.length === 0) {
+        throw new BadRequestException('No payments to undo for this party');
+      }
+
+      // Reverse each payment
+      for (const payment of allPayments) {
+        const entry = payment.entry;
+        
+        // Create reversing journal entry if original exists
+        let reversalJournalEntry: any = null;
+        if (payment.journalEntry && payment.journalEntryId) {
+          const originalLines = await tx.journalEntryLine.findMany({
+            where: { journalEntryId: payment.journalEntryId }
+          });
+
+          reversalJournalEntry = await tx.journalEntry.create({
+            data: {
+              entryNo: `REV-${payment.journalEntry.entryNo}`,
+              date: new Date(),
+              description: `undo receivable payment - ${payment.journalEntry.description}`,
+              status: JournalStatus.POSTED,
+              isManual: true,
+              isReversal: true,
+              reversesJournalEntryId: payment.journalEntryId,
+              lines: {
+                create: originalLines.map(line => ({
+                  accountId: line.accountId,
+                  debit: line.credit,
+                  credit: line.debit
+                }))
+              }
+            }
+          });
+        }
+
+        // Mark receivable payment as reversed
+        await tx.receivablePayment.update({
+          where: { id: payment.id },
+          data: {
+            isReversed: true,
+            reversedAt: new Date(),
+            reversedById: userId,
+            reversalJournalEntryId: reversalJournalEntry?.id
+          }
+        });
+
+        // Update entry paid amount
+        const newPaidAmount = Number(entry.paidAmount) - Number(payment.amount);
+        const newBalanceDue = Number(entry.amount) - newPaidAmount;
+        const newStatus = newPaidAmount >= Number(entry.amount) ? 'PAID' : newPaidAmount > 0 ? 'PARTIAL' : 'DUE';
+
+        await tx.receivableEntry.update({
+          where: { id: entry.id },
+          data: {
+            paidAmount: newPaidAmount,
+            balanceDue: newBalanceDue,
+            status: newStatus as PaymentState
+          }
+        });
+
+        // Create audit log
+        await tx.auditLog.create({
+          data: {
+            userId,
+            userRole: UserRole.ADMIN,
+            action: AuditAction.UNDO_RECEIVABLE_PAYMENT,
+            entityType: 'ReceivablePayment',
+            entityId: payment.id,
+            oldValue: {
+              amount: Number(payment.amount),
+              entryId: entry.id,
+              previousPaidAmount: Number(entry.paidAmount) + Number(payment.amount)
+            },
+            newValue: {
+              isReversed: true,
+              newPaidAmount: newPaidAmount
+            }
+          }
+        });
+      }
+
+      return {
+        success: true,
+        message: `Undid ${allPayments.length} payment(s) for ${party.name}`,
+        paymentsUndone: allPayments.length
+      };
+    });
+  }
+
   async undoReceivablePayment(receivablePaymentId: string, userId: string) {
     // Check if user is admin
     const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
@@ -747,20 +869,6 @@ export class ReceivablesService {
       if (!entry) {
         throw new NotFoundException('Receivable entry not found');
       }
-
-      // Reverse receivable entry: decrease paid, increase balance due
-      const newPaid = Number(entry.paidAmount) - Number(receivablePayment.amount);
-      const newBalance = Number(entry.amount) - newPaid;
-      const newStatus = newPaid >= Number(entry.amount) ? PaymentState.PAID : newPaid > 0 ? PaymentState.PARTIAL : PaymentState.DUE;
-
-      await tx.receivableEntry.update({
-        where: { id: entry.id },
-        data: {
-          paidAmount: newPaid,
-          balanceDue: newBalance,
-          status: newStatus
-        }
-      });
 
       // Create reversing journal entry if original exists
       let reversalJournalEntry: any = null;
@@ -815,22 +923,20 @@ export class ReceivablesService {
           },
           newValue: {
             isReversed: true,
-            newPaidAmount: newPaid,
-            newBalanceDue: newBalance,
-            newStatus: newStatus
+            entryDeleted: true,
           }
         }
       });
 
+      // Delete all payment records for this entry (including the one just reversed),
+      // then delete the entry itself — this debt no longer needs to be collected.
+      await tx.receivablePayment.deleteMany({ where: { entryId: entry.id } });
+      await tx.receivableEntry.delete({ where: { id: entry.id } });
+
       return {
         success: true,
-        message: 'Receivable payment successfully undone',
-        entry: {
-          id: entry.id,
-          newPaid,
-          newBalance,
-          newStatus
-        },
+        message: 'Receivable payment reversed and entry deleted',
+        entryDeleted: true,
         reversalJournalEntryId: reversalJournalEntry?.id
       };
     });

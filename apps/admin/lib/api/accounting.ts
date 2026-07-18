@@ -208,6 +208,11 @@ export const undoReceivablePayment = async (receivablePaymentId: string) => {
   return data;
 };
 
+export const undoReceivablePaymentsByPartyId = async (partyId: string) => {
+  const { data } = await api.post(`/accounting/receivables/parties/${partyId}/undo-all`);
+  return data;
+};
+
 export const undoOrderPayment = async (orderId: string, paymentId: string) => {
   const { data } = await api.post(`/accounting/receivables/orders/${orderId}/payments/${paymentId}/undo`);
   return data;

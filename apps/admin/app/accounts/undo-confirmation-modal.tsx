@@ -111,7 +111,7 @@ export function UndoConfirmationModal({
           className="mb-4 p-3 rounded-md bg-red-50 border border-red-200"
         >
           <p className="text-sm text-red-800">
-            ⚠️ This action cannot be undone. Account balances will be automatically recalculated.
+            ⚠️ This action cannot be undone. The payment will be reversed and the payable/receivable entry will be permanently deleted — the amount will no longer appear as owed.
           </p>
         </div>
 

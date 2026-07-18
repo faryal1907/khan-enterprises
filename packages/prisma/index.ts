@@ -37,10 +37,13 @@ if (isAccelerate) {
     accelerateUrl: databaseUrl,
   });
 } else {
-  // Direct database connection via driver adapter
+  // Direct database connection via driver adapter.
+  // Supabase pooler (port 6543) requires SSL — rejectUnauthorized:false trusts
+  // Supabase's self-signed cert without needing a CA bundle.
   const pool = globalForPrisma.pool ?? new Pool({
     connectionString: databaseUrl,
     max: maxConnections,
+    ssl: { rejectUnauthorized: false },
   });
 
   if (process.env.NODE_ENV !== "production") {
