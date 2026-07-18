@@ -34,6 +34,18 @@ api.interceptors.response.use(
     // Use console.warn so the Next.js dev overlay is NOT triggered
     console.warn(`[API ${status ?? "ERR"}]`, message);
 
+    // If the token is expired or invalid, clear the cookie and redirect to login.
+    // Skip this for the /auth/me call itself (handled by AuthProvider) to avoid
+    // redirect loops on initial load.
+    if (
+      status === 401 &&
+      typeof window !== "undefined" &&
+      !error?.config?.url?.includes("/auth/me")
+    ) {
+      Cookies.remove(ADMIN_ACCESS_TOKEN_COOKIE, { path: "/" });
+      window.location.href = "/login";
+    }
+
     // Re-throw the original Axios error unchanged so that
     // err.response?.data?.message works in every catch block.
     return Promise.reject(error);
