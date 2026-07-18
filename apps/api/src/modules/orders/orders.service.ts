@@ -351,7 +351,7 @@ export class OrdersService {
 
       const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
       const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
-      const costOfGoods = Number(bike.purchasePrice || 0);
+      const costOfGoods = Number(bike.purchaseCost || 0);
 
       if (cogsAcc && inventoryAcc && costOfGoods > 0) {
         await tx.journalEntry.create({
@@ -1195,7 +1195,7 @@ export class OrdersService {
 
       const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
       const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
-      const costOfGoods = Number(bike.purchasePrice || 0);
+      const costOfGoods = Number(bike.purchaseCost || 0);
 
       if (cogsAcc && inventoryAcc && costOfGoods > 0) {
         await tx.journalEntry.create({
