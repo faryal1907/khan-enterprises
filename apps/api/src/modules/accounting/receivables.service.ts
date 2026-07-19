@@ -231,7 +231,11 @@ export class ReceivablesService {
         id: true, orderNumber: true, customerName: true, customerPhone: true,
         customerId: true, totalAmount: true, paidAmount: true, balanceDue: true,
         paymentState: true, status: true, createdAt: true,
-        bike: { select: { model: { select: { brand: true, modelName: true, year: true } } } },
+        bike: { select: { 
+          model: { select: { brand: true, modelName: true, year: true } },
+          purchaseCost: true,
+          actualSalePrice: true,
+        } },
         branch: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -281,6 +285,8 @@ export class ReceivablesService {
       totalOutstanding: number;
       totalBilled: number;
       totalPaid: number;
+      totalCostPrice: number;
+      totalSalePrice: number;
       orderCount: number;
       latestDate: Date;
       lastPaymentDate: Date | null;
@@ -290,7 +296,7 @@ export class ReceivablesService {
     const map = new Map<string, PartyRow>();
 
     const mergeOrder = (phone: string, name: string, billed: number, paid: number,
-      outstanding: number, createdAt: Date, paymentState: string) => {
+      outstanding: number, costPrice: number, salePrice: number, createdAt: Date, paymentState: string) => {
       const existing = map.get(phone);
       const party = partyByPhone.get(phone);
       const itemStatus = paymentState === "OVERDUE" ? "OVERDUE"
@@ -301,6 +307,8 @@ export class ReceivablesService {
         existing.totalOutstanding += outstanding;
         existing.totalBilled += billed;
         existing.totalPaid += paid;
+        existing.totalCostPrice += costPrice;
+        existing.totalSalePrice += salePrice;
         existing.orderCount += 1;
         if (createdAt > existing.latestDate) existing.latestDate = createdAt;
         if (itemStatus === "OVERDUE") existing.status = "OVERDUE";
@@ -315,6 +323,8 @@ export class ReceivablesService {
           totalOutstanding: outstanding,
           totalBilled: billed,
           totalPaid: paid,
+          totalCostPrice: costPrice,
+          totalSalePrice: salePrice,
           orderCount: 1,
           latestDate: createdAt,
           lastPaymentDate: null,
@@ -324,9 +334,12 @@ export class ReceivablesService {
     };
 
     for (const o of orders) mergeOrder(o.customerPhone, o.customerName,
-      Number(o.totalAmount), Number(o.paidAmount), Number(o.balanceDue), o.createdAt, o.paymentState);
+      Number(o.totalAmount), Number(o.paidAmount), Number(o.balanceDue),
+      Number(o.bike.purchaseCost || 0), Number(o.bike.actualSalePrice || o.totalAmount),
+      o.createdAt, o.paymentState);
     for (const po of partOrders) mergeOrder(po.customerPhone, po.customerName,
-      Number(po.amount), Number(po.paidAmount), Number(po.balanceDue), po.createdAt, po.paymentState);
+      Number(po.amount), Number(po.paidAmount), Number(po.balanceDue), 0, Number(po.amount),
+      po.createdAt, po.paymentState);
 
     // Compute last payment dates for customer parties
     const phones = Array.from(map.keys());
@@ -380,6 +393,8 @@ export class ReceivablesService {
           totalBilled,
           totalPaid,
           totalOutstanding,
+          totalCostPrice: 0, // Manual receivables don't have cost price
+          totalSalePrice: totalBilled, // For manual receivables, sale price equals billed amount
           orderCount: p.entries.length,
           latestDate,
           lastPaymentDate: null,

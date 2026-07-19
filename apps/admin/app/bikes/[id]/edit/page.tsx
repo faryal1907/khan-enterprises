@@ -172,6 +172,7 @@ export default function EditBikePage() {
   // New fields
   const [price, setPrice] = useState("");
   const [purchaseCost, setPurchaseCost] = useState("");
+  const [actualSalePrice, setActualSalePrice] = useState("");
   const [onlineDiscountPercent, setOnlineDiscountPercent] = useState("");
   const [color, setColor] = useState("");
   const [media, setMedia] = useState<string[]>([]);
@@ -221,6 +222,7 @@ export default function EditBikePage() {
         setStatus(bike.status || "AVAILABLE");
         setPrice(bike.price ? bike.price.toString() : "");
         setPurchaseCost(bike.purchaseCost ? bike.purchaseCost.toString() : "");
+        setActualSalePrice(bike.actualSalePrice ? bike.actualSalePrice.toString() : "");
         setOnlineDiscountPercent(bike.onlineDiscountPercent !== undefined && bike.onlineDiscountPercent !== null ? bike.onlineDiscountPercent.toString() : "");
         setColor(bike.color || "");
         setMedia(bike.media || []);
@@ -326,6 +328,7 @@ export default function EditBikePage() {
         vendorId,
         price: price ? parseFloat(price) : undefined,
         purchaseCost: purchaseCost ? parseFloat(purchaseCost) : undefined,
+        actualSalePrice: actualSalePrice ? parseFloat(actualSalePrice) : undefined,
         onlineDiscountPercent: onlineDiscountPercent ? parseFloat(onlineDiscountPercent) : undefined,
         color: color || undefined,
         media,
@@ -578,6 +581,34 @@ export default function EditBikePage() {
                     Cost price cannot be edited for manually created bikes
                   </p>
                 )}
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: theme.text.secondary }}
+                >
+                  Actual Sale Price (PKR)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 rounded text-sm disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    border: `1px solid ${theme.borders.medium}`,
+                    color: theme.text.primary,
+                  }}
+                  placeholder="Final sale price when sold"
+                  value={actualSalePrice}
+                  onChange={(e) => setActualSalePrice(e.target.value)}
+                  disabled={bikeData?.status !== 'SOLD'}
+                />
+                <p className="mt-1 text-xs" style={{ color: theme.text.muted }}>
+                  {bikeData?.status === 'SOLD' 
+                    ? "Actual sale price from the order" 
+                    : "This field is populated automatically when the bike is sold"}
+                </p>
               </div>
               <div>
                 <label

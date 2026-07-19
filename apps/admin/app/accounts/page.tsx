@@ -1345,6 +1345,8 @@ export default function AccountsPage() {
                     <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
                       <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Party Name</th>
                       <th className="p-3 font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Party Type</th>
+                      <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Cost Price</th>
+                      <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Sale Price</th>
                       <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Billed</th>
                       <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Total Collected</th>
                       <th className="p-3 text-right font-medium uppercase tracking-wider text-xs" style={{ color: theme.text.secondary }}>Outstanding</th>
@@ -1354,11 +1356,13 @@ export default function AccountsPage() {
                   </thead>
                   <tbody>
                     {filteredReceivables.length === 0 ? (
-                      <tr><td colSpan={7} className="px-6 py-10 text-center" style={{ color: theme.text.muted }}>
+                      <tr><td colSpan={9} className="px-6 py-10 text-center" style={{ color: theme.text.muted }}>
                         No parties match the current filters.
                       </td></tr>
                     ) : filteredReceivables.map((r: any) => {
                       const outstanding = Number(r.totalOutstanding);
+                      const costPrice = Number(r.totalCostPrice || 0);
+                      const salePrice = Number(r.totalSalePrice || 0);
                       return (
                         <tr key={r.partyId ?? r.partyName} className="border-b last:border-0 hover:bg-gray-50 transition-colors" style={{ borderColor: theme.borders.light }}>
                           <td className="p-3 font-medium" style={{ color: theme.text.primary }}>{r.partyName}</td>
@@ -1368,6 +1372,8 @@ export default function AccountsPage() {
                               {(r.partyType as string).replace(/_/g, ' ')}
                             </span>
                           </td>
+                          <td className="p-3 text-right" style={{ color: theme.text.primary }}>{costPrice > 0 ? costPrice.toLocaleString() : '-'}</td>
+                          <td className="p-3 text-right" style={{ color: theme.text.primary }}>{salePrice > 0 ? salePrice.toLocaleString() : '-'}</td>
                           <td className="p-3 text-right" style={{ color: theme.text.primary }}>{Number(r.totalBilled).toLocaleString()}</td>
                           <td className="p-3 text-right text-emerald-600">{Number(r.totalPaid).toLocaleString()}</td>
                           <td className="p-3 text-right font-semibold" style={{ color: outstanding > 0 ? theme.accents.error : theme.text.secondary }}>
