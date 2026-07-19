@@ -13,6 +13,10 @@ export class UpdateBikeUnitDto {
   @IsOptional()
   purchaseCost?: number;
 
+  @IsNumber()
+  @IsOptional()
+  actualSalePrice?: number;
+
   @IsString()
   @IsOptional()
   color?: string;

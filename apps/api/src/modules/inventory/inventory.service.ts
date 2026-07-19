@@ -257,6 +257,7 @@ export class InventoryService {
           vendorId: dto.vendorId,
           price: dto.price,
           purchaseCost: dto.purchaseCost,
+          actualSalePrice: dto.actualSalePrice,
           color: dto.color,
           media: dto.media,
           onlineDiscountPercent: dto.onlineDiscountPercent,

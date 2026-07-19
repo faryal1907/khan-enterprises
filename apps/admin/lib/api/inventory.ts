@@ -50,6 +50,7 @@ export async function updateBike(id: string, data: {
   status?: string;
   price?: number;
   purchaseCost?: number;
+  actualSalePrice?: number;
   color?: string;
   media?: string[];
   onlineDiscountPercent?: number;
