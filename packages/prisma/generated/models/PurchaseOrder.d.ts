@@ -125,9 +125,9 @@ export type PurchaseOrderWhereInput = {
     type?: Prisma.StringFilter<"PurchaseOrder"> | string;
     totalCost?: Prisma.DecimalFilter<"PurchaseOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFilter<"PurchaseOrder"> | $Enums.POStatus;
+    payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null;
     vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>;
     items?: Prisma.PurchaseOrderItemListRelationFilter;
-    payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null;
 };
 export type PurchaseOrderOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -136,9 +136,9 @@ export type PurchaseOrderOrderByWithRelationInput = {
     type?: Prisma.SortOrder;
     totalCost?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    payable?: Prisma.PayableOrderByWithRelationInput;
     vendor?: Prisma.VendorOrderByWithRelationInput;
     items?: Prisma.PurchaseOrderItemOrderByRelationAggregateInput;
-    payable?: Prisma.PayableOrderByWithRelationInput;
 };
 export type PurchaseOrderWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -150,9 +150,9 @@ export type PurchaseOrderWhereUniqueInput = Prisma.AtLeast<{
     type?: Prisma.StringFilter<"PurchaseOrder"> | string;
     totalCost?: Prisma.DecimalFilter<"PurchaseOrder"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFilter<"PurchaseOrder"> | $Enums.POStatus;
+    payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null;
     vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>;
     items?: Prisma.PurchaseOrderItemListRelationFilter;
-    payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null;
 }, "id" | "poNumber">;
 export type PurchaseOrderOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -184,9 +184,9 @@ export type PurchaseOrderCreateInput = {
     type: string;
     totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: $Enums.POStatus;
+    payable?: Prisma.PayableCreateNestedOneWithoutPurchaseOrderInput;
     vendor: Prisma.VendorCreateNestedOneWithoutPurchaseOrdersInput;
     items?: Prisma.PurchaseOrderItemCreateNestedManyWithoutPurchaseOrderInput;
-    payable?: Prisma.PayableCreateNestedOneWithoutPurchaseOrderInput;
 };
 export type PurchaseOrderUncheckedCreateInput = {
     id?: string;
@@ -195,8 +195,8 @@ export type PurchaseOrderUncheckedCreateInput = {
     type: string;
     totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: $Enums.POStatus;
-    items?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutPurchaseOrderInput;
     payable?: Prisma.PayableUncheckedCreateNestedOneWithoutPurchaseOrderInput;
+    items?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutPurchaseOrderInput;
 };
 export type PurchaseOrderUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -204,9 +204,9 @@ export type PurchaseOrderUpdateInput = {
     type?: Prisma.StringFieldUpdateOperationsInput | string;
     totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFieldUpdateOperationsInput | $Enums.POStatus;
+    payable?: Prisma.PayableUpdateOneWithoutPurchaseOrderNestedInput;
     vendor?: Prisma.VendorUpdateOneRequiredWithoutPurchaseOrdersNestedInput;
     items?: Prisma.PurchaseOrderItemUpdateManyWithoutPurchaseOrderNestedInput;
-    payable?: Prisma.PayableUpdateOneWithoutPurchaseOrderNestedInput;
 };
 export type PurchaseOrderUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -215,8 +215,8 @@ export type PurchaseOrderUncheckedUpdateInput = {
     type?: Prisma.StringFieldUpdateOperationsInput | string;
     totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFieldUpdateOperationsInput | $Enums.POStatus;
-    items?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutPurchaseOrderNestedInput;
     payable?: Prisma.PayableUncheckedUpdateOneWithoutPurchaseOrderNestedInput;
+    items?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutPurchaseOrderNestedInput;
 };
 export type PurchaseOrderCreateManyInput = {
     id?: string;
@@ -360,8 +360,8 @@ export type PurchaseOrderCreateWithoutVendorInput = {
     type: string;
     totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: $Enums.POStatus;
-    items?: Prisma.PurchaseOrderItemCreateNestedManyWithoutPurchaseOrderInput;
     payable?: Prisma.PayableCreateNestedOneWithoutPurchaseOrderInput;
+    items?: Prisma.PurchaseOrderItemCreateNestedManyWithoutPurchaseOrderInput;
 };
 export type PurchaseOrderUncheckedCreateWithoutVendorInput = {
     id?: string;
@@ -369,8 +369,8 @@ export type PurchaseOrderUncheckedCreateWithoutVendorInput = {
     type: string;
     totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: $Enums.POStatus;
-    items?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutPurchaseOrderInput;
     payable?: Prisma.PayableUncheckedCreateNestedOneWithoutPurchaseOrderInput;
+    items?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutPurchaseOrderInput;
 };
 export type PurchaseOrderCreateOrConnectWithoutVendorInput = {
     where: Prisma.PurchaseOrderWhereUniqueInput;
@@ -410,8 +410,8 @@ export type PurchaseOrderCreateWithoutItemsInput = {
     type: string;
     totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: $Enums.POStatus;
-    vendor: Prisma.VendorCreateNestedOneWithoutPurchaseOrdersInput;
     payable?: Prisma.PayableCreateNestedOneWithoutPurchaseOrderInput;
+    vendor: Prisma.VendorCreateNestedOneWithoutPurchaseOrdersInput;
 };
 export type PurchaseOrderUncheckedCreateWithoutItemsInput = {
     id?: string;
@@ -441,8 +441,8 @@ export type PurchaseOrderUpdateWithoutItemsInput = {
     type?: Prisma.StringFieldUpdateOperationsInput | string;
     totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFieldUpdateOperationsInput | $Enums.POStatus;
-    vendor?: Prisma.VendorUpdateOneRequiredWithoutPurchaseOrdersNestedInput;
     payable?: Prisma.PayableUpdateOneWithoutPurchaseOrderNestedInput;
+    vendor?: Prisma.VendorUpdateOneRequiredWithoutPurchaseOrdersNestedInput;
 };
 export type PurchaseOrderUncheckedUpdateWithoutItemsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -515,8 +515,8 @@ export type PurchaseOrderUpdateWithoutVendorInput = {
     type?: Prisma.StringFieldUpdateOperationsInput | string;
     totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFieldUpdateOperationsInput | $Enums.POStatus;
-    items?: Prisma.PurchaseOrderItemUpdateManyWithoutPurchaseOrderNestedInput;
     payable?: Prisma.PayableUpdateOneWithoutPurchaseOrderNestedInput;
+    items?: Prisma.PurchaseOrderItemUpdateManyWithoutPurchaseOrderNestedInput;
 };
 export type PurchaseOrderUncheckedUpdateWithoutVendorInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -524,8 +524,8 @@ export type PurchaseOrderUncheckedUpdateWithoutVendorInput = {
     type?: Prisma.StringFieldUpdateOperationsInput | string;
     totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     status?: Prisma.EnumPOStatusFieldUpdateOperationsInput | $Enums.POStatus;
-    items?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutPurchaseOrderNestedInput;
     payable?: Prisma.PayableUncheckedUpdateOneWithoutPurchaseOrderNestedInput;
+    items?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutPurchaseOrderNestedInput;
 };
 export type PurchaseOrderUncheckedUpdateManyWithoutVendorInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -553,9 +553,9 @@ export type PurchaseOrderSelect<ExtArgs extends runtime.Types.Extensions.Interna
     type?: boolean;
     totalCost?: boolean;
     status?: boolean;
+    payable?: boolean | Prisma.PurchaseOrder$payableArgs<ExtArgs>;
     vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     items?: boolean | Prisma.PurchaseOrder$itemsArgs<ExtArgs>;
-    payable?: boolean | Prisma.PurchaseOrder$payableArgs<ExtArgs>;
     _count?: boolean | Prisma.PurchaseOrderCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["purchaseOrder"]>;
 export type PurchaseOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -586,9 +586,9 @@ export type PurchaseOrderSelectScalar = {
 };
 export type PurchaseOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "poNumber" | "vendorId" | "type" | "totalCost" | "status", ExtArgs["result"]["purchaseOrder"]>;
 export type PurchaseOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    payable?: boolean | Prisma.PurchaseOrder$payableArgs<ExtArgs>;
     vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     items?: boolean | Prisma.PurchaseOrder$itemsArgs<ExtArgs>;
-    payable?: boolean | Prisma.PurchaseOrder$payableArgs<ExtArgs>;
     _count?: boolean | Prisma.PurchaseOrderCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type PurchaseOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -600,9 +600,9 @@ export type PurchaseOrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type $PurchaseOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "PurchaseOrder";
     objects: {
+        payable: Prisma.$PayablePayload<ExtArgs> | null;
         vendor: Prisma.$VendorPayload<ExtArgs>;
         items: Prisma.$PurchaseOrderItemPayload<ExtArgs>[];
-        payable: Prisma.$PayablePayload<ExtArgs> | null;
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -663,9 +663,9 @@ export interface PurchaseOrderDelegate<ExtArgs extends runtime.Types.Extensions.
 }
 export interface Prisma__PurchaseOrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
+    payable<T extends Prisma.PurchaseOrder$payableArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PurchaseOrder$payableArgs<ExtArgs>>): Prisma.Prisma__PayableClient<runtime.Types.Result.GetResult<Prisma.$PayablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     items<T extends Prisma.PurchaseOrder$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PurchaseOrder$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
-    payable<T extends Prisma.PurchaseOrder$payableArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PurchaseOrder$payableArgs<ExtArgs>>): Prisma.Prisma__PayableClient<runtime.Types.Result.GetResult<Prisma.$PayablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -778,6 +778,12 @@ export type PurchaseOrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
     where?: Prisma.PurchaseOrderWhereInput;
     limit?: number;
 };
+export type PurchaseOrder$payableArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PayableSelect<ExtArgs> | null;
+    omit?: Prisma.PayableOmit<ExtArgs> | null;
+    include?: Prisma.PayableInclude<ExtArgs> | null;
+    where?: Prisma.PayableWhereInput;
+};
 export type PurchaseOrder$itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PurchaseOrderItemSelect<ExtArgs> | null;
     omit?: Prisma.PurchaseOrderItemOmit<ExtArgs> | null;
@@ -788,12 +794,6 @@ export type PurchaseOrder$itemsArgs<ExtArgs extends runtime.Types.Extensions.Int
     take?: number;
     skip?: number;
     distinct?: Prisma.PurchaseOrderItemScalarFieldEnum | Prisma.PurchaseOrderItemScalarFieldEnum[];
-};
-export type PurchaseOrder$payableArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.PayableSelect<ExtArgs> | null;
-    omit?: Prisma.PayableOmit<ExtArgs> | null;
-    include?: Prisma.PayableInclude<ExtArgs> | null;
-    where?: Prisma.PayableWhereInput;
 };
 export type PurchaseOrderDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PurchaseOrderSelect<ExtArgs> | null;

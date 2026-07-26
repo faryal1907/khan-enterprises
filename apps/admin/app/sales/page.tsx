@@ -28,6 +28,7 @@ type SaleRecord = {
   status: OrderStatus;
   type: "BIKE" | "PART";
   createdAt: string;
+  saleDate?: string | null;
   bike?: {
     actualSalePrice?: number | null;
     model?: {
@@ -221,7 +222,7 @@ export default function SalesRecordsPage() {
       sale.type,
       sale.status,
       sale.processedBy?.fullName || "",
-      new Date(sale.createdAt).toLocaleDateString(),
+      new Date(sale.saleDate || sale.createdAt).toLocaleDateString(),
     ]);
 
     const csvContent = [
@@ -446,7 +447,7 @@ export default function SalesRecordsPage() {
                       {sale.processedBy?.fullName || "-"}
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
-                      {new Date(sale.createdAt).toLocaleDateString()}
+                      {new Date(sale.saleDate || sale.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center gap-2 md:gap-3">

@@ -49,15 +49,16 @@ export type PaymentTransactionMinAggregateOutputType = {
   paymentProofUrl: string | null
   verifiedAt: Date | null
   verifiedById: string | null
-  processedById: string | null
   webhookReceivedAt: Date | null
+  createdAt: Date | null
+  transactionDate: Date | null
+  updatedAt: Date | null
+  processedById: string | null
   isReversed: boolean | null
+  originalAmount: runtime.Decimal | null
+  reversalTransactionId: string | null
   reversedAt: Date | null
   reversedById: string | null
-  reversalTransactionId: string | null
-  originalAmount: runtime.Decimal | null
-  createdAt: Date | null
-  updatedAt: Date | null
 }
 
 export type PaymentTransactionMaxAggregateOutputType = {
@@ -73,15 +74,16 @@ export type PaymentTransactionMaxAggregateOutputType = {
   paymentProofUrl: string | null
   verifiedAt: Date | null
   verifiedById: string | null
-  processedById: string | null
   webhookReceivedAt: Date | null
+  createdAt: Date | null
+  transactionDate: Date | null
+  updatedAt: Date | null
+  processedById: string | null
   isReversed: boolean | null
+  originalAmount: runtime.Decimal | null
+  reversalTransactionId: string | null
   reversedAt: Date | null
   reversedById: string | null
-  reversalTransactionId: string | null
-  originalAmount: runtime.Decimal | null
-  createdAt: Date | null
-  updatedAt: Date | null
 }
 
 export type PaymentTransactionCountAggregateOutputType = {
@@ -98,15 +100,16 @@ export type PaymentTransactionCountAggregateOutputType = {
   paymentProofUrl: number
   verifiedAt: number
   verifiedById: number
-  processedById: number
   webhookReceivedAt: number
+  createdAt: number
+  transactionDate: number
+  updatedAt: number
+  processedById: number
   isReversed: number
+  originalAmount: number
+  reversalTransactionId: number
   reversedAt: number
   reversedById: number
-  reversalTransactionId: number
-  originalAmount: number
-  createdAt: number
-  updatedAt: number
   _all: number
 }
 
@@ -134,15 +137,16 @@ export type PaymentTransactionMinAggregateInputType = {
   paymentProofUrl?: true
   verifiedAt?: true
   verifiedById?: true
-  processedById?: true
   webhookReceivedAt?: true
+  createdAt?: true
+  transactionDate?: true
+  updatedAt?: true
+  processedById?: true
   isReversed?: true
+  originalAmount?: true
+  reversalTransactionId?: true
   reversedAt?: true
   reversedById?: true
-  reversalTransactionId?: true
-  originalAmount?: true
-  createdAt?: true
-  updatedAt?: true
 }
 
 export type PaymentTransactionMaxAggregateInputType = {
@@ -158,15 +162,16 @@ export type PaymentTransactionMaxAggregateInputType = {
   paymentProofUrl?: true
   verifiedAt?: true
   verifiedById?: true
-  processedById?: true
   webhookReceivedAt?: true
+  createdAt?: true
+  transactionDate?: true
+  updatedAt?: true
+  processedById?: true
   isReversed?: true
+  originalAmount?: true
+  reversalTransactionId?: true
   reversedAt?: true
   reversedById?: true
-  reversalTransactionId?: true
-  originalAmount?: true
-  createdAt?: true
-  updatedAt?: true
 }
 
 export type PaymentTransactionCountAggregateInputType = {
@@ -183,15 +188,16 @@ export type PaymentTransactionCountAggregateInputType = {
   paymentProofUrl?: true
   verifiedAt?: true
   verifiedById?: true
-  processedById?: true
   webhookReceivedAt?: true
+  createdAt?: true
+  transactionDate?: true
+  updatedAt?: true
+  processedById?: true
   isReversed?: true
+  originalAmount?: true
+  reversalTransactionId?: true
   reversedAt?: true
   reversedById?: true
-  reversalTransactionId?: true
-  originalAmount?: true
-  createdAt?: true
-  updatedAt?: true
   _all?: true
 }
 
@@ -295,15 +301,16 @@ export type PaymentTransactionGroupByOutputType = {
   paymentProofUrl: string | null
   verifiedAt: Date | null
   verifiedById: string | null
-  processedById: string | null
   webhookReceivedAt: Date | null
+  createdAt: Date
+  transactionDate: Date | null
+  updatedAt: Date
+  processedById: string | null
   isReversed: boolean
+  originalAmount: runtime.Decimal | null
+  reversalTransactionId: string | null
   reversedAt: Date | null
   reversedById: string | null
-  reversalTransactionId: string | null
-  originalAmount: runtime.Decimal | null
-  createdAt: Date
-  updatedAt: Date
   _count: PaymentTransactionCountAggregateOutputType | null
   _avg: PaymentTransactionAvgAggregateOutputType | null
   _sum: PaymentTransactionSumAggregateOutputType | null
@@ -343,18 +350,19 @@ export type PaymentTransactionWhereInput = {
   paymentProofUrl?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   verifiedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
   verifiedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  processedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
+  transactionDate?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
+  updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
+  processedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   isReversed?: Prisma.BoolFilter<"PaymentTransaction"> | boolean
+  originalAmount?: Prisma.DecimalNullableFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
   reversedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  reversalTransactionId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  originalAmount?: Prisma.DecimalNullableFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
-  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
   allocations?: Prisma.PaymentAllocationListRelationFilter
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -372,18 +380,19 @@ export type PaymentTransactionOrderByWithRelationInput = {
   paymentProofUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   verifiedById?: Prisma.SortOrderInput | Prisma.SortOrder
-  processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  transactionDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  originalAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalTransactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedById?: Prisma.SortOrderInput | Prisma.SortOrder
-  reversalTransactionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  originalAmount?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
-  order?: Prisma.OrderOrderByWithRelationInput
-  account?: Prisma.AccountOrderByWithRelationInput
   allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput
+  account?: Prisma.AccountOrderByWithRelationInput
+  order?: Prisma.OrderOrderByWithRelationInput
   processedBy?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -404,18 +413,19 @@ export type PaymentTransactionWhereUniqueInput = Prisma.AtLeast<{
   paymentProofUrl?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   verifiedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
   verifiedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  processedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
+  transactionDate?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
+  updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
+  processedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   isReversed?: Prisma.BoolFilter<"PaymentTransaction"> | boolean
+  originalAmount?: Prisma.DecimalNullableFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
   reversedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  reversalTransactionId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  originalAmount?: Prisma.DecimalNullableFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
-  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
   allocations?: Prisma.PaymentAllocationListRelationFilter
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
   processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "gatewayReference" | "idempotencyKey">
 
@@ -433,15 +443,16 @@ export type PaymentTransactionOrderByWithAggregationInput = {
   paymentProofUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   verifiedById?: Prisma.SortOrderInput | Prisma.SortOrder
-  processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  transactionDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  processedById?: Prisma.SortOrderInput | Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  originalAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalTransactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedById?: Prisma.SortOrderInput | Prisma.SortOrder
-  reversalTransactionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  originalAmount?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   _count?: Prisma.PaymentTransactionCountOrderByAggregateInput
   _avg?: Prisma.PaymentTransactionAvgOrderByAggregateInput
   _max?: Prisma.PaymentTransactionMaxOrderByAggregateInput
@@ -466,15 +477,16 @@ export type PaymentTransactionScalarWhereWithAggregatesInput = {
   paymentProofUrl?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
   verifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PaymentTransaction"> | Date | string | null
   verifiedById?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
-  processedById?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PaymentTransaction"> | Date | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
+  transactionDate?: Prisma.DateTimeNullableWithAggregatesFilter<"PaymentTransaction"> | Date | string | null
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
+  processedById?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
   isReversed?: Prisma.BoolWithAggregatesFilter<"PaymentTransaction"> | boolean
+  originalAmount?: Prisma.DecimalNullableWithAggregatesFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
   reversedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PaymentTransaction"> | Date | string | null
   reversedById?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
-  reversalTransactionId?: Prisma.StringNullableWithAggregatesFilter<"PaymentTransaction"> | string | null
-  originalAmount?: Prisma.DecimalNullableWithAggregatesFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentTransaction"> | Date | string
 }
 
 export type PaymentTransactionCreateInput = {
@@ -490,16 +502,17 @@ export type PaymentTransactionCreateInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
-  account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
+  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPaymentTransactionsInput
 }
 
@@ -517,15 +530,16 @@ export type PaymentTransactionUncheckedCreateInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -542,16 +556,17 @@ export type PaymentTransactionUpdateInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
-  account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
+  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPaymentTransactionsNestedInput
 }
 
@@ -569,15 +584,16 @@ export type PaymentTransactionUncheckedUpdateInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -595,15 +611,16 @@ export type PaymentTransactionCreateManyInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type PaymentTransactionUpdateManyMutationInput = {
@@ -619,13 +636,14 @@ export type PaymentTransactionUpdateManyMutationInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentTransactionUncheckedUpdateManyInput = {
@@ -642,15 +660,16 @@ export type PaymentTransactionUncheckedUpdateManyInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentTransactionListRelationFilter = {
@@ -677,15 +696,16 @@ export type PaymentTransactionCountOrderByAggregateInput = {
   paymentProofUrl?: Prisma.SortOrder
   verifiedAt?: Prisma.SortOrder
   verifiedById?: Prisma.SortOrder
-  processedById?: Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  transactionDate?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  processedById?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  originalAmount?: Prisma.SortOrder
+  reversalTransactionId?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   reversedById?: Prisma.SortOrder
-  reversalTransactionId?: Prisma.SortOrder
-  originalAmount?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type PaymentTransactionAvgOrderByAggregateInput = {
@@ -706,15 +726,16 @@ export type PaymentTransactionMaxOrderByAggregateInput = {
   paymentProofUrl?: Prisma.SortOrder
   verifiedAt?: Prisma.SortOrder
   verifiedById?: Prisma.SortOrder
-  processedById?: Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  transactionDate?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  processedById?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  originalAmount?: Prisma.SortOrder
+  reversalTransactionId?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   reversedById?: Prisma.SortOrder
-  reversalTransactionId?: Prisma.SortOrder
-  originalAmount?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type PaymentTransactionMinOrderByAggregateInput = {
@@ -730,15 +751,16 @@ export type PaymentTransactionMinOrderByAggregateInput = {
   paymentProofUrl?: Prisma.SortOrder
   verifiedAt?: Prisma.SortOrder
   verifiedById?: Prisma.SortOrder
-  processedById?: Prisma.SortOrder
   webhookReceivedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  transactionDate?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  processedById?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  originalAmount?: Prisma.SortOrder
+  reversalTransactionId?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   reversedById?: Prisma.SortOrder
-  reversalTransactionId?: Prisma.SortOrder
-  originalAmount?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type PaymentTransactionSumOrderByAggregateInput = {
@@ -908,16 +930,17 @@ export type PaymentTransactionCreateWithoutProcessedByInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
-  account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
+  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
 }
 
 export type PaymentTransactionUncheckedCreateWithoutProcessedByInput = {
@@ -935,13 +958,14 @@ export type PaymentTransactionUncheckedCreateWithoutProcessedByInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -988,15 +1012,16 @@ export type PaymentTransactionScalarWhereInput = {
   paymentProofUrl?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   verifiedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
   verifiedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  processedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   webhookReceivedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
+  transactionDate?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
+  updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
+  processedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   isReversed?: Prisma.BoolFilter<"PaymentTransaction"> | boolean
+  originalAmount?: Prisma.DecimalNullableFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"PaymentTransaction"> | Date | string | null
   reversedById?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  reversalTransactionId?: Prisma.StringNullableFilter<"PaymentTransaction"> | string | null
-  originalAmount?: Prisma.DecimalNullableFilter<"PaymentTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"PaymentTransaction"> | Date | string
 }
 
 export type PaymentTransactionCreateWithoutOrderInput = {
@@ -1012,15 +1037,16 @@ export type PaymentTransactionCreateWithoutOrderInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPaymentTransactionsInput
 }
 
@@ -1037,15 +1063,16 @@ export type PaymentTransactionUncheckedCreateWithoutOrderInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -1088,15 +1115,16 @@ export type PaymentTransactionCreateWithoutAccountInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPaymentTransactionsInput
 }
 
@@ -1113,15 +1141,16 @@ export type PaymentTransactionUncheckedCreateWithoutAccountInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -1164,15 +1193,16 @@ export type PaymentTransactionCreateWithoutAllocationsInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
   account?: Prisma.AccountCreateNestedOneWithoutPaymentsInput
+  order?: Prisma.OrderCreateNestedOneWithoutTransactionsInput
   processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPaymentTransactionsInput
 }
 
@@ -1190,15 +1220,16 @@ export type PaymentTransactionUncheckedCreateWithoutAllocationsInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type PaymentTransactionCreateOrConnectWithoutAllocationsInput = {
@@ -1230,15 +1261,16 @@ export type PaymentTransactionUpdateWithoutAllocationsInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
   account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
+  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPaymentTransactionsNestedInput
 }
 
@@ -1256,15 +1288,16 @@ export type PaymentTransactionUncheckedUpdateWithoutAllocationsInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentTransactionCreateManyProcessedByInput = {
@@ -1282,13 +1315,14 @@ export type PaymentTransactionCreateManyProcessedByInput = {
   verifiedAt?: Date | string | null
   verifiedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type PaymentTransactionUpdateWithoutProcessedByInput = {
@@ -1304,16 +1338,17 @@ export type PaymentTransactionUpdateWithoutProcessedByInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
-  account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
+  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
 }
 
 export type PaymentTransactionUncheckedUpdateWithoutProcessedByInput = {
@@ -1331,13 +1366,14 @@ export type PaymentTransactionUncheckedUpdateWithoutProcessedByInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -1356,13 +1392,14 @@ export type PaymentTransactionUncheckedUpdateManyWithoutProcessedByInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentTransactionCreateManyOrderInput = {
@@ -1378,15 +1415,16 @@ export type PaymentTransactionCreateManyOrderInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type PaymentTransactionUpdateWithoutOrderInput = {
@@ -1402,15 +1440,16 @@ export type PaymentTransactionUpdateWithoutOrderInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  account?: Prisma.AccountUpdateOneWithoutPaymentsNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPaymentTransactionsNestedInput
 }
 
@@ -1427,15 +1466,16 @@ export type PaymentTransactionUncheckedUpdateWithoutOrderInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -1452,15 +1492,16 @@ export type PaymentTransactionUncheckedUpdateManyWithoutOrderInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PaymentTransactionCreateManyAccountInput = {
@@ -1476,15 +1517,16 @@ export type PaymentTransactionCreateManyAccountInput = {
   paymentProofUrl?: string | null
   verifiedAt?: Date | string | null
   verifiedById?: string | null
-  processedById?: string | null
   webhookReceivedAt?: Date | string | null
+  createdAt?: Date | string
+  transactionDate?: Date | string | null
+  updatedAt?: Date | string
+  processedById?: string | null
   isReversed?: boolean
+  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalTransactionId?: string | null
-  originalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type PaymentTransactionUpdateWithoutAccountInput = {
@@ -1500,15 +1542,16 @@ export type PaymentTransactionUpdateWithoutAccountInput = {
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  order?: Prisma.OrderUpdateOneWithoutTransactionsNestedInput
   processedBy?: Prisma.UserUpdateOneWithoutProcessedPaymentTransactionsNestedInput
 }
 
@@ -1525,15 +1568,16 @@ export type PaymentTransactionUncheckedUpdateWithoutAccountInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -1550,15 +1594,16 @@ export type PaymentTransactionUncheckedUpdateManyWithoutAccountInput = {
   paymentProofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   webhookReceivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  originalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1606,18 +1651,19 @@ export type PaymentTransactionSelect<ExtArgs extends runtime.Types.Extensions.In
   paymentProofUrl?: boolean
   verifiedAt?: boolean
   verifiedById?: boolean
-  processedById?: boolean
   webhookReceivedAt?: boolean
+  createdAt?: boolean
+  transactionDate?: boolean
+  updatedAt?: boolean
+  processedById?: boolean
   isReversed?: boolean
+  originalAmount?: boolean
+  reversalTransactionId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalTransactionId?: boolean
-  originalAmount?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
-  account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
   allocations?: boolean | Prisma.PaymentTransaction$allocationsArgs<ExtArgs>
+  account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   processedBy?: boolean | Prisma.PaymentTransaction$processedByArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentTransaction"]>
@@ -1636,17 +1682,18 @@ export type PaymentTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.
   paymentProofUrl?: boolean
   verifiedAt?: boolean
   verifiedById?: boolean
-  processedById?: boolean
   webhookReceivedAt?: boolean
+  createdAt?: boolean
+  transactionDate?: boolean
+  updatedAt?: boolean
+  processedById?: boolean
   isReversed?: boolean
+  originalAmount?: boolean
+  reversalTransactionId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalTransactionId?: boolean
-  originalAmount?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   processedBy?: boolean | Prisma.PaymentTransaction$processedByArgs<ExtArgs>
 }, ExtArgs["result"]["paymentTransaction"]>
 
@@ -1664,17 +1711,18 @@ export type PaymentTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.
   paymentProofUrl?: boolean
   verifiedAt?: boolean
   verifiedById?: boolean
-  processedById?: boolean
   webhookReceivedAt?: boolean
+  createdAt?: boolean
+  transactionDate?: boolean
+  updatedAt?: boolean
+  processedById?: boolean
   isReversed?: boolean
+  originalAmount?: boolean
+  reversalTransactionId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalTransactionId?: boolean
-  originalAmount?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
-  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   processedBy?: boolean | Prisma.PaymentTransaction$processedByArgs<ExtArgs>
 }, ExtArgs["result"]["paymentTransaction"]>
 
@@ -1692,42 +1740,43 @@ export type PaymentTransactionSelectScalar = {
   paymentProofUrl?: boolean
   verifiedAt?: boolean
   verifiedById?: boolean
-  processedById?: boolean
   webhookReceivedAt?: boolean
+  createdAt?: boolean
+  transactionDate?: boolean
+  updatedAt?: boolean
+  processedById?: boolean
   isReversed?: boolean
+  originalAmount?: boolean
+  reversalTransactionId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalTransactionId?: boolean
-  originalAmount?: boolean
-  createdAt?: boolean
-  updatedAt?: boolean
 }
 
-export type PaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "accountId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "processedById" | "webhookReceivedAt" | "isReversed" | "reversedAt" | "reversedById" | "reversalTransactionId" | "originalAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentTransaction"]>
+export type PaymentTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "accountId" | "gatewayReference" | "idempotencyKey" | "amount" | "method" | "status" | "gatewayResponse" | "failureReason" | "paymentProofUrl" | "verifiedAt" | "verifiedById" | "webhookReceivedAt" | "createdAt" | "transactionDate" | "updatedAt" | "processedById" | "isReversed" | "originalAmount" | "reversalTransactionId" | "reversedAt" | "reversedById", ExtArgs["result"]["paymentTransaction"]>
 export type PaymentTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
-  account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
   allocations?: boolean | Prisma.PaymentTransaction$allocationsArgs<ExtArgs>
+  account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   processedBy?: boolean | Prisma.PaymentTransaction$processedByArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PaymentTransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   processedBy?: boolean | Prisma.PaymentTransaction$processedByArgs<ExtArgs>
 }
 export type PaymentTransactionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   account?: boolean | Prisma.PaymentTransaction$accountArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentTransaction$orderArgs<ExtArgs>
   processedBy?: boolean | Prisma.PaymentTransaction$processedByArgs<ExtArgs>
 }
 
 export type $PaymentTransactionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PaymentTransaction"
   objects: {
-    order: Prisma.$OrderPayload<ExtArgs> | null
-    account: Prisma.$AccountPayload<ExtArgs> | null
     allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[]
+    account: Prisma.$AccountPayload<ExtArgs> | null
+    order: Prisma.$OrderPayload<ExtArgs> | null
     processedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1744,15 +1793,16 @@ export type $PaymentTransactionPayload<ExtArgs extends runtime.Types.Extensions.
     paymentProofUrl: string | null
     verifiedAt: Date | null
     verifiedById: string | null
-    processedById: string | null
     webhookReceivedAt: Date | null
+    createdAt: Date
+    transactionDate: Date | null
+    updatedAt: Date
+    processedById: string | null
     isReversed: boolean
+    originalAmount: runtime.Decimal | null
+    reversalTransactionId: string | null
     reversedAt: Date | null
     reversedById: string | null
-    reversalTransactionId: string | null
-    originalAmount: runtime.Decimal | null
-    createdAt: Date
-    updatedAt: Date
   }, ExtArgs["result"]["paymentTransaction"]>
   composites: {}
 }
@@ -2147,9 +2197,9 @@ readonly fields: PaymentTransactionFieldRefs;
  */
 export interface Prisma__PaymentTransactionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  order<T extends Prisma.PaymentTransaction$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  account<T extends Prisma.PaymentTransaction$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   allocations<T extends Prisma.PaymentTransaction$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  account<T extends Prisma.PaymentTransaction$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  order<T extends Prisma.PaymentTransaction$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   processedBy<T extends Prisma.PaymentTransaction$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransaction$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2193,15 +2243,16 @@ export interface PaymentTransactionFieldRefs {
   readonly paymentProofUrl: Prisma.FieldRef<"PaymentTransaction", 'String'>
   readonly verifiedAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
   readonly verifiedById: Prisma.FieldRef<"PaymentTransaction", 'String'>
-  readonly processedById: Prisma.FieldRef<"PaymentTransaction", 'String'>
   readonly webhookReceivedAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
+  readonly createdAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
+  readonly transactionDate: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
+  readonly processedById: Prisma.FieldRef<"PaymentTransaction", 'String'>
   readonly isReversed: Prisma.FieldRef<"PaymentTransaction", 'Boolean'>
+  readonly originalAmount: Prisma.FieldRef<"PaymentTransaction", 'Decimal'>
+  readonly reversalTransactionId: Prisma.FieldRef<"PaymentTransaction", 'String'>
   readonly reversedAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
   readonly reversedById: Prisma.FieldRef<"PaymentTransaction", 'String'>
-  readonly reversalTransactionId: Prisma.FieldRef<"PaymentTransaction", 'String'>
-  readonly originalAmount: Prisma.FieldRef<"PaymentTransaction", 'Decimal'>
-  readonly createdAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
-  readonly updatedAt: Prisma.FieldRef<"PaymentTransaction", 'DateTime'>
 }
     
 
@@ -2603,22 +2654,27 @@ export type PaymentTransactionDeleteManyArgs<ExtArgs extends runtime.Types.Exten
 }
 
 /**
- * PaymentTransaction.order
+ * PaymentTransaction.allocations
  */
-export type PaymentTransaction$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type PaymentTransaction$allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Order
+   * Select specific fields to fetch from the PaymentAllocation
    */
-  select?: Prisma.OrderSelect<ExtArgs> | null
+  select?: Prisma.PaymentAllocationSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Order
+   * Omit specific fields from the PaymentAllocation
    */
-  omit?: Prisma.OrderOmit<ExtArgs> | null
+  omit?: Prisma.PaymentAllocationOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.OrderInclude<ExtArgs> | null
-  where?: Prisma.OrderWhereInput
+  include?: Prisma.PaymentAllocationInclude<ExtArgs> | null
+  where?: Prisma.PaymentAllocationWhereInput
+  orderBy?: Prisma.PaymentAllocationOrderByWithRelationInput | Prisma.PaymentAllocationOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentAllocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[]
 }
 
 /**
@@ -2641,27 +2697,22 @@ export type PaymentTransaction$accountArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
- * PaymentTransaction.allocations
+ * PaymentTransaction.order
  */
-export type PaymentTransaction$allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type PaymentTransaction$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the PaymentAllocation
+   * Select specific fields to fetch from the Order
    */
-  select?: Prisma.PaymentAllocationSelect<ExtArgs> | null
+  select?: Prisma.OrderSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the PaymentAllocation
+   * Omit specific fields from the Order
    */
-  omit?: Prisma.PaymentAllocationOmit<ExtArgs> | null
+  omit?: Prisma.OrderOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.PaymentAllocationInclude<ExtArgs> | null
-  where?: Prisma.PaymentAllocationWhereInput
-  orderBy?: Prisma.PaymentAllocationOrderByWithRelationInput | Prisma.PaymentAllocationOrderByWithRelationInput[]
-  cursor?: Prisma.PaymentAllocationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[]
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
 }
 
 /**

@@ -132,8 +132,8 @@ export type VendorDefectiveReturnPartLineWhereInput = {
     quantity?: Prisma.IntFilter<"VendorDefectiveReturnPartLine"> | number;
     unitCost?: Prisma.DecimalFilter<"VendorDefectiveReturnPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     totalCost?: Prisma.DecimalFilter<"VendorDefectiveReturnPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    return?: Prisma.XOR<Prisma.VendorDefectiveReturnScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput>;
     partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
+    return?: Prisma.XOR<Prisma.VendorDefectiveReturnScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput>;
 };
 export type VendorDefectiveReturnPartLineOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -142,8 +142,8 @@ export type VendorDefectiveReturnPartLineOrderByWithRelationInput = {
     quantity?: Prisma.SortOrder;
     unitCost?: Prisma.SortOrder;
     totalCost?: Prisma.SortOrder;
-    return?: Prisma.VendorDefectiveReturnOrderByWithRelationInput;
     partInventory?: Prisma.PartInventoryOrderByWithRelationInput;
+    return?: Prisma.VendorDefectiveReturnOrderByWithRelationInput;
 };
 export type VendorDefectiveReturnPartLineWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -155,8 +155,8 @@ export type VendorDefectiveReturnPartLineWhereUniqueInput = Prisma.AtLeast<{
     quantity?: Prisma.IntFilter<"VendorDefectiveReturnPartLine"> | number;
     unitCost?: Prisma.DecimalFilter<"VendorDefectiveReturnPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
     totalCost?: Prisma.DecimalFilter<"VendorDefectiveReturnPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    return?: Prisma.XOR<Prisma.VendorDefectiveReturnScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput>;
     partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
+    return?: Prisma.XOR<Prisma.VendorDefectiveReturnScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput>;
 }, "id">;
 export type VendorDefectiveReturnPartLineOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -187,8 +187,8 @@ export type VendorDefectiveReturnPartLineCreateInput = {
     quantity: number;
     unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
     totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    return: Prisma.VendorDefectiveReturnCreateNestedOneWithoutPartLinesInput;
     partInventory: Prisma.PartInventoryCreateNestedOneWithoutDefectiveReturnLinesInput;
+    return: Prisma.VendorDefectiveReturnCreateNestedOneWithoutPartLinesInput;
 };
 export type VendorDefectiveReturnPartLineUncheckedCreateInput = {
     id?: string;
@@ -203,8 +203,8 @@ export type VendorDefectiveReturnPartLineUpdateInput = {
     quantity?: Prisma.IntFieldUpdateOperationsInput | number;
     unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    return?: Prisma.VendorDefectiveReturnUpdateOneRequiredWithoutPartLinesNestedInput;
     partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutDefectiveReturnLinesNestedInput;
+    return?: Prisma.VendorDefectiveReturnUpdateOneRequiredWithoutPartLinesNestedInput;
 };
 export type VendorDefectiveReturnPartLineUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -498,8 +498,8 @@ export type VendorDefectiveReturnPartLineSelect<ExtArgs extends runtime.Types.Ex
     quantity?: boolean;
     unitCost?: boolean;
     totalCost?: boolean;
-    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendorDefectiveReturnPartLine"]>;
 export type VendorDefectiveReturnPartLineSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -508,8 +508,8 @@ export type VendorDefectiveReturnPartLineSelectCreateManyAndReturn<ExtArgs exten
     quantity?: boolean;
     unitCost?: boolean;
     totalCost?: boolean;
-    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendorDefectiveReturnPartLine"]>;
 export type VendorDefectiveReturnPartLineSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -518,8 +518,8 @@ export type VendorDefectiveReturnPartLineSelectUpdateManyAndReturn<ExtArgs exten
     quantity?: boolean;
     unitCost?: boolean;
     totalCost?: boolean;
-    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendorDefectiveReturnPartLine"]>;
 export type VendorDefectiveReturnPartLineSelectScalar = {
     id?: boolean;
@@ -531,22 +531,22 @@ export type VendorDefectiveReturnPartLineSelectScalar = {
 };
 export type VendorDefectiveReturnPartLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "returnId" | "partInventoryId" | "quantity" | "unitCost" | "totalCost", ExtArgs["result"]["vendorDefectiveReturnPartLine"]>;
 export type VendorDefectiveReturnPartLineInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
 };
 export type VendorDefectiveReturnPartLineIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
 };
 export type VendorDefectiveReturnPartLineIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    return?: boolean | Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>;
 };
 export type $VendorDefectiveReturnPartLinePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "VendorDefectiveReturnPartLine";
     objects: {
-        return: Prisma.$VendorDefectiveReturnPayload<ExtArgs>;
         partInventory: Prisma.$PartInventoryPayload<ExtArgs>;
+        return: Prisma.$VendorDefectiveReturnPayload<ExtArgs>;
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -607,8 +607,8 @@ export interface VendorDefectiveReturnPartLineDelegate<ExtArgs extends runtime.T
 }
 export interface Prisma__VendorDefectiveReturnPartLineClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    return<T extends Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorDefectiveReturnClient<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     partInventory<T extends Prisma.PartInventoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartInventoryDefaultArgs<ExtArgs>>): Prisma.Prisma__PartInventoryClient<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    return<T extends Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturnDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorDefectiveReturnClient<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;

@@ -92,6 +92,22 @@ export class PartOrdersController {
   }
 
   /**
+   * PATCH /api/part-orders/:id/complete-details
+   * Complete/update customer details of a part order
+   * Customer info can be updated at any order status
+   */
+  @Patch(":id/complete-details")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MANAGER", "SALES_STAFF", "CUSTOMER")
+  async completePartOrderDetails(
+    @Param("id") id: string,
+    @Body() dto: { customerName?: string; customerPhone?: string; customerAddress?: string },
+    @CurrentUser() user: any
+  ) {
+    return this.partOrdersService.completePartOrderDetails(id, dto, user);
+  }
+
+  /**
    * POST /api/part-orders/manual
    * Create a manual part order (admin only)
    */

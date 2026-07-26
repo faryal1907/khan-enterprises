@@ -156,10 +156,10 @@ export type VendorPaymentWhereInput = {
     recordedById?: Prisma.StringNullableFilter<"VendorPayment"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"VendorPayment"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"VendorPayment"> | Date | string;
-    vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>;
     fromAccount?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>;
     journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null;
     recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>;
 };
 export type VendorPaymentOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -172,10 +172,10 @@ export type VendorPaymentOrderByWithRelationInput = {
     recordedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
-    vendor?: Prisma.VendorOrderByWithRelationInput;
     fromAccount?: Prisma.AccountOrderByWithRelationInput;
     journalEntry?: Prisma.JournalEntryOrderByWithRelationInput;
     recordedBy?: Prisma.UserOrderByWithRelationInput;
+    vendor?: Prisma.VendorOrderByWithRelationInput;
 };
 export type VendorPaymentWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -191,10 +191,10 @@ export type VendorPaymentWhereUniqueInput = Prisma.AtLeast<{
     recordedById?: Prisma.StringNullableFilter<"VendorPayment"> | string | null;
     createdAt?: Prisma.DateTimeFilter<"VendorPayment"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"VendorPayment"> | Date | string;
-    vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>;
     fromAccount?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>;
     journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null;
     recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>;
 }, "id" | "journalEntryId">;
 export type VendorPaymentOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -235,10 +235,10 @@ export type VendorPaymentCreateInput = {
     notes?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
     fromAccount: Prisma.AccountCreateNestedOneWithoutVendorPaymentsInput;
     journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorPaymentInput;
     recordedBy?: Prisma.UserCreateNestedOneWithoutVendorPaymentsRecordedInput;
+    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
 };
 export type VendorPaymentUncheckedCreateInput = {
     id?: string;
@@ -259,10 +259,10 @@ export type VendorPaymentUpdateInput = {
     notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
     fromAccount?: Prisma.AccountUpdateOneRequiredWithoutVendorPaymentsNestedInput;
     journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorPaymentNestedInput;
     recordedBy?: Prisma.UserUpdateOneWithoutVendorPaymentsRecordedNestedInput;
+    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
 };
 export type VendorPaymentUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -511,9 +511,9 @@ export type VendorPaymentCreateWithoutRecordedByInput = {
     notes?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
     fromAccount: Prisma.AccountCreateNestedOneWithoutVendorPaymentsInput;
     journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorPaymentInput;
+    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
 };
 export type VendorPaymentUncheckedCreateWithoutRecordedByInput = {
     id?: string;
@@ -612,9 +612,9 @@ export type VendorPaymentCreateWithoutFromAccountInput = {
     notes?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
     journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorPaymentInput;
     recordedBy?: Prisma.UserCreateNestedOneWithoutVendorPaymentsRecordedInput;
+    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
 };
 export type VendorPaymentUncheckedCreateWithoutFromAccountInput = {
     id?: string;
@@ -655,9 +655,9 @@ export type VendorPaymentCreateWithoutJournalEntryInput = {
     notes?: string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
     fromAccount: Prisma.AccountCreateNestedOneWithoutVendorPaymentsInput;
     recordedBy?: Prisma.UserCreateNestedOneWithoutVendorPaymentsRecordedInput;
+    vendor: Prisma.VendorCreateNestedOneWithoutPaymentsInput;
 };
 export type VendorPaymentUncheckedCreateWithoutJournalEntryInput = {
     id?: string;
@@ -690,9 +690,9 @@ export type VendorPaymentUpdateWithoutJournalEntryInput = {
     notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
     fromAccount?: Prisma.AccountUpdateOneRequiredWithoutVendorPaymentsNestedInput;
     recordedBy?: Prisma.UserUpdateOneWithoutVendorPaymentsRecordedNestedInput;
+    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
 };
 export type VendorPaymentUncheckedUpdateWithoutJournalEntryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -723,9 +723,9 @@ export type VendorPaymentUpdateWithoutRecordedByInput = {
     notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
     fromAccount?: Prisma.AccountUpdateOneRequiredWithoutVendorPaymentsNestedInput;
     journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorPaymentNestedInput;
+    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
 };
 export type VendorPaymentUncheckedUpdateWithoutRecordedByInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -811,9 +811,9 @@ export type VendorPaymentUpdateWithoutFromAccountInput = {
     notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
     journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorPaymentNestedInput;
     recordedBy?: Prisma.UserUpdateOneWithoutVendorPaymentsRecordedNestedInput;
+    vendor?: Prisma.VendorUpdateOneRequiredWithoutPaymentsNestedInput;
 };
 export type VendorPaymentUncheckedUpdateWithoutFromAccountInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -848,10 +848,10 @@ export type VendorPaymentSelect<ExtArgs extends runtime.Types.Extensions.Interna
     recordedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     fromAccount?: boolean | Prisma.AccountDefaultArgs<ExtArgs>;
     journalEntry?: boolean | Prisma.VendorPayment$journalEntryArgs<ExtArgs>;
     recordedBy?: boolean | Prisma.VendorPayment$recordedByArgs<ExtArgs>;
+    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendorPayment"]>;
 export type VendorPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -864,10 +864,10 @@ export type VendorPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types
     recordedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     fromAccount?: boolean | Prisma.AccountDefaultArgs<ExtArgs>;
     journalEntry?: boolean | Prisma.VendorPayment$journalEntryArgs<ExtArgs>;
     recordedBy?: boolean | Prisma.VendorPayment$recordedByArgs<ExtArgs>;
+    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendorPayment"]>;
 export type VendorPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -880,10 +880,10 @@ export type VendorPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
     recordedById?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     fromAccount?: boolean | Prisma.AccountDefaultArgs<ExtArgs>;
     journalEntry?: boolean | Prisma.VendorPayment$journalEntryArgs<ExtArgs>;
     recordedBy?: boolean | Prisma.VendorPayment$recordedByArgs<ExtArgs>;
+    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["vendorPayment"]>;
 export type VendorPaymentSelectScalar = {
     id?: boolean;
@@ -899,30 +899,30 @@ export type VendorPaymentSelectScalar = {
 };
 export type VendorPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "fromAccountId" | "amount" | "date" | "notes" | "journalEntryId" | "recordedById" | "createdAt" | "updatedAt", ExtArgs["result"]["vendorPayment"]>;
 export type VendorPaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     fromAccount?: boolean | Prisma.AccountDefaultArgs<ExtArgs>;
     journalEntry?: boolean | Prisma.VendorPayment$journalEntryArgs<ExtArgs>;
     recordedBy?: boolean | Prisma.VendorPayment$recordedByArgs<ExtArgs>;
+    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
 };
 export type VendorPaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     fromAccount?: boolean | Prisma.AccountDefaultArgs<ExtArgs>;
     journalEntry?: boolean | Prisma.VendorPayment$journalEntryArgs<ExtArgs>;
     recordedBy?: boolean | Prisma.VendorPayment$recordedByArgs<ExtArgs>;
+    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
 };
 export type VendorPaymentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
     fromAccount?: boolean | Prisma.AccountDefaultArgs<ExtArgs>;
     journalEntry?: boolean | Prisma.VendorPayment$journalEntryArgs<ExtArgs>;
     recordedBy?: boolean | Prisma.VendorPayment$recordedByArgs<ExtArgs>;
+    vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>;
 };
 export type $VendorPaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "VendorPayment";
     objects: {
-        vendor: Prisma.$VendorPayload<ExtArgs>;
         fromAccount: Prisma.$AccountPayload<ExtArgs>;
         journalEntry: Prisma.$JournalEntryPayload<ExtArgs> | null;
         recordedBy: Prisma.$UserPayload<ExtArgs> | null;
+        vendor: Prisma.$VendorPayload<ExtArgs>;
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -987,10 +987,10 @@ export interface VendorPaymentDelegate<ExtArgs extends runtime.Types.Extensions.
 }
 export interface Prisma__VendorPaymentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     fromAccount<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     journalEntry<T extends Prisma.VendorPayment$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorPayment$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     recordedBy<T extends Prisma.VendorPayment$recordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorPayment$recordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;

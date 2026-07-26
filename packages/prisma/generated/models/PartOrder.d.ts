@@ -39,6 +39,7 @@ export type PartOrderMinAggregateOutputType = {
     orderType: $Enums.OrderType | null;
     reservationExpiry: Date | null;
     pickupType: $Enums.PickupType | null;
+    saleDate: Date | null;
     expiresAt: Date | null;
     processedById: string | null;
     customerId: string | null;
@@ -67,6 +68,7 @@ export type PartOrderMaxAggregateOutputType = {
     orderType: $Enums.OrderType | null;
     reservationExpiry: Date | null;
     pickupType: $Enums.PickupType | null;
+    saleDate: Date | null;
     expiresAt: Date | null;
     processedById: string | null;
     customerId: string | null;
@@ -95,6 +97,7 @@ export type PartOrderCountAggregateOutputType = {
     orderType: number;
     reservationExpiry: number;
     pickupType: number;
+    saleDate: number;
     expiresAt: number;
     processedById: number;
     customerId: number;
@@ -136,6 +139,7 @@ export type PartOrderMinAggregateInputType = {
     orderType?: true;
     reservationExpiry?: true;
     pickupType?: true;
+    saleDate?: true;
     expiresAt?: true;
     processedById?: true;
     customerId?: true;
@@ -164,6 +168,7 @@ export type PartOrderMaxAggregateInputType = {
     orderType?: true;
     reservationExpiry?: true;
     pickupType?: true;
+    saleDate?: true;
     expiresAt?: true;
     processedById?: true;
     customerId?: true;
@@ -192,6 +197,7 @@ export type PartOrderCountAggregateInputType = {
     orderType?: true;
     reservationExpiry?: true;
     pickupType?: true;
+    saleDate?: true;
     expiresAt?: true;
     processedById?: true;
     customerId?: true;
@@ -249,6 +255,7 @@ export type PartOrderGroupByOutputType = {
     orderType: $Enums.OrderType;
     reservationExpiry: Date | null;
     pickupType: $Enums.PickupType;
+    saleDate: Date | null;
     expiresAt: Date | null;
     processedById: string | null;
     customerId: string | null;
@@ -288,6 +295,7 @@ export type PartOrderWhereInput = {
     orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
     customerId?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
@@ -297,16 +305,16 @@ export type PartOrderWhereInput = {
     paymentState?: Prisma.EnumPaymentStateFilter<"PartOrder"> | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
-    part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
-    partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
-    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
-    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
-    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    transactions?: Prisma.PartPaymentTransactionListRelationFilter;
-    allocations?: Prisma.PaymentAllocationListRelationFilter;
     delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null;
     alerts?: Prisma.OrderAlertListRelationFilter;
+    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
+    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
+    partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
+    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
+    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    transactions?: Prisma.PartPaymentTransactionListRelationFilter;
+    allocations?: Prisma.PaymentAllocationListRelationFilter;
 };
 export type PartOrderOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -326,6 +334,7 @@ export type PartOrderOrderByWithRelationInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrderInput | Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     customerId?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -335,16 +344,16 @@ export type PartOrderOrderByWithRelationInput = {
     paymentState?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
-    part?: Prisma.PartOrderByWithRelationInput;
-    partInventory?: Prisma.PartInventoryOrderByWithRelationInput;
-    branch?: Prisma.BranchOrderByWithRelationInput;
-    paymentAccount?: Prisma.AccountOrderByWithRelationInput;
-    processedBy?: Prisma.UserOrderByWithRelationInput;
-    customer?: Prisma.UserOrderByWithRelationInput;
-    transactions?: Prisma.PartPaymentTransactionOrderByRelationAggregateInput;
-    allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput;
     delivery?: Prisma.DeliveryRequestOrderByWithRelationInput;
     alerts?: Prisma.OrderAlertOrderByRelationAggregateInput;
+    branch?: Prisma.BranchOrderByWithRelationInput;
+    customer?: Prisma.UserOrderByWithRelationInput;
+    part?: Prisma.PartOrderByWithRelationInput;
+    partInventory?: Prisma.PartInventoryOrderByWithRelationInput;
+    paymentAccount?: Prisma.AccountOrderByWithRelationInput;
+    processedBy?: Prisma.UserOrderByWithRelationInput;
+    transactions?: Prisma.PartPaymentTransactionOrderByRelationAggregateInput;
+    allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput;
 };
 export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -367,6 +376,7 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
     orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
     customerId?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
@@ -376,16 +386,16 @@ export type PartOrderWhereUniqueInput = Prisma.AtLeast<{
     paymentState?: Prisma.EnumPaymentStateFilter<"PartOrder"> | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
-    part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
-    partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
-    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
-    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
-    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    transactions?: Prisma.PartPaymentTransactionListRelationFilter;
-    allocations?: Prisma.PaymentAllocationListRelationFilter;
     delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null;
     alerts?: Prisma.OrderAlertListRelationFilter;
+    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
+    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>;
+    partInventory?: Prisma.XOR<Prisma.PartInventoryScalarRelationFilter, Prisma.PartInventoryWhereInput>;
+    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
+    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    transactions?: Prisma.PartPaymentTransactionListRelationFilter;
+    allocations?: Prisma.PaymentAllocationListRelationFilter;
 }, "id" | "orderNumber">;
 export type PartOrderOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -405,6 +415,7 @@ export type PartOrderOrderByWithAggregationInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrderInput | Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     customerId?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -441,6 +452,7 @@ export type PartOrderScalarWhereWithAggregatesInput = {
     orderType?: Prisma.EnumOrderTypeWithAggregatesFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeWithAggregatesFilter<"PartOrder"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null;
     customerId?: Prisma.StringNullableWithAggregatesFilter<"PartOrder"> | string | null;
@@ -465,6 +477,7 @@ export type PartOrderCreateInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -472,16 +485,16 @@ export type PartOrderCreateInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
-    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateInput = {
     id?: string;
@@ -501,6 +514,7 @@ export type PartOrderUncheckedCreateInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -510,10 +524,10 @@ export type PartOrderUncheckedCreateInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -529,6 +543,7 @@ export type PartOrderUpdateInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -536,16 +551,16 @@ export type PartOrderUpdateInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -565,6 +580,7 @@ export type PartOrderUncheckedUpdateInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -574,10 +590,10 @@ export type PartOrderUncheckedUpdateInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderCreateManyInput = {
     id?: string;
@@ -597,6 +613,7 @@ export type PartOrderCreateManyInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -621,6 +638,7 @@ export type PartOrderUpdateManyMutationInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -647,6 +665,7 @@ export type PartOrderUncheckedUpdateManyInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -687,6 +706,7 @@ export type PartOrderCountOrderByAggregateInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     customerId?: Prisma.SortOrder;
@@ -721,6 +741,7 @@ export type PartOrderMaxOrderByAggregateInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     customerId?: Prisma.SortOrder;
@@ -749,6 +770,7 @@ export type PartOrderMinOrderByAggregateInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     customerId?: Prisma.SortOrder;
@@ -765,19 +787,13 @@ export type PartOrderSumOrderByAggregateInput = {
     paidAmount?: Prisma.SortOrder;
     balanceDue?: Prisma.SortOrder;
 };
-export type PartOrderCreateNestedManyWithoutProcessedByInput = {
-    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
-    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
-    createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
-    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
-};
 export type PartOrderCreateNestedManyWithoutCustomerInput = {
     create?: Prisma.XOR<Prisma.PartOrderCreateWithoutCustomerInput, Prisma.PartOrderUncheckedCreateWithoutCustomerInput> | Prisma.PartOrderCreateWithoutCustomerInput[] | Prisma.PartOrderUncheckedCreateWithoutCustomerInput[];
     connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutCustomerInput | Prisma.PartOrderCreateOrConnectWithoutCustomerInput[];
     createMany?: Prisma.PartOrderCreateManyCustomerInputEnvelope;
     connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
 };
-export type PartOrderUncheckedCreateNestedManyWithoutProcessedByInput = {
+export type PartOrderCreateNestedManyWithoutProcessedByInput = {
     create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
     connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
     createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
@@ -789,18 +805,11 @@ export type PartOrderUncheckedCreateNestedManyWithoutCustomerInput = {
     createMany?: Prisma.PartOrderCreateManyCustomerInputEnvelope;
     connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
 };
-export type PartOrderUpdateManyWithoutProcessedByNestedInput = {
+export type PartOrderUncheckedCreateNestedManyWithoutProcessedByInput = {
     create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
     connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
-    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput[];
     createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
-    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
-    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
-    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
     connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
-    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput[];
-    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput | Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput[];
-    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
 };
 export type PartOrderUpdateManyWithoutCustomerNestedInput = {
     create?: Prisma.XOR<Prisma.PartOrderCreateWithoutCustomerInput, Prisma.PartOrderUncheckedCreateWithoutCustomerInput> | Prisma.PartOrderCreateWithoutCustomerInput[] | Prisma.PartOrderUncheckedCreateWithoutCustomerInput[];
@@ -815,7 +824,7 @@ export type PartOrderUpdateManyWithoutCustomerNestedInput = {
     updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutCustomerInput | Prisma.PartOrderUpdateManyWithWhereWithoutCustomerInput[];
     deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
 };
-export type PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput = {
+export type PartOrderUpdateManyWithoutProcessedByNestedInput = {
     create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
     connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
     upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput[];
@@ -839,6 +848,19 @@ export type PartOrderUncheckedUpdateManyWithoutCustomerNestedInput = {
     connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
     update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutCustomerInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutCustomerInput[];
     updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutCustomerInput | Prisma.PartOrderUpdateManyWithWhereWithoutCustomerInput[];
+    deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
+};
+export type PartOrderUncheckedUpdateManyWithoutProcessedByNestedInput = {
+    create?: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput> | Prisma.PartOrderCreateWithoutProcessedByInput[] | Prisma.PartOrderUncheckedCreateWithoutProcessedByInput[];
+    connectOrCreate?: Prisma.PartOrderCreateOrConnectWithoutProcessedByInput | Prisma.PartOrderCreateOrConnectWithoutProcessedByInput[];
+    upsert?: Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpsertWithWhereUniqueWithoutProcessedByInput[];
+    createMany?: Prisma.PartOrderCreateManyProcessedByInputEnvelope;
+    set?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    disconnect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    delete?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    connect?: Prisma.PartOrderWhereUniqueInput | Prisma.PartOrderWhereUniqueInput[];
+    update?: Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput | Prisma.PartOrderUpdateWithWhereUniqueWithoutProcessedByInput[];
+    updateMany?: Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput | Prisma.PartOrderUpdateManyWithWhereWithoutProcessedByInput[];
     deleteMany?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
 };
 export type PartOrderCreateNestedManyWithoutBranchInput = {
@@ -1049,76 +1071,6 @@ export type PartOrderUpdateOneWithoutAllocationsNestedInput = {
     connect?: Prisma.PartOrderWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.PartOrderUpdateToOneWithWhereWithoutAllocationsInput, Prisma.PartOrderUpdateWithoutAllocationsInput>, Prisma.PartOrderUncheckedUpdateWithoutAllocationsInput>;
 };
-export type PartOrderCreateWithoutProcessedByInput = {
-    id?: string;
-    orderNumber: string;
-    customerName: string;
-    customerPhone: string;
-    customerAddress?: string | null;
-    quantity: number;
-    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paymentMethod: $Enums.PaymentMethod;
-    status?: $Enums.OrderStatus;
-    paymentVerified?: boolean;
-    orderType?: $Enums.OrderType;
-    reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
-    expiresAt?: Date | string | null;
-    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: boolean;
-    paymentState?: $Enums.PaymentState;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
-    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
-    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
-};
-export type PartOrderUncheckedCreateWithoutProcessedByInput = {
-    id?: string;
-    orderNumber: string;
-    partId: string;
-    partInventoryId: string;
-    branchId: string;
-    customerName: string;
-    customerPhone: string;
-    customerAddress?: string | null;
-    quantity: number;
-    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paymentMethod: $Enums.PaymentMethod;
-    paymentAccountId?: string | null;
-    status?: $Enums.OrderStatus;
-    paymentVerified?: boolean;
-    orderType?: $Enums.OrderType;
-    reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
-    expiresAt?: Date | string | null;
-    customerId?: string | null;
-    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: boolean;
-    paymentState?: $Enums.PaymentState;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
-    delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
-    alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
-};
-export type PartOrderCreateOrConnectWithoutProcessedByInput = {
-    where: Prisma.PartOrderWhereUniqueInput;
-    create: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput>;
-};
-export type PartOrderCreateManyProcessedByInputEnvelope = {
-    data: Prisma.PartOrderCreateManyProcessedByInput | Prisma.PartOrderCreateManyProcessedByInput[];
-    skipDuplicates?: boolean;
-};
 export type PartOrderCreateWithoutCustomerInput = {
     id?: string;
     orderNumber: string;
@@ -1133,6 +1085,7 @@ export type PartOrderCreateWithoutCustomerInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1140,15 +1093,15 @@ export type PartOrderCreateWithoutCustomerInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
+    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
     part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
     partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
     transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
     allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
-    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutCustomerInput = {
     id?: string;
@@ -1168,6 +1121,7 @@ export type PartOrderUncheckedCreateWithoutCustomerInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1176,10 +1130,10 @@ export type PartOrderUncheckedCreateWithoutCustomerInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutCustomerInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1189,18 +1143,90 @@ export type PartOrderCreateManyCustomerInputEnvelope = {
     data: Prisma.PartOrderCreateManyCustomerInput | Prisma.PartOrderCreateManyCustomerInput[];
     skipDuplicates?: boolean;
 };
-export type PartOrderUpsertWithWhereUniqueWithoutProcessedByInput = {
+export type PartOrderCreateWithoutProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress?: string | null;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    paymentVerified?: boolean;
+    orderType?: $Enums.OrderType;
+    reservationExpiry?: Date | string | null;
+    pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
+    expiresAt?: Date | string | null;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: boolean;
+    paymentState?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
+    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderUncheckedCreateWithoutProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress?: string | null;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    paymentAccountId?: string | null;
+    status?: $Enums.OrderStatus;
+    paymentVerified?: boolean;
+    orderType?: $Enums.OrderType;
+    reservationExpiry?: Date | string | null;
+    pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
+    expiresAt?: Date | string | null;
+    customerId?: string | null;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: boolean;
+    paymentState?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
+    alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
+};
+export type PartOrderCreateOrConnectWithoutProcessedByInput = {
     where: Prisma.PartOrderWhereUniqueInput;
-    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutProcessedByInput, Prisma.PartOrderUncheckedUpdateWithoutProcessedByInput>;
     create: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput>;
 };
-export type PartOrderUpdateWithWhereUniqueWithoutProcessedByInput = {
-    where: Prisma.PartOrderWhereUniqueInput;
-    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutProcessedByInput, Prisma.PartOrderUncheckedUpdateWithoutProcessedByInput>;
+export type PartOrderCreateManyProcessedByInputEnvelope = {
+    data: Prisma.PartOrderCreateManyProcessedByInput | Prisma.PartOrderCreateManyProcessedByInput[];
+    skipDuplicates?: boolean;
 };
-export type PartOrderUpdateManyWithWhereWithoutProcessedByInput = {
+export type PartOrderUpsertWithWhereUniqueWithoutCustomerInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutCustomerInput, Prisma.PartOrderUncheckedUpdateWithoutCustomerInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutCustomerInput, Prisma.PartOrderUncheckedCreateWithoutCustomerInput>;
+};
+export type PartOrderUpdateWithWhereUniqueWithoutCustomerInput = {
+    where: Prisma.PartOrderWhereUniqueInput;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutCustomerInput, Prisma.PartOrderUncheckedUpdateWithoutCustomerInput>;
+};
+export type PartOrderUpdateManyWithWhereWithoutCustomerInput = {
     where: Prisma.PartOrderScalarWhereInput;
-    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByInput>;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutCustomerInput>;
 };
 export type PartOrderScalarWhereInput = {
     AND?: Prisma.PartOrderScalarWhereInput | Prisma.PartOrderScalarWhereInput[];
@@ -1223,6 +1249,7 @@ export type PartOrderScalarWhereInput = {
     orderType?: Prisma.EnumOrderTypeFilter<"PartOrder"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFilter<"PartOrder"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"PartOrder"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
     customerId?: Prisma.StringNullableFilter<"PartOrder"> | string | null;
@@ -1233,18 +1260,18 @@ export type PartOrderScalarWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"PartOrder"> | Date | string;
 };
-export type PartOrderUpsertWithWhereUniqueWithoutCustomerInput = {
+export type PartOrderUpsertWithWhereUniqueWithoutProcessedByInput = {
     where: Prisma.PartOrderWhereUniqueInput;
-    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutCustomerInput, Prisma.PartOrderUncheckedUpdateWithoutCustomerInput>;
-    create: Prisma.XOR<Prisma.PartOrderCreateWithoutCustomerInput, Prisma.PartOrderUncheckedCreateWithoutCustomerInput>;
+    update: Prisma.XOR<Prisma.PartOrderUpdateWithoutProcessedByInput, Prisma.PartOrderUncheckedUpdateWithoutProcessedByInput>;
+    create: Prisma.XOR<Prisma.PartOrderCreateWithoutProcessedByInput, Prisma.PartOrderUncheckedCreateWithoutProcessedByInput>;
 };
-export type PartOrderUpdateWithWhereUniqueWithoutCustomerInput = {
+export type PartOrderUpdateWithWhereUniqueWithoutProcessedByInput = {
     where: Prisma.PartOrderWhereUniqueInput;
-    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutCustomerInput, Prisma.PartOrderUncheckedUpdateWithoutCustomerInput>;
+    data: Prisma.XOR<Prisma.PartOrderUpdateWithoutProcessedByInput, Prisma.PartOrderUncheckedUpdateWithoutProcessedByInput>;
 };
-export type PartOrderUpdateManyWithWhereWithoutCustomerInput = {
+export type PartOrderUpdateManyWithWhereWithoutProcessedByInput = {
     where: Prisma.PartOrderScalarWhereInput;
-    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutCustomerInput>;
+    data: Prisma.XOR<Prisma.PartOrderUpdateManyMutationInput, Prisma.PartOrderUncheckedUpdateManyWithoutProcessedByInput>;
 };
 export type PartOrderCreateWithoutBranchInput = {
     id?: string;
@@ -1260,6 +1287,7 @@ export type PartOrderCreateWithoutBranchInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1267,15 +1295,15 @@ export type PartOrderCreateWithoutBranchInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
+    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
     part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
     partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
     transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
     allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
-    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutBranchInput = {
     id?: string;
@@ -1294,6 +1322,7 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1303,10 +1332,10 @@ export type PartOrderUncheckedCreateWithoutBranchInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutBranchInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1343,6 +1372,7 @@ export type PartOrderCreateWithoutPartInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1350,15 +1380,15 @@ export type PartOrderCreateWithoutPartInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutPartInput = {
     id?: string;
@@ -1377,6 +1407,7 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1386,10 +1417,10 @@ export type PartOrderUncheckedCreateWithoutPartInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutPartInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1426,6 +1457,7 @@ export type PartOrderCreateWithoutPartInventoryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1433,15 +1465,15 @@ export type PartOrderCreateWithoutPartInventoryInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
     id?: string;
@@ -1460,6 +1492,7 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1469,10 +1502,10 @@ export type PartOrderUncheckedCreateWithoutPartInventoryInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutPartInventoryInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1509,6 +1542,7 @@ export type PartOrderCreateWithoutAlertsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1516,15 +1550,15 @@ export type PartOrderCreateWithoutAlertsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
     part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
     partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
     transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
     allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutAlertsInput = {
     id?: string;
@@ -1544,6 +1578,7 @@ export type PartOrderUncheckedCreateWithoutAlertsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1553,9 +1588,9 @@ export type PartOrderUncheckedCreateWithoutAlertsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
     allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
-    delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutAlertsInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1584,6 +1619,7 @@ export type PartOrderUpdateWithoutAlertsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1591,15 +1627,15 @@ export type PartOrderUpdateWithoutAlertsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
     part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
     partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
     transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
     allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutAlertsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1619,6 +1655,7 @@ export type PartOrderUncheckedUpdateWithoutAlertsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1628,9 +1665,9 @@ export type PartOrderUncheckedUpdateWithoutAlertsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
     allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
 };
 export type PartOrderCreateWithoutTransactionsInput = {
     id?: string;
@@ -1646,6 +1683,7 @@ export type PartOrderCreateWithoutTransactionsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1653,15 +1691,15 @@ export type PartOrderCreateWithoutTransactionsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
-    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutTransactionsInput = {
     id?: string;
@@ -1681,6 +1719,7 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1690,9 +1729,9 @@ export type PartOrderUncheckedCreateWithoutTransactionsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutTransactionsInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1721,6 +1760,7 @@ export type PartOrderUpdateWithoutTransactionsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1728,15 +1768,15 @@ export type PartOrderUpdateWithoutTransactionsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1756,6 +1796,7 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1765,9 +1806,9 @@ export type PartOrderUncheckedUpdateWithoutTransactionsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderCreateWithoutDeliveryInput = {
     id?: string;
@@ -1783,6 +1824,7 @@ export type PartOrderCreateWithoutDeliveryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1790,15 +1832,15 @@ export type PartOrderCreateWithoutDeliveryInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
     part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
     partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
     transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
     allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
-    alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutDeliveryInput = {
     id?: string;
@@ -1818,6 +1860,7 @@ export type PartOrderUncheckedCreateWithoutDeliveryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1827,9 +1870,9 @@ export type PartOrderUncheckedCreateWithoutDeliveryInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
     transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
     allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
-    alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutDeliveryInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -1858,6 +1901,7 @@ export type PartOrderUpdateWithoutDeliveryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1865,15 +1909,15 @@ export type PartOrderUpdateWithoutDeliveryInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
     part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
     partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
     transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
     allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
-    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1893,6 +1937,7 @@ export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1902,9 +1947,9 @@ export type PartOrderUncheckedUpdateWithoutDeliveryInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
     transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
     allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
-    alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderCreateWithoutPaymentAccountInput = {
     id?: string;
@@ -1920,6 +1965,7 @@ export type PartOrderCreateWithoutPaymentAccountInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1927,15 +1973,15 @@ export type PartOrderCreateWithoutPaymentAccountInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
-    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutPaymentAccountInput = {
     id?: string;
@@ -1954,6 +2000,7 @@ export type PartOrderUncheckedCreateWithoutPaymentAccountInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1963,10 +2010,10 @@ export type PartOrderUncheckedCreateWithoutPaymentAccountInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutPaymentAccountInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -2003,6 +2050,7 @@ export type PartOrderCreateWithoutAllocationsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2010,15 +2058,15 @@ export type PartOrderCreateWithoutAllocationsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
-    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
-    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutPartOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutPartOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerPartOrdersInput;
+    part: Prisma.PartCreateNestedOneWithoutPartOrdersInput;
+    partInventory: Prisma.PartInventoryCreateNestedOneWithoutPartOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutPartOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedPartOrdersInput;
+    transactions?: Prisma.PartPaymentTransactionCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderUncheckedCreateWithoutAllocationsInput = {
     id?: string;
@@ -2038,6 +2086,7 @@ export type PartOrderUncheckedCreateWithoutAllocationsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2047,9 +2096,9 @@ export type PartOrderUncheckedCreateWithoutAllocationsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutPartOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutPartOrderInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedCreateNestedManyWithoutPartOrderInput;
 };
 export type PartOrderCreateOrConnectWithoutAllocationsInput = {
     where: Prisma.PartOrderWhereUniqueInput;
@@ -2078,6 +2127,7 @@ export type PartOrderUpdateWithoutAllocationsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2085,15 +2135,15 @@ export type PartOrderUpdateWithoutAllocationsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutAllocationsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2113,6 +2163,7 @@ export type PartOrderUncheckedUpdateWithoutAllocationsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2122,36 +2173,9 @@ export type PartOrderUncheckedUpdateWithoutAllocationsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
-};
-export type PartOrderCreateManyProcessedByInput = {
-    id?: string;
-    orderNumber: string;
-    partId: string;
-    partInventoryId: string;
-    branchId: string;
-    customerName: string;
-    customerPhone: string;
-    customerAddress?: string | null;
-    quantity: number;
-    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paymentMethod: $Enums.PaymentMethod;
-    paymentAccountId?: string | null;
-    status?: $Enums.OrderStatus;
-    paymentVerified?: boolean;
-    orderType?: $Enums.OrderType;
-    reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
-    expiresAt?: Date | string | null;
-    customerId?: string | null;
-    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: boolean;
-    paymentState?: $Enums.PaymentState;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderCreateManyCustomerInput = {
     id?: string;
@@ -2171,6 +2195,7 @@ export type PartOrderCreateManyCustomerInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2180,94 +2205,33 @@ export type PartOrderCreateManyCustomerInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
-export type PartOrderUpdateWithoutProcessedByInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
-    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
-    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
-    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
-    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
-    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
-    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
-};
-export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
-    partId?: Prisma.StringFieldUpdateOperationsInput | string;
-    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
-    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
-    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
-    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
-    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
-    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
-    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
-    alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
-};
-export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
-    partId?: Prisma.StringFieldUpdateOperationsInput | string;
-    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
-    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
-    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
-    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
-    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
-    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
-    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+export type PartOrderCreateManyProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    partId: string;
+    partInventoryId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerAddress?: string | null;
+    quantity: number;
+    amount: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod: $Enums.PaymentMethod;
+    paymentAccountId?: string | null;
+    status?: $Enums.OrderStatus;
+    paymentVerified?: boolean;
+    orderType?: $Enums.OrderType;
+    reservationExpiry?: Date | string | null;
+    pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
+    expiresAt?: Date | string | null;
+    customerId?: string | null;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: boolean;
+    paymentState?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 };
 export type PartOrderUpdateWithoutCustomerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2283,6 +2247,7 @@ export type PartOrderUpdateWithoutCustomerInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2290,15 +2255,15 @@ export type PartOrderUpdateWithoutCustomerInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
+    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
     part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
     partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
     transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
     allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
-    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutCustomerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2318,6 +2283,7 @@ export type PartOrderUncheckedUpdateWithoutCustomerInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2326,10 +2292,10 @@ export type PartOrderUncheckedUpdateWithoutCustomerInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateManyWithoutCustomerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2349,8 +2315,101 @@ export type PartOrderUncheckedUpdateManyWithoutCustomerInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type PartOrderUpdateWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
+    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
+    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
+    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
+    alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
+};
+export type PartOrderUncheckedUpdateManyWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    partId?: Prisma.StringFieldUpdateOperationsInput | string;
+    partInventoryId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    quantity?: Prisma.IntFieldUpdateOperationsInput | number;
+    amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
+    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
@@ -2375,6 +2434,7 @@ export type PartOrderCreateManyBranchInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2399,6 +2459,7 @@ export type PartOrderUpdateWithoutBranchInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2406,15 +2467,15 @@ export type PartOrderUpdateWithoutBranchInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
+    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
     part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
     partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
     transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
     allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
-    alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutBranchInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2433,6 +2494,7 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2442,10 +2504,10 @@ export type PartOrderUncheckedUpdateWithoutBranchInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2464,6 +2526,7 @@ export type PartOrderUncheckedUpdateManyWithoutBranchInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2491,6 +2554,7 @@ export type PartOrderCreateManyPartInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2515,6 +2579,7 @@ export type PartOrderUpdateWithoutPartInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2522,15 +2587,15 @@ export type PartOrderUpdateWithoutPartInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutPartInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2549,6 +2614,7 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2558,10 +2624,10 @@ export type PartOrderUncheckedUpdateWithoutPartInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateManyWithoutPartInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2580,6 +2646,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2607,6 +2674,7 @@ export type PartOrderCreateManyPartInventoryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2631,6 +2699,7 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2638,15 +2707,15 @@ export type PartOrderUpdateWithoutPartInventoryInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutPartOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2665,6 +2734,7 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2674,10 +2744,10 @@ export type PartOrderUncheckedUpdateWithoutPartInventoryInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2696,6 +2766,7 @@ export type PartOrderUncheckedUpdateManyWithoutPartInventoryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2723,6 +2794,7 @@ export type PartOrderCreateManyPaymentAccountInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2747,6 +2819,7 @@ export type PartOrderUpdateWithoutPaymentAccountInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2754,15 +2827,15 @@ export type PartOrderUpdateWithoutPaymentAccountInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
-    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
-    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutPartOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutPartOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerPartOrdersNestedInput;
+    part?: Prisma.PartUpdateOneRequiredWithoutPartOrdersNestedInput;
+    partInventory?: Prisma.PartInventoryUpdateOneRequiredWithoutPartOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedPartOrdersNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateWithoutPaymentAccountInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2781,6 +2854,7 @@ export type PartOrderUncheckedUpdateWithoutPaymentAccountInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2790,10 +2864,10 @@ export type PartOrderUncheckedUpdateWithoutPaymentAccountInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutPartOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutPartOrderNestedInput;
+    transactions?: Prisma.PartPaymentTransactionUncheckedUpdateManyWithoutPartOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPartOrderNestedInput;
 };
 export type PartOrderUncheckedUpdateManyWithoutPaymentAccountInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2812,6 +2886,7 @@ export type PartOrderUncheckedUpdateManyWithoutPaymentAccountInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2823,26 +2898,26 @@ export type PartOrderUncheckedUpdateManyWithoutPaymentAccountInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type PartOrderCountOutputType = {
+    alerts: number;
     transactions: number;
     allocations: number;
-    alerts: number;
 };
 export type PartOrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    alerts?: boolean | PartOrderCountOutputTypeCountAlertsArgs;
     transactions?: boolean | PartOrderCountOutputTypeCountTransactionsArgs;
     allocations?: boolean | PartOrderCountOutputTypeCountAllocationsArgs;
-    alerts?: boolean | PartOrderCountOutputTypeCountAlertsArgs;
 };
 export type PartOrderCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PartOrderCountOutputTypeSelect<ExtArgs> | null;
+};
+export type PartOrderCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.OrderAlertWhereInput;
 };
 export type PartOrderCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.PartPaymentTransactionWhereInput;
 };
 export type PartOrderCountOutputTypeCountAllocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.PaymentAllocationWhereInput;
-};
-export type PartOrderCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    where?: Prisma.OrderAlertWhereInput;
 };
 export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -2862,6 +2937,7 @@ export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -2871,16 +2947,16 @@ export type PartOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
     paymentState?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
-    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
-    paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
-    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
-    transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>;
-    allocations?: boolean | Prisma.PartOrder$allocationsArgs<ExtArgs>;
     delivery?: boolean | Prisma.PartOrder$deliveryArgs<ExtArgs>;
     alerts?: boolean | Prisma.PartOrder$alertsArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+    transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>;
+    allocations?: boolean | Prisma.PartOrder$allocationsArgs<ExtArgs>;
     _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["partOrder"]>;
 export type PartOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2901,6 +2977,7 @@ export type PartOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -2910,12 +2987,12 @@ export type PartOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
     paymentState?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
     part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
 }, ExtArgs["result"]["partOrder"]>;
 export type PartOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -2935,6 +3012,7 @@ export type PartOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -2944,12 +3022,12 @@ export type PartOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
     paymentState?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
     part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
 }, ExtArgs["result"]["partOrder"]>;
 export type PartOrderSelectScalar = {
     id?: boolean;
@@ -2969,6 +3047,7 @@ export type PartOrderSelectScalar = {
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -2979,49 +3058,49 @@ export type PartOrderSelectScalar = {
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "paymentAccountId" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "expiresAt" | "processedById" | "customerId" | "paidAmount" | "balanceDue" | "isInstallmentPlan" | "paymentState" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>;
+export type PartOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "partId" | "partInventoryId" | "branchId" | "customerName" | "customerPhone" | "customerAddress" | "quantity" | "amount" | "paymentMethod" | "paymentAccountId" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "saleDate" | "expiresAt" | "processedById" | "customerId" | "paidAmount" | "balanceDue" | "isInstallmentPlan" | "paymentState" | "createdAt" | "updatedAt", ExtArgs["result"]["partOrder"]>;
 export type PartOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
-    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
-    paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
-    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
-    transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>;
-    allocations?: boolean | Prisma.PartOrder$allocationsArgs<ExtArgs>;
     delivery?: boolean | Prisma.PartOrder$deliveryArgs<ExtArgs>;
     alerts?: boolean | Prisma.PartOrder$alertsArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
+    part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
+    partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
+    paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
+    transactions?: boolean | Prisma.PartOrder$transactionsArgs<ExtArgs>;
+    allocations?: boolean | Prisma.PartOrder$allocationsArgs<ExtArgs>;
     _count?: boolean | Prisma.PartOrderCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type PartOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
     part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
 };
 export type PartOrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
     part?: boolean | Prisma.PartDefaultArgs<ExtArgs>;
     partInventory?: boolean | Prisma.PartInventoryDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.PartOrder$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.PartOrder$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.PartOrder$customerArgs<ExtArgs>;
 };
 export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "PartOrder";
     objects: {
-        part: Prisma.$PartPayload<ExtArgs>;
-        partInventory: Prisma.$PartInventoryPayload<ExtArgs>;
-        branch: Prisma.$BranchPayload<ExtArgs>;
-        paymentAccount: Prisma.$AccountPayload<ExtArgs> | null;
-        processedBy: Prisma.$UserPayload<ExtArgs> | null;
-        customer: Prisma.$UserPayload<ExtArgs> | null;
-        transactions: Prisma.$PartPaymentTransactionPayload<ExtArgs>[];
-        allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[];
         delivery: Prisma.$DeliveryRequestPayload<ExtArgs> | null;
         alerts: Prisma.$OrderAlertPayload<ExtArgs>[];
+        branch: Prisma.$BranchPayload<ExtArgs>;
+        customer: Prisma.$UserPayload<ExtArgs> | null;
+        part: Prisma.$PartPayload<ExtArgs>;
+        partInventory: Prisma.$PartInventoryPayload<ExtArgs>;
+        paymentAccount: Prisma.$AccountPayload<ExtArgs> | null;
+        processedBy: Prisma.$UserPayload<ExtArgs> | null;
+        transactions: Prisma.$PartPaymentTransactionPayload<ExtArgs>[];
+        allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -3041,6 +3120,7 @@ export type $PartOrderPayload<ExtArgs extends runtime.Types.Extensions.InternalA
         orderType: $Enums.OrderType;
         reservationExpiry: Date | null;
         pickupType: $Enums.PickupType;
+        saleDate: Date | null;
         expiresAt: Date | null;
         processedById: string | null;
         customerId: string | null;
@@ -3102,16 +3182,16 @@ export interface PartOrderDelegate<ExtArgs extends runtime.Types.Extensions.Inte
 }
 export interface Prisma__PartOrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    part<T extends Prisma.PartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartDefaultArgs<ExtArgs>>): Prisma.Prisma__PartClient<runtime.Types.Result.GetResult<Prisma.$PartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
-    partInventory<T extends Prisma.PartInventoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartInventoryDefaultArgs<ExtArgs>>): Prisma.Prisma__PartInventoryClient<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
-    branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
-    paymentAccount<T extends Prisma.PartOrder$paymentAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$paymentAccountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    processedBy<T extends Prisma.PartOrder$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    customer<T extends Prisma.PartOrder$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$customerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    transactions<T extends Prisma.PartOrder$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
-    allocations<T extends Prisma.PartOrder$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     delivery<T extends Prisma.PartOrder$deliveryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$deliveryArgs<ExtArgs>>): Prisma.Prisma__DeliveryRequestClient<runtime.Types.Result.GetResult<Prisma.$DeliveryRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     alerts<T extends Prisma.PartOrder$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    customer<T extends Prisma.PartOrder$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$customerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    part<T extends Prisma.PartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartDefaultArgs<ExtArgs>>): Prisma.Prisma__PartClient<runtime.Types.Result.GetResult<Prisma.$PartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    partInventory<T extends Prisma.PartInventoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartInventoryDefaultArgs<ExtArgs>>): Prisma.Prisma__PartInventoryClient<runtime.Types.Result.GetResult<Prisma.$PartInventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    paymentAccount<T extends Prisma.PartOrder$paymentAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$paymentAccountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    processedBy<T extends Prisma.PartOrder$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    transactions<T extends Prisma.PartOrder$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    allocations<T extends Prisma.PartOrder$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartOrder$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -3134,6 +3214,7 @@ export interface PartOrderFieldRefs {
     readonly orderType: Prisma.FieldRef<"PartOrder", 'OrderType'>;
     readonly reservationExpiry: Prisma.FieldRef<"PartOrder", 'DateTime'>;
     readonly pickupType: Prisma.FieldRef<"PartOrder", 'PickupType'>;
+    readonly saleDate: Prisma.FieldRef<"PartOrder", 'DateTime'>;
     readonly expiresAt: Prisma.FieldRef<"PartOrder", 'DateTime'>;
     readonly processedById: Prisma.FieldRef<"PartOrder", 'String'>;
     readonly customerId: Prisma.FieldRef<"PartOrder", 'String'>;
@@ -3244,6 +3325,29 @@ export type PartOrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
     where?: Prisma.PartOrderWhereInput;
     limit?: number;
 };
+export type PartOrder$deliveryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.DeliveryRequestSelect<ExtArgs> | null;
+    omit?: Prisma.DeliveryRequestOmit<ExtArgs> | null;
+    include?: Prisma.DeliveryRequestInclude<ExtArgs> | null;
+    where?: Prisma.DeliveryRequestWhereInput;
+};
+export type PartOrder$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.OrderAlertSelect<ExtArgs> | null;
+    omit?: Prisma.OrderAlertOmit<ExtArgs> | null;
+    include?: Prisma.OrderAlertInclude<ExtArgs> | null;
+    where?: Prisma.OrderAlertWhereInput;
+    orderBy?: Prisma.OrderAlertOrderByWithRelationInput | Prisma.OrderAlertOrderByWithRelationInput[];
+    cursor?: Prisma.OrderAlertWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.OrderAlertScalarFieldEnum | Prisma.OrderAlertScalarFieldEnum[];
+};
+export type PartOrder$customerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+};
 export type PartOrder$paymentAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.AccountSelect<ExtArgs> | null;
     omit?: Prisma.AccountOmit<ExtArgs> | null;
@@ -3251,12 +3355,6 @@ export type PartOrder$paymentAccountArgs<ExtArgs extends runtime.Types.Extension
     where?: Prisma.AccountWhereInput;
 };
 export type PartOrder$processedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.UserSelect<ExtArgs> | null;
-    omit?: Prisma.UserOmit<ExtArgs> | null;
-    include?: Prisma.UserInclude<ExtArgs> | null;
-    where?: Prisma.UserWhereInput;
-};
-export type PartOrder$customerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.UserSelect<ExtArgs> | null;
     omit?: Prisma.UserOmit<ExtArgs> | null;
     include?: Prisma.UserInclude<ExtArgs> | null;
@@ -3283,23 +3381,6 @@ export type PartOrder$allocationsArgs<ExtArgs extends runtime.Types.Extensions.I
     take?: number;
     skip?: number;
     distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[];
-};
-export type PartOrder$deliveryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.DeliveryRequestSelect<ExtArgs> | null;
-    omit?: Prisma.DeliveryRequestOmit<ExtArgs> | null;
-    include?: Prisma.DeliveryRequestInclude<ExtArgs> | null;
-    where?: Prisma.DeliveryRequestWhereInput;
-};
-export type PartOrder$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.OrderAlertSelect<ExtArgs> | null;
-    omit?: Prisma.OrderAlertOmit<ExtArgs> | null;
-    include?: Prisma.OrderAlertInclude<ExtArgs> | null;
-    where?: Prisma.OrderAlertWhereInput;
-    orderBy?: Prisma.OrderAlertOrderByWithRelationInput | Prisma.OrderAlertOrderByWithRelationInput[];
-    cursor?: Prisma.OrderAlertWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: Prisma.OrderAlertScalarFieldEnum | Prisma.OrderAlertScalarFieldEnum[];
 };
 export type PartOrderDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.PartOrderSelect<ExtArgs> | null;

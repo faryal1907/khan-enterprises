@@ -302,6 +302,7 @@ export class OrdersService {
           balanceDue: isCash ? salePrice : balanceDue,
           isInstallmentPlan: balanceDue > 0,
           paymentState: isCash ? PaymentState.DUE : paymentState,
+          saleDate: dto.saleDate || new Date(),
         },
       });
 
@@ -325,6 +326,7 @@ export class OrdersService {
           paymentProofUrl: dto.paymentProofUrl || null,
           processedById: user.id,
           originalAmount: isCash ? salePrice : advanceAmount,
+          transactionDate: dto.saleDate || new Date(),
         },
       });
 
@@ -449,29 +451,25 @@ export class OrdersService {
   }
 
   /**
-   * Complete missing details of an order before payment
+   * Complete missing details of an order
+   * Customer info can be updated at any order status
    */
   async completeOrderDetails(id: string, dto: CompleteOrderDetailsDto, user: any) {
     const order = await this.getOrderById(id, user);
 
-
-    if (order.status !== OrderStatus.PENDING_PAYMENT) {
-      throw new BadRequestException(
-        `Cannot complete details for order in ${order.status} status`
-      );
-    }
-
     // Ownership was already verified by getOrderById → assertOrderAccess above.
     // No need to re-check here.
 
-
+    const updateData: any = {};
+    if (dto.customerName !== undefined) updateData.customerName = dto.customerName;
+    if (dto.customerPhone !== undefined) updateData.customerPhone = dto.customerPhone;
+    if (dto.customerCNIC !== undefined) updateData.customerCNIC = dto.customerCNIC;
+    if (dto.customerAddress !== undefined) updateData.customerAddress = dto.customerAddress;
 
     return this.prisma.client.order.update({
       where: { id },
       data: {
-        customerCNIC: dto.customerCNIC,
-        customerAddress: dto.customerAddress,
-        paymentMethod: dto.paymentMethod,
+        ...updateData,
         // Only update processedById if the action is taken by a staff member
         ...(user?.role !== "CUSTOMER" && { processedById: user.id }),
       },
@@ -832,6 +830,7 @@ export class OrdersService {
           },
         });
       } else {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
         transaction = await tx.paymentTransaction.create({
           data: {
             orderId,
@@ -843,6 +842,7 @@ export class OrdersService {
             verifiedById: user.id,
             processedById: user.id,
             originalAmount: dto.amount,
+            transactionDate: order?.saleDate || new Date(),
           },
         });
       }
@@ -1121,6 +1121,7 @@ export class OrdersService {
           balanceDue: balance,
           isInstallmentPlan: isInstallment,
           paymentState,
+          saleDate: dto.saleDate || new Date(),
         },
       });
 
@@ -1164,6 +1165,7 @@ export class OrdersService {
             accountId: paymentAcc?.id,
             processedById: user.id,
             originalAmount: initialPayment,
+            transactionDate: dto.saleDate || new Date(),
           },
         });
         await tx.paymentAllocation.create({

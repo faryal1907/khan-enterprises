@@ -232,11 +232,11 @@ export type PaymentAllocationWhereInput = {
   payableId?: Prisma.StringNullableFilter<"PaymentAllocation"> | string | null
   allocatedAmount?: Prisma.DecimalFilter<"PaymentAllocation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   partPaymentTransactionId?: Prisma.StringNullableFilter<"PaymentAllocation"> | string | null
-  payment?: Prisma.XOR<Prisma.PaymentTransactionScalarRelationFilter, Prisma.PaymentTransactionWhereInput>
   order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
   partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
-  payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null
   partPaymentTransaction?: Prisma.XOR<Prisma.PartPaymentTransactionNullableScalarRelationFilter, Prisma.PartPaymentTransactionWhereInput> | null
+  payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null
+  payment?: Prisma.XOR<Prisma.PaymentTransactionScalarRelationFilter, Prisma.PaymentTransactionWhereInput>
 }
 
 export type PaymentAllocationOrderByWithRelationInput = {
@@ -247,11 +247,11 @@ export type PaymentAllocationOrderByWithRelationInput = {
   payableId?: Prisma.SortOrderInput | Prisma.SortOrder
   allocatedAmount?: Prisma.SortOrder
   partPaymentTransactionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  payment?: Prisma.PaymentTransactionOrderByWithRelationInput
   order?: Prisma.OrderOrderByWithRelationInput
   partOrder?: Prisma.PartOrderOrderByWithRelationInput
-  payable?: Prisma.PayableOrderByWithRelationInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionOrderByWithRelationInput
+  payable?: Prisma.PayableOrderByWithRelationInput
+  payment?: Prisma.PaymentTransactionOrderByWithRelationInput
 }
 
 export type PaymentAllocationWhereUniqueInput = Prisma.AtLeast<{
@@ -265,11 +265,11 @@ export type PaymentAllocationWhereUniqueInput = Prisma.AtLeast<{
   payableId?: Prisma.StringNullableFilter<"PaymentAllocation"> | string | null
   allocatedAmount?: Prisma.DecimalFilter<"PaymentAllocation"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   partPaymentTransactionId?: Prisma.StringNullableFilter<"PaymentAllocation"> | string | null
-  payment?: Prisma.XOR<Prisma.PaymentTransactionScalarRelationFilter, Prisma.PaymentTransactionWhereInput>
   order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
   partOrder?: Prisma.XOR<Prisma.PartOrderNullableScalarRelationFilter, Prisma.PartOrderWhereInput> | null
-  payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null
   partPaymentTransaction?: Prisma.XOR<Prisma.PartPaymentTransactionNullableScalarRelationFilter, Prisma.PartPaymentTransactionWhereInput> | null
+  payable?: Prisma.XOR<Prisma.PayableNullableScalarRelationFilter, Prisma.PayableWhereInput> | null
+  payment?: Prisma.XOR<Prisma.PaymentTransactionScalarRelationFilter, Prisma.PaymentTransactionWhereInput>
 }, "id">
 
 export type PaymentAllocationOrderByWithAggregationInput = {
@@ -303,11 +303,11 @@ export type PaymentAllocationScalarWhereWithAggregatesInput = {
 export type PaymentAllocationCreateInput = {
   id?: string
   allocatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
   order?: Prisma.OrderCreateNestedOneWithoutAllocationsInput
   partOrder?: Prisma.PartOrderCreateNestedOneWithoutAllocationsInput
-  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionCreateNestedOneWithoutAllocationsInput
+  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
+  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
 }
 
 export type PaymentAllocationUncheckedCreateInput = {
@@ -323,11 +323,11 @@ export type PaymentAllocationUncheckedCreateInput = {
 export type PaymentAllocationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   allocatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
   order?: Prisma.OrderUpdateOneWithoutAllocationsNestedInput
   partOrder?: Prisma.PartOrderUpdateOneWithoutAllocationsNestedInput
-  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionUpdateOneWithoutAllocationsNestedInput
+  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
+  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
 }
 
 export type PaymentAllocationUncheckedUpdateInput = {
@@ -626,10 +626,10 @@ export type PaymentAllocationUncheckedUpdateManyWithoutPayableNestedInput = {
 export type PaymentAllocationCreateWithoutOrderInput = {
   id?: string
   allocatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
   partOrder?: Prisma.PartOrderCreateNestedOneWithoutAllocationsInput
-  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionCreateNestedOneWithoutAllocationsInput
+  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
+  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
 }
 
 export type PaymentAllocationUncheckedCreateWithoutOrderInput = {
@@ -683,10 +683,10 @@ export type PaymentAllocationScalarWhereInput = {
 export type PaymentAllocationCreateWithoutPartOrderInput = {
   id?: string
   allocatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
   order?: Prisma.OrderCreateNestedOneWithoutAllocationsInput
-  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionCreateNestedOneWithoutAllocationsInput
+  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
+  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
 }
 
 export type PaymentAllocationUncheckedCreateWithoutPartOrderInput = {
@@ -729,8 +729,8 @@ export type PaymentAllocationCreateWithoutPaymentInput = {
   allocatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   order?: Prisma.OrderCreateNestedOneWithoutAllocationsInput
   partOrder?: Prisma.PartOrderCreateNestedOneWithoutAllocationsInput
-  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionCreateNestedOneWithoutAllocationsInput
+  payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
 }
 
 export type PaymentAllocationUncheckedCreateWithoutPaymentInput = {
@@ -771,10 +771,10 @@ export type PaymentAllocationUpdateManyWithWhereWithoutPaymentInput = {
 export type PaymentAllocationCreateWithoutPartPaymentTransactionInput = {
   id?: string
   allocatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
   order?: Prisma.OrderCreateNestedOneWithoutAllocationsInput
   partOrder?: Prisma.PartOrderCreateNestedOneWithoutAllocationsInput
   payable?: Prisma.PayableCreateNestedOneWithoutAllocationsInput
+  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
 }
 
 export type PaymentAllocationUncheckedCreateWithoutPartPaymentTransactionInput = {
@@ -815,10 +815,10 @@ export type PaymentAllocationUpdateManyWithWhereWithoutPartPaymentTransactionInp
 export type PaymentAllocationCreateWithoutPayableInput = {
   id?: string
   allocatedAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
   order?: Prisma.OrderCreateNestedOneWithoutAllocationsInput
   partOrder?: Prisma.PartOrderCreateNestedOneWithoutAllocationsInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionCreateNestedOneWithoutAllocationsInput
+  payment: Prisma.PaymentTransactionCreateNestedOneWithoutAllocationsInput
 }
 
 export type PaymentAllocationUncheckedCreateWithoutPayableInput = {
@@ -868,10 +868,10 @@ export type PaymentAllocationCreateManyOrderInput = {
 export type PaymentAllocationUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   allocatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
   partOrder?: Prisma.PartOrderUpdateOneWithoutAllocationsNestedInput
-  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionUpdateOneWithoutAllocationsNestedInput
+  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
+  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
 }
 
 export type PaymentAllocationUncheckedUpdateWithoutOrderInput = {
@@ -904,10 +904,10 @@ export type PaymentAllocationCreateManyPartOrderInput = {
 export type PaymentAllocationUpdateWithoutPartOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   allocatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
   order?: Prisma.OrderUpdateOneWithoutAllocationsNestedInput
-  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionUpdateOneWithoutAllocationsNestedInput
+  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
+  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
 }
 
 export type PaymentAllocationUncheckedUpdateWithoutPartOrderInput = {
@@ -942,8 +942,8 @@ export type PaymentAllocationUpdateWithoutPaymentInput = {
   allocatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   order?: Prisma.OrderUpdateOneWithoutAllocationsNestedInput
   partOrder?: Prisma.PartOrderUpdateOneWithoutAllocationsNestedInput
-  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionUpdateOneWithoutAllocationsNestedInput
+  payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
 }
 
 export type PaymentAllocationUncheckedUpdateWithoutPaymentInput = {
@@ -976,10 +976,10 @@ export type PaymentAllocationCreateManyPartPaymentTransactionInput = {
 export type PaymentAllocationUpdateWithoutPartPaymentTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   allocatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
   order?: Prisma.OrderUpdateOneWithoutAllocationsNestedInput
   partOrder?: Prisma.PartOrderUpdateOneWithoutAllocationsNestedInput
   payable?: Prisma.PayableUpdateOneWithoutAllocationsNestedInput
+  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
 }
 
 export type PaymentAllocationUncheckedUpdateWithoutPartPaymentTransactionInput = {
@@ -1012,10 +1012,10 @@ export type PaymentAllocationCreateManyPayableInput = {
 export type PaymentAllocationUpdateWithoutPayableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   allocatedAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
   order?: Prisma.OrderUpdateOneWithoutAllocationsNestedInput
   partOrder?: Prisma.PartOrderUpdateOneWithoutAllocationsNestedInput
   partPaymentTransaction?: Prisma.PartPaymentTransactionUpdateOneWithoutAllocationsNestedInput
+  payment?: Prisma.PaymentTransactionUpdateOneRequiredWithoutAllocationsNestedInput
 }
 
 export type PaymentAllocationUncheckedUpdateWithoutPayableInput = {
@@ -1046,11 +1046,11 @@ export type PaymentAllocationSelect<ExtArgs extends runtime.Types.Extensions.Int
   payableId?: boolean
   allocatedAmount?: boolean
   partPaymentTransactionId?: boolean
-  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
   order?: boolean | Prisma.PaymentAllocation$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.PaymentAllocation$partOrderArgs<ExtArgs>
-  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
   partPaymentTransaction?: boolean | Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>
+  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentAllocation"]>
 
 export type PaymentAllocationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1061,11 +1061,11 @@ export type PaymentAllocationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   payableId?: boolean
   allocatedAmount?: boolean
   partPaymentTransactionId?: boolean
-  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
   order?: boolean | Prisma.PaymentAllocation$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.PaymentAllocation$partOrderArgs<ExtArgs>
-  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
   partPaymentTransaction?: boolean | Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>
+  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentAllocation"]>
 
 export type PaymentAllocationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1076,11 +1076,11 @@ export type PaymentAllocationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   payableId?: boolean
   allocatedAmount?: boolean
   partPaymentTransactionId?: boolean
-  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
   order?: boolean | Prisma.PaymentAllocation$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.PaymentAllocation$partOrderArgs<ExtArgs>
-  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
   partPaymentTransaction?: boolean | Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>
+  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentAllocation"]>
 
 export type PaymentAllocationSelectScalar = {
@@ -1095,35 +1095,35 @@ export type PaymentAllocationSelectScalar = {
 
 export type PaymentAllocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentId" | "orderId" | "partOrderId" | "payableId" | "allocatedAmount" | "partPaymentTransactionId", ExtArgs["result"]["paymentAllocation"]>
 export type PaymentAllocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
   order?: boolean | Prisma.PaymentAllocation$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.PaymentAllocation$partOrderArgs<ExtArgs>
-  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
   partPaymentTransaction?: boolean | Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>
+  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
 }
 export type PaymentAllocationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
   order?: boolean | Prisma.PaymentAllocation$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.PaymentAllocation$partOrderArgs<ExtArgs>
-  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
   partPaymentTransaction?: boolean | Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>
+  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
 }
 export type PaymentAllocationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
   order?: boolean | Prisma.PaymentAllocation$orderArgs<ExtArgs>
   partOrder?: boolean | Prisma.PaymentAllocation$partOrderArgs<ExtArgs>
-  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
   partPaymentTransaction?: boolean | Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>
+  payable?: boolean | Prisma.PaymentAllocation$payableArgs<ExtArgs>
+  payment?: boolean | Prisma.PaymentTransactionDefaultArgs<ExtArgs>
 }
 
 export type $PaymentAllocationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PaymentAllocation"
   objects: {
-    payment: Prisma.$PaymentTransactionPayload<ExtArgs>
     order: Prisma.$OrderPayload<ExtArgs> | null
     partOrder: Prisma.$PartOrderPayload<ExtArgs> | null
-    payable: Prisma.$PayablePayload<ExtArgs> | null
     partPaymentTransaction: Prisma.$PartPaymentTransactionPayload<ExtArgs> | null
+    payable: Prisma.$PayablePayload<ExtArgs> | null
+    payment: Prisma.$PaymentTransactionPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1527,11 +1527,11 @@ readonly fields: PaymentAllocationFieldRefs;
  */
 export interface Prisma__PaymentAllocationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  payment<T extends Prisma.PaymentTransactionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransactionDefaultArgs<ExtArgs>>): Prisma.Prisma__PaymentTransactionClient<runtime.Types.Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   order<T extends Prisma.PaymentAllocation$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAllocation$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   partOrder<T extends Prisma.PaymentAllocation$partOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAllocation$partOrderArgs<ExtArgs>>): Prisma.Prisma__PartOrderClient<runtime.Types.Result.GetResult<Prisma.$PartOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  payable<T extends Prisma.PaymentAllocation$payableArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAllocation$payableArgs<ExtArgs>>): Prisma.Prisma__PayableClient<runtime.Types.Result.GetResult<Prisma.$PayablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   partPaymentTransaction<T extends Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAllocation$partPaymentTransactionArgs<ExtArgs>>): Prisma.Prisma__PartPaymentTransactionClient<runtime.Types.Result.GetResult<Prisma.$PartPaymentTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  payable<T extends Prisma.PaymentAllocation$payableArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentAllocation$payableArgs<ExtArgs>>): Prisma.Prisma__PayableClient<runtime.Types.Result.GetResult<Prisma.$PayablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  payment<T extends Prisma.PaymentTransactionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentTransactionDefaultArgs<ExtArgs>>): Prisma.Prisma__PaymentTransactionClient<runtime.Types.Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2007,25 +2007,6 @@ export type PaymentAllocation$partOrderArgs<ExtArgs extends runtime.Types.Extens
 }
 
 /**
- * PaymentAllocation.payable
- */
-export type PaymentAllocation$payableArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Payable
-   */
-  select?: Prisma.PayableSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Payable
-   */
-  omit?: Prisma.PayableOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.PayableInclude<ExtArgs> | null
-  where?: Prisma.PayableWhereInput
-}
-
-/**
  * PaymentAllocation.partPaymentTransaction
  */
 export type PaymentAllocation$partPaymentTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2042,6 +2023,25 @@ export type PaymentAllocation$partPaymentTransactionArgs<ExtArgs extends runtime
    */
   include?: Prisma.PartPaymentTransactionInclude<ExtArgs> | null
   where?: Prisma.PartPaymentTransactionWhereInput
+}
+
+/**
+ * PaymentAllocation.payable
+ */
+export type PaymentAllocation$payableArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payable
+   */
+  select?: Prisma.PayableSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payable
+   */
+  omit?: Prisma.PayableOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PayableInclude<ExtArgs> | null
+  where?: Prisma.PayableWhereInput
 }
 
 /**

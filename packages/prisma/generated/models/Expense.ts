@@ -256,8 +256,8 @@ export type ExpenseWhereInput = {
   recordedById?: Prisma.StringFilter<"Expense"> | string
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
-  payeeAccount?: Prisma.XOR<Prisma.PayeeAccountNullableScalarRelationFilter, Prisma.PayeeAccountWhereInput> | null
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
+  payeeAccount?: Prisma.XOR<Prisma.PayeeAccountNullableScalarRelationFilter, Prisma.PayeeAccountWhereInput> | null
   recordedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -272,8 +272,8 @@ export type ExpenseOrderByWithRelationInput = {
   recordedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  payeeAccount?: Prisma.PayeeAccountOrderByWithRelationInput
   branch?: Prisma.BranchOrderByWithRelationInput
+  payeeAccount?: Prisma.PayeeAccountOrderByWithRelationInput
   recordedBy?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -291,8 +291,8 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<{
   recordedById?: Prisma.StringFilter<"Expense"> | string
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
-  payeeAccount?: Prisma.XOR<Prisma.PayeeAccountNullableScalarRelationFilter, Prisma.PayeeAccountWhereInput> | null
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
+  payeeAccount?: Prisma.XOR<Prisma.PayeeAccountNullableScalarRelationFilter, Prisma.PayeeAccountWhereInput> | null
   recordedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -338,8 +338,8 @@ export type ExpenseCreateInput = {
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
   branch: Prisma.BranchCreateNestedOneWithoutExpensesInput
+  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
   recordedBy: Prisma.UserCreateNestedOneWithoutRecordedExpensesInput
 }
 
@@ -364,8 +364,8 @@ export type ExpenseUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutExpensesNestedInput
+  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
   recordedBy?: Prisma.UserUpdateOneRequiredWithoutRecordedExpensesNestedInput
 }
 
@@ -613,8 +613,8 @@ export type ExpenseCreateWithoutRecordedByInput = {
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
   branch: Prisma.BranchCreateNestedOneWithoutExpensesInput
+  payeeAccount?: Prisma.PayeeAccountCreateNestedOneWithoutExpensesInput
 }
 
 export type ExpenseUncheckedCreateWithoutRecordedByInput = {
@@ -791,8 +791,8 @@ export type ExpenseUpdateWithoutRecordedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutExpensesNestedInput
+  payeeAccount?: Prisma.PayeeAccountUpdateOneWithoutExpensesNestedInput
 }
 
 export type ExpenseUncheckedUpdateWithoutRecordedByInput = {
@@ -928,8 +928,8 @@ export type ExpenseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expense"]>
 
@@ -944,8 +944,8 @@ export type ExpenseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expense"]>
 
@@ -960,8 +960,8 @@ export type ExpenseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expense"]>
 
@@ -980,26 +980,26 @@ export type ExpenseSelectScalar = {
 
 export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "amount" | "date" | "category" | "description" | "payeeAccountId" | "branchId" | "recordedById" | "createdAt" | "updatedAt", ExtArgs["result"]["expense"]>
 export type ExpenseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ExpenseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ExpenseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  payeeAccount?: boolean | Prisma.Expense$payeeAccountArgs<ExtArgs>
   recordedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ExpensePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Expense"
   objects: {
-    payeeAccount: Prisma.$PayeeAccountPayload<ExtArgs> | null
     branch: Prisma.$BranchPayload<ExtArgs>
+    payeeAccount: Prisma.$PayeeAccountPayload<ExtArgs> | null
     recordedBy: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1410,8 +1410,8 @@ readonly fields: ExpenseFieldRefs;
  */
 export interface Prisma__ExpenseClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  payeeAccount<T extends Prisma.Expense$payeeAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Expense$payeeAccountArgs<ExtArgs>>): Prisma.Prisma__PayeeAccountClient<runtime.Types.Result.GetResult<Prisma.$PayeeAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payeeAccount<T extends Prisma.Expense$payeeAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Expense$payeeAccountArgs<ExtArgs>>): Prisma.Prisma__PayeeAccountClient<runtime.Types.Result.GetResult<Prisma.$PayeeAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   recordedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.

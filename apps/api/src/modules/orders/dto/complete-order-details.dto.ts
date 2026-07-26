@@ -1,15 +1,19 @@
-import { IsString, IsNotEmpty, IsEnum } from "class-validator";
-import { PaymentMethod } from "@khan/prisma";
+import { IsString, IsOptional } from "class-validator";
 
 export class CompleteOrderDetailsDto {
   @IsString()
-  @IsNotEmpty()
-  customerCNIC: string;
+  @IsOptional()
+  customerName?: string;
 
   @IsString()
-  @IsNotEmpty()
-  customerAddress: string;
+  @IsOptional()
+  customerPhone?: string;
 
-  @IsEnum(PaymentMethod)
-  paymentMethod: PaymentMethod;
+  @IsString()
+  @IsOptional()
+  customerCNIC?: string;
+
+  @IsString()
+  @IsOptional()
+  customerAddress?: string;
 }

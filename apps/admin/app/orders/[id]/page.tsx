@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { theme } from "@/lib/colors";
 import { OrderStatus, PaymentMethod, Order, PaymentTransaction, UserRole } from "@/lib/types";
-import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, verifyPayment, downloadInvoice, markAsPickedByCustomer } from "@/lib/api/orders";
+import { getOrderById, updateOrderStatus, cancelOrder, recordPayment, verifyPayment, downloadInvoice, markAsPickedByCustomer, completeOrderDetails } from "@/lib/api/orders";
 import { approveDelivery } from "@/lib/api/deliveries";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
@@ -25,6 +25,7 @@ export default function OrderDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showRejectPaymentModal, setShowRejectPaymentModal] = useState(false);
+  const [showEditCustomerModal, setShowEditCustomerModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [rejectPaymentReason, setRejectPaymentReason] = useState("");
   const [paymentAccounts, setPaymentAccounts] = useState<any[]>([]);
@@ -33,6 +34,12 @@ export default function OrderDetailPage() {
     amount: 0,
     referenceNumber: "",
     accountId: "",
+  });
+  const [customerData, setCustomerData] = useState({
+    customerName: "",
+    customerPhone: "",
+    customerCNIC: "",
+    customerAddress: "",
   });
 
   useEffect(() => {
@@ -154,6 +161,34 @@ export default function OrderDetailPage() {
       toast.error(error?.message || "Failed to reject payment");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleEditCustomerInfo = async () => {
+    try {
+      setActionLoading(true);
+      await completeOrderDetails(orderId, customerData);
+      const updatedOrder = await getOrderById(orderId);
+      setOrder(updatedOrder);
+      setShowEditCustomerModal(false);
+      toast.success("Customer information updated successfully");
+    } catch (error: any) {
+      console.warn("Failed to update customer info:", error?.message || error);
+      toast.error(error?.message || "Failed to update customer information");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const openEditCustomerModal = () => {
+    if (order) {
+      setCustomerData({
+        customerName: order.customerName || "",
+        customerPhone: order.customerPhone || "",
+        customerCNIC: order.customerCNIC || "",
+        customerAddress: order.customerAddress || "",
+      });
+      setShowEditCustomerModal(true);
     }
   };
 
@@ -380,12 +415,27 @@ export default function OrderDetailPage() {
             className="rounded-lg p-4 md:p-6"
             style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}
           >
-            <h3
-              className="text-lg font-semibold mb-3 md:mb-4"
-              style={{ color: theme.text.primary }}
-            >
-              Customer Information
-            </h3>
+            <div className="flex justify-between items-start mb-3 md:mb-4">
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: theme.text.primary }}
+              >
+                Customer Information
+              </h3>
+              {canManageLifecycle && (
+                <button
+                  onClick={openEditCustomerModal}
+                  disabled={actionLoading}
+                  className="text-xs font-medium px-2 py-1 rounded transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.accents.primary,
+                    color: theme.text.inverse,
+                  }}
+                >
+                  Edit
+                </button>
+              )}
+            </div>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wider mb-1" style={{ color: theme.text.muted }}>
@@ -960,6 +1010,116 @@ export default function OrderDetailPage() {
                Confirm Rejection
              </AsyncButton>
            </div>
+        </ActionModal>
+      )}
+
+      {/* Edit Customer Info Modal */}
+      {showEditCustomerModal && (
+        <ActionModal
+          title="Edit Customer Information"
+          onClose={() => {
+            if (actionLoading) return;
+            setShowEditCustomerModal(false);
+          }}
+        >
+          <div className="space-y-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Name
+              </label>
+              <input
+                type="text"
+                value={customerData.customerName}
+                onChange={(e) => setCustomerData({ ...customerData, customerName: e.target.value })}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                placeholder="Enter customer name"
+                disabled={actionLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Phone
+              </label>
+              <input
+                type="text"
+                value={customerData.customerPhone}
+                onChange={(e) => setCustomerData({ ...customerData, customerPhone: e.target.value })}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                placeholder="Enter customer phone"
+                disabled={actionLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                CNIC
+              </label>
+              <input
+                type="text"
+                value={customerData.customerCNIC}
+                onChange={(e) => setCustomerData({ ...customerData, customerCNIC: e.target.value })}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                placeholder="Enter CNIC number"
+                disabled={actionLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: theme.text.secondary }}>
+                Address
+              </label>
+              <textarea
+                value={customerData.customerAddress}
+                onChange={(e) => setCustomerData({ ...customerData, customerAddress: e.target.value })}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={{
+                  backgroundColor: theme.backgrounds.tertiary,
+                  border: `1px solid ${theme.borders.medium}`,
+                  color: theme.text.primary,
+                }}
+                rows={3}
+                placeholder="Enter customer address"
+                disabled={actionLoading}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+            <button
+              onClick={() => setShowEditCustomerModal(false)}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-70"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Cancel
+            </button>
+            <AsyncButton
+              onClick={handleEditCustomerInfo}
+              disabled={actionLoading}
+              loading={actionLoading}
+              loadingLabel="Updating..."
+              style={{
+                backgroundColor: theme.accents.primary,
+              }}
+            >
+              Update Information
+            </AsyncButton>
+          </div>
         </ActionModal>
       )}
     </div>

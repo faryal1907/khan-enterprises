@@ -248,11 +248,11 @@ export type VendorDefectiveReturnWhereInput = {
   recordedById?: Prisma.StringNullableFilter<"VendorDefectiveReturn"> | string | null
   createdAt?: Prisma.DateTimeFilter<"VendorDefectiveReturn"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VendorDefectiveReturn"> | Date | string
+  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
+  recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
   bikes?: Prisma.VendorDefectiveReturnBikeListRelationFilter
   partLines?: Prisma.VendorDefectiveReturnPartLineListRelationFilter
-  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
-  recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type VendorDefectiveReturnOrderByWithRelationInput = {
@@ -265,11 +265,11 @@ export type VendorDefectiveReturnOrderByWithRelationInput = {
   recordedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  journalEntry?: Prisma.JournalEntryOrderByWithRelationInput
+  recordedBy?: Prisma.UserOrderByWithRelationInput
   vendor?: Prisma.VendorOrderByWithRelationInput
   bikes?: Prisma.VendorDefectiveReturnBikeOrderByRelationAggregateInput
   partLines?: Prisma.VendorDefectiveReturnPartLineOrderByRelationAggregateInput
-  journalEntry?: Prisma.JournalEntryOrderByWithRelationInput
-  recordedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type VendorDefectiveReturnWhereUniqueInput = Prisma.AtLeast<{
@@ -285,11 +285,11 @@ export type VendorDefectiveReturnWhereUniqueInput = Prisma.AtLeast<{
   recordedById?: Prisma.StringNullableFilter<"VendorDefectiveReturn"> | string | null
   createdAt?: Prisma.DateTimeFilter<"VendorDefectiveReturn"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VendorDefectiveReturn"> | Date | string
+  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
+  recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
   bikes?: Prisma.VendorDefectiveReturnBikeListRelationFilter
   partLines?: Prisma.VendorDefectiveReturnPartLineListRelationFilter
-  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
-  recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "journalEntryId">
 
 export type VendorDefectiveReturnOrderByWithAggregationInput = {
@@ -331,11 +331,11 @@ export type VendorDefectiveReturnCreateInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
+  recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
   vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
   bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
   partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
-  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
-  recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
 }
 
 export type VendorDefectiveReturnUncheckedCreateInput = {
@@ -359,11 +359,11 @@ export type VendorDefectiveReturnUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
+  recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
   vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
   bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
   partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
-  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
-  recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
 }
 
 export type VendorDefectiveReturnUncheckedUpdateInput = {
@@ -628,10 +628,10 @@ export type VendorDefectiveReturnCreateWithoutRecordedByInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
   vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
   bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
   partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
-  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
 }
 
 export type VendorDefectiveReturnUncheckedCreateWithoutRecordedByInput = {
@@ -695,10 +695,10 @@ export type VendorDefectiveReturnCreateWithoutVendorInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
-  partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
+  bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
+  partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
 }
 
 export type VendorDefectiveReturnUncheckedCreateWithoutVendorInput = {
@@ -747,10 +747,10 @@ export type VendorDefectiveReturnCreateWithoutJournalEntryInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
   vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
   bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
   partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
-  recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
 }
 
 export type VendorDefectiveReturnUncheckedCreateWithoutJournalEntryInput = {
@@ -789,10 +789,10 @@ export type VendorDefectiveReturnUpdateWithoutJournalEntryInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
   vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
   bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
   partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
-  recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
 }
 
 export type VendorDefectiveReturnUncheckedUpdateWithoutJournalEntryInput = {
@@ -815,10 +815,10 @@ export type VendorDefectiveReturnCreateWithoutBikesInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
-  partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
+  vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
+  partLines?: Prisma.VendorDefectiveReturnPartLineCreateNestedManyWithoutReturnInput
 }
 
 export type VendorDefectiveReturnUncheckedCreateWithoutBikesInput = {
@@ -857,10 +857,10 @@ export type VendorDefectiveReturnUpdateWithoutBikesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
-  partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
+  partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
 }
 
 export type VendorDefectiveReturnUncheckedUpdateWithoutBikesInput = {
@@ -883,10 +883,10 @@ export type VendorDefectiveReturnCreateWithoutPartLinesInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
-  bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorDefectiveReturnInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorDefectiveReturnsRecordedInput
+  vendor: Prisma.VendorCreateNestedOneWithoutDefectiveReturnsInput
+  bikes?: Prisma.VendorDefectiveReturnBikeCreateNestedManyWithoutReturnInput
 }
 
 export type VendorDefectiveReturnUncheckedCreateWithoutPartLinesInput = {
@@ -925,10 +925,10 @@ export type VendorDefectiveReturnUpdateWithoutPartLinesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
-  bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
+  bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
 }
 
 export type VendorDefectiveReturnUncheckedUpdateWithoutPartLinesInput = {
@@ -962,10 +962,10 @@ export type VendorDefectiveReturnUpdateWithoutRecordedByInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
   vendor?: Prisma.VendorUpdateOneRequiredWithoutDefectiveReturnsNestedInput
   bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
   partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
-  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
 }
 
 export type VendorDefectiveReturnUncheckedUpdateWithoutRecordedByInput = {
@@ -1010,10 +1010,10 @@ export type VendorDefectiveReturnUpdateWithoutVendorInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
-  partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorDefectiveReturnNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorDefectiveReturnsRecordedNestedInput
+  bikes?: Prisma.VendorDefectiveReturnBikeUpdateManyWithoutReturnNestedInput
+  partLines?: Prisma.VendorDefectiveReturnPartLineUpdateManyWithoutReturnNestedInput
 }
 
 export type VendorDefectiveReturnUncheckedUpdateWithoutVendorInput = {
@@ -1090,11 +1090,11 @@ export type VendorDefectiveReturnSelect<ExtArgs extends runtime.Types.Extensions
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   bikes?: boolean | Prisma.VendorDefectiveReturn$bikesArgs<ExtArgs>
   partLines?: boolean | Prisma.VendorDefectiveReturn$partLinesArgs<ExtArgs>
-  journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
-  recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
   _count?: boolean | Prisma.VendorDefectiveReturnCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorDefectiveReturn"]>
 
@@ -1108,9 +1108,9 @@ export type VendorDefectiveReturnSelectCreateManyAndReturn<ExtArgs extends runti
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorDefectiveReturn"]>
 
 export type VendorDefectiveReturnSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1123,9 +1123,9 @@ export type VendorDefectiveReturnSelectUpdateManyAndReturn<ExtArgs extends runti
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorDefectiveReturn"]>
 
 export type VendorDefectiveReturnSelectScalar = {
@@ -1142,38 +1142,32 @@ export type VendorDefectiveReturnSelectScalar = {
 
 export type VendorDefectiveReturnOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "totalAmount" | "date" | "notes" | "journalEntryId" | "recordedById" | "createdAt" | "updatedAt", ExtArgs["result"]["vendorDefectiveReturn"]>
 export type VendorDefectiveReturnInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
+  recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   bikes?: boolean | Prisma.VendorDefectiveReturn$bikesArgs<ExtArgs>
   partLines?: boolean | Prisma.VendorDefectiveReturn$partLinesArgs<ExtArgs>
-  journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
-  recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
   _count?: boolean | Prisma.VendorDefectiveReturnCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorDefectiveReturnIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
 export type VendorDefectiveReturnIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
 
 export type $VendorDefectiveReturnPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "VendorDefectiveReturn"
   objects: {
-    vendor: Prisma.$VendorPayload<ExtArgs>
-    /**
-     * The bike units being returned
-     */
-    bikes: Prisma.$VendorDefectiveReturnBikePayload<ExtArgs>[]
-    /**
-     * Part line items being returned
-     */
-    partLines: Prisma.$VendorDefectiveReturnPartLinePayload<ExtArgs>[]
     journalEntry: Prisma.$JournalEntryPayload<ExtArgs> | null
     recordedBy: Prisma.$UserPayload<ExtArgs> | null
+    vendor: Prisma.$VendorPayload<ExtArgs>
+    bikes: Prisma.$VendorDefectiveReturnBikePayload<ExtArgs>[]
+    partLines: Prisma.$VendorDefectiveReturnPartLinePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1585,11 +1579,11 @@ readonly fields: VendorDefectiveReturnFieldRefs;
  */
 export interface Prisma__VendorDefectiveReturnClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  journalEntry<T extends Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recordedBy<T extends Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   bikes<T extends Prisma.VendorDefectiveReturn$bikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturn$bikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnBikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   partLines<T extends Prisma.VendorDefectiveReturn$partLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturn$partLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnPartLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  journalEntry<T extends Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturn$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  recordedBy<T extends Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefectiveReturn$recordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2029,6 +2023,44 @@ export type VendorDefectiveReturnDeleteManyArgs<ExtArgs extends runtime.Types.Ex
 }
 
 /**
+ * VendorDefectiveReturn.journalEntry
+ */
+export type VendorDefectiveReturn$journalEntryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JournalEntry
+   */
+  select?: Prisma.JournalEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JournalEntry
+   */
+  omit?: Prisma.JournalEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JournalEntryInclude<ExtArgs> | null
+  where?: Prisma.JournalEntryWhereInput
+}
+
+/**
+ * VendorDefectiveReturn.recordedBy
+ */
+export type VendorDefectiveReturn$recordedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
  * VendorDefectiveReturn.bikes
  */
 export type VendorDefectiveReturn$bikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2074,44 +2106,6 @@ export type VendorDefectiveReturn$partLinesArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.VendorDefectiveReturnPartLineScalarFieldEnum | Prisma.VendorDefectiveReturnPartLineScalarFieldEnum[]
-}
-
-/**
- * VendorDefectiveReturn.journalEntry
- */
-export type VendorDefectiveReturn$journalEntryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the JournalEntry
-   */
-  select?: Prisma.JournalEntrySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the JournalEntry
-   */
-  omit?: Prisma.JournalEntryOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.JournalEntryInclude<ExtArgs> | null
-  where?: Prisma.JournalEntryWhereInput
-}
-
-/**
- * VendorDefectiveReturn.recordedBy
- */
-export type VendorDefectiveReturn$recordedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the User
-   */
-  select?: Prisma.UserSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the User
-   */
-  omit?: Prisma.UserOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
 }
 
 /**

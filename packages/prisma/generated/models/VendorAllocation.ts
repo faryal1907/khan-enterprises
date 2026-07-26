@@ -249,11 +249,11 @@ export type VendorAllocationWhereInput = {
   recordedById?: Prisma.StringNullableFilter<"VendorAllocation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"VendorAllocation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VendorAllocation"> | Date | string
-  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
-  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
   bikes?: Prisma.BikeUnitListRelationFilter
-  partLines?: Prisma.VendorAllocationPartLineListRelationFilter
+  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
   recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
+  partLines?: Prisma.VendorAllocationPartLineListRelationFilter
 }
 
 export type VendorAllocationOrderByWithRelationInput = {
@@ -266,11 +266,11 @@ export type VendorAllocationOrderByWithRelationInput = {
   recordedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  vendor?: Prisma.VendorOrderByWithRelationInput
-  journalEntry?: Prisma.JournalEntryOrderByWithRelationInput
   bikes?: Prisma.BikeUnitOrderByRelationAggregateInput
-  partLines?: Prisma.VendorAllocationPartLineOrderByRelationAggregateInput
+  journalEntry?: Prisma.JournalEntryOrderByWithRelationInput
   recordedBy?: Prisma.UserOrderByWithRelationInput
+  vendor?: Prisma.VendorOrderByWithRelationInput
+  partLines?: Prisma.VendorAllocationPartLineOrderByRelationAggregateInput
 }
 
 export type VendorAllocationWhereUniqueInput = Prisma.AtLeast<{
@@ -286,11 +286,11 @@ export type VendorAllocationWhereUniqueInput = Prisma.AtLeast<{
   recordedById?: Prisma.StringNullableFilter<"VendorAllocation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"VendorAllocation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VendorAllocation"> | Date | string
-  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
-  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
   bikes?: Prisma.BikeUnitListRelationFilter
-  partLines?: Prisma.VendorAllocationPartLineListRelationFilter
+  journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
   recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
+  partLines?: Prisma.VendorAllocationPartLineListRelationFilter
 }, "id" | "journalEntryId">
 
 export type VendorAllocationOrderByWithAggregationInput = {
@@ -332,11 +332,11 @@ export type VendorAllocationCreateInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
-  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   bikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorAllocationInput
-  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorAllocationsRecordedInput
+  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
+  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
 }
 
 export type VendorAllocationUncheckedCreateInput = {
@@ -360,11 +360,11 @@ export type VendorAllocationUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
-  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   bikes?: Prisma.BikeUnitUpdateManyWithoutVendorAllocationNestedInput
-  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorAllocationsRecordedNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
+  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
 }
 
 export type VendorAllocationUncheckedUpdateInput = {
@@ -631,9 +631,9 @@ export type VendorAllocationCreateWithoutRecordedByInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
-  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   bikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorAllocationInput
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
+  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
   partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
 }
 
@@ -698,10 +698,10 @@ export type VendorAllocationCreateWithoutVendorInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   bikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorAllocationInput
-  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorAllocationsRecordedInput
+  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
 }
 
 export type VendorAllocationUncheckedCreateWithoutVendorInput = {
@@ -750,10 +750,10 @@ export type VendorAllocationCreateWithoutBikesInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
-  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorAllocationsRecordedInput
+  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
+  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
 }
 
 export type VendorAllocationUncheckedCreateWithoutBikesInput = {
@@ -792,10 +792,10 @@ export type VendorAllocationUpdateWithoutBikesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
-  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorAllocationsRecordedNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
+  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
 }
 
 export type VendorAllocationUncheckedUpdateWithoutBikesInput = {
@@ -818,10 +818,10 @@ export type VendorAllocationCreateWithoutJournalEntryInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
   bikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorAllocationInput
-  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorAllocationsRecordedInput
+  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
+  partLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutAllocationInput
 }
 
 export type VendorAllocationUncheckedCreateWithoutJournalEntryInput = {
@@ -860,10 +860,10 @@ export type VendorAllocationUpdateWithoutJournalEntryInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
   bikes?: Prisma.BikeUnitUpdateManyWithoutVendorAllocationNestedInput
-  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorAllocationsRecordedNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
+  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
 }
 
 export type VendorAllocationUncheckedUpdateWithoutJournalEntryInput = {
@@ -886,10 +886,10 @@ export type VendorAllocationCreateWithoutPartLinesInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
-  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   bikes?: Prisma.BikeUnitCreateNestedManyWithoutVendorAllocationInput
+  journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutVendorAllocationInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutVendorAllocationsRecordedInput
+  vendor: Prisma.VendorCreateNestedOneWithoutAllocationsInput
 }
 
 export type VendorAllocationUncheckedCreateWithoutPartLinesInput = {
@@ -928,10 +928,10 @@ export type VendorAllocationUpdateWithoutPartLinesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
-  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   bikes?: Prisma.BikeUnitUpdateManyWithoutVendorAllocationNestedInput
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorAllocationsRecordedNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
 }
 
 export type VendorAllocationUncheckedUpdateWithoutPartLinesInput = {
@@ -965,9 +965,9 @@ export type VendorAllocationUpdateWithoutRecordedByInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
-  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   bikes?: Prisma.BikeUnitUpdateManyWithoutVendorAllocationNestedInput
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutAllocationsNestedInput
   partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
 }
 
@@ -1013,10 +1013,10 @@ export type VendorAllocationUpdateWithoutVendorInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   bikes?: Prisma.BikeUnitUpdateManyWithoutVendorAllocationNestedInput
-  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
+  journalEntry?: Prisma.JournalEntryUpdateOneWithoutVendorAllocationNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutVendorAllocationsRecordedNestedInput
+  partLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutAllocationNestedInput
 }
 
 export type VendorAllocationUncheckedUpdateWithoutVendorInput = {
@@ -1093,11 +1093,11 @@ export type VendorAllocationSelect<ExtArgs extends runtime.Types.Extensions.Inte
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
-  journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   bikes?: boolean | Prisma.VendorAllocation$bikesArgs<ExtArgs>
-  partLines?: boolean | Prisma.VendorAllocation$partLinesArgs<ExtArgs>
+  journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorAllocation$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
+  partLines?: boolean | Prisma.VendorAllocation$partLinesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorAllocationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorAllocation"]>
 
@@ -1111,9 +1111,9 @@ export type VendorAllocationSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorAllocation$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorAllocation"]>
 
 export type VendorAllocationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1126,9 +1126,9 @@ export type VendorAllocationSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   recordedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorAllocation$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorAllocation"]>
 
 export type VendorAllocationSelectScalar = {
@@ -1145,38 +1145,32 @@ export type VendorAllocationSelectScalar = {
 
 export type VendorAllocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "totalAmount" | "date" | "notes" | "journalEntryId" | "recordedById" | "createdAt" | "updatedAt", ExtArgs["result"]["vendorAllocation"]>
 export type VendorAllocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
-  journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   bikes?: boolean | Prisma.VendorAllocation$bikesArgs<ExtArgs>
-  partLines?: boolean | Prisma.VendorAllocation$partLinesArgs<ExtArgs>
+  journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorAllocation$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
+  partLines?: boolean | Prisma.VendorAllocation$partLinesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorAllocationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorAllocationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorAllocation$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
 export type VendorAllocationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.VendorAllocation$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.VendorAllocation$recordedByArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
 
 export type $VendorAllocationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "VendorAllocation"
   objects: {
-    vendor: Prisma.$VendorPayload<ExtArgs>
-    journalEntry: Prisma.$JournalEntryPayload<ExtArgs> | null
-    /**
-     * Bikes included in this allocation
-     */
     bikes: Prisma.$BikeUnitPayload<ExtArgs>[]
-    /**
-     * Part line items included in this allocation
-     */
-    partLines: Prisma.$VendorAllocationPartLinePayload<ExtArgs>[]
+    journalEntry: Prisma.$JournalEntryPayload<ExtArgs> | null
     recordedBy: Prisma.$UserPayload<ExtArgs> | null
+    vendor: Prisma.$VendorPayload<ExtArgs>
+    partLines: Prisma.$VendorAllocationPartLinePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1588,11 +1582,11 @@ readonly fields: VendorAllocationFieldRefs;
  */
 export interface Prisma__VendorAllocationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  journalEntry<T extends Prisma.VendorAllocation$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocation$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   bikes<T extends Prisma.VendorAllocation$bikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocation$bikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  partLines<T extends Prisma.VendorAllocation$partLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocation$partLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPartLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  journalEntry<T extends Prisma.VendorAllocation$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocation$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   recordedBy<T extends Prisma.VendorAllocation$recordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocation$recordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  partLines<T extends Prisma.VendorAllocation$partLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocation$partLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPartLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2032,25 +2026,6 @@ export type VendorAllocationDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
- * VendorAllocation.journalEntry
- */
-export type VendorAllocation$journalEntryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the JournalEntry
-   */
-  select?: Prisma.JournalEntrySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the JournalEntry
-   */
-  omit?: Prisma.JournalEntryOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.JournalEntryInclude<ExtArgs> | null
-  where?: Prisma.JournalEntryWhereInput
-}
-
-/**
  * VendorAllocation.bikes
  */
 export type VendorAllocation$bikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2075,6 +2050,44 @@ export type VendorAllocation$bikesArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 /**
+ * VendorAllocation.journalEntry
+ */
+export type VendorAllocation$journalEntryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JournalEntry
+   */
+  select?: Prisma.JournalEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JournalEntry
+   */
+  omit?: Prisma.JournalEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JournalEntryInclude<ExtArgs> | null
+  where?: Prisma.JournalEntryWhereInput
+}
+
+/**
+ * VendorAllocation.recordedBy
+ */
+export type VendorAllocation$recordedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
  * VendorAllocation.partLines
  */
 export type VendorAllocation$partLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2096,25 +2109,6 @@ export type VendorAllocation$partLinesArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.VendorAllocationPartLineScalarFieldEnum | Prisma.VendorAllocationPartLineScalarFieldEnum[]
-}
-
-/**
- * VendorAllocation.recordedBy
- */
-export type VendorAllocation$recordedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the User
-   */
-  select?: Prisma.UserSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the User
-   */
-  omit?: Prisma.UserOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
 }
 
 /**

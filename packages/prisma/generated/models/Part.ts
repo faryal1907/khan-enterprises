@@ -43,9 +43,9 @@ export type PartMinAggregateOutputType = {
   category: string | null
   description: string | null
   sellingPrice: runtime.Decimal | null
-  purchaseCost: runtime.Decimal | null
   createdAt: Date | null
   updatedAt: Date | null
+  purchaseCost: runtime.Decimal | null
 }
 
 export type PartMaxAggregateOutputType = {
@@ -55,9 +55,9 @@ export type PartMaxAggregateOutputType = {
   category: string | null
   description: string | null
   sellingPrice: runtime.Decimal | null
-  purchaseCost: runtime.Decimal | null
   createdAt: Date | null
   updatedAt: Date | null
+  purchaseCost: runtime.Decimal | null
 }
 
 export type PartCountAggregateOutputType = {
@@ -67,9 +67,9 @@ export type PartCountAggregateOutputType = {
   category: number
   description: number
   sellingPrice: number
-  purchaseCost: number
   createdAt: number
   updatedAt: number
+  purchaseCost: number
   _all: number
 }
 
@@ -91,9 +91,9 @@ export type PartMinAggregateInputType = {
   category?: true
   description?: true
   sellingPrice?: true
-  purchaseCost?: true
   createdAt?: true
   updatedAt?: true
+  purchaseCost?: true
 }
 
 export type PartMaxAggregateInputType = {
@@ -103,9 +103,9 @@ export type PartMaxAggregateInputType = {
   category?: true
   description?: true
   sellingPrice?: true
-  purchaseCost?: true
   createdAt?: true
   updatedAt?: true
+  purchaseCost?: true
 }
 
 export type PartCountAggregateInputType = {
@@ -115,9 +115,9 @@ export type PartCountAggregateInputType = {
   category?: true
   description?: true
   sellingPrice?: true
-  purchaseCost?: true
   createdAt?: true
   updatedAt?: true
+  purchaseCost?: true
   _all?: true
 }
 
@@ -214,9 +214,9 @@ export type PartGroupByOutputType = {
   category: string
   description: string | null
   sellingPrice: runtime.Decimal
-  purchaseCost: runtime.Decimal | null
   createdAt: Date
   updatedAt: Date
+  purchaseCost: runtime.Decimal | null
   _count: PartCountAggregateOutputType | null
   _avg: PartAvgAggregateOutputType | null
   _sum: PartSumAggregateOutputType | null
@@ -249,9 +249,9 @@ export type PartWhereInput = {
   category?: Prisma.StringFilter<"Part"> | string
   description?: Prisma.StringNullableFilter<"Part"> | string | null
   sellingPrice?: Prisma.DecimalFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.DecimalNullableFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Part"> | Date | string
+  purchaseCost?: Prisma.DecimalNullableFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryListRelationFilter
   partOrders?: Prisma.PartOrderListRelationFilter
   allocationLines?: Prisma.VendorAllocationPartLineListRelationFilter
@@ -264,9 +264,9 @@ export type PartOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   sellingPrice?: Prisma.SortOrder
-  purchaseCost?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  purchaseCost?: Prisma.SortOrderInput | Prisma.SortOrder
   inventories?: Prisma.PartInventoryOrderByRelationAggregateInput
   partOrders?: Prisma.PartOrderOrderByRelationAggregateInput
   allocationLines?: Prisma.VendorAllocationPartLineOrderByRelationAggregateInput
@@ -282,9 +282,9 @@ export type PartWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.StringFilter<"Part"> | string
   description?: Prisma.StringNullableFilter<"Part"> | string | null
   sellingPrice?: Prisma.DecimalFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.DecimalNullableFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"Part"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Part"> | Date | string
+  purchaseCost?: Prisma.DecimalNullableFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryListRelationFilter
   partOrders?: Prisma.PartOrderListRelationFilter
   allocationLines?: Prisma.VendorAllocationPartLineListRelationFilter
@@ -297,9 +297,9 @@ export type PartOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   sellingPrice?: Prisma.SortOrder
-  purchaseCost?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  purchaseCost?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PartCountOrderByAggregateInput
   _avg?: Prisma.PartAvgOrderByAggregateInput
   _max?: Prisma.PartMaxOrderByAggregateInput
@@ -317,9 +317,9 @@ export type PartScalarWhereWithAggregatesInput = {
   category?: Prisma.StringWithAggregatesFilter<"Part"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Part"> | string | null
   sellingPrice?: Prisma.DecimalWithAggregatesFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.DecimalNullableWithAggregatesFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Part"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Part"> | Date | string
+  purchaseCost?: Prisma.DecimalNullableWithAggregatesFilter<"Part"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type PartCreateInput = {
@@ -329,9 +329,9 @@ export type PartCreateInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
   allocationLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutPartInput
@@ -344,9 +344,9 @@ export type PartUncheckedCreateInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
   allocationLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutPartInput
@@ -359,9 +359,9 @@ export type PartUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
   allocationLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutPartNestedInput
@@ -374,9 +374,9 @@ export type PartUncheckedUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
   allocationLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutPartNestedInput
@@ -389,9 +389,9 @@ export type PartCreateManyInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type PartUpdateManyMutationInput = {
@@ -401,9 +401,9 @@ export type PartUpdateManyMutationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type PartUncheckedUpdateManyInput = {
@@ -413,9 +413,9 @@ export type PartUncheckedUpdateManyInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type PartCountOrderByAggregateInput = {
@@ -425,9 +425,9 @@ export type PartCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
   sellingPrice?: Prisma.SortOrder
-  purchaseCost?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  purchaseCost?: Prisma.SortOrder
 }
 
 export type PartAvgOrderByAggregateInput = {
@@ -442,9 +442,9 @@ export type PartMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
   sellingPrice?: Prisma.SortOrder
-  purchaseCost?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  purchaseCost?: Prisma.SortOrder
 }
 
 export type PartMinOrderByAggregateInput = {
@@ -454,9 +454,9 @@ export type PartMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   description?: Prisma.SortOrder
   sellingPrice?: Prisma.SortOrder
-  purchaseCost?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  purchaseCost?: Prisma.SortOrder
 }
 
 export type PartSumOrderByAggregateInput = {
@@ -518,9 +518,9 @@ export type PartCreateWithoutInventoriesInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
   allocationLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutPartInput
 }
@@ -532,9 +532,9 @@ export type PartUncheckedCreateWithoutInventoriesInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
   allocationLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutPartInput
 }
@@ -562,9 +562,9 @@ export type PartUpdateWithoutInventoriesInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
   allocationLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutPartNestedInput
 }
@@ -576,9 +576,9 @@ export type PartUncheckedUpdateWithoutInventoriesInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
   allocationLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutPartNestedInput
 }
@@ -590,9 +590,9 @@ export type PartCreateWithoutPartOrdersInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
   allocationLines?: Prisma.VendorAllocationPartLineCreateNestedManyWithoutPartInput
 }
@@ -604,9 +604,9 @@ export type PartUncheckedCreateWithoutPartOrdersInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
   allocationLines?: Prisma.VendorAllocationPartLineUncheckedCreateNestedManyWithoutPartInput
 }
@@ -634,9 +634,9 @@ export type PartUpdateWithoutPartOrdersInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
   allocationLines?: Prisma.VendorAllocationPartLineUpdateManyWithoutPartNestedInput
 }
@@ -648,9 +648,9 @@ export type PartUncheckedUpdateWithoutPartOrdersInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
   allocationLines?: Prisma.VendorAllocationPartLineUncheckedUpdateManyWithoutPartNestedInput
 }
@@ -662,9 +662,9 @@ export type PartCreateWithoutAllocationLinesInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryCreateNestedManyWithoutPartInput
   partOrders?: Prisma.PartOrderCreateNestedManyWithoutPartInput
 }
@@ -676,9 +676,9 @@ export type PartUncheckedCreateWithoutAllocationLinesInput = {
   category: string
   description?: string | null
   sellingPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  purchaseCost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUncheckedCreateNestedManyWithoutPartInput
   partOrders?: Prisma.PartOrderUncheckedCreateNestedManyWithoutPartInput
 }
@@ -706,9 +706,9 @@ export type PartUpdateWithoutAllocationLinesInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUpdateManyWithoutPartNestedInput
   partOrders?: Prisma.PartOrderUpdateManyWithoutPartNestedInput
 }
@@ -720,9 +720,9 @@ export type PartUncheckedUpdateWithoutAllocationLinesInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sellingPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  purchaseCost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   inventories?: Prisma.PartInventoryUncheckedUpdateManyWithoutPartNestedInput
   partOrders?: Prisma.PartOrderUncheckedUpdateManyWithoutPartNestedInput
 }
@@ -783,9 +783,9 @@ export type PartSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   category?: boolean
   description?: boolean
   sellingPrice?: boolean
-  purchaseCost?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  purchaseCost?: boolean
   inventories?: boolean | Prisma.Part$inventoriesArgs<ExtArgs>
   partOrders?: boolean | Prisma.Part$partOrdersArgs<ExtArgs>
   allocationLines?: boolean | Prisma.Part$allocationLinesArgs<ExtArgs>
@@ -799,9 +799,9 @@ export type PartSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   category?: boolean
   description?: boolean
   sellingPrice?: boolean
-  purchaseCost?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  purchaseCost?: boolean
 }, ExtArgs["result"]["part"]>
 
 export type PartSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -811,9 +811,9 @@ export type PartSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   category?: boolean
   description?: boolean
   sellingPrice?: boolean
-  purchaseCost?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  purchaseCost?: boolean
 }, ExtArgs["result"]["part"]>
 
 export type PartSelectScalar = {
@@ -823,12 +823,12 @@ export type PartSelectScalar = {
   category?: boolean
   description?: boolean
   sellingPrice?: boolean
-  purchaseCost?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  purchaseCost?: boolean
 }
 
-export type PartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sku" | "category" | "description" | "sellingPrice" | "purchaseCost" | "createdAt" | "updatedAt", ExtArgs["result"]["part"]>
+export type PartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sku" | "category" | "description" | "sellingPrice" | "createdAt" | "updatedAt" | "purchaseCost", ExtArgs["result"]["part"]>
 export type PartInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inventories?: boolean | Prisma.Part$inventoriesArgs<ExtArgs>
   partOrders?: boolean | Prisma.Part$partOrdersArgs<ExtArgs>
@@ -852,9 +852,9 @@ export type $PartPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     category: string
     description: string | null
     sellingPrice: runtime.Decimal
-    purchaseCost: runtime.Decimal | null
     createdAt: Date
     updatedAt: Date
+    purchaseCost: runtime.Decimal | null
   }, ExtArgs["result"]["part"]>
   composites: {}
 }
@@ -1287,9 +1287,9 @@ export interface PartFieldRefs {
   readonly category: Prisma.FieldRef<"Part", 'String'>
   readonly description: Prisma.FieldRef<"Part", 'String'>
   readonly sellingPrice: Prisma.FieldRef<"Part", 'Decimal'>
-  readonly purchaseCost: Prisma.FieldRef<"Part", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"Part", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Part", 'DateTime'>
+  readonly purchaseCost: Prisma.FieldRef<"Part", 'Decimal'>
 }
     
 

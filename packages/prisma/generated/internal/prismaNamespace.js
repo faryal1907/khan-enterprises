@@ -122,9 +122,9 @@ exports.VendorScalarFieldEnum = {
     email: 'email',
     address: 'address',
     isActive: 'isActive',
-    commissionRate: 'commissionRate',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    commissionRate: 'commissionRate'
 };
 exports.BikeModelScalarFieldEnum = {
     id: 'id',
@@ -167,9 +167,9 @@ exports.PartScalarFieldEnum = {
     category: 'category',
     description: 'description',
     sellingPrice: 'sellingPrice',
-    purchaseCost: 'purchaseCost',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    purchaseCost: 'purchaseCost'
 };
 exports.PartInventoryScalarFieldEnum = {
     id: 'id',
@@ -208,6 +208,7 @@ exports.OrderScalarFieldEnum = {
     orderType: 'orderType',
     reservationExpiry: 'reservationExpiry',
     pickupType: 'pickupType',
+    saleDate: 'saleDate',
     expiresAt: 'expiresAt',
     processedById: 'processedById',
     customerId: 'customerId',
@@ -246,6 +247,7 @@ exports.PartOrderScalarFieldEnum = {
     orderType: 'orderType',
     reservationExpiry: 'reservationExpiry',
     pickupType: 'pickupType',
+    saleDate: 'saleDate',
     expiresAt: 'expiresAt',
     processedById: 'processedById',
     customerId: 'customerId',
@@ -270,15 +272,16 @@ exports.PaymentTransactionScalarFieldEnum = {
     paymentProofUrl: 'paymentProofUrl',
     verifiedAt: 'verifiedAt',
     verifiedById: 'verifiedById',
-    processedById: 'processedById',
     webhookReceivedAt: 'webhookReceivedAt',
-    isReversed: 'isReversed',
-    reversedAt: 'reversedAt',
-    reversedById: 'reversedById',
-    reversalTransactionId: 'reversalTransactionId',
-    originalAmount: 'originalAmount',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    transactionDate: 'transactionDate',
+    updatedAt: 'updatedAt',
+    processedById: 'processedById',
+    isReversed: 'isReversed',
+    originalAmount: 'originalAmount',
+    reversalTransactionId: 'reversalTransactionId',
+    reversedAt: 'reversedAt',
+    reversedById: 'reversedById'
 };
 exports.PartPaymentTransactionScalarFieldEnum = {
     id: 'id',
@@ -294,15 +297,16 @@ exports.PartPaymentTransactionScalarFieldEnum = {
     paymentProofUrl: 'paymentProofUrl',
     verifiedAt: 'verifiedAt',
     verifiedById: 'verifiedById',
-    processedById: 'processedById',
     webhookReceivedAt: 'webhookReceivedAt',
-    isReversed: 'isReversed',
-    reversedAt: 'reversedAt',
-    reversedById: 'reversedById',
-    reversalTransactionId: 'reversalTransactionId',
-    originalAmount: 'originalAmount',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    transactionDate: 'transactionDate',
+    updatedAt: 'updatedAt',
+    processedById: 'processedById',
+    isReversed: 'isReversed',
+    originalAmount: 'originalAmount',
+    reversalTransactionId: 'reversalTransactionId',
+    reversedAt: 'reversedAt',
+    reversedById: 'reversedById'
 };
 exports.PayeeAccountScalarFieldEnum = {
     id: 'id',
@@ -544,11 +548,11 @@ exports.ReceivablePaymentScalarFieldEnum = {
     journalEntryId: 'journalEntryId',
     recordedById: 'recordedById',
     collectedAt: 'collectedAt',
+    createdAt: 'createdAt',
     isReversed: 'isReversed',
-    reversedAt: 'reversedAt',
-    reversedById: 'reversedById',
     reversalJournalEntryId: 'reversalJournalEntryId',
-    createdAt: 'createdAt'
+    reversedAt: 'reversedAt',
+    reversedById: 'reversedById'
 };
 exports.ReceivablesAlertScalarFieldEnum = {
     id: 'id',

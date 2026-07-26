@@ -44,11 +44,11 @@ export type ReceivablePaymentMinAggregateOutputType = {
   journalEntryId: string | null
   recordedById: string | null
   collectedAt: Date | null
+  createdAt: Date | null
   isReversed: boolean | null
+  reversalJournalEntryId: string | null
   reversedAt: Date | null
   reversedById: string | null
-  reversalJournalEntryId: string | null
-  createdAt: Date | null
 }
 
 export type ReceivablePaymentMaxAggregateOutputType = {
@@ -61,11 +61,11 @@ export type ReceivablePaymentMaxAggregateOutputType = {
   journalEntryId: string | null
   recordedById: string | null
   collectedAt: Date | null
+  createdAt: Date | null
   isReversed: boolean | null
+  reversalJournalEntryId: string | null
   reversedAt: Date | null
   reversedById: string | null
-  reversalJournalEntryId: string | null
-  createdAt: Date | null
 }
 
 export type ReceivablePaymentCountAggregateOutputType = {
@@ -78,11 +78,11 @@ export type ReceivablePaymentCountAggregateOutputType = {
   journalEntryId: number
   recordedById: number
   collectedAt: number
+  createdAt: number
   isReversed: number
+  reversalJournalEntryId: number
   reversedAt: number
   reversedById: number
-  reversalJournalEntryId: number
-  createdAt: number
   _all: number
 }
 
@@ -105,11 +105,11 @@ export type ReceivablePaymentMinAggregateInputType = {
   journalEntryId?: true
   recordedById?: true
   collectedAt?: true
+  createdAt?: true
   isReversed?: true
+  reversalJournalEntryId?: true
   reversedAt?: true
   reversedById?: true
-  reversalJournalEntryId?: true
-  createdAt?: true
 }
 
 export type ReceivablePaymentMaxAggregateInputType = {
@@ -122,11 +122,11 @@ export type ReceivablePaymentMaxAggregateInputType = {
   journalEntryId?: true
   recordedById?: true
   collectedAt?: true
+  createdAt?: true
   isReversed?: true
+  reversalJournalEntryId?: true
   reversedAt?: true
   reversedById?: true
-  reversalJournalEntryId?: true
-  createdAt?: true
 }
 
 export type ReceivablePaymentCountAggregateInputType = {
@@ -139,11 +139,11 @@ export type ReceivablePaymentCountAggregateInputType = {
   journalEntryId?: true
   recordedById?: true
   collectedAt?: true
+  createdAt?: true
   isReversed?: true
+  reversalJournalEntryId?: true
   reversedAt?: true
   reversedById?: true
-  reversalJournalEntryId?: true
-  createdAt?: true
   _all?: true
 }
 
@@ -243,11 +243,11 @@ export type ReceivablePaymentGroupByOutputType = {
   journalEntryId: string | null
   recordedById: string | null
   collectedAt: Date
+  createdAt: Date
   isReversed: boolean
+  reversalJournalEntryId: string | null
   reversedAt: Date | null
   reversedById: string | null
-  reversalJournalEntryId: string | null
-  createdAt: Date
   _count: ReceivablePaymentCountAggregateOutputType | null
   _avg: ReceivablePaymentAvgAggregateOutputType | null
   _sum: ReceivablePaymentSumAggregateOutputType | null
@@ -283,13 +283,13 @@ export type ReceivablePaymentWhereInput = {
   journalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   recordedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   collectedAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
   isReversed?: Prisma.BoolFilter<"ReceivablePayment"> | boolean
+  reversalJournalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"ReceivablePayment"> | Date | string | null
   reversedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  reversalJournalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
-  entry?: Prisma.XOR<Prisma.ReceivableEntryScalarRelationFilter, Prisma.ReceivableEntryWhereInput>
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  entry?: Prisma.XOR<Prisma.ReceivableEntryScalarRelationFilter, Prisma.ReceivableEntryWhereInput>
   journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
   recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
@@ -304,13 +304,13 @@ export type ReceivablePaymentOrderByWithRelationInput = {
   journalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   recordedById?: Prisma.SortOrderInput | Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  reversalJournalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedById?: Prisma.SortOrderInput | Prisma.SortOrder
-  reversalJournalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-  entry?: Prisma.ReceivableEntryOrderByWithRelationInput
   account?: Prisma.AccountOrderByWithRelationInput
+  entry?: Prisma.ReceivableEntryOrderByWithRelationInput
   journalEntry?: Prisma.JournalEntryOrderByWithRelationInput
   recordedBy?: Prisma.UserOrderByWithRelationInput
 }
@@ -328,13 +328,13 @@ export type ReceivablePaymentWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   recordedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   collectedAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
   isReversed?: Prisma.BoolFilter<"ReceivablePayment"> | boolean
+  reversalJournalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"ReceivablePayment"> | Date | string | null
   reversedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  reversalJournalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
-  entry?: Prisma.XOR<Prisma.ReceivableEntryScalarRelationFilter, Prisma.ReceivableEntryWhereInput>
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  entry?: Prisma.XOR<Prisma.ReceivableEntryScalarRelationFilter, Prisma.ReceivableEntryWhereInput>
   journalEntry?: Prisma.XOR<Prisma.JournalEntryNullableScalarRelationFilter, Prisma.JournalEntryWhereInput> | null
   recordedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "journalEntryId">
@@ -349,11 +349,11 @@ export type ReceivablePaymentOrderByWithAggregationInput = {
   journalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   recordedById?: Prisma.SortOrderInput | Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  reversalJournalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   reversedById?: Prisma.SortOrderInput | Prisma.SortOrder
-  reversalJournalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
   _count?: Prisma.ReceivablePaymentCountOrderByAggregateInput
   _avg?: Prisma.ReceivablePaymentAvgOrderByAggregateInput
   _max?: Prisma.ReceivablePaymentMaxOrderByAggregateInput
@@ -374,11 +374,11 @@ export type ReceivablePaymentScalarWhereWithAggregatesInput = {
   journalEntryId?: Prisma.StringNullableWithAggregatesFilter<"ReceivablePayment"> | string | null
   recordedById?: Prisma.StringNullableWithAggregatesFilter<"ReceivablePayment"> | string | null
   collectedAt?: Prisma.DateTimeWithAggregatesFilter<"ReceivablePayment"> | Date | string
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ReceivablePayment"> | Date | string
   isReversed?: Prisma.BoolWithAggregatesFilter<"ReceivablePayment"> | boolean
+  reversalJournalEntryId?: Prisma.StringNullableWithAggregatesFilter<"ReceivablePayment"> | string | null
   reversedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ReceivablePayment"> | Date | string | null
   reversedById?: Prisma.StringNullableWithAggregatesFilter<"ReceivablePayment"> | string | null
-  reversalJournalEntryId?: Prisma.StringNullableWithAggregatesFilter<"ReceivablePayment"> | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"ReceivablePayment"> | Date | string
 }
 
 export type ReceivablePaymentCreateInput = {
@@ -387,13 +387,13 @@ export type ReceivablePaymentCreateInput = {
   method: $Enums.PaymentMethod
   notes?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
-  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
+  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
 }
@@ -408,11 +408,11 @@ export type ReceivablePaymentUncheckedCreateInput = {
   journalEntryId?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentUpdateInput = {
@@ -421,13 +421,13 @@ export type ReceivablePaymentUpdateInput = {
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
+  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
 }
@@ -442,11 +442,11 @@ export type ReceivablePaymentUncheckedUpdateInput = {
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentCreateManyInput = {
@@ -459,11 +459,11 @@ export type ReceivablePaymentCreateManyInput = {
   journalEntryId?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentUpdateManyMutationInput = {
@@ -472,11 +472,11 @@ export type ReceivablePaymentUpdateManyMutationInput = {
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentUncheckedUpdateManyInput = {
@@ -489,11 +489,11 @@ export type ReceivablePaymentUncheckedUpdateManyInput = {
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentListRelationFilter = {
@@ -521,11 +521,11 @@ export type ReceivablePaymentCountOrderByAggregateInput = {
   journalEntryId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  reversalJournalEntryId?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   reversedById?: Prisma.SortOrder
-  reversalJournalEntryId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
 }
 
 export type ReceivablePaymentAvgOrderByAggregateInput = {
@@ -542,11 +542,11 @@ export type ReceivablePaymentMaxOrderByAggregateInput = {
   journalEntryId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  reversalJournalEntryId?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   reversedById?: Prisma.SortOrder
-  reversalJournalEntryId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
 }
 
 export type ReceivablePaymentMinOrderByAggregateInput = {
@@ -559,11 +559,11 @@ export type ReceivablePaymentMinOrderByAggregateInput = {
   journalEntryId?: Prisma.SortOrder
   recordedById?: Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isReversed?: Prisma.SortOrder
+  reversalJournalEntryId?: Prisma.SortOrder
   reversedAt?: Prisma.SortOrder
   reversedById?: Prisma.SortOrder
-  reversalJournalEntryId?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
 }
 
 export type ReceivablePaymentSumOrderByAggregateInput = {
@@ -734,13 +734,13 @@ export type ReceivablePaymentCreateWithoutRecordedByInput = {
   method: $Enums.PaymentMethod
   notes?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
-  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
+  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
 }
 
@@ -753,11 +753,11 @@ export type ReceivablePaymentUncheckedCreateWithoutRecordedByInput = {
   notes?: string | null
   journalEntryId?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentCreateOrConnectWithoutRecordedByInput = {
@@ -799,11 +799,11 @@ export type ReceivablePaymentScalarWhereInput = {
   journalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   recordedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   collectedAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
   isReversed?: Prisma.BoolFilter<"ReceivablePayment"> | boolean
+  reversalJournalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
   reversedAt?: Prisma.DateTimeNullableFilter<"ReceivablePayment"> | Date | string | null
   reversedById?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  reversalJournalEntryId?: Prisma.StringNullableFilter<"ReceivablePayment"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"ReceivablePayment"> | Date | string
 }
 
 export type ReceivablePaymentCreateWithoutAccountInput = {
@@ -812,11 +812,11 @@ export type ReceivablePaymentCreateWithoutAccountInput = {
   method: $Enums.PaymentMethod
   notes?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
   entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
@@ -831,11 +831,11 @@ export type ReceivablePaymentUncheckedCreateWithoutAccountInput = {
   journalEntryId?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentCreateOrConnectWithoutAccountInput = {
@@ -870,13 +870,13 @@ export type ReceivablePaymentCreateWithoutJournalEntryInput = {
   method: $Enums.PaymentMethod
   notes?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
-  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
+  entry: Prisma.ReceivableEntryCreateNestedOneWithoutPaymentsInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
 }
 
@@ -889,11 +889,11 @@ export type ReceivablePaymentUncheckedCreateWithoutJournalEntryInput = {
   notes?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentCreateOrConnectWithoutJournalEntryInput = {
@@ -918,13 +918,13 @@ export type ReceivablePaymentUpdateWithoutJournalEntryInput = {
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
+  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
 }
 
@@ -937,11 +937,11 @@ export type ReceivablePaymentUncheckedUpdateWithoutJournalEntryInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentCreateWithoutEntryInput = {
@@ -950,11 +950,11 @@ export type ReceivablePaymentCreateWithoutEntryInput = {
   method: $Enums.PaymentMethod
   notes?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
   account?: Prisma.AccountCreateNestedOneWithoutReceivablePaymentsInput
   journalEntry?: Prisma.JournalEntryCreateNestedOneWithoutReceivablePaymentInput
   recordedBy?: Prisma.UserCreateNestedOneWithoutReceivablePaymentsRecordedInput
@@ -969,11 +969,11 @@ export type ReceivablePaymentUncheckedCreateWithoutEntryInput = {
   journalEntryId?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentCreateOrConnectWithoutEntryInput = {
@@ -1011,11 +1011,11 @@ export type ReceivablePaymentCreateManyRecordedByInput = {
   notes?: string | null
   journalEntryId?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentUpdateWithoutRecordedByInput = {
@@ -1024,13 +1024,13 @@ export type ReceivablePaymentUpdateWithoutRecordedByInput = {
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
+  entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
 }
 
@@ -1043,11 +1043,11 @@ export type ReceivablePaymentUncheckedUpdateWithoutRecordedByInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentUncheckedUpdateManyWithoutRecordedByInput = {
@@ -1059,11 +1059,11 @@ export type ReceivablePaymentUncheckedUpdateManyWithoutRecordedByInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentCreateManyAccountInput = {
@@ -1075,11 +1075,11 @@ export type ReceivablePaymentCreateManyAccountInput = {
   journalEntryId?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentUpdateWithoutAccountInput = {
@@ -1088,11 +1088,11 @@ export type ReceivablePaymentUpdateWithoutAccountInput = {
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entry?: Prisma.ReceivableEntryUpdateOneRequiredWithoutPaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
@@ -1107,11 +1107,11 @@ export type ReceivablePaymentUncheckedUpdateWithoutAccountInput = {
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentUncheckedUpdateManyWithoutAccountInput = {
@@ -1123,11 +1123,11 @@ export type ReceivablePaymentUncheckedUpdateManyWithoutAccountInput = {
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentCreateManyEntryInput = {
@@ -1139,11 +1139,11 @@ export type ReceivablePaymentCreateManyEntryInput = {
   journalEntryId?: string | null
   recordedById?: string | null
   collectedAt?: Date | string
+  createdAt?: Date | string
   isReversed?: boolean
+  reversalJournalEntryId?: string | null
   reversedAt?: Date | string | null
   reversedById?: string | null
-  reversalJournalEntryId?: string | null
-  createdAt?: Date | string
 }
 
 export type ReceivablePaymentUpdateWithoutEntryInput = {
@@ -1152,11 +1152,11 @@ export type ReceivablePaymentUpdateWithoutEntryInput = {
   method?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   account?: Prisma.AccountUpdateOneWithoutReceivablePaymentsNestedInput
   journalEntry?: Prisma.JournalEntryUpdateOneWithoutReceivablePaymentNestedInput
   recordedBy?: Prisma.UserUpdateOneWithoutReceivablePaymentsRecordedNestedInput
@@ -1171,11 +1171,11 @@ export type ReceivablePaymentUncheckedUpdateWithoutEntryInput = {
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ReceivablePaymentUncheckedUpdateManyWithoutEntryInput = {
@@ -1187,11 +1187,11 @@ export type ReceivablePaymentUncheckedUpdateManyWithoutEntryInput = {
   journalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recordedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reversedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reversedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reversalJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1206,13 +1206,13 @@ export type ReceivablePaymentSelect<ExtArgs extends runtime.Types.Extensions.Int
   journalEntryId?: boolean
   recordedById?: boolean
   collectedAt?: boolean
+  createdAt?: boolean
   isReversed?: boolean
+  reversalJournalEntryId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalJournalEntryId?: boolean
-  createdAt?: boolean
-  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
+  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }, ExtArgs["result"]["receivablePayment"]>
@@ -1227,13 +1227,13 @@ export type ReceivablePaymentSelectCreateManyAndReturn<ExtArgs extends runtime.T
   journalEntryId?: boolean
   recordedById?: boolean
   collectedAt?: boolean
+  createdAt?: boolean
   isReversed?: boolean
+  reversalJournalEntryId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalJournalEntryId?: boolean
-  createdAt?: boolean
-  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
+  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }, ExtArgs["result"]["receivablePayment"]>
@@ -1248,13 +1248,13 @@ export type ReceivablePaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   journalEntryId?: boolean
   recordedById?: boolean
   collectedAt?: boolean
+  createdAt?: boolean
   isReversed?: boolean
+  reversalJournalEntryId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalJournalEntryId?: boolean
-  createdAt?: boolean
-  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
+  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }, ExtArgs["result"]["receivablePayment"]>
@@ -1269,29 +1269,29 @@ export type ReceivablePaymentSelectScalar = {
   journalEntryId?: boolean
   recordedById?: boolean
   collectedAt?: boolean
+  createdAt?: boolean
   isReversed?: boolean
+  reversalJournalEntryId?: boolean
   reversedAt?: boolean
   reversedById?: boolean
-  reversalJournalEntryId?: boolean
-  createdAt?: boolean
 }
 
-export type ReceivablePaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryId" | "amount" | "method" | "accountId" | "notes" | "journalEntryId" | "recordedById" | "collectedAt" | "isReversed" | "reversedAt" | "reversedById" | "reversalJournalEntryId" | "createdAt", ExtArgs["result"]["receivablePayment"]>
+export type ReceivablePaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryId" | "amount" | "method" | "accountId" | "notes" | "journalEntryId" | "recordedById" | "collectedAt" | "createdAt" | "isReversed" | "reversalJournalEntryId" | "reversedAt" | "reversedById", ExtArgs["result"]["receivablePayment"]>
 export type ReceivablePaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
+  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }
 export type ReceivablePaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
+  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }
 export type ReceivablePaymentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   account?: boolean | Prisma.ReceivablePayment$accountArgs<ExtArgs>
+  entry?: boolean | Prisma.ReceivableEntryDefaultArgs<ExtArgs>
   journalEntry?: boolean | Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>
   recordedBy?: boolean | Prisma.ReceivablePayment$recordedByArgs<ExtArgs>
 }
@@ -1299,8 +1299,8 @@ export type ReceivablePaymentIncludeUpdateManyAndReturn<ExtArgs extends runtime.
 export type $ReceivablePaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ReceivablePayment"
   objects: {
-    entry: Prisma.$ReceivableEntryPayload<ExtArgs>
     account: Prisma.$AccountPayload<ExtArgs> | null
+    entry: Prisma.$ReceivableEntryPayload<ExtArgs>
     journalEntry: Prisma.$JournalEntryPayload<ExtArgs> | null
     recordedBy: Prisma.$UserPayload<ExtArgs> | null
   }
@@ -1314,11 +1314,11 @@ export type $ReceivablePaymentPayload<ExtArgs extends runtime.Types.Extensions.I
     journalEntryId: string | null
     recordedById: string | null
     collectedAt: Date
+    createdAt: Date
     isReversed: boolean
+    reversalJournalEntryId: string | null
     reversedAt: Date | null
     reversedById: string | null
-    reversalJournalEntryId: string | null
-    createdAt: Date
   }, ExtArgs["result"]["receivablePayment"]>
   composites: {}
 }
@@ -1713,8 +1713,8 @@ readonly fields: ReceivablePaymentFieldRefs;
  */
 export interface Prisma__ReceivablePaymentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  entry<T extends Prisma.ReceivableEntryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivableEntryDefaultArgs<ExtArgs>>): Prisma.Prisma__ReceivableEntryClient<runtime.Types.Result.GetResult<Prisma.$ReceivableEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   account<T extends Prisma.ReceivablePayment$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePayment$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  entry<T extends Prisma.ReceivableEntryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivableEntryDefaultArgs<ExtArgs>>): Prisma.Prisma__ReceivableEntryClient<runtime.Types.Result.GetResult<Prisma.$ReceivableEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   journalEntry<T extends Prisma.ReceivablePayment$journalEntryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePayment$journalEntryArgs<ExtArgs>>): Prisma.Prisma__JournalEntryClient<runtime.Types.Result.GetResult<Prisma.$JournalEntryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   recordedBy<T extends Prisma.ReceivablePayment$recordedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReceivablePayment$recordedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1755,11 +1755,11 @@ export interface ReceivablePaymentFieldRefs {
   readonly journalEntryId: Prisma.FieldRef<"ReceivablePayment", 'String'>
   readonly recordedById: Prisma.FieldRef<"ReceivablePayment", 'String'>
   readonly collectedAt: Prisma.FieldRef<"ReceivablePayment", 'DateTime'>
+  readonly createdAt: Prisma.FieldRef<"ReceivablePayment", 'DateTime'>
   readonly isReversed: Prisma.FieldRef<"ReceivablePayment", 'Boolean'>
+  readonly reversalJournalEntryId: Prisma.FieldRef<"ReceivablePayment", 'String'>
   readonly reversedAt: Prisma.FieldRef<"ReceivablePayment", 'DateTime'>
   readonly reversedById: Prisma.FieldRef<"ReceivablePayment", 'String'>
-  readonly reversalJournalEntryId: Prisma.FieldRef<"ReceivablePayment", 'String'>
-  readonly createdAt: Prisma.FieldRef<"ReceivablePayment", 'DateTime'>
 }
     
 

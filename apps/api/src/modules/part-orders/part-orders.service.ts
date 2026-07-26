@@ -178,6 +178,7 @@ const partOrder = await tx.partOrder.create({
           paymentProofUrl: dto.paymentProofUrl || null,
           processedById: user.id,
           originalAmount: isCash ? amount : advanceAmount,
+          transactionDate: dto.saleDate || new Date(),
         },
       });
 
@@ -435,6 +436,52 @@ const partOrder = await tx.partOrder.create({
     });
 
     return orders;
+  }
+
+  /**
+   * Complete/update customer details of a part order
+   * Customer info can be updated at any order status
+   */
+  async completePartOrderDetails(id: string, dto: { customerName?: string; customerPhone?: string; customerAddress?: string }, user: any) {
+    const order = await this.prisma.client.partOrder.findUnique({
+      where: { id },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Part order with ID ${id} not found`);
+    }
+
+    this.assertPartOrderAccess(order, user);
+
+    const updateData: any = {};
+    if (dto.customerName !== undefined) updateData.customerName = dto.customerName;
+    if (dto.customerPhone !== undefined) updateData.customerPhone = dto.customerPhone;
+    if (dto.customerAddress !== undefined) updateData.customerAddress = dto.customerAddress;
+
+    return this.prisma.client.partOrder.update({
+      where: { id },
+      data: {
+        ...updateData,
+        // Only update processedById if the action is taken by a staff member
+        ...(user?.role !== "CUSTOMER" && { processedById: user.id }),
+      },
+      include: {
+        part: true,
+        partInventory: {
+          include: {
+            part: true,
+          },
+        },
+        branch: true,
+        processedBy: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+      },
+    });
   }
 
   /**
@@ -796,6 +843,7 @@ const partOrder = await tx.partOrder.create({
           balanceDue: balance,
           isInstallmentPlan: dto.isInstallmentPlan || false,
           paymentState,
+          saleDate: dto.saleDate || new Date(),
         },
       });
 
@@ -838,6 +886,7 @@ const partOrder = await tx.partOrder.create({
             accountId: paymentAcc?.id,
             processedById: user.id,
             originalAmount: initialPayment,
+            transactionDate: dto.saleDate || new Date(),
           },
         });
 
@@ -1345,6 +1394,7 @@ const partOrder = await tx.partOrder.create({
           },
         });
       } else {
+        const partOrder = await tx.partOrder.findUnique({ where: { id: partOrderId } });
         transaction = await tx.partPaymentTransaction.create({
           data: {
             partOrderId,
@@ -1356,6 +1406,7 @@ const partOrder = await tx.partOrder.create({
             verifiedById: txStatus === PaymentStatus.SUCCESS ? user.id : null,
             processedById: user.id,
             originalAmount: dto.amount,
+            transactionDate: partOrder?.saleDate || new Date(),
           },
         });
       }

@@ -39,6 +39,7 @@ export default function ManualOrderPage() {
     customerPhone: "",
     customerAddress: "",
     salePrice: "",
+    saleDate: "",
   });
 
   // Payment state
@@ -227,6 +228,7 @@ export default function ManualOrderPage() {
           accountId: selectedAccountId,
           isInstallmentPlan: isPartial && balanceDue > 0,
           initialPaymentAmount: initialPaymentNum,
+          saleDate: formData.saleDate ? new Date(formData.saleDate) : undefined,
         };
 
         const res = await createManualOrder(payload);
@@ -268,6 +270,7 @@ export default function ManualOrderPage() {
           accountId: selectedAccountId,
           isInstallmentPlan: isPartial && balanceDue > 0,
           initialPaymentAmount: initialPaymentNum,
+          saleDate: formData.saleDate ? new Date(formData.saleDate) : undefined,
         };
 
         const res = await createManualPartOrder(payload);
@@ -459,20 +462,34 @@ export default function ManualOrderPage() {
         {/* Sale Details */}
         <div className="rounded-lg p-4 md:p-6 mb-4 md:mb-6" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.light}` }}>
           <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Sale Details</h3>
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Sale Price *</label>
-            <input
-              type="text"
-              value={formData.salePrice}
-              onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); handleInputChange("salePrice", val ? Number(val).toLocaleString() : ""); }}
-              disabled={isSubmitting}
-              className="w-full px-3 py-2 rounded text-sm"
-              style={inputStyle}
-              placeholder="Final sale price"
-            />
-            {salePriceNum > 0 && (
-              <p className="text-sm mt-1 font-medium" style={{ color: "#059669" }}>{numberToWords(salePriceNum)}</p>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Sale Price *</label>
+              <input
+                type="text"
+                value={formData.salePrice}
+                onChange={(e) => { const val = e.target.value.replace(/\D/g, ""); handleInputChange("salePrice", val ? Number(val).toLocaleString() : ""); }}
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={inputStyle}
+                placeholder="Final sale price"
+              />
+              {salePriceNum > 0 && (
+                <p className="text-sm mt-1 font-medium" style={{ color: "#059669" }}>{numberToWords(salePriceNum)}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Date of Sale</label>
+              <input
+                type="date"
+                value={formData.saleDate}
+                onChange={(e) => handleInputChange("saleDate", e.target.value)}
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded text-sm"
+                style={inputStyle}
+              />
+              <p className="text-xs mt-1" style={{ color: theme.text.muted }}>Leave empty for today's date</p>
+            </div>
           </div>
 
           {/* Partial payment toggle */}

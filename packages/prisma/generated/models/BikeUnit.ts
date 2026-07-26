@@ -348,10 +348,10 @@ export type BikeUnitWhereInput = {
   vendorAllocationId?: Prisma.StringNullableFilter<"BikeUnit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
-  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   model?: Prisma.XOR<Prisma.BikeModelScalarRelationFilter, Prisma.BikeModelWhereInput>
   vendorAllocation?: Prisma.XOR<Prisma.VendorAllocationNullableScalarRelationFilter, Prisma.VendorAllocationWhereInput> | null
+  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
   documents?: Prisma.DocumentListRelationFilter
   orders?: Prisma.OrderListRelationFilter
 }
@@ -377,10 +377,10 @@ export type BikeUnitOrderByWithRelationInput = {
   vendorAllocationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  vendor?: Prisma.VendorOrderByWithRelationInput
   branch?: Prisma.BranchOrderByWithRelationInput
   model?: Prisma.BikeModelOrderByWithRelationInput
   vendorAllocation?: Prisma.VendorAllocationOrderByWithRelationInput
+  vendor?: Prisma.VendorOrderByWithRelationInput
   documents?: Prisma.DocumentOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
 }
@@ -409,10 +409,10 @@ export type BikeUnitWhereUniqueInput = Prisma.AtLeast<{
   vendorAllocationId?: Prisma.StringNullableFilter<"BikeUnit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BikeUnit"> | Date | string
-  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
   model?: Prisma.XOR<Prisma.BikeModelScalarRelationFilter, Prisma.BikeModelWhereInput>
   vendorAllocation?: Prisma.XOR<Prisma.VendorAllocationNullableScalarRelationFilter, Prisma.VendorAllocationWhereInput> | null
+  vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
   documents?: Prisma.DocumentListRelationFilter
   orders?: Prisma.OrderListRelationFilter
 }, "id" | "chassisNumber" | "engineNumber">
@@ -488,10 +488,10 @@ export type BikeUnitCreateInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutBikesInput
+  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
@@ -538,10 +538,10 @@ export type BikeUnitUpdateInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutBikesNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
@@ -975,9 +975,9 @@ export type BikeUnitCreateWithoutBranchInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutBikesInput
+  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
@@ -1149,9 +1149,9 @@ export type BikeUnitCreateWithoutModelInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutBikesInput
+  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
@@ -1223,10 +1223,10 @@ export type BikeUnitCreateWithoutOrdersInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutBikesInput
+  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
 }
 
@@ -1287,10 +1287,10 @@ export type BikeUnitUpdateWithoutOrdersInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutBikesNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
 }
 
@@ -1335,10 +1335,10 @@ export type BikeUnitCreateWithoutDocumentsInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutBikesInput
+  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
 
@@ -1399,10 +1399,10 @@ export type BikeUnitUpdateWithoutDocumentsInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutBikesNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
 
@@ -1447,9 +1447,9 @@ export type BikeUnitCreateWithoutVendorAllocationInput = {
   soldAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   branch: Prisma.BranchCreateNestedOneWithoutBikeInventoryInput
   model: Prisma.BikeModelCreateNestedOneWithoutBikesInput
+  vendor: Prisma.VendorCreateNestedOneWithoutSuppliedBikesInput
   documents?: Prisma.DocumentCreateNestedManyWithoutBikeInput
   orders?: Prisma.OrderCreateNestedManyWithoutBikeInput
 }
@@ -1543,9 +1543,9 @@ export type BikeUnitUpdateWithoutBranchInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutBikesNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
@@ -1727,9 +1727,9 @@ export type BikeUnitUpdateWithoutModelInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutBikesNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
@@ -1819,9 +1819,9 @@ export type BikeUnitUpdateWithoutVendorAllocationInput = {
   soldAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutBikeInventoryNestedInput
   model?: Prisma.BikeModelUpdateOneRequiredWithoutBikesNestedInput
+  vendor?: Prisma.VendorUpdateOneRequiredWithoutSuppliedBikesNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutBikeNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBikeNestedInput
 }
@@ -1933,10 +1933,10 @@ export type BikeUnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   vendorAllocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.BikeUnit$documentsArgs<ExtArgs>
   orders?: boolean | Prisma.BikeUnit$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.BikeUnitCountOutputTypeDefaultArgs<ExtArgs>
@@ -1963,10 +1963,10 @@ export type BikeUnitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   vendorAllocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bikeUnit"]>
 
 export type BikeUnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1990,10 +1990,10 @@ export type BikeUnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   vendorAllocationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bikeUnit"]>
 
 export type BikeUnitSelectScalar = {
@@ -2021,34 +2021,34 @@ export type BikeUnitSelectScalar = {
 
 export type BikeUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "branchId" | "modelId" | "chassisNumber" | "engineNumber" | "serialNumber" | "status" | "price" | "purchasePrice" | "purchaseCost" | "color" | "media" | "onlineDiscountPercent" | "actualSalePrice" | "reservedUntil" | "soldAt" | "vendorAllocationId" | "createdAt" | "updatedAt", ExtArgs["result"]["bikeUnit"]>
 export type BikeUnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.BikeUnit$documentsArgs<ExtArgs>
   orders?: boolean | Prisma.BikeUnit$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.BikeUnitCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BikeUnitIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
 export type BikeUnitIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   model?: boolean | Prisma.BikeModelDefaultArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>
+  vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
 
 export type $BikeUnitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BikeUnit"
   objects: {
-    vendor: Prisma.$VendorPayload<ExtArgs>
     branch: Prisma.$BranchPayload<ExtArgs>
     model: Prisma.$BikeModelPayload<ExtArgs>
     vendorAllocation: Prisma.$VendorAllocationPayload<ExtArgs> | null
+    vendor: Prisma.$VendorPayload<ExtArgs>
     documents: Prisma.$DocumentPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
   }
@@ -2467,10 +2467,10 @@ readonly fields: BikeUnitFieldRefs;
  */
 export interface Prisma__BikeUnitClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   model<T extends Prisma.BikeModelDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeModelDefaultArgs<ExtArgs>>): Prisma.Prisma__BikeModelClient<runtime.Types.Result.GetResult<Prisma.$BikeModelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   vendorAllocation<T extends Prisma.BikeUnit$vendorAllocationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$vendorAllocationArgs<ExtArgs>>): Prisma.Prisma__VendorAllocationClient<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  vendor<T extends Prisma.VendorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorClient<runtime.Types.Result.GetResult<Prisma.$VendorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   documents<T extends Prisma.BikeUnit$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.BikeUnit$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnit$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**

@@ -231,10 +231,10 @@ export type JournalEntryWhereInput = {
   isReversal?: Prisma.BoolFilter<"JournalEntry"> | boolean
   reversesJournalEntryId?: Prisma.StringNullableFilter<"JournalEntry"> | string | null
   lines?: Prisma.JournalEntryLineListRelationFilter
-  vendorPayment?: Prisma.XOR<Prisma.VendorPaymentNullableScalarRelationFilter, Prisma.VendorPaymentWhereInput> | null
+  receivablePayment?: Prisma.XOR<Prisma.ReceivablePaymentNullableScalarRelationFilter, Prisma.ReceivablePaymentWhereInput> | null
   vendorAllocation?: Prisma.XOR<Prisma.VendorAllocationNullableScalarRelationFilter, Prisma.VendorAllocationWhereInput> | null
   vendorDefectiveReturn?: Prisma.XOR<Prisma.VendorDefectiveReturnNullableScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput> | null
-  receivablePayment?: Prisma.XOR<Prisma.ReceivablePaymentNullableScalarRelationFilter, Prisma.ReceivablePaymentWhereInput> | null
+  vendorPayment?: Prisma.XOR<Prisma.VendorPaymentNullableScalarRelationFilter, Prisma.VendorPaymentWhereInput> | null
 }
 
 export type JournalEntryOrderByWithRelationInput = {
@@ -250,10 +250,10 @@ export type JournalEntryOrderByWithRelationInput = {
   isReversal?: Prisma.SortOrder
   reversesJournalEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   lines?: Prisma.JournalEntryLineOrderByRelationAggregateInput
-  vendorPayment?: Prisma.VendorPaymentOrderByWithRelationInput
+  receivablePayment?: Prisma.ReceivablePaymentOrderByWithRelationInput
   vendorAllocation?: Prisma.VendorAllocationOrderByWithRelationInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnOrderByWithRelationInput
-  receivablePayment?: Prisma.ReceivablePaymentOrderByWithRelationInput
+  vendorPayment?: Prisma.VendorPaymentOrderByWithRelationInput
 }
 
 export type JournalEntryWhereUniqueInput = Prisma.AtLeast<{
@@ -272,10 +272,10 @@ export type JournalEntryWhereUniqueInput = Prisma.AtLeast<{
   isReversal?: Prisma.BoolFilter<"JournalEntry"> | boolean
   reversesJournalEntryId?: Prisma.StringNullableFilter<"JournalEntry"> | string | null
   lines?: Prisma.JournalEntryLineListRelationFilter
-  vendorPayment?: Prisma.XOR<Prisma.VendorPaymentNullableScalarRelationFilter, Prisma.VendorPaymentWhereInput> | null
+  receivablePayment?: Prisma.XOR<Prisma.ReceivablePaymentNullableScalarRelationFilter, Prisma.ReceivablePaymentWhereInput> | null
   vendorAllocation?: Prisma.XOR<Prisma.VendorAllocationNullableScalarRelationFilter, Prisma.VendorAllocationWhereInput> | null
   vendorDefectiveReturn?: Prisma.XOR<Prisma.VendorDefectiveReturnNullableScalarRelationFilter, Prisma.VendorDefectiveReturnWhereInput> | null
-  receivablePayment?: Prisma.XOR<Prisma.ReceivablePaymentNullableScalarRelationFilter, Prisma.ReceivablePaymentWhereInput> | null
+  vendorPayment?: Prisma.XOR<Prisma.VendorPaymentNullableScalarRelationFilter, Prisma.VendorPaymentWhereInput> | null
 }, "id" | "entryNo">
 
 export type JournalEntryOrderByWithAggregationInput = {
@@ -325,10 +325,10 @@ export type JournalEntryCreateInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
-  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateInput = {
@@ -344,10 +344,10 @@ export type JournalEntryUncheckedCreateInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
-  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUpdateInput = {
@@ -363,10 +363,10 @@ export type JournalEntryUpdateInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
-  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateInput = {
@@ -382,10 +382,10 @@ export type JournalEntryUncheckedUpdateInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
-  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateManyInput = {
@@ -576,10 +576,10 @@ export type JournalEntryCreateWithoutLinesInput = {
   createdAt?: Date | string
   isReversal?: boolean
   reversesJournalEntryId?: string | null
-  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
-  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutLinesInput = {
@@ -594,10 +594,10 @@ export type JournalEntryUncheckedCreateWithoutLinesInput = {
   createdAt?: Date | string
   isReversal?: boolean
   reversesJournalEntryId?: string | null
-  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
-  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutLinesInput = {
@@ -628,10 +628,10 @@ export type JournalEntryUpdateWithoutLinesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
-  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutLinesInput = {
@@ -646,10 +646,10 @@ export type JournalEntryUncheckedUpdateWithoutLinesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
-  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutVendorPaymentInput = {
@@ -665,9 +665,9 @@ export type JournalEntryCreateWithoutVendorPaymentInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
-  receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutVendorPaymentInput = {
@@ -683,9 +683,9 @@ export type JournalEntryUncheckedCreateWithoutVendorPaymentInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
-  receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutVendorPaymentInput = {
@@ -717,9 +717,9 @@ export type JournalEntryUpdateWithoutVendorPaymentInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
-  receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutVendorPaymentInput = {
@@ -735,9 +735,9 @@ export type JournalEntryUncheckedUpdateWithoutVendorPaymentInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
+  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
-  receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutVendorAllocationInput = {
@@ -753,9 +753,9 @@ export type JournalEntryCreateWithoutVendorAllocationInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
-  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
   receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutVendorAllocationInput = {
@@ -771,9 +771,9 @@ export type JournalEntryUncheckedCreateWithoutVendorAllocationInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
-  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
   receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutVendorAllocationInput = {
@@ -805,9 +805,9 @@ export type JournalEntryUpdateWithoutVendorAllocationInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
-  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
   receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutVendorAllocationInput = {
@@ -823,9 +823,9 @@ export type JournalEntryUncheckedUpdateWithoutVendorAllocationInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
-  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
   receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutVendorDefectiveReturnInput = {
@@ -841,9 +841,9 @@ export type JournalEntryCreateWithoutVendorDefectiveReturnInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
-  vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   receivablePayment?: Prisma.ReceivablePaymentCreateNestedOneWithoutJournalEntryInput
+  vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutVendorDefectiveReturnInput = {
@@ -859,9 +859,9 @@ export type JournalEntryUncheckedCreateWithoutVendorDefectiveReturnInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
-  vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   receivablePayment?: Prisma.ReceivablePaymentUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutVendorDefectiveReturnInput = {
@@ -893,9 +893,9 @@ export type JournalEntryUpdateWithoutVendorDefectiveReturnInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
-  vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   receivablePayment?: Prisma.ReceivablePaymentUpdateOneWithoutJournalEntryNestedInput
+  vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutVendorDefectiveReturnInput = {
@@ -911,9 +911,9 @@ export type JournalEntryUncheckedUpdateWithoutVendorDefectiveReturnInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
-  vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   receivablePayment?: Prisma.ReceivablePaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryCreateWithoutReceivablePaymentInput = {
@@ -929,9 +929,9 @@ export type JournalEntryCreateWithoutReceivablePaymentInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryUncheckedCreateWithoutReceivablePaymentInput = {
@@ -947,9 +947,9 @@ export type JournalEntryUncheckedCreateWithoutReceivablePaymentInput = {
   isReversal?: boolean
   reversesJournalEntryId?: string | null
   lines?: Prisma.JournalEntryLineUncheckedCreateNestedManyWithoutJournalEntryInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedCreateNestedOneWithoutJournalEntryInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedCreateNestedOneWithoutJournalEntryInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedCreateNestedOneWithoutJournalEntryInput
 }
 
 export type JournalEntryCreateOrConnectWithoutReceivablePaymentInput = {
@@ -981,9 +981,9 @@ export type JournalEntryUpdateWithoutReceivablePaymentInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUpdateOneWithoutJournalEntryNestedInput
 }
 
 export type JournalEntryUncheckedUpdateWithoutReceivablePaymentInput = {
@@ -999,9 +999,9 @@ export type JournalEntryUncheckedUpdateWithoutReceivablePaymentInput = {
   isReversal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reversesJournalEntryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lines?: Prisma.JournalEntryLineUncheckedUpdateManyWithoutJournalEntryNestedInput
-  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorAllocation?: Prisma.VendorAllocationUncheckedUpdateOneWithoutJournalEntryNestedInput
   vendorDefectiveReturn?: Prisma.VendorDefectiveReturnUncheckedUpdateOneWithoutJournalEntryNestedInput
+  vendorPayment?: Prisma.VendorPaymentUncheckedUpdateOneWithoutJournalEntryNestedInput
 }
 
 
@@ -1048,10 +1048,10 @@ export type JournalEntrySelect<ExtArgs extends runtime.Types.Extensions.Internal
   isReversal?: boolean
   reversesJournalEntryId?: boolean
   lines?: boolean | Prisma.JournalEntry$linesArgs<ExtArgs>
-  vendorPayment?: boolean | Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>
+  receivablePayment?: boolean | Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.JournalEntry$vendorAllocationArgs<ExtArgs>
   vendorDefectiveReturn?: boolean | Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs>
-  receivablePayment?: boolean | Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>
+  vendorPayment?: boolean | Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>
   _count?: boolean | Prisma.JournalEntryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["journalEntry"]>
 
@@ -1100,10 +1100,10 @@ export type JournalEntrySelectScalar = {
 export type JournalEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entryNo" | "date" | "description" | "sourceRef" | "notes" | "status" | "isManual" | "createdAt" | "isReversal" | "reversesJournalEntryId", ExtArgs["result"]["journalEntry"]>
 export type JournalEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lines?: boolean | Prisma.JournalEntry$linesArgs<ExtArgs>
-  vendorPayment?: boolean | Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>
+  receivablePayment?: boolean | Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>
   vendorAllocation?: boolean | Prisma.JournalEntry$vendorAllocationArgs<ExtArgs>
   vendorDefectiveReturn?: boolean | Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs>
-  receivablePayment?: boolean | Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>
+  vendorPayment?: boolean | Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>
   _count?: boolean | Prisma.JournalEntryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JournalEntryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1113,10 +1113,10 @@ export type $JournalEntryPayload<ExtArgs extends runtime.Types.Extensions.Intern
   name: "JournalEntry"
   objects: {
     lines: Prisma.$JournalEntryLinePayload<ExtArgs>[]
-    vendorPayment: Prisma.$VendorPaymentPayload<ExtArgs> | null
+    receivablePayment: Prisma.$ReceivablePaymentPayload<ExtArgs> | null
     vendorAllocation: Prisma.$VendorAllocationPayload<ExtArgs> | null
     vendorDefectiveReturn: Prisma.$VendorDefectiveReturnPayload<ExtArgs> | null
-    receivablePayment: Prisma.$ReceivablePaymentPayload<ExtArgs> | null
+    vendorPayment: Prisma.$VendorPaymentPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1525,10 +1525,10 @@ readonly fields: JournalEntryFieldRefs;
 export interface Prisma__JournalEntryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   lines<T extends Prisma.JournalEntry$linesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$linesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JournalEntryLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  vendorPayment<T extends Prisma.JournalEntry$vendorPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>>): Prisma.Prisma__VendorPaymentClient<runtime.Types.Result.GetResult<Prisma.$VendorPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  receivablePayment<T extends Prisma.JournalEntry$receivablePaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>>): Prisma.Prisma__ReceivablePaymentClient<runtime.Types.Result.GetResult<Prisma.$ReceivablePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   vendorAllocation<T extends Prisma.JournalEntry$vendorAllocationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorAllocationArgs<ExtArgs>>): Prisma.Prisma__VendorAllocationClient<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   vendorDefectiveReturn<T extends Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorDefectiveReturnArgs<ExtArgs>>): Prisma.Prisma__VendorDefectiveReturnClient<runtime.Types.Result.GetResult<Prisma.$VendorDefectiveReturnPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  receivablePayment<T extends Prisma.JournalEntry$receivablePaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$receivablePaymentArgs<ExtArgs>>): Prisma.Prisma__ReceivablePaymentClient<runtime.Types.Result.GetResult<Prisma.$ReceivablePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  vendorPayment<T extends Prisma.JournalEntry$vendorPaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JournalEntry$vendorPaymentArgs<ExtArgs>>): Prisma.Prisma__VendorPaymentClient<runtime.Types.Result.GetResult<Prisma.$VendorPaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1986,22 +1986,22 @@ export type JournalEntry$linesArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * JournalEntry.vendorPayment
+ * JournalEntry.receivablePayment
  */
-export type JournalEntry$vendorPaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type JournalEntry$receivablePaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the VendorPayment
+   * Select specific fields to fetch from the ReceivablePayment
    */
-  select?: Prisma.VendorPaymentSelect<ExtArgs> | null
+  select?: Prisma.ReceivablePaymentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the VendorPayment
+   * Omit specific fields from the ReceivablePayment
    */
-  omit?: Prisma.VendorPaymentOmit<ExtArgs> | null
+  omit?: Prisma.ReceivablePaymentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.VendorPaymentInclude<ExtArgs> | null
-  where?: Prisma.VendorPaymentWhereInput
+  include?: Prisma.ReceivablePaymentInclude<ExtArgs> | null
+  where?: Prisma.ReceivablePaymentWhereInput
 }
 
 /**
@@ -2043,22 +2043,22 @@ export type JournalEntry$vendorDefectiveReturnArgs<ExtArgs extends runtime.Types
 }
 
 /**
- * JournalEntry.receivablePayment
+ * JournalEntry.vendorPayment
  */
-export type JournalEntry$receivablePaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type JournalEntry$vendorPaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the ReceivablePayment
+   * Select specific fields to fetch from the VendorPayment
    */
-  select?: Prisma.ReceivablePaymentSelect<ExtArgs> | null
+  select?: Prisma.VendorPaymentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the ReceivablePayment
+   * Omit specific fields from the VendorPayment
    */
-  omit?: Prisma.ReceivablePaymentOmit<ExtArgs> | null
+  omit?: Prisma.VendorPaymentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ReceivablePaymentInclude<ExtArgs> | null
-  where?: Prisma.ReceivablePaymentWhereInput
+  include?: Prisma.VendorPaymentInclude<ExtArgs> | null
+  where?: Prisma.VendorPaymentWhereInput
 }
 
 /**

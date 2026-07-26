@@ -39,6 +39,7 @@ export type OrderMinAggregateOutputType = {
     orderType: $Enums.OrderType | null;
     reservationExpiry: Date | null;
     pickupType: $Enums.PickupType | null;
+    saleDate: Date | null;
     expiresAt: Date | null;
     processedById: string | null;
     customerId: string | null;
@@ -68,6 +69,7 @@ export type OrderMaxAggregateOutputType = {
     orderType: $Enums.OrderType | null;
     reservationExpiry: Date | null;
     pickupType: $Enums.PickupType | null;
+    saleDate: Date | null;
     expiresAt: Date | null;
     processedById: string | null;
     customerId: string | null;
@@ -97,6 +99,7 @@ export type OrderCountAggregateOutputType = {
     orderType: number;
     reservationExpiry: number;
     pickupType: number;
+    saleDate: number;
     expiresAt: number;
     processedById: number;
     customerId: number;
@@ -139,6 +142,7 @@ export type OrderMinAggregateInputType = {
     orderType?: true;
     reservationExpiry?: true;
     pickupType?: true;
+    saleDate?: true;
     expiresAt?: true;
     processedById?: true;
     customerId?: true;
@@ -168,6 +172,7 @@ export type OrderMaxAggregateInputType = {
     orderType?: true;
     reservationExpiry?: true;
     pickupType?: true;
+    saleDate?: true;
     expiresAt?: true;
     processedById?: true;
     customerId?: true;
@@ -197,6 +202,7 @@ export type OrderCountAggregateInputType = {
     orderType?: true;
     reservationExpiry?: true;
     pickupType?: true;
+    saleDate?: true;
     expiresAt?: true;
     processedById?: true;
     customerId?: true;
@@ -255,6 +261,7 @@ export type OrderGroupByOutputType = {
     orderType: $Enums.OrderType;
     reservationExpiry: Date | null;
     pickupType: $Enums.PickupType;
+    saleDate: Date | null;
     expiresAt: Date | null;
     processedById: string | null;
     customerId: string | null;
@@ -295,6 +302,7 @@ export type OrderWhereInput = {
     orderType?: Prisma.EnumOrderTypeFilter<"Order"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFilter<"Order"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"Order"> | string | null;
     customerId?: Prisma.StringNullableFilter<"Order"> | string | null;
@@ -305,16 +313,16 @@ export type OrderWhereInput = {
     paymentState?: Prisma.EnumPaymentStateFilter<"Order"> | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
-    bike?: Prisma.XOR<Prisma.BikeUnitScalarRelationFilter, Prisma.BikeUnitWhereInput>;
-    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
-    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
-    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    transactions?: Prisma.PaymentTransactionListRelationFilter;
-    allocations?: Prisma.PaymentAllocationListRelationFilter;
     delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null;
     documents?: Prisma.DocumentListRelationFilter;
+    bike?: Prisma.XOR<Prisma.BikeUnitScalarRelationFilter, Prisma.BikeUnitWhereInput>;
+    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
+    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
+    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
     alerts?: Prisma.OrderAlertListRelationFilter;
+    allocations?: Prisma.PaymentAllocationListRelationFilter;
+    transactions?: Prisma.PaymentTransactionListRelationFilter;
 };
 export type OrderOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -334,6 +342,7 @@ export type OrderOrderByWithRelationInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrderInput | Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     customerId?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -344,16 +353,16 @@ export type OrderOrderByWithRelationInput = {
     paymentState?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
-    bike?: Prisma.BikeUnitOrderByWithRelationInput;
-    branch?: Prisma.BranchOrderByWithRelationInput;
-    paymentAccount?: Prisma.AccountOrderByWithRelationInput;
-    processedBy?: Prisma.UserOrderByWithRelationInput;
-    customer?: Prisma.UserOrderByWithRelationInput;
-    transactions?: Prisma.PaymentTransactionOrderByRelationAggregateInput;
-    allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput;
     delivery?: Prisma.DeliveryRequestOrderByWithRelationInput;
     documents?: Prisma.DocumentOrderByRelationAggregateInput;
+    bike?: Prisma.BikeUnitOrderByWithRelationInput;
+    branch?: Prisma.BranchOrderByWithRelationInput;
+    customer?: Prisma.UserOrderByWithRelationInput;
+    paymentAccount?: Prisma.AccountOrderByWithRelationInput;
+    processedBy?: Prisma.UserOrderByWithRelationInput;
     alerts?: Prisma.OrderAlertOrderByRelationAggregateInput;
+    allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput;
+    transactions?: Prisma.PaymentTransactionOrderByRelationAggregateInput;
 };
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -376,6 +385,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
     orderType?: Prisma.EnumOrderTypeFilter<"Order"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFilter<"Order"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"Order"> | string | null;
     customerId?: Prisma.StringNullableFilter<"Order"> | string | null;
@@ -386,16 +396,16 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
     paymentState?: Prisma.EnumPaymentStateFilter<"Order"> | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
-    bike?: Prisma.XOR<Prisma.BikeUnitScalarRelationFilter, Prisma.BikeUnitWhereInput>;
-    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
-    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
-    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
-    transactions?: Prisma.PaymentTransactionListRelationFilter;
-    allocations?: Prisma.PaymentAllocationListRelationFilter;
     delivery?: Prisma.XOR<Prisma.DeliveryRequestNullableScalarRelationFilter, Prisma.DeliveryRequestWhereInput> | null;
     documents?: Prisma.DocumentListRelationFilter;
+    bike?: Prisma.XOR<Prisma.BikeUnitScalarRelationFilter, Prisma.BikeUnitWhereInput>;
+    branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>;
+    customer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
+    paymentAccount?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null;
+    processedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null;
     alerts?: Prisma.OrderAlertListRelationFilter;
+    allocations?: Prisma.PaymentAllocationListRelationFilter;
+    transactions?: Prisma.PaymentTransactionListRelationFilter;
 }, "id" | "orderNumber">;
 export type OrderOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -415,6 +425,7 @@ export type OrderOrderByWithAggregationInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrderInput | Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrderInput | Prisma.SortOrder;
     expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder;
     processedById?: Prisma.SortOrderInput | Prisma.SortOrder;
     customerId?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -452,6 +463,7 @@ export type OrderScalarWhereWithAggregatesInput = {
     orderType?: Prisma.EnumOrderTypeWithAggregatesFilter<"Order"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeWithAggregatesFilter<"Order"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null;
     customerId?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null;
@@ -478,6 +490,7 @@ export type OrderCreateInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -486,16 +499,16 @@ export type OrderCreateInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateInput = {
     id?: string;
@@ -515,6 +528,7 @@ export type OrderUncheckedCreateInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -525,11 +539,11 @@ export type OrderUncheckedCreateInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -546,6 +560,7 @@ export type OrderUpdateInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -554,16 +569,16 @@ export type OrderUpdateInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -583,6 +598,7 @@ export type OrderUncheckedUpdateInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -593,11 +609,11 @@ export type OrderUncheckedUpdateInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderCreateManyInput = {
     id?: string;
@@ -617,6 +633,7 @@ export type OrderCreateManyInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -643,6 +660,7 @@ export type OrderUpdateManyMutationInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -670,6 +688,7 @@ export type OrderUncheckedUpdateManyInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -707,6 +726,7 @@ export type OrderCountOrderByAggregateInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     customerId?: Prisma.SortOrder;
@@ -742,6 +762,7 @@ export type OrderMaxOrderByAggregateInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     customerId?: Prisma.SortOrder;
@@ -771,6 +792,7 @@ export type OrderMinOrderByAggregateInput = {
     orderType?: Prisma.SortOrder;
     reservationExpiry?: Prisma.SortOrder;
     pickupType?: Prisma.SortOrder;
+    saleDate?: Prisma.SortOrder;
     expiresAt?: Prisma.SortOrder;
     processedById?: Prisma.SortOrder;
     customerId?: Prisma.SortOrder;
@@ -792,19 +814,13 @@ export type OrderNullableScalarRelationFilter = {
     is?: Prisma.OrderWhereInput | null;
     isNot?: Prisma.OrderWhereInput | null;
 };
-export type OrderCreateNestedManyWithoutProcessedByInput = {
-    create?: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput> | Prisma.OrderCreateWithoutProcessedByInput[] | Prisma.OrderUncheckedCreateWithoutProcessedByInput[];
-    connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProcessedByInput | Prisma.OrderCreateOrConnectWithoutProcessedByInput[];
-    createMany?: Prisma.OrderCreateManyProcessedByInputEnvelope;
-    connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
-};
 export type OrderCreateNestedManyWithoutCustomerInput = {
     create?: Prisma.XOR<Prisma.OrderCreateWithoutCustomerInput, Prisma.OrderUncheckedCreateWithoutCustomerInput> | Prisma.OrderCreateWithoutCustomerInput[] | Prisma.OrderUncheckedCreateWithoutCustomerInput[];
     connectOrCreate?: Prisma.OrderCreateOrConnectWithoutCustomerInput | Prisma.OrderCreateOrConnectWithoutCustomerInput[];
     createMany?: Prisma.OrderCreateManyCustomerInputEnvelope;
     connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
 };
-export type OrderUncheckedCreateNestedManyWithoutProcessedByInput = {
+export type OrderCreateNestedManyWithoutProcessedByInput = {
     create?: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput> | Prisma.OrderCreateWithoutProcessedByInput[] | Prisma.OrderUncheckedCreateWithoutProcessedByInput[];
     connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProcessedByInput | Prisma.OrderCreateOrConnectWithoutProcessedByInput[];
     createMany?: Prisma.OrderCreateManyProcessedByInputEnvelope;
@@ -816,18 +832,11 @@ export type OrderUncheckedCreateNestedManyWithoutCustomerInput = {
     createMany?: Prisma.OrderCreateManyCustomerInputEnvelope;
     connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
 };
-export type OrderUpdateManyWithoutProcessedByNestedInput = {
+export type OrderUncheckedCreateNestedManyWithoutProcessedByInput = {
     create?: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput> | Prisma.OrderCreateWithoutProcessedByInput[] | Prisma.OrderUncheckedCreateWithoutProcessedByInput[];
     connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProcessedByInput | Prisma.OrderCreateOrConnectWithoutProcessedByInput[];
-    upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.OrderUpsertWithWhereUniqueWithoutProcessedByInput[];
     createMany?: Prisma.OrderCreateManyProcessedByInputEnvelope;
-    set?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
-    disconnect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
-    delete?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
     connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
-    update?: Prisma.OrderUpdateWithWhereUniqueWithoutProcessedByInput | Prisma.OrderUpdateWithWhereUniqueWithoutProcessedByInput[];
-    updateMany?: Prisma.OrderUpdateManyWithWhereWithoutProcessedByInput | Prisma.OrderUpdateManyWithWhereWithoutProcessedByInput[];
-    deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[];
 };
 export type OrderUpdateManyWithoutCustomerNestedInput = {
     create?: Prisma.XOR<Prisma.OrderCreateWithoutCustomerInput, Prisma.OrderUncheckedCreateWithoutCustomerInput> | Prisma.OrderCreateWithoutCustomerInput[] | Prisma.OrderUncheckedCreateWithoutCustomerInput[];
@@ -842,7 +851,7 @@ export type OrderUpdateManyWithoutCustomerNestedInput = {
     updateMany?: Prisma.OrderUpdateManyWithWhereWithoutCustomerInput | Prisma.OrderUpdateManyWithWhereWithoutCustomerInput[];
     deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[];
 };
-export type OrderUncheckedUpdateManyWithoutProcessedByNestedInput = {
+export type OrderUpdateManyWithoutProcessedByNestedInput = {
     create?: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput> | Prisma.OrderCreateWithoutProcessedByInput[] | Prisma.OrderUncheckedCreateWithoutProcessedByInput[];
     connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProcessedByInput | Prisma.OrderCreateOrConnectWithoutProcessedByInput[];
     upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.OrderUpsertWithWhereUniqueWithoutProcessedByInput[];
@@ -866,6 +875,19 @@ export type OrderUncheckedUpdateManyWithoutCustomerNestedInput = {
     connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
     update?: Prisma.OrderUpdateWithWhereUniqueWithoutCustomerInput | Prisma.OrderUpdateWithWhereUniqueWithoutCustomerInput[];
     updateMany?: Prisma.OrderUpdateManyWithWhereWithoutCustomerInput | Prisma.OrderUpdateManyWithWhereWithoutCustomerInput[];
+    deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[];
+};
+export type OrderUncheckedUpdateManyWithoutProcessedByNestedInput = {
+    create?: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput> | Prisma.OrderCreateWithoutProcessedByInput[] | Prisma.OrderUncheckedCreateWithoutProcessedByInput[];
+    connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProcessedByInput | Prisma.OrderCreateOrConnectWithoutProcessedByInput[];
+    upsert?: Prisma.OrderUpsertWithWhereUniqueWithoutProcessedByInput | Prisma.OrderUpsertWithWhereUniqueWithoutProcessedByInput[];
+    createMany?: Prisma.OrderCreateManyProcessedByInputEnvelope;
+    set?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
+    disconnect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
+    delete?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
+    connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[];
+    update?: Prisma.OrderUpdateWithWhereUniqueWithoutProcessedByInput | Prisma.OrderUpdateWithWhereUniqueWithoutProcessedByInput[];
+    updateMany?: Prisma.OrderUpdateManyWithWhereWithoutProcessedByInput | Prisma.OrderUpdateManyWithWhereWithoutProcessedByInput[];
     deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[];
 };
 export type OrderCreateNestedManyWithoutBranchInput = {
@@ -1067,80 +1089,6 @@ export type OrderUpdateOneWithoutAllocationsNestedInput = {
     connect?: Prisma.OrderWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutAllocationsInput, Prisma.OrderUpdateWithoutAllocationsInput>, Prisma.OrderUncheckedUpdateWithoutAllocationsInput>;
 };
-export type OrderCreateWithoutProcessedByInput = {
-    id?: string;
-    orderNumber: string;
-    customerName: string;
-    customerPhone: string;
-    customerCNIC?: string | null;
-    customerAddress?: string | null;
-    isOnlineOrder?: boolean;
-    appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
-    paymentMethod: $Enums.PaymentMethod;
-    status?: $Enums.OrderStatus;
-    paymentVerified?: boolean;
-    orderType?: $Enums.OrderType;
-    reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
-    expiresAt?: Date | string | null;
-    totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: boolean;
-    paymentState?: $Enums.PaymentState;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
-    documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
-    alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
-};
-export type OrderUncheckedCreateWithoutProcessedByInput = {
-    id?: string;
-    orderNumber: string;
-    bikeId: string;
-    branchId: string;
-    customerName: string;
-    customerPhone: string;
-    customerCNIC?: string | null;
-    customerAddress?: string | null;
-    isOnlineOrder?: boolean;
-    appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
-    paymentMethod: $Enums.PaymentMethod;
-    paymentAccountId?: string | null;
-    status?: $Enums.OrderStatus;
-    paymentVerified?: boolean;
-    orderType?: $Enums.OrderType;
-    reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
-    expiresAt?: Date | string | null;
-    customerId?: string | null;
-    totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: boolean;
-    paymentState?: $Enums.PaymentState;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
-    delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
-    documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
-    alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
-};
-export type OrderCreateOrConnectWithoutProcessedByInput = {
-    where: Prisma.OrderWhereUniqueInput;
-    create: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput>;
-};
-export type OrderCreateManyProcessedByInputEnvelope = {
-    data: Prisma.OrderCreateManyProcessedByInput | Prisma.OrderCreateManyProcessedByInput[];
-    skipDuplicates?: boolean;
-};
 export type OrderCreateWithoutCustomerInput = {
     id?: string;
     orderNumber: string;
@@ -1156,6 +1104,7 @@ export type OrderCreateWithoutCustomerInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1164,15 +1113,15 @@ export type OrderCreateWithoutCustomerInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
+    documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
     branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
-    documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutCustomerInput = {
     id?: string;
@@ -1192,6 +1141,7 @@ export type OrderUncheckedCreateWithoutCustomerInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1201,11 +1151,11 @@ export type OrderUncheckedCreateWithoutCustomerInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutCustomerInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1215,18 +1165,94 @@ export type OrderCreateManyCustomerInputEnvelope = {
     data: Prisma.OrderCreateManyCustomerInput | Prisma.OrderCreateManyCustomerInput[];
     skipDuplicates?: boolean;
 };
-export type OrderUpsertWithWhereUniqueWithoutProcessedByInput = {
+export type OrderCreateWithoutProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    customerName: string;
+    customerPhone: string;
+    customerCNIC?: string | null;
+    customerAddress?: string | null;
+    isOnlineOrder?: boolean;
+    appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    paymentMethod: $Enums.PaymentMethod;
+    status?: $Enums.OrderStatus;
+    paymentVerified?: boolean;
+    orderType?: $Enums.OrderType;
+    reservationExpiry?: Date | string | null;
+    pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
+    expiresAt?: Date | string | null;
+    totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: boolean;
+    paymentState?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
+    documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
+};
+export type OrderUncheckedCreateWithoutProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    bikeId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerCNIC?: string | null;
+    customerAddress?: string | null;
+    isOnlineOrder?: boolean;
+    appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    paymentMethod: $Enums.PaymentMethod;
+    paymentAccountId?: string | null;
+    status?: $Enums.OrderStatus;
+    paymentVerified?: boolean;
+    orderType?: $Enums.OrderType;
+    reservationExpiry?: Date | string | null;
+    pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
+    expiresAt?: Date | string | null;
+    customerId?: string | null;
+    totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: boolean;
+    paymentState?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
+    documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
+    alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
+};
+export type OrderCreateOrConnectWithoutProcessedByInput = {
     where: Prisma.OrderWhereUniqueInput;
-    update: Prisma.XOR<Prisma.OrderUpdateWithoutProcessedByInput, Prisma.OrderUncheckedUpdateWithoutProcessedByInput>;
     create: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput>;
 };
-export type OrderUpdateWithWhereUniqueWithoutProcessedByInput = {
-    where: Prisma.OrderWhereUniqueInput;
-    data: Prisma.XOR<Prisma.OrderUpdateWithoutProcessedByInput, Prisma.OrderUncheckedUpdateWithoutProcessedByInput>;
+export type OrderCreateManyProcessedByInputEnvelope = {
+    data: Prisma.OrderCreateManyProcessedByInput | Prisma.OrderCreateManyProcessedByInput[];
+    skipDuplicates?: boolean;
 };
-export type OrderUpdateManyWithWhereWithoutProcessedByInput = {
+export type OrderUpsertWithWhereUniqueWithoutCustomerInput = {
+    where: Prisma.OrderWhereUniqueInput;
+    update: Prisma.XOR<Prisma.OrderUpdateWithoutCustomerInput, Prisma.OrderUncheckedUpdateWithoutCustomerInput>;
+    create: Prisma.XOR<Prisma.OrderCreateWithoutCustomerInput, Prisma.OrderUncheckedCreateWithoutCustomerInput>;
+};
+export type OrderUpdateWithWhereUniqueWithoutCustomerInput = {
+    where: Prisma.OrderWhereUniqueInput;
+    data: Prisma.XOR<Prisma.OrderUpdateWithoutCustomerInput, Prisma.OrderUncheckedUpdateWithoutCustomerInput>;
+};
+export type OrderUpdateManyWithWhereWithoutCustomerInput = {
     where: Prisma.OrderScalarWhereInput;
-    data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutProcessedByInput>;
+    data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutCustomerInput>;
 };
 export type OrderScalarWhereInput = {
     AND?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[];
@@ -1249,6 +1275,7 @@ export type OrderScalarWhereInput = {
     orderType?: Prisma.EnumOrderTypeFilter<"Order"> | $Enums.OrderType;
     reservationExpiry?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFilter<"Order"> | $Enums.PickupType;
+    saleDate?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     expiresAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null;
     processedById?: Prisma.StringNullableFilter<"Order"> | string | null;
     customerId?: Prisma.StringNullableFilter<"Order"> | string | null;
@@ -1260,18 +1287,18 @@ export type OrderScalarWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string;
 };
-export type OrderUpsertWithWhereUniqueWithoutCustomerInput = {
+export type OrderUpsertWithWhereUniqueWithoutProcessedByInput = {
     where: Prisma.OrderWhereUniqueInput;
-    update: Prisma.XOR<Prisma.OrderUpdateWithoutCustomerInput, Prisma.OrderUncheckedUpdateWithoutCustomerInput>;
-    create: Prisma.XOR<Prisma.OrderCreateWithoutCustomerInput, Prisma.OrderUncheckedCreateWithoutCustomerInput>;
+    update: Prisma.XOR<Prisma.OrderUpdateWithoutProcessedByInput, Prisma.OrderUncheckedUpdateWithoutProcessedByInput>;
+    create: Prisma.XOR<Prisma.OrderCreateWithoutProcessedByInput, Prisma.OrderUncheckedCreateWithoutProcessedByInput>;
 };
-export type OrderUpdateWithWhereUniqueWithoutCustomerInput = {
+export type OrderUpdateWithWhereUniqueWithoutProcessedByInput = {
     where: Prisma.OrderWhereUniqueInput;
-    data: Prisma.XOR<Prisma.OrderUpdateWithoutCustomerInput, Prisma.OrderUncheckedUpdateWithoutCustomerInput>;
+    data: Prisma.XOR<Prisma.OrderUpdateWithoutProcessedByInput, Prisma.OrderUncheckedUpdateWithoutProcessedByInput>;
 };
-export type OrderUpdateManyWithWhereWithoutCustomerInput = {
+export type OrderUpdateManyWithWhereWithoutProcessedByInput = {
     where: Prisma.OrderScalarWhereInput;
-    data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutCustomerInput>;
+    data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutProcessedByInput>;
 };
 export type OrderCreateWithoutBranchInput = {
     id?: string;
@@ -1288,6 +1315,7 @@ export type OrderCreateWithoutBranchInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1296,15 +1324,15 @@ export type OrderCreateWithoutBranchInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutBranchInput = {
     id?: string;
@@ -1323,6 +1351,7 @@ export type OrderUncheckedCreateWithoutBranchInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1333,11 +1362,11 @@ export type OrderUncheckedCreateWithoutBranchInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutBranchInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1375,6 +1404,7 @@ export type OrderCreateWithoutBikeInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1383,15 +1413,15 @@ export type OrderCreateWithoutBikeInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutBikeInput = {
     id?: string;
@@ -1410,6 +1440,7 @@ export type OrderUncheckedCreateWithoutBikeInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1420,11 +1451,11 @@ export type OrderUncheckedCreateWithoutBikeInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutBikeInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1462,6 +1493,7 @@ export type OrderCreateWithoutAlertsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1470,15 +1502,15 @@ export type OrderCreateWithoutAlertsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutAlertsInput = {
     id?: string;
@@ -1498,6 +1530,7 @@ export type OrderUncheckedCreateWithoutAlertsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1508,10 +1541,10 @@ export type OrderUncheckedCreateWithoutAlertsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutAlertsInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1541,6 +1574,7 @@ export type OrderUpdateWithoutAlertsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1549,15 +1583,15 @@ export type OrderUpdateWithoutAlertsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutAlertsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1577,6 +1611,7 @@ export type OrderUncheckedUpdateWithoutAlertsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1587,10 +1622,10 @@ export type OrderUncheckedUpdateWithoutAlertsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderCreateWithoutTransactionsInput = {
     id?: string;
@@ -1607,6 +1642,7 @@ export type OrderCreateWithoutTransactionsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1615,15 +1651,15 @@ export type OrderCreateWithoutTransactionsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutTransactionsInput = {
     id?: string;
@@ -1643,6 +1679,7 @@ export type OrderUncheckedCreateWithoutTransactionsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1653,10 +1690,10 @@ export type OrderUncheckedCreateWithoutTransactionsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutTransactionsInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1686,6 +1723,7 @@ export type OrderUpdateWithoutTransactionsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1694,15 +1732,15 @@ export type OrderUpdateWithoutTransactionsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutTransactionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1722,6 +1760,7 @@ export type OrderUncheckedUpdateWithoutTransactionsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1732,10 +1771,10 @@ export type OrderUncheckedUpdateWithoutTransactionsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderCreateWithoutDeliveryInput = {
     id?: string;
@@ -1752,6 +1791,7 @@ export type OrderCreateWithoutDeliveryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1760,15 +1800,15 @@ export type OrderCreateWithoutDeliveryInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
     branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
-    documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutDeliveryInput = {
     id?: string;
@@ -1788,6 +1828,7 @@ export type OrderUncheckedCreateWithoutDeliveryInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1798,10 +1839,10 @@ export type OrderUncheckedCreateWithoutDeliveryInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutDeliveryInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1831,6 +1872,7 @@ export type OrderUpdateWithoutDeliveryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1839,15 +1881,15 @@ export type OrderUpdateWithoutDeliveryInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
     branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
-    documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutDeliveryInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1867,6 +1909,7 @@ export type OrderUncheckedUpdateWithoutDeliveryInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1877,10 +1920,10 @@ export type OrderUncheckedUpdateWithoutDeliveryInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderCreateWithoutDocumentsInput = {
     id?: string;
@@ -1897,6 +1940,7 @@ export type OrderCreateWithoutDocumentsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1905,15 +1949,15 @@ export type OrderCreateWithoutDocumentsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
     branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
     paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
     processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
-    delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutDocumentsInput = {
     id?: string;
@@ -1933,6 +1977,7 @@ export type OrderUncheckedCreateWithoutDocumentsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -1943,10 +1988,10 @@ export type OrderUncheckedCreateWithoutDocumentsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutDocumentsInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -1976,6 +2021,7 @@ export type OrderUpdateWithoutDocumentsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -1984,15 +2030,15 @@ export type OrderUpdateWithoutDocumentsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
     branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutDocumentsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2012,6 +2058,7 @@ export type OrderUncheckedUpdateWithoutDocumentsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2022,10 +2069,10 @@ export type OrderUncheckedUpdateWithoutDocumentsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderCreateWithoutPaymentAccountInput = {
     id?: string;
@@ -2042,6 +2089,7 @@ export type OrderCreateWithoutPaymentAccountInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2050,15 +2098,15 @@ export type OrderCreateWithoutPaymentAccountInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutPaymentAccountInput = {
     id?: string;
@@ -2077,6 +2125,7 @@ export type OrderUncheckedCreateWithoutPaymentAccountInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2087,11 +2136,11 @@ export type OrderUncheckedCreateWithoutPaymentAccountInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
-    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutPaymentAccountInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -2129,6 +2178,7 @@ export type OrderCreateWithoutAllocationsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2137,15 +2187,15 @@ export type OrderCreateWithoutAllocationsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
-    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
-    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
-    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
-    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
-    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentCreateNestedManyWithoutOrderInput;
+    bike: Prisma.BikeUnitCreateNestedOneWithoutOrdersInput;
+    branch: Prisma.BranchCreateNestedOneWithoutOrdersInput;
+    customer?: Prisma.UserCreateNestedOneWithoutCustomerOrdersInput;
+    paymentAccount?: Prisma.AccountCreateNestedOneWithoutOrderPaymentsInput;
+    processedBy?: Prisma.UserCreateNestedOneWithoutProcessedOrdersInput;
     alerts?: Prisma.OrderAlertCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionCreateNestedManyWithoutOrderInput;
 };
 export type OrderUncheckedCreateWithoutAllocationsInput = {
     id?: string;
@@ -2165,6 +2215,7 @@ export type OrderUncheckedCreateWithoutAllocationsInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2175,10 +2226,10 @@ export type OrderUncheckedCreateWithoutAllocationsInput = {
     paymentState?: $Enums.PaymentState;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
     delivery?: Prisma.DeliveryRequestUncheckedCreateNestedOneWithoutOrderInput;
     documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrderInput;
     alerts?: Prisma.OrderAlertUncheckedCreateNestedManyWithoutOrderInput;
+    transactions?: Prisma.PaymentTransactionUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrderCreateOrConnectWithoutAllocationsInput = {
     where: Prisma.OrderWhereUniqueInput;
@@ -2208,6 +2259,7 @@ export type OrderUpdateWithoutAllocationsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2216,15 +2268,15 @@ export type OrderUpdateWithoutAllocationsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutAllocationsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2244,6 +2296,7 @@ export type OrderUncheckedUpdateWithoutAllocationsInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2254,38 +2307,10 @@ export type OrderUncheckedUpdateWithoutAllocationsInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
-};
-export type OrderCreateManyProcessedByInput = {
-    id?: string;
-    orderNumber: string;
-    bikeId: string;
-    branchId: string;
-    customerName: string;
-    customerPhone: string;
-    customerCNIC?: string | null;
-    customerAddress?: string | null;
-    isOnlineOrder?: boolean;
-    appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
-    paymentMethod: $Enums.PaymentMethod;
-    paymentAccountId?: string | null;
-    status?: $Enums.OrderStatus;
-    paymentVerified?: boolean;
-    orderType?: $Enums.OrderType;
-    reservationExpiry?: Date | string | null;
-    pickupType?: $Enums.PickupType;
-    expiresAt?: Date | string | null;
-    customerId?: string | null;
-    totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: boolean;
-    paymentState?: $Enums.PaymentState;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderCreateManyCustomerInput = {
     id?: string;
@@ -2305,6 +2330,7 @@ export type OrderCreateManyCustomerInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2315,99 +2341,34 @@ export type OrderCreateManyCustomerInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
-export type OrderUpdateWithoutProcessedByInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
-    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
-    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
-    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
-    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
-    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
-    documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
-    alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
-};
-export type OrderUncheckedUpdateWithoutProcessedByInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
-    bikeId?: Prisma.StringFieldUpdateOperationsInput | string;
-    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
-    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
-    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
-    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
-    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
-    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
-    documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
-    alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
-};
-export type OrderUncheckedUpdateManyWithoutProcessedByInput = {
-    id?: Prisma.StringFieldUpdateOperationsInput | string;
-    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
-    bikeId?: Prisma.StringFieldUpdateOperationsInput | string;
-    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
-    customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
-    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
-    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
-    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
-    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
-    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
-    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-    totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
-    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
-    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
-    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+export type OrderCreateManyProcessedByInput = {
+    id?: string;
+    orderNumber: string;
+    bikeId: string;
+    branchId: string;
+    customerName: string;
+    customerPhone: string;
+    customerCNIC?: string | null;
+    customerAddress?: string | null;
+    isOnlineOrder?: boolean;
+    appliedDiscount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    paymentMethod: $Enums.PaymentMethod;
+    paymentAccountId?: string | null;
+    status?: $Enums.OrderStatus;
+    paymentVerified?: boolean;
+    orderType?: $Enums.OrderType;
+    reservationExpiry?: Date | string | null;
+    pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
+    expiresAt?: Date | string | null;
+    customerId?: string | null;
+    totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: boolean;
+    paymentState?: $Enums.PaymentState;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 };
 export type OrderUpdateWithoutCustomerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2424,6 +2385,7 @@ export type OrderUpdateWithoutCustomerInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2432,15 +2394,15 @@ export type OrderUpdateWithoutCustomerInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
+    documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
     bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
     branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
     paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
     processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
-    delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
-    documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutCustomerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2460,6 +2422,7 @@ export type OrderUncheckedUpdateWithoutCustomerInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2469,11 +2432,11 @@ export type OrderUncheckedUpdateWithoutCustomerInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateManyWithoutCustomerInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2493,8 +2456,106 @@ export type OrderUncheckedUpdateManyWithoutCustomerInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type OrderUpdateWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
+    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
+    documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
+};
+export type OrderUncheckedUpdateWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    bikeId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
+    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
+    isInstallmentPlan?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
+    documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
+    alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
+};
+export type OrderUncheckedUpdateManyWithoutProcessedByInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    orderNumber?: Prisma.StringFieldUpdateOperationsInput | string;
+    bikeId?: Prisma.StringFieldUpdateOperationsInput | string;
+    branchId?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerName?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerPhone?: Prisma.StringFieldUpdateOperationsInput | string;
+    customerCNIC?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    customerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isOnlineOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    appliedDiscount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    paymentMethod?: Prisma.EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod;
+    paymentAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    paymentVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
+    reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     balanceDue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2520,6 +2581,7 @@ export type OrderCreateManyBranchInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2546,6 +2608,7 @@ export type OrderUpdateWithoutBranchInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2554,15 +2617,15 @@ export type OrderUpdateWithoutBranchInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutBranchInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2581,6 +2644,7 @@ export type OrderUncheckedUpdateWithoutBranchInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2591,11 +2655,11 @@ export type OrderUncheckedUpdateWithoutBranchInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateManyWithoutBranchInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2614,6 +2678,7 @@ export type OrderUncheckedUpdateManyWithoutBranchInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2642,6 +2707,7 @@ export type OrderCreateManyBikeInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2668,6 +2734,7 @@ export type OrderUpdateWithoutBikeInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2676,15 +2743,15 @@ export type OrderUpdateWithoutBikeInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    paymentAccount?: Prisma.AccountUpdateOneWithoutOrderPaymentsNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutBikeInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2703,6 +2770,7 @@ export type OrderUncheckedUpdateWithoutBikeInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2713,11 +2781,11 @@ export type OrderUncheckedUpdateWithoutBikeInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateManyWithoutBikeInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2736,6 +2804,7 @@ export type OrderUncheckedUpdateManyWithoutBikeInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2764,6 +2833,7 @@ export type OrderCreateManyPaymentAccountInput = {
     orderType?: $Enums.OrderType;
     reservationExpiry?: Date | string | null;
     pickupType?: $Enums.PickupType;
+    saleDate?: Date | string | null;
     expiresAt?: Date | string | null;
     processedById?: string | null;
     customerId?: string | null;
@@ -2790,6 +2860,7 @@ export type OrderUpdateWithoutPaymentAccountInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
     paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string;
@@ -2798,15 +2869,15 @@ export type OrderUpdateWithoutPaymentAccountInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
-    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
-    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
-    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
-    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUpdateManyWithoutOrderNestedInput;
+    bike?: Prisma.BikeUnitUpdateOneRequiredWithoutOrdersNestedInput;
+    branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput;
+    customer?: Prisma.UserUpdateOneWithoutCustomerOrdersNestedInput;
+    processedBy?: Prisma.UserUpdateOneWithoutProcessedOrdersNestedInput;
     alerts?: Prisma.OrderAlertUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateWithoutPaymentAccountInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2825,6 +2896,7 @@ export type OrderUncheckedUpdateWithoutPaymentAccountInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2835,11 +2907,11 @@ export type OrderUncheckedUpdateWithoutPaymentAccountInput = {
     paymentState?: Prisma.EnumPaymentStateFieldUpdateOperationsInput | $Enums.PaymentState;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
-    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
     delivery?: Prisma.DeliveryRequestUncheckedUpdateOneWithoutOrderNestedInput;
     documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrderNestedInput;
     alerts?: Prisma.OrderAlertUncheckedUpdateManyWithoutOrderNestedInput;
+    allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutOrderNestedInput;
+    transactions?: Prisma.PaymentTransactionUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrderUncheckedUpdateManyWithoutPaymentAccountInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2858,6 +2930,7 @@ export type OrderUncheckedUpdateManyWithoutPaymentAccountInput = {
     orderType?: Prisma.EnumOrderTypeFieldUpdateOperationsInput | $Enums.OrderType;
     reservationExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     pickupType?: Prisma.EnumPickupTypeFieldUpdateOperationsInput | $Enums.PickupType;
+    saleDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     processedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -2870,31 +2943,31 @@ export type OrderUncheckedUpdateManyWithoutPaymentAccountInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
 export type OrderCountOutputType = {
-    transactions: number;
-    allocations: number;
     documents: number;
     alerts: number;
+    allocations: number;
+    transactions: number;
 };
 export type OrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    transactions?: boolean | OrderCountOutputTypeCountTransactionsArgs;
-    allocations?: boolean | OrderCountOutputTypeCountAllocationsArgs;
     documents?: boolean | OrderCountOutputTypeCountDocumentsArgs;
     alerts?: boolean | OrderCountOutputTypeCountAlertsArgs;
+    allocations?: boolean | OrderCountOutputTypeCountAllocationsArgs;
+    transactions?: boolean | OrderCountOutputTypeCountTransactionsArgs;
 };
 export type OrderCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.OrderCountOutputTypeSelect<ExtArgs> | null;
-};
-export type OrderCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    where?: Prisma.PaymentTransactionWhereInput;
-};
-export type OrderCountOutputTypeCountAllocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    where?: Prisma.PaymentAllocationWhereInput;
 };
 export type OrderCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.DocumentWhereInput;
 };
 export type OrderCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.OrderAlertWhereInput;
+};
+export type OrderCountOutputTypeCountAllocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PaymentAllocationWhereInput;
+};
+export type OrderCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PaymentTransactionWhereInput;
 };
 export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -2914,6 +2987,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -2924,16 +2998,16 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     paymentState?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
-    bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
-    paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
-    processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
-    transactions?: boolean | Prisma.Order$transactionsArgs<ExtArgs>;
-    allocations?: boolean | Prisma.Order$allocationsArgs<ExtArgs>;
     delivery?: boolean | Prisma.Order$deliveryArgs<ExtArgs>;
     documents?: boolean | Prisma.Order$documentsArgs<ExtArgs>;
+    bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
+    paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
     alerts?: boolean | Prisma.Order$alertsArgs<ExtArgs>;
+    allocations?: boolean | Prisma.Order$allocationsArgs<ExtArgs>;
+    transactions?: boolean | Prisma.Order$transactionsArgs<ExtArgs>;
     _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["order"]>;
 export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2954,6 +3028,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -2966,9 +3041,9 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     updatedAt?: boolean;
     bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
     branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
 }, ExtArgs["result"]["order"]>;
 export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -2988,6 +3063,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -3000,9 +3076,9 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
     updatedAt?: boolean;
     bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
     branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
 }, ExtArgs["result"]["order"]>;
 export type OrderSelectScalar = {
     id?: boolean;
@@ -3022,6 +3098,7 @@ export type OrderSelectScalar = {
     orderType?: boolean;
     reservationExpiry?: boolean;
     pickupType?: boolean;
+    saleDate?: boolean;
     expiresAt?: boolean;
     processedById?: boolean;
     customerId?: boolean;
@@ -3033,47 +3110,47 @@ export type OrderSelectScalar = {
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "bikeId" | "branchId" | "customerName" | "customerPhone" | "customerCNIC" | "customerAddress" | "isOnlineOrder" | "appliedDiscount" | "paymentMethod" | "paymentAccountId" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "expiresAt" | "processedById" | "customerId" | "totalAmount" | "paidAmount" | "balanceDue" | "isInstallmentPlan" | "paymentState" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>;
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "bikeId" | "branchId" | "customerName" | "customerPhone" | "customerCNIC" | "customerAddress" | "isOnlineOrder" | "appliedDiscount" | "paymentMethod" | "paymentAccountId" | "status" | "paymentVerified" | "orderType" | "reservationExpiry" | "pickupType" | "saleDate" | "expiresAt" | "processedById" | "customerId" | "totalAmount" | "paidAmount" | "balanceDue" | "isInstallmentPlan" | "paymentState" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>;
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
-    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
-    paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
-    processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
-    transactions?: boolean | Prisma.Order$transactionsArgs<ExtArgs>;
-    allocations?: boolean | Prisma.Order$allocationsArgs<ExtArgs>;
     delivery?: boolean | Prisma.Order$deliveryArgs<ExtArgs>;
     documents?: boolean | Prisma.Order$documentsArgs<ExtArgs>;
+    bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
+    branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
+    paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
+    processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
     alerts?: boolean | Prisma.Order$alertsArgs<ExtArgs>;
+    allocations?: boolean | Prisma.Order$allocationsArgs<ExtArgs>;
+    transactions?: boolean | Prisma.Order$transactionsArgs<ExtArgs>;
     _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
     branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
 };
 export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     bike?: boolean | Prisma.BikeUnitDefaultArgs<ExtArgs>;
     branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>;
+    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
     paymentAccount?: boolean | Prisma.Order$paymentAccountArgs<ExtArgs>;
     processedBy?: boolean | Prisma.Order$processedByArgs<ExtArgs>;
-    customer?: boolean | Prisma.Order$customerArgs<ExtArgs>;
 };
 export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "Order";
     objects: {
-        bike: Prisma.$BikeUnitPayload<ExtArgs>;
-        branch: Prisma.$BranchPayload<ExtArgs>;
-        paymentAccount: Prisma.$AccountPayload<ExtArgs> | null;
-        processedBy: Prisma.$UserPayload<ExtArgs> | null;
-        customer: Prisma.$UserPayload<ExtArgs> | null;
-        transactions: Prisma.$PaymentTransactionPayload<ExtArgs>[];
-        allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[];
         delivery: Prisma.$DeliveryRequestPayload<ExtArgs> | null;
         documents: Prisma.$DocumentPayload<ExtArgs>[];
+        bike: Prisma.$BikeUnitPayload<ExtArgs>;
+        branch: Prisma.$BranchPayload<ExtArgs>;
+        customer: Prisma.$UserPayload<ExtArgs> | null;
+        paymentAccount: Prisma.$AccountPayload<ExtArgs> | null;
+        processedBy: Prisma.$UserPayload<ExtArgs> | null;
         alerts: Prisma.$OrderAlertPayload<ExtArgs>[];
+        allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[];
+        transactions: Prisma.$PaymentTransactionPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -3093,6 +3170,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
         orderType: $Enums.OrderType;
         reservationExpiry: Date | null;
         pickupType: $Enums.PickupType;
+        saleDate: Date | null;
         expiresAt: Date | null;
         processedById: string | null;
         customerId: string | null;
@@ -3155,16 +3233,16 @@ export interface OrderDelegate<ExtArgs extends runtime.Types.Extensions.Internal
 }
 export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
-    bike<T extends Prisma.BikeUnitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnitDefaultArgs<ExtArgs>>): Prisma.Prisma__BikeUnitClient<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
-    branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
-    paymentAccount<T extends Prisma.Order$paymentAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$paymentAccountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    processedBy<T extends Prisma.Order$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    customer<T extends Prisma.Order$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$customerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    transactions<T extends Prisma.Order$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
-    allocations<T extends Prisma.Order$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     delivery<T extends Prisma.Order$deliveryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$deliveryArgs<ExtArgs>>): Prisma.Prisma__DeliveryRequestClient<runtime.Types.Result.GetResult<Prisma.$DeliveryRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     documents<T extends Prisma.Order$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    bike<T extends Prisma.BikeUnitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BikeUnitDefaultArgs<ExtArgs>>): Prisma.Prisma__BikeUnitClient<runtime.Types.Result.GetResult<Prisma.$BikeUnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    customer<T extends Prisma.Order$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$customerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    paymentAccount<T extends Prisma.Order$paymentAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$paymentAccountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    processedBy<T extends Prisma.Order$processedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$processedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     alerts<T extends Prisma.Order$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    allocations<T extends Prisma.Order$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    transactions<T extends Prisma.Order$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -3187,6 +3265,7 @@ export interface OrderFieldRefs {
     readonly orderType: Prisma.FieldRef<"Order", 'OrderType'>;
     readonly reservationExpiry: Prisma.FieldRef<"Order", 'DateTime'>;
     readonly pickupType: Prisma.FieldRef<"Order", 'PickupType'>;
+    readonly saleDate: Prisma.FieldRef<"Order", 'DateTime'>;
     readonly expiresAt: Prisma.FieldRef<"Order", 'DateTime'>;
     readonly processedById: Prisma.FieldRef<"Order", 'String'>;
     readonly customerId: Prisma.FieldRef<"Order", 'String'>;
@@ -3298,46 +3377,6 @@ export type OrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
     where?: Prisma.OrderWhereInput;
     limit?: number;
 };
-export type Order$paymentAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.AccountSelect<ExtArgs> | null;
-    omit?: Prisma.AccountOmit<ExtArgs> | null;
-    include?: Prisma.AccountInclude<ExtArgs> | null;
-    where?: Prisma.AccountWhereInput;
-};
-export type Order$processedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.UserSelect<ExtArgs> | null;
-    omit?: Prisma.UserOmit<ExtArgs> | null;
-    include?: Prisma.UserInclude<ExtArgs> | null;
-    where?: Prisma.UserWhereInput;
-};
-export type Order$customerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.UserSelect<ExtArgs> | null;
-    omit?: Prisma.UserOmit<ExtArgs> | null;
-    include?: Prisma.UserInclude<ExtArgs> | null;
-    where?: Prisma.UserWhereInput;
-};
-export type Order$transactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.PaymentTransactionSelect<ExtArgs> | null;
-    omit?: Prisma.PaymentTransactionOmit<ExtArgs> | null;
-    include?: Prisma.PaymentTransactionInclude<ExtArgs> | null;
-    where?: Prisma.PaymentTransactionWhereInput;
-    orderBy?: Prisma.PaymentTransactionOrderByWithRelationInput | Prisma.PaymentTransactionOrderByWithRelationInput[];
-    cursor?: Prisma.PaymentTransactionWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: Prisma.PaymentTransactionScalarFieldEnum | Prisma.PaymentTransactionScalarFieldEnum[];
-};
-export type Order$allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    select?: Prisma.PaymentAllocationSelect<ExtArgs> | null;
-    omit?: Prisma.PaymentAllocationOmit<ExtArgs> | null;
-    include?: Prisma.PaymentAllocationInclude<ExtArgs> | null;
-    where?: Prisma.PaymentAllocationWhereInput;
-    orderBy?: Prisma.PaymentAllocationOrderByWithRelationInput | Prisma.PaymentAllocationOrderByWithRelationInput[];
-    cursor?: Prisma.PaymentAllocationWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[];
-};
 export type Order$deliveryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.DeliveryRequestSelect<ExtArgs> | null;
     omit?: Prisma.DeliveryRequestOmit<ExtArgs> | null;
@@ -3355,6 +3394,24 @@ export type Order$documentsArgs<ExtArgs extends runtime.Types.Extensions.Interna
     skip?: number;
     distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[];
 };
+export type Order$customerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+};
+export type Order$paymentAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.AccountSelect<ExtArgs> | null;
+    omit?: Prisma.AccountOmit<ExtArgs> | null;
+    include?: Prisma.AccountInclude<ExtArgs> | null;
+    where?: Prisma.AccountWhereInput;
+};
+export type Order$processedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.UserSelect<ExtArgs> | null;
+    omit?: Prisma.UserOmit<ExtArgs> | null;
+    include?: Prisma.UserInclude<ExtArgs> | null;
+    where?: Prisma.UserWhereInput;
+};
 export type Order$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.OrderAlertSelect<ExtArgs> | null;
     omit?: Prisma.OrderAlertOmit<ExtArgs> | null;
@@ -3365,6 +3422,28 @@ export type Order$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
     take?: number;
     skip?: number;
     distinct?: Prisma.OrderAlertScalarFieldEnum | Prisma.OrderAlertScalarFieldEnum[];
+};
+export type Order$allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PaymentAllocationSelect<ExtArgs> | null;
+    omit?: Prisma.PaymentAllocationOmit<ExtArgs> | null;
+    include?: Prisma.PaymentAllocationInclude<ExtArgs> | null;
+    where?: Prisma.PaymentAllocationWhereInput;
+    orderBy?: Prisma.PaymentAllocationOrderByWithRelationInput | Prisma.PaymentAllocationOrderByWithRelationInput[];
+    cursor?: Prisma.PaymentAllocationWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[];
+};
+export type Order$transactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PaymentTransactionSelect<ExtArgs> | null;
+    omit?: Prisma.PaymentTransactionOmit<ExtArgs> | null;
+    include?: Prisma.PaymentTransactionInclude<ExtArgs> | null;
+    where?: Prisma.PaymentTransactionWhereInput;
+    orderBy?: Prisma.PaymentTransactionOrderByWithRelationInput | Prisma.PaymentTransactionOrderByWithRelationInput[];
+    cursor?: Prisma.PaymentTransactionWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PaymentTransactionScalarFieldEnum | Prisma.PaymentTransactionScalarFieldEnum[];
 };
 export type OrderDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.OrderSelect<ExtArgs> | null;

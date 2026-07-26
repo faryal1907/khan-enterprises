@@ -140,3 +140,22 @@ export async function markPartOrderAsPickedByCustomer(id: string) {
   const response = await api.patch(`/part-orders/${id}/picked-up`);
   return response.data;
 }
+
+export async function completeOrderDetails(id: string, data: {
+  customerName?: string;
+  customerPhone?: string;
+  customerCNIC?: string;
+  customerAddress?: string;
+}) {
+  const response = await api.patch(`/orders/${id}/complete-details`, data);
+  return response.data;
+}
+
+export async function completePartOrderDetails(id: string, data: {
+  customerName?: string;
+  customerPhone?: string;
+  customerAddress?: string;
+}) {
+  const response = await api.patch(`/part-orders/${id}/complete-details`, data);
+  return response.data;
+}

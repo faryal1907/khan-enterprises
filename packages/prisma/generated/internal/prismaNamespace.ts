@@ -3357,9 +3357,9 @@ export const VendorScalarFieldEnum = {
   email: 'email',
   address: 'address',
   isActive: 'isActive',
-  commissionRate: 'commissionRate',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  commissionRate: 'commissionRate'
 } as const
 
 export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
@@ -3414,9 +3414,9 @@ export const PartScalarFieldEnum = {
   category: 'category',
   description: 'description',
   sellingPrice: 'sellingPrice',
-  purchaseCost: 'purchaseCost',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  purchaseCost: 'purchaseCost'
 } as const
 
 export type PartScalarFieldEnum = (typeof PartScalarFieldEnum)[keyof typeof PartScalarFieldEnum]
@@ -3467,6 +3467,7 @@ export const OrderScalarFieldEnum = {
   orderType: 'orderType',
   reservationExpiry: 'reservationExpiry',
   pickupType: 'pickupType',
+  saleDate: 'saleDate',
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   customerId: 'customerId',
@@ -3513,6 +3514,7 @@ export const PartOrderScalarFieldEnum = {
   orderType: 'orderType',
   reservationExpiry: 'reservationExpiry',
   pickupType: 'pickupType',
+  saleDate: 'saleDate',
   expiresAt: 'expiresAt',
   processedById: 'processedById',
   customerId: 'customerId',
@@ -3541,15 +3543,16 @@ export const PaymentTransactionScalarFieldEnum = {
   paymentProofUrl: 'paymentProofUrl',
   verifiedAt: 'verifiedAt',
   verifiedById: 'verifiedById',
-  processedById: 'processedById',
   webhookReceivedAt: 'webhookReceivedAt',
-  isReversed: 'isReversed',
-  reversedAt: 'reversedAt',
-  reversedById: 'reversedById',
-  reversalTransactionId: 'reversalTransactionId',
-  originalAmount: 'originalAmount',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  transactionDate: 'transactionDate',
+  updatedAt: 'updatedAt',
+  processedById: 'processedById',
+  isReversed: 'isReversed',
+  originalAmount: 'originalAmount',
+  reversalTransactionId: 'reversalTransactionId',
+  reversedAt: 'reversedAt',
+  reversedById: 'reversedById'
 } as const
 
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum]
@@ -3569,15 +3572,16 @@ export const PartPaymentTransactionScalarFieldEnum = {
   paymentProofUrl: 'paymentProofUrl',
   verifiedAt: 'verifiedAt',
   verifiedById: 'verifiedById',
-  processedById: 'processedById',
   webhookReceivedAt: 'webhookReceivedAt',
-  isReversed: 'isReversed',
-  reversedAt: 'reversedAt',
-  reversedById: 'reversedById',
-  reversalTransactionId: 'reversalTransactionId',
-  originalAmount: 'originalAmount',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  transactionDate: 'transactionDate',
+  updatedAt: 'updatedAt',
+  processedById: 'processedById',
+  isReversed: 'isReversed',
+  originalAmount: 'originalAmount',
+  reversalTransactionId: 'reversalTransactionId',
+  reversedAt: 'reversedAt',
+  reversedById: 'reversedById'
 } as const
 
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum]
@@ -3907,11 +3911,11 @@ export const ReceivablePaymentScalarFieldEnum = {
   journalEntryId: 'journalEntryId',
   recordedById: 'recordedById',
   collectedAt: 'collectedAt',
+  createdAt: 'createdAt',
   isReversed: 'isReversed',
-  reversedAt: 'reversedAt',
-  reversedById: 'reversedById',
   reversalJournalEntryId: 'reversalJournalEntryId',
-  createdAt: 'createdAt'
+  reversedAt: 'reversedAt',
+  reversedById: 'reversedById'
 } as const
 
 export type ReceivablePaymentScalarFieldEnum = (typeof ReceivablePaymentScalarFieldEnum)[keyof typeof ReceivablePaymentScalarFieldEnum]

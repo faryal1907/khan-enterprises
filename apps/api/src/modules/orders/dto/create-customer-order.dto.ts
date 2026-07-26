@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, ValidateIf, IsNumber, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, ValidateIf, IsNumber, Min, IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 import { PaymentMethod } from '@khan/prisma';
 
 export class CreateCustomerOrderDto {
@@ -50,4 +51,10 @@ export class CreateCustomerOrderDto {
   @IsOptional()
   @IsString()
   paymentAccountId?: string;
+
+  /** Date of sale - if not provided, defaults to current date */
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  saleDate?: Date;
 }

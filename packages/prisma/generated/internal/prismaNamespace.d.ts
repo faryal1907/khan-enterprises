@@ -3107,9 +3107,9 @@ export declare const VendorScalarFieldEnum: {
     readonly email: "email";
     readonly address: "address";
     readonly isActive: "isActive";
-    readonly commissionRate: "commissionRate";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
+    readonly commissionRate: "commissionRate";
 };
 export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum];
 export declare const BikeModelScalarFieldEnum: {
@@ -3155,9 +3155,9 @@ export declare const PartScalarFieldEnum: {
     readonly category: "category";
     readonly description: "description";
     readonly sellingPrice: "sellingPrice";
-    readonly purchaseCost: "purchaseCost";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
+    readonly purchaseCost: "purchaseCost";
 };
 export type PartScalarFieldEnum = (typeof PartScalarFieldEnum)[keyof typeof PartScalarFieldEnum];
 export declare const PartInventoryScalarFieldEnum: {
@@ -3199,6 +3199,7 @@ export declare const OrderScalarFieldEnum: {
     readonly orderType: "orderType";
     readonly reservationExpiry: "reservationExpiry";
     readonly pickupType: "pickupType";
+    readonly saleDate: "saleDate";
     readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly customerId: "customerId";
@@ -3239,6 +3240,7 @@ export declare const PartOrderScalarFieldEnum: {
     readonly orderType: "orderType";
     readonly reservationExpiry: "reservationExpiry";
     readonly pickupType: "pickupType";
+    readonly saleDate: "saleDate";
     readonly expiresAt: "expiresAt";
     readonly processedById: "processedById";
     readonly customerId: "customerId";
@@ -3264,15 +3266,16 @@ export declare const PaymentTransactionScalarFieldEnum: {
     readonly paymentProofUrl: "paymentProofUrl";
     readonly verifiedAt: "verifiedAt";
     readonly verifiedById: "verifiedById";
-    readonly processedById: "processedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly createdAt: "createdAt";
+    readonly transactionDate: "transactionDate";
+    readonly updatedAt: "updatedAt";
+    readonly processedById: "processedById";
     readonly isReversed: "isReversed";
+    readonly originalAmount: "originalAmount";
+    readonly reversalTransactionId: "reversalTransactionId";
     readonly reversedAt: "reversedAt";
     readonly reversedById: "reversedById";
-    readonly reversalTransactionId: "reversalTransactionId";
-    readonly originalAmount: "originalAmount";
-    readonly createdAt: "createdAt";
-    readonly updatedAt: "updatedAt";
 };
 export type PaymentTransactionScalarFieldEnum = (typeof PaymentTransactionScalarFieldEnum)[keyof typeof PaymentTransactionScalarFieldEnum];
 export declare const PartPaymentTransactionScalarFieldEnum: {
@@ -3289,15 +3292,16 @@ export declare const PartPaymentTransactionScalarFieldEnum: {
     readonly paymentProofUrl: "paymentProofUrl";
     readonly verifiedAt: "verifiedAt";
     readonly verifiedById: "verifiedById";
-    readonly processedById: "processedById";
     readonly webhookReceivedAt: "webhookReceivedAt";
+    readonly createdAt: "createdAt";
+    readonly transactionDate: "transactionDate";
+    readonly updatedAt: "updatedAt";
+    readonly processedById: "processedById";
     readonly isReversed: "isReversed";
+    readonly originalAmount: "originalAmount";
+    readonly reversalTransactionId: "reversalTransactionId";
     readonly reversedAt: "reversedAt";
     readonly reversedById: "reversedById";
-    readonly reversalTransactionId: "reversalTransactionId";
-    readonly originalAmount: "originalAmount";
-    readonly createdAt: "createdAt";
-    readonly updatedAt: "updatedAt";
 };
 export type PartPaymentTransactionScalarFieldEnum = (typeof PartPaymentTransactionScalarFieldEnum)[keyof typeof PartPaymentTransactionScalarFieldEnum];
 export declare const PayeeAccountScalarFieldEnum: {
@@ -3561,11 +3565,11 @@ export declare const ReceivablePaymentScalarFieldEnum: {
     readonly journalEntryId: "journalEntryId";
     readonly recordedById: "recordedById";
     readonly collectedAt: "collectedAt";
+    readonly createdAt: "createdAt";
     readonly isReversed: "isReversed";
+    readonly reversalJournalEntryId: "reversalJournalEntryId";
     readonly reversedAt: "reversedAt";
     readonly reversedById: "reversedById";
-    readonly reversalJournalEntryId: "reversalJournalEntryId";
-    readonly createdAt: "createdAt";
 };
 export type ReceivablePaymentScalarFieldEnum = (typeof ReceivablePaymentScalarFieldEnum)[keyof typeof ReceivablePaymentScalarFieldEnum];
 export declare const ReceivablesAlertScalarFieldEnum: {

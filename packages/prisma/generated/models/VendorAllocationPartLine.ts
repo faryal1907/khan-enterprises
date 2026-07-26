@@ -241,8 +241,8 @@ export type VendorAllocationPartLineWhereInput = {
   unitCost?: Prisma.DecimalFilter<"VendorAllocationPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalCost?: Prisma.DecimalFilter<"VendorAllocationPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   allocation?: Prisma.XOR<Prisma.VendorAllocationScalarRelationFilter, Prisma.VendorAllocationWhereInput>
-  part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
+  part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>
 }
 
 export type VendorAllocationPartLineOrderByWithRelationInput = {
@@ -254,8 +254,8 @@ export type VendorAllocationPartLineOrderByWithRelationInput = {
   unitCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
   allocation?: Prisma.VendorAllocationOrderByWithRelationInput
-  part?: Prisma.PartOrderByWithRelationInput
   branch?: Prisma.BranchOrderByWithRelationInput
+  part?: Prisma.PartOrderByWithRelationInput
 }
 
 export type VendorAllocationPartLineWhereUniqueInput = Prisma.AtLeast<{
@@ -270,8 +270,8 @@ export type VendorAllocationPartLineWhereUniqueInput = Prisma.AtLeast<{
   unitCost?: Prisma.DecimalFilter<"VendorAllocationPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalCost?: Prisma.DecimalFilter<"VendorAllocationPartLine"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   allocation?: Prisma.XOR<Prisma.VendorAllocationScalarRelationFilter, Prisma.VendorAllocationWhereInput>
-  part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
+  part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>
 }, "id">
 
 export type VendorAllocationPartLineOrderByWithAggregationInput = {
@@ -308,8 +308,8 @@ export type VendorAllocationPartLineCreateInput = {
   unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string
   allocation: Prisma.VendorAllocationCreateNestedOneWithoutPartLinesInput
-  part: Prisma.PartCreateNestedOneWithoutAllocationLinesInput
   branch: Prisma.BranchCreateNestedOneWithoutAllocationPartLinesInput
+  part: Prisma.PartCreateNestedOneWithoutAllocationLinesInput
 }
 
 export type VendorAllocationPartLineUncheckedCreateInput = {
@@ -328,8 +328,8 @@ export type VendorAllocationPartLineUpdateInput = {
   unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   allocation?: Prisma.VendorAllocationUpdateOneRequiredWithoutPartLinesNestedInput
-  part?: Prisma.PartUpdateOneRequiredWithoutAllocationLinesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutAllocationPartLinesNestedInput
+  part?: Prisma.PartUpdateOneRequiredWithoutAllocationLinesNestedInput
 }
 
 export type VendorAllocationPartLineUncheckedUpdateInput = {
@@ -653,8 +653,8 @@ export type VendorAllocationPartLineCreateWithoutAllocationInput = {
   quantity: number
   unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalCost: runtime.Decimal | runtime.DecimalJsLike | number | string
-  part: Prisma.PartCreateNestedOneWithoutAllocationLinesInput
   branch: Prisma.BranchCreateNestedOneWithoutAllocationPartLinesInput
+  part: Prisma.PartCreateNestedOneWithoutAllocationLinesInput
 }
 
 export type VendorAllocationPartLineUncheckedCreateWithoutAllocationInput = {
@@ -778,8 +778,8 @@ export type VendorAllocationPartLineUpdateWithoutAllocationInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  part?: Prisma.PartUpdateOneRequiredWithoutAllocationLinesNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutAllocationPartLinesNestedInput
+  part?: Prisma.PartUpdateOneRequiredWithoutAllocationLinesNestedInput
 }
 
 export type VendorAllocationPartLineUncheckedUpdateWithoutAllocationInput = {
@@ -811,8 +811,8 @@ export type VendorAllocationPartLineSelect<ExtArgs extends runtime.Types.Extensi
   unitCost?: boolean
   totalCost?: boolean
   allocation?: boolean | Prisma.VendorAllocationDefaultArgs<ExtArgs>
-  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorAllocationPartLine"]>
 
 export type VendorAllocationPartLineSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -824,8 +824,8 @@ export type VendorAllocationPartLineSelectCreateManyAndReturn<ExtArgs extends ru
   unitCost?: boolean
   totalCost?: boolean
   allocation?: boolean | Prisma.VendorAllocationDefaultArgs<ExtArgs>
-  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorAllocationPartLine"]>
 
 export type VendorAllocationPartLineSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -837,8 +837,8 @@ export type VendorAllocationPartLineSelectUpdateManyAndReturn<ExtArgs extends ru
   unitCost?: boolean
   totalCost?: boolean
   allocation?: boolean | Prisma.VendorAllocationDefaultArgs<ExtArgs>
-  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendorAllocationPartLine"]>
 
 export type VendorAllocationPartLineSelectScalar = {
@@ -854,26 +854,26 @@ export type VendorAllocationPartLineSelectScalar = {
 export type VendorAllocationPartLineOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "allocationId" | "partId" | "branchId" | "quantity" | "unitCost" | "totalCost", ExtArgs["result"]["vendorAllocationPartLine"]>
 export type VendorAllocationPartLineInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   allocation?: boolean | Prisma.VendorAllocationDefaultArgs<ExtArgs>
-  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }
 export type VendorAllocationPartLineIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   allocation?: boolean | Prisma.VendorAllocationDefaultArgs<ExtArgs>
-  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }
 export type VendorAllocationPartLineIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   allocation?: boolean | Prisma.VendorAllocationDefaultArgs<ExtArgs>
-  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
+  part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }
 
 export type $VendorAllocationPartLinePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "VendorAllocationPartLine"
   objects: {
     allocation: Prisma.$VendorAllocationPayload<ExtArgs>
-    part: Prisma.$PartPayload<ExtArgs>
     branch: Prisma.$BranchPayload<ExtArgs>
+    part: Prisma.$PartPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1278,8 +1278,8 @@ readonly fields: VendorAllocationPartLineFieldRefs;
 export interface Prisma__VendorAllocationPartLineClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   allocation<T extends Prisma.VendorAllocationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VendorAllocationDefaultArgs<ExtArgs>>): Prisma.Prisma__VendorAllocationClient<runtime.Types.Result.GetResult<Prisma.$VendorAllocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  part<T extends Prisma.PartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartDefaultArgs<ExtArgs>>): Prisma.Prisma__PartClient<runtime.Types.Result.GetResult<Prisma.$PartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   branch<T extends Prisma.BranchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BranchDefaultArgs<ExtArgs>>): Prisma.Prisma__BranchClient<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  part<T extends Prisma.PartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartDefaultArgs<ExtArgs>>): Prisma.Prisma__PartClient<runtime.Types.Result.GetResult<Prisma.$PartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
