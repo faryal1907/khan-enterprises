@@ -396,8 +396,11 @@ export default function BikesPage() {
                       <p className="text-xs sm:text-sm mb-2" style={{ color: theme.text.secondary }}>
                         {bike.model?.brand}
                       </p>
-                      <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{ color: theme.text.muted }}>
+                      <p className="text-xs sm:text-sm mb-2" style={{ color: theme.text.muted }}>
                         {bike.model?.engineCapacity || "N/A"}
+                      </p>
+                      <p className="text-xs sm:text-sm mb-3 sm:mb-4" style={{ color: theme.text.muted }}>
+                        Color: {bike.color || "N/A"}
                       </p>
                       <div style={{ backgroundColor: theme.accents.primary + '15', borderRadius: '8px', padding: '6px 10px', marginBottom: '8px' }}>
                         <div className="flex items-center gap-1.5 mb-0.5">

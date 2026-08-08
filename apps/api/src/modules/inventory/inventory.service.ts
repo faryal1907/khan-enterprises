@@ -93,6 +93,7 @@ export class InventoryService {
           createdAt: true,
           vendorAllocationId: true,
           purchaseCost: true,
+          color: true,
           model: {
             select: {
               id: true,

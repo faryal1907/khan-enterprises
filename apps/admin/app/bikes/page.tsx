@@ -667,7 +667,7 @@ function BikeTable({
                 />
               </th>
             )}
-            {["Chassis No.", "Motor No.", "Model", "Branch", "Vendor", "Status", "Actions"].map((heading) => (
+            {["Chassis No.", "Motor No.", "Model", "Color", "Branch", "Vendor", "Status", "Actions"].map((heading) => (
               <th
                 key={heading}
                 className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
@@ -681,7 +681,7 @@ function BikeTable({
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={7} className="px-6 py-8 text-center">
+              <td colSpan={8} className="px-6 py-8 text-center">
                 <div className="flex justify-center">
                   <div
                     className="animate-spin rounded-full h-8 w-8 border-b-2"
@@ -692,7 +692,7 @@ function BikeTable({
             </tr>
           ) : bikes.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
+              <td colSpan={8} className="px-6 py-8 text-center text-sm" style={{ color: theme.text.secondary }}>
                 No bikes found
               </td>
             </tr>
@@ -741,6 +741,9 @@ function BikeTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                   {bike.model.brand} {bike.model.modelName}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                  {bike.color || "N/A"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                   {bike.branch.name}
