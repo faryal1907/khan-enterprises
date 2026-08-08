@@ -90,6 +90,7 @@ export class TransactionsService {
         paymentMethod: orderData.paymentMethod,
         status: orderData.status,
         branch: orderData.branch,
+        bike: (orderData as any).bike,
       },
       timeline,
     };

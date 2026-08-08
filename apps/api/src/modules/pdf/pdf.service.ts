@@ -89,6 +89,7 @@ export class PdfService {
     drawSectionHeader(y, 'ITEM DETAILS'); y += 20;
     if (order.bike) {
       drawRow(y, 'Bike', `${order.bike.model?.brand || ''} ${order.bike.model?.modelName || ''}`.trim()); y += R;
+      drawRow(y, 'Color', order.bike.color || 'N/A'); y += R;
       drawRow(y, 'Chassis Number', order.bike.chassisNumber || 'N/A'); y += R;
       drawRow(y, 'Engine Number', order.bike.engineNumber || 'N/A'); y += R;
     } else if (order.part) {
@@ -231,6 +232,12 @@ export class PdfService {
       y += 8;
       drawSectionHeader(y, 'ORDER DETAILS'); y += 20;
       drawRow(y, 'Order Number', order.orderNumber || 'N/A'); y += R;
+      if (order.bike) {
+        drawRow(y, 'Bike', `${order.bike.model?.brand || ''} ${order.bike.model?.modelName || ''}`.trim()); y += R;
+        drawRow(y, 'Color', order.bike.color || 'N/A'); y += R;
+      } else if (order.part) {
+        drawRow(y, 'Part Name', order.part.name || 'N/A'); y += R;
+      }
       drawRow(y, 'Customer Name', order.customerName || 'N/A'); y += R;
       drawRow(y, 'Customer Phone', order.customerPhone || 'N/A'); y += R;
     }
