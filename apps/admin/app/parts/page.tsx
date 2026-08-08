@@ -14,6 +14,7 @@ import {
 } from "@/lib/api/inventory";
 import type { Branch, PartInventory } from "@/lib/types";
 import { SummaryCard } from "@/components/summary-card";
+import * as XLSX from "xlsx";
 
 export default function PartsListPage() {
   const searchParams = useSearchParams();
@@ -146,6 +147,28 @@ export default function PartsListPage() {
     setShowTransferModal(true);
   };
 
+  // Export to Excel
+  const handleExportXLSX = () => {
+    const headers = ["Part Name", "SKU", "Category", "Branch", "Quantity", "Reserved", "Available", "Reorder Level", "Selling Price"];
+    const rows = parts.map((part) => [
+      part.part.name,
+      part.part.sku,
+      part.part.category,
+      part.branch.name,
+      part.quantity,
+      part.reservedQuantity,
+      part.quantity - part.reservedQuantity,
+      part.reorderLevel,
+      part.part.sellingPrice,
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Parts");
+    XLSX.writeFile(wb, `parts_inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   // Compute summary stats
   const totalParts = parts.length;
   const lowStockItems = lowStockCount;
@@ -186,6 +209,18 @@ export default function PartsListPage() {
           <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
             Parts Inventory
           </h1>
+          <button
+            onClick={handleExportXLSX}
+            disabled={parts.length === 0}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+            style={{
+              backgroundColor: theme.backgrounds.tertiary,
+              color: theme.text.secondary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            Export Excel
+          </button>
         </div>
 
         {/* Summary Cards */}

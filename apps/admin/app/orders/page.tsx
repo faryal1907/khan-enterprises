@@ -150,13 +150,27 @@ export default function OrdersListPage() {
   return (
     <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-4 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
-            Orders
-          </h1>
-          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
-            Manage bike and part customer orders.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: theme.text.primary }}>
+              Orders
+            </h1>
+            <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
+              Manage bike and part customer orders.
+            </p>
+          </div>
+          <button
+            onClick={handleExportXLSX}
+            disabled={orders.length === 0}
+            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+            style={{
+              backgroundColor: theme.backgrounds.tertiary,
+              color: theme.text.secondary,
+              border: `1px solid ${theme.borders.medium}`,
+            }}
+          >
+            Export Excel
+          </button>
         </div>
 
         <div className="flex space-x-4 md:space-x-6 mb-4 md:mb-6 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: theme.borders.light }}>
@@ -419,21 +433,6 @@ export default function OrdersListPage() {
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end mt-3 md:mt-4">
-          <button
-            onClick={handleExportXLSX}
-            disabled={orders.length === 0}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Export Excel
-          </button>
         </div>
       </div>
     </div>

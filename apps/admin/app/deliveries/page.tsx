@@ -6,6 +6,7 @@ import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { getDeliveries, getDeliveryStats } from "@/lib/api/deliveries";
+import * as XLSX from "xlsx";
 
 export default function DeliveryQueuePage() {
   const searchParams = useSearchParams();
@@ -127,19 +128,55 @@ export default function DeliveryQueuePage() {
     }
   };
 
+  const handleExportXLSX = () => {
+    const headers = ["Order Number", "Customer", "Phone", "Address", "Branch", "Status", "Requested Time", "Created Date"];
+    const rows = deliveries.map((delivery) => [
+      delivery.order?.orderNumber || "N/A",
+      delivery.order?.customerName || "N/A",
+      delivery.order?.customerPhone || "N/A",
+      delivery.deliveryAddress || "N/A",
+      delivery.branch?.name || "N/A",
+      delivery.status,
+      delivery.preferredTimeWindow || "N/A",
+      new Date(delivery.createdAt).toLocaleDateString(),
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Deliveries");
+    XLSX.writeFile(wb, `deliveries_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   return (
     <div className="px-4 py-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-4 md:mb-6">
-          <h1
-            className="text-2xl md:text-3xl font-bold"
-            style={{ color: theme.text.primary }}
-          >
-            Delivery Queue
-          </h1>
-          <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
-            Manage delivery requests and track delivery status
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1
+                className="text-2xl md:text-3xl font-bold"
+                style={{ color: theme.text.primary }}
+              >
+                Delivery Queue
+              </h1>
+              <p className="text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                Manage delivery requests and track delivery status
+              </p>
+            </div>
+            <button
+              onClick={handleExportXLSX}
+              disabled={deliveries.length === 0}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Export Excel
+            </button>
+          </div>
         </div>
 
         {/* Filters */}

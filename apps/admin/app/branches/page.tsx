@@ -11,6 +11,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { theme } from "@/lib/colors";
 import { UserRole } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import * as XLSX from "xlsx";
 
 type Branch = {
   id: string;
@@ -102,6 +103,28 @@ export default function BranchesPage() {
     }
   };
 
+  const handleExportXLSX = () => {
+    const headers = ["Branch Name", "City", "Address", "Phone Number", "Manager", "Manager Email", "Users", "Bike Inventory", "Part Inventory", "Created Date"];
+    const rows = visibleBranches.map((branch) => [
+      branch.name,
+      branch.city,
+      branch.address,
+      branch.phoneNumber || "N/A",
+      branch.manager?.fullName || "N/A",
+      branch.manager?.email || "N/A",
+      branch._count.users,
+      branch._count.bikeInventory,
+      branch._count.partInventory,
+      new Date(branch.createdAt).toLocaleDateString(),
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Branches");
+    XLSX.writeFile(wb, `branches_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   if (user && user.role === UserRole.SALES_STAFF) return null;
 
   return (
@@ -117,15 +140,29 @@ export default function BranchesPage() {
             </p>
           </div>
 
-          {isAdmin && (
-            <Link
-              href="/branches/new"
-              className="px-4 py-2 text-sm font-medium rounded text-center"
-              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button
+              onClick={handleExportXLSX}
+              disabled={visibleBranches.length === 0}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-center"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
             >
-              Add Branch
-            </Link>
-          )}
+              Export Excel
+            </button>
+            {isAdmin && (
+              <Link
+                href="/branches/new"
+                className="px-4 py-2 text-sm font-medium rounded text-center"
+                style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+              >
+                Add Branch
+              </Link>
+            )}
+          </div>
         </div>
 
         <div

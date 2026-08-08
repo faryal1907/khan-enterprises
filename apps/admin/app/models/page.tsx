@@ -12,6 +12,7 @@ import {
   deleteBikeModel,
 } from "@/lib/api/inventory";
 import type { BikeModel } from "@/lib/types";
+import * as XLSX from "xlsx";
 
 export default function ModelsListPage() {
   const { user } = useAuthStore();
@@ -76,6 +77,25 @@ export default function ModelsListPage() {
     setShowDeleteModal(true);
   };
 
+  const handleExportXLSX = () => {
+    const headers = ["Brand", "Model Name", "Year", "Engine Capacity", "Colors", "Base Price", "Created Date"];
+    const rows = models.map((model) => [
+      model.brand,
+      model.modelName,
+      model.year,
+      model.engineCapacity || "N/A",
+      model.colors.join(", "),
+      model.basePrice,
+      new Date(model.createdAt).toLocaleDateString(),
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Bike Models");
+    XLSX.writeFile(wb, `bike_models_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   if (!isAdmin && !isManager) {
     return (
       <div className="px-4 py-6 md:p-8 text-center text-red-500 text-sm md:text-base">
@@ -94,15 +114,29 @@ export default function ModelsListPage() {
           >
             Bike Models
           </h1>
-          {isAdmin && (
-            <Link
-              href="/models/new"
-              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 w-full sm:w-auto text-center"
-              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button
+              onClick={handleExportXLSX}
+              disabled={models.length === 0}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
             >
-              Add New Model
-            </Link>
-          )}
+              Export Excel
+            </button>
+            {isAdmin && (
+              <Link
+                href="/models/new"
+                className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 w-full sm:w-auto text-center"
+                style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+              >
+                Add New Model
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Table */}

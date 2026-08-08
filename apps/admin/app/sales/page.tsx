@@ -243,7 +243,19 @@ export default function SalesRecordsPage() {
               View completed bike and part sales from orders and part orders
             </p>
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <button
+              onClick={handleExportXLSX}
+              disabled={sales.length === 0}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Export Excel
+            </button>
             <AsyncButton onClick={() => router.push("/sales/new")} className="w-full sm:w-auto">
               Register Sale
             </AsyncButton>
@@ -466,21 +478,6 @@ export default function SalesRecordsPage() {
               })}
             </tbody>
           </table>
-        </div>
-
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end mt-3 md:mt-4">
-          <button
-            onClick={handleExportXLSX}
-            disabled={sales.length === 0}
-            className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
-            style={{
-              backgroundColor: theme.backgrounds.tertiary,
-              color: theme.text.secondary,
-              border: `1px solid ${theme.borders.medium}`,
-            }}
-          >
-            Export Excel
-          </button>
         </div>
       </div>
     </div>

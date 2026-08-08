@@ -28,6 +28,7 @@ import { ReturnDefectiveInventoryModal } from "@/app/vendors/return-defective-in
 import { getBranches } from "@/lib/api/inventory";
 import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
+import * as XLSX from "xlsx";
 
 type Tab = 'OVERVIEW' | 'JOURNALS' | 'PAYABLES' | 'RECEIVABLES' | 'OWNER_EQUITY' | 'VENDORS';
 
@@ -452,6 +453,68 @@ export default function AccountsPage() {
     getVendors().then((d) => setVendors(d.vendors || [])).catch(() => {});
   }, []);
 
+  // Export journals to Excel
+  const handleExportJournalsXLSX = () => {
+    const headers = ["Entry No", "Date", "Type", "Description", "Debit Account", "Credit Account", "Amount", "Status"];
+    const rows = journals.map((journal) => [
+      journal.entryNo || "N/A",
+      new Date(journal.date).toLocaleDateString(),
+      detectJournalType(journal),
+      journal.description || "N/A",
+      journal.lines?.[0]?.account?.name || "N/A",
+      journal.lines?.[1]?.account?.name || "N/A",
+      formatCurrency(journal.totalAmount || 0),
+      journal.status || "N/A",
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Journal Entries");
+    XLSX.writeFile(wb, `journal_entries_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
+  // Export receivables to Excel
+  const handleExportReceivablesXLSX = () => {
+    const headers = ["Party Name", "Party Type", "Phone", "Total Sale Price", "Total Cost Price", "Total Paid", "Outstanding", "Status"];
+    const rows = receivables.map((r) => [
+      r.partyName || "N/A",
+      r.partyType || "N/A",
+      r.partyPhone || "N/A",
+      formatCurrency(Number(r.totalSalePrice || 0)),
+      formatCurrency(Number(r.totalCostPrice || 0)),
+      formatCurrency(Number(r.totalPaid || 0)),
+      formatCurrency(Number(r.totalOutstanding || 0)),
+      r.totalOutstanding > 0 ? "Due" : "Paid",
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Receivables");
+    XLSX.writeFile(wb, `receivables_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
+  // Export payables to Excel
+  const handleExportPayablesXLSX = () => {
+    const headers = ["Payee Name", "Payee Type", "Phone", "Total Expenses", "Total Paid", "Outstanding", "Status"];
+    const rows = payablesByPayee.map((p) => [
+      p.payeeName || "N/A",
+      p.payeeType || "N/A",
+      p.payeePhone || "N/A",
+      formatCurrency(Number(p.totalExpenses || 0)),
+      formatCurrency(Number(p.totalPaid || 0)),
+      formatCurrency(Number(p.totalOutstanding || 0)),
+      p.totalOutstanding > 0 ? "Due" : "Paid",
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Payables");
+    XLSX.writeFile(wb, `payables_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   // Fetch journals when filters change or JOURNALS tab activates
   useEffect(() => {
     if (activeTab === 'JOURNALS') fetchJournals();
@@ -774,13 +837,27 @@ export default function AccountsPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
               <h2 className="text-lg md:text-xl font-semibold" style={{ color: theme.text.primary }}>Journal Entries</h2>
-              <button
-                onClick={() => setIsJournalModalOpen(true)}
-                className="text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors w-full sm:w-auto"
-                style={{ backgroundColor: theme.accents.primary }}
-              >
-                + Create Journal Entry
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  onClick={handleExportJournalsXLSX}
+                  disabled={journals.length === 0}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Export Excel
+                </button>
+                <button
+                  onClick={() => setIsJournalModalOpen(true)}
+                  className="text-white px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors w-full sm:w-auto"
+                  style={{ backgroundColor: theme.accents.primary }}
+                >
+                  + Create Journal Entry
+                </button>
+              </div>
             </div>
 
             {/* Filter Panel */}
@@ -970,15 +1047,29 @@ export default function AccountsPage() {
                   Money owed to vendors, employees, landlords, and other payees.
                 </p>
               </div>
-              {(isAdmin || isManager) && (
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
-                  onClick={() => setIsAddExpenseOpen(true)}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white w-full sm:w-auto"
-                  style={{ backgroundColor: theme.accents.primary }}
+                  onClick={handleExportPayablesXLSX}
+                  disabled={payablesByPayee.length === 0}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
                 >
-                  + Add Expense
+                  Export Excel
                 </button>
-              )}
+                {(isAdmin || isManager) && (
+                  <button
+                    onClick={() => setIsAddExpenseOpen(true)}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 text-white w-full sm:w-auto"
+                    style={{ backgroundColor: theme.accents.primary }}
+                  >
+                    + Add Expense
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Summary Cards */}
@@ -1238,6 +1329,18 @@ export default function AccountsPage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <button
+                  onClick={handleExportReceivablesXLSX}
+                  disabled={receivables.length === 0}
+                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
+                  style={{
+                    backgroundColor: theme.backgrounds.tertiary,
+                    color: theme.text.secondary,
+                    border: `1px solid ${theme.borders.medium}`,
+                  }}
+                >
+                  Export Excel
+                </button>
                 {isAdmin && (
                   <button
                     onClick={() => setIsAddReceivableOpen(true)}

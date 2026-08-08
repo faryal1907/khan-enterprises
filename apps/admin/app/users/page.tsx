@@ -13,6 +13,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { theme } from "@/lib/colors";
 import { Branch, UserRole } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import * as XLSX from "xlsx";
 
 type StaffUser = {
   id: string;
@@ -125,6 +126,26 @@ export default function UsersPage() {
     }
   };
 
+  const handleExportXLSX = () => {
+    const headers = ["Name", "Email", "Phone", "Role", "Status", "Branch", "Vendor", "Created Date"];
+    const rows = users.map((user) => [
+      user.fullName,
+      user.email,
+      user.phoneNumber || "N/A",
+      user.role,
+      user.status,
+      getBranchLabel(user),
+      user.vendor?.name || "N/A",
+      new Date(user.createdAt).toLocaleDateString(),
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Users");
+    XLSX.writeFile(wb, `users_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   if (currentUser && currentUser.role !== UserRole.ADMIN) return null;
 
   return (
@@ -140,13 +161,27 @@ export default function UsersPage() {
             </p>
           </div>
 
-          <Link
-            href="/users/new"
-            className="px-4 py-2 text-sm font-medium rounded text-center"
-            style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
-          >
-            Create Staff Account
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button
+              onClick={handleExportXLSX}
+              disabled={users.length === 0}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-center"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Export Excel
+            </button>
+            <Link
+              href="/users/new"
+              className="px-4 py-2 text-sm font-medium rounded text-center"
+              style={{ backgroundColor: theme.accents.primary, color: theme.text.inverse }}
+            >
+              Create Staff Account
+            </Link>
+          </div>
         </div>
 
         <div

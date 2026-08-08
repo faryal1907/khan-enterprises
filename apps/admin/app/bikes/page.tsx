@@ -29,6 +29,7 @@ import {
   type Branch,
   type Vendor,
 } from "@/lib/types";
+import * as XLSX from "xlsx";
 
 const PAGE_SIZE = 20;
 
@@ -237,6 +238,26 @@ export default function BikesListPage() {
     }
   };
 
+  const handleExportXLSX = () => {
+    const headers = ["Chassis No.", "Motor No.", "Model", "Color", "Branch", "Vendor", "Status", "Created Date"];
+    const rows = result.bikes.map((bike) => [
+      bike.chassisNumber,
+      bike.engineNumber,
+      `${bike.model.brand} ${bike.model.modelName}`,
+      bike.color || "N/A",
+      bike.branch.name,
+      bike.vendor.name,
+      bike.status,
+      new Date(bike.createdAt).toLocaleDateString(),
+    ]);
+
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Bikes");
+    XLSX.writeFile(wb, `bikes_inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
+  };
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -249,22 +270,36 @@ export default function BikesListPage() {
               {isGlobal ? "Global inventory access" : "Inventory for your assigned branch"}
             </p>
           </div>
-          {isAdmin && (
-            <div className="flex gap-2">
-              {selectedBikeIds.length > 0 && (
-                <button
-                  onClick={() => setShowReturnModal(true)}
-                  className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
-                  style={{
-                    backgroundColor: "#f59e0b",
-                    color: "white",
-                  }}
-                >
-                  Return Selected ({selectedBikeIds.length})
-                </button>
-              )}
-            </div>
-          )}
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportXLSX}
+              disabled={result.bikes.length === 0}
+              className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: theme.backgrounds.tertiary,
+                color: theme.text.secondary,
+                border: `1px solid ${theme.borders.medium}`,
+              }}
+            >
+              Export Excel
+            </button>
+            {isAdmin && (
+              <>
+                {selectedBikeIds.length > 0 && (
+                  <button
+                    onClick={() => setShowReturnModal(true)}
+                    className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90"
+                    style={{
+                      backgroundColor: "#f59e0b",
+                      color: "white",
+                    }}
+                  >
+                    Return Selected ({selectedBikeIds.length})
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">

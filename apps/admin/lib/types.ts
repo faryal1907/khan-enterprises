@@ -103,6 +103,7 @@ export interface BikeModel {
   engineCapacity: string | null;
   colors: string[];
   basePrice: number;
+  createdAt: string;
 }
 
 export interface Vendor {
