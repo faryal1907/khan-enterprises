@@ -12,6 +12,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { UserRole } from "@/lib/types";
 import { getAuditLogById, getAuditLogs, type AuditLogRecord } from "@/lib/api/audit-logs";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 const EMPTY = "-";
 const ACTIONS = ["CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT", "APPROVE", "REJECT", "PAYMENT"];
@@ -68,11 +69,6 @@ function getUserLabel(log: AuditLogRecord) {
 
 function getRoleLabel(log: AuditLogRecord) {
   return log.user?.role || log.userRole || EMPTY;
-}
-
-function csvCell(value: unknown) {
-  const text = String(value ?? EMPTY);
-  return `"${text.replace(/"/g, '""')}"`;
 }
 
 export default function AuditLogsPage() {
@@ -147,13 +143,13 @@ export default function AuditLogsPage() {
     }
   };
 
-  const handleExportCSV = async () => {
+  const handleExportXLSX = async () => {
     try {
       setExporting(true);
       const response = await getAuditLogs({ ...requestFilters, limit: 500 });
       const rows: AuditLogRecord[] = response.auditLogs || [];
       const headers = ["Timestamp", "User", "Role", "Action", "Entity", "Entity ID", "IP Address", "Old Value", "New Value"];
-      const csvRows = rows.map((log) => [
+      const dataRows = rows.map((log) => [
         formatDate(log.createdAt || log.timestamp),
         getUserLabel(log),
         getRoleLabel(log),
@@ -163,18 +159,16 @@ export default function AuditLogsPage() {
         log.ipAddress || EMPTY,
         formatJson(log.oldValue),
         formatJson(log.newValue),
-      ].map(csvCell));
+      ]);
 
-      const csvContent = [headers.map(csvCell), ...csvRows].map((row) => row.join(",")).join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "audit-logs.csv");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      // Create worksheet
+      const ws = [headers, ...dataRows];
+      const wb = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.aoa_to_sheet(ws);
+      XLSX.utils.book_append_sheet(wb, worksheet, "Audit Logs");
+
+      // Generate file
+      XLSX.writeFile(wb, "audit-logs.xlsx");
     } catch (err) {
       console.error("Failed to export audit logs:", err);
       toast.error("Failed to export audit logs");
@@ -209,8 +203,8 @@ export default function AuditLogsPage() {
           </div>
 
           <div className="w-full sm:w-auto">
-            <AsyncButton onClick={handleExportCSV} loading={exporting} loadingLabel="Exporting..." disabled={loading || auditLogs.length === 0} className="w-full sm:w-auto">
-              Export CSV
+            <AsyncButton onClick={handleExportXLSX} loading={exporting} loadingLabel="Exporting..." disabled={loading || auditLogs.length === 0} className="w-full sm:w-auto">
+              Export Excel
             </AsyncButton>
           </div>
         </div>

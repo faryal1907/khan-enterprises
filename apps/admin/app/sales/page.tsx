@@ -12,6 +12,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { Branch, OrderStatus, PaymentStatus, UserRole } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { AsyncButton } from "@/components/async-button";
+import * as XLSX from "xlsx";
 
 type StaffOption = {
   id: string;
@@ -88,11 +89,6 @@ function getSaleItemLabel(sale: SaleRecord) {
 }
 
 
-
-function escapeCsv(value: unknown) {
-  const text = String(value ?? "");
-  return `"${text.replace(/"/g, '""')}"`;
-}
 
 export default function SalesRecordsPage() {
   const { user } = useAuthStore();
@@ -212,7 +208,7 @@ export default function SalesRecordsPage() {
     }
   };
 
-  const handleExportCSV = () => {
+  const handleExportXLSX = () => {
     const headers = ["Order Number", "Customer", "Items", "Total (Rs)", "Source", "Status", "Staff", "Date"];
     const rows = sales.map((sale) => [
       sale.orderNumber,
@@ -225,20 +221,14 @@ export default function SalesRecordsPage() {
       new Date(sale.saleDate || sale.createdAt).toLocaleDateString(),
     ]);
 
-    const csvContent = [
-      headers.map(escapeCsv).join(","),
-      ...rows.map((row) => row.map(escapeCsv).join(",")),
-    ].join("\n");
+    // Create worksheet
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Sales");
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `sales_export_${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Generate file
+    XLSX.writeFile(wb, `sales_export_${new Date().toISOString().split("T")[0]}.xlsx`);
   };
 
   return (
@@ -480,7 +470,7 @@ export default function SalesRecordsPage() {
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end mt-3 md:mt-4">
           <button
-            onClick={handleExportCSV}
+            onClick={handleExportXLSX}
             disabled={sales.length === 0}
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
             style={{
@@ -489,7 +479,7 @@ export default function SalesRecordsPage() {
               border: `1px solid ${theme.borders.medium}`,
             }}
           >
-            Export CSV
+            Export Excel
           </button>
         </div>
       </div>

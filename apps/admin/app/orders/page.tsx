@@ -12,6 +12,7 @@ import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { Branch, DashboardStats, Order, OrderStatus, UserRole } from "@/lib/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import * as XLSX from "xlsx";
 
 type OrderKind = "BIKE" | "PART";
 type OrderRow = Order & {
@@ -31,11 +32,6 @@ function getOrderItemLabel(order: OrderRow) {
 
 function getOrderAmount(order: OrderRow) {
   return Number(order.type === "BIKE" ? order.bike?.actualSalePrice : order.amount || 0);
-}
-
-function escapeCsv(value: unknown) {
-  const text = String(value ?? "");
-  return `"${text.replace(/"/g, '""')}"`;
 }
 
 export default function OrdersListPage() {
@@ -125,7 +121,7 @@ export default function OrdersListPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleExportCSV = () => {
+  const handleExportXLSX = () => {
     const headers = ["Order Number", "Item Type", "Order Type", "Pickup Type", "Customer", "Item", "Branch", "Amount", "Payment Method", "Status", "Created Date"];
     const rows = orders.map((order) => [
       order.orderNumber,
@@ -141,20 +137,14 @@ export default function OrdersListPage() {
       new Date(order.createdAt).toLocaleDateString(),
     ]);
 
-    const csv = [
-      headers.map(escapeCsv).join(","),
-      ...rows.map((row) => row.map(escapeCsv).join(",")),
-    ].join("\n");
+    // Create worksheet
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Orders");
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${activeTab.toLowerCase()}_orders_${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Generate file
+    XLSX.writeFile(wb, `${activeTab.toLowerCase()}_orders_${new Date().toISOString().split("T")[0]}.xlsx`);
   };
 
   return (
@@ -433,7 +423,7 @@ export default function OrdersListPage() {
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end mt-3 md:mt-4">
           <button
-            onClick={handleExportCSV}
+            onClick={handleExportXLSX}
             disabled={orders.length === 0}
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
             style={{
@@ -442,7 +432,7 @@ export default function OrdersListPage() {
               border: `1px solid ${theme.borders.medium}`,
             }}
           >
-            Export CSV
+            Export Excel
           </button>
         </div>
       </div>

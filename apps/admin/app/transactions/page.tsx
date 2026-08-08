@@ -11,6 +11,7 @@ import { downloadReceipt, getTransactions, type TransactionRecord } from "@/lib/
 import { theme } from "@/lib/colors";
 import { useAuthStore } from "@/lib/auth-store";
 import { Branch, PaymentMethod, PaymentStatus, UserRole } from "@/lib/types";
+import * as XLSX from "xlsx";
 
 type TransactionFilters = {
   status: string;
@@ -71,11 +72,6 @@ function getRef(transaction: TransactionRecord): string | null {
   if (transaction.party?.ref) return transaction.party.ref;
   if (transaction.party?.description) return transaction.party.description;
   return null;
-}
-
-function escapeCsv(value: unknown) {
-  const text = String(value ?? "");
-  return `"${text.replace(/"/g, '""')}"`;
 }
 
 export default function TransactionsPage() {
@@ -187,7 +183,7 @@ export default function TransactionsPage() {
 
 
 
-  const handleExportCSV = () => {
+  const handleExportXLSX = () => {
     const headers = ["Transaction ID", "Ref / Description", "Type", "Counterparty", "Branch", "Amount", "Method", "Status", "Processed By", "Date"];
     const rows = transactions.map((transaction) => [
       transaction.id,
@@ -202,20 +198,14 @@ export default function TransactionsPage() {
       new Date(transaction.createdAt).toLocaleString(),
     ]);
 
-    const csv = [
-      headers.map(escapeCsv).join(","),
-      ...rows.map((row) => row.map(escapeCsv).join(",")),
-    ].join("\n");
+    // Create worksheet
+    const ws = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(ws);
+    XLSX.utils.book_append_sheet(wb, worksheet, "Transactions");
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `transactions_${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Generate file
+    XLSX.writeFile(wb, `transactions_${new Date().toISOString().split("T")[0]}.xlsx`);
   };
 
   return (
@@ -231,7 +221,7 @@ export default function TransactionsPage() {
             </p>
           </div>
           <button
-            onClick={handleExportCSV}
+            onClick={handleExportXLSX}
             disabled={transactions.length === 0}
             className="px-4 py-2 text-sm font-medium rounded transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center"
             style={{
@@ -240,7 +230,7 @@ export default function TransactionsPage() {
               border: `1px solid ${theme.borders.medium}`,
             }}
           >
-            Export CSV
+            Export Excel
           </button>
         </div>
 
