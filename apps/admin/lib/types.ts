@@ -68,6 +68,7 @@ export interface BikeUnit {
   onlineDiscountPercent?: number | null;
   reservedUntil?: string | null;
   soldAt?: string | null;
+  color?: string | null;
   model: BikeModel;
   vendor: Vendor;
   branch: Branch;
