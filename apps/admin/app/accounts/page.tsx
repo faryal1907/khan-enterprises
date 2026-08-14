@@ -225,7 +225,14 @@ export default function AccountsPage() {
     isOpen: boolean; partyId: string; partyName: string; partyType: string;
   }>({ isOpen: false, partyId: '', partyName: '', partyType: '' });
   const [isAddReceivableOpen, setIsAddReceivableOpen] = useState(false);
-  const [receivableFilters, setReceivableFilters] = useState({ partySearch: '', partyType: '' });
+  const [receivableFilters, setReceivableFilters] = useState({
+    branch: isBranchScoped ? user?.branchId || '' : '',
+    dateFrom: '',
+    dateTo: '',
+    partySearch: '',
+    partyType: '',
+    paymentStatus: '' as '' | 'DUE' | 'PARTIAL' | 'PAID' | 'OVERDUE',
+  });
 
   // ── Expenses / Payables state ──────────────────────────────────────────────
   const [branches, setBranches] = useState<any[]>([]);
@@ -257,6 +264,7 @@ export default function AccountsPage() {
     dateTo: '',
     payeeType: '',
     payeeSearch: '',
+    paymentStatus: '' as '' | 'DUE' | 'PARTIAL' | 'PAID' | 'OVERDUE',
   });
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [payeeLedgerModalData, setPayeeLedgerModalData] = useState<{
@@ -319,8 +327,11 @@ export default function AccountsPage() {
       const q = receivableFilters.partySearch.trim().toLowerCase();
       result = result.filter((r: any) => r.partyName?.toLowerCase().includes(q));
     }
+    if (receivableFilters.paymentStatus) {
+      result = result.filter((r: any) => r.status === receivableFilters.paymentStatus);
+    }
     return result;
-  }, [receivables, receivableFilters.partyType, receivableFilters.partySearch]);
+  }, [receivables, receivableFilters.partyType, receivableFilters.partySearch, receivableFilters.paymentStatus]);
 
   const expenseSummary = useMemo(() => ({
     total: payablesByPayee.reduce((s, g) => s + g.totalExpenses, 0),
@@ -338,8 +349,15 @@ export default function AccountsPage() {
       const q = expenseFilters.payeeSearch.trim().toLowerCase();
       result = result.filter((g) => g.payeeName.toLowerCase().includes(q));
     }
+    if (expenseFilters.paymentStatus) {
+      result = result.filter((g) => {
+        const outstanding = Number(g.totalOutstanding);
+        const status = outstanding <= 0 ? 'PAID' : g.totalOutstanding < g.totalExpenses ? 'PARTIAL' : 'DUE';
+        return status === expenseFilters.paymentStatus;
+      });
+    }
     return result;
-  }, [payablesByPayee, expenseFilters.payeeType, expenseFilters.payeeSearch]);
+  }, [payablesByPayee, expenseFilters.payeeType, expenseFilters.payeeSearch, expenseFilters.paymentStatus]);
 
   // Fetch expenses when PAYABLES tab is active
   useEffect(() => {
@@ -526,7 +544,11 @@ export default function AccountsPage() {
       const [accData, journalData, receivableData] = await Promise.all([
         getAccounts(),
         getJournalEntries(),
-        getReceivables(),
+        getReceivables({
+          branchId: receivableFilters.branch || undefined,
+          dateFrom: receivableFilters.dateFrom || undefined,
+          dateTo: receivableFilters.dateTo || undefined,
+        }),
       ]);
       setAccounts(accData);
       setJournals(journalData);
@@ -542,7 +564,7 @@ export default function AccountsPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [receivableFilters.branch, receivableFilters.dateFrom, receivableFilters.dateTo]);
 
   useEffect(() => {
     let unsubscribe: any;
@@ -1109,7 +1131,7 @@ export default function AccountsPage() {
 
             {/* Filters */}
             <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Payee Name</label>
                   <input
@@ -1137,6 +1159,20 @@ export default function AccountsPage() {
                     <option value="UTILITY_COMPANY">Utility Company</option>
                     <option value="CONTRACTOR">Contractor</option>
                     <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Payment Status</label>
+                  <select
+                    value={expenseFilters.paymentStatus}
+                    onChange={(e) => setExpenseFilters(p => ({ ...p, paymentStatus: e.target.value as any }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Status</option>
+                    <option value="DUE">Due</option>
+                    <option value="PARTIAL">Partial</option>
+                    <option value="PAID">Paid</option>
                   </select>
                 </div>
                 <div>
@@ -1169,13 +1205,20 @@ export default function AccountsPage() {
                   />
                 </div>
               </div>
-              {(expenseFilters.payeeSearch || expenseFilters.payeeType) && (
+              {(expenseFilters.payeeSearch || expenseFilters.payeeType || expenseFilters.paymentStatus || expenseFilters.branch || expenseFilters.dateFrom || expenseFilters.dateTo) && (
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-xs" style={{ color: theme.text.secondary }}>
                     {filteredPayablesByPayee.length} of {payablesByPayee.length} payee{payablesByPayee.length !== 1 ? 's' : ''}
                   </span>
                   <button
-                    onClick={() => setExpenseFilters(p => ({ ...p, payeeSearch: '', payeeType: '' }))}
+                    onClick={() => setExpenseFilters({ 
+                      branch: isBranchScoped ? user?.branchId || '' : '',
+                      dateFrom: '',
+                      dateTo: '',
+                      payeeType: '',
+                      payeeSearch: '',
+                      paymentStatus: '' as '' | 'DUE' | 'PARTIAL' | 'PAID' | 'OVERDUE',
+                    })}
                     className="text-xs font-semibold px-3 py-1 rounded border hover:bg-gray-50"
                     style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}
                   >
@@ -1389,7 +1432,7 @@ export default function AccountsPage() {
 
             {/* Filters */}
             <div className="rounded-lg p-4 mb-5" style={{ backgroundColor: theme.backgrounds.secondary, border: `1px solid ${theme.borders.light}` }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Party Name</label>
                   <input
@@ -1420,14 +1463,64 @@ export default function AccountsPage() {
                     <option value="OTHER">Other</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Payment Status</label>
+                  <select
+                    value={receivableFilters.paymentStatus}
+                    onChange={(e) => setReceivableFilters(p => ({ ...p, paymentStatus: e.target.value as any }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Status</option>
+                    <option value="DUE">Due</option>
+                    <option value="PARTIAL">Partial</option>
+                    <option value="PAID">Paid</option>
+                    <option value="OVERDUE">Overdue</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Branch</label>
+                  <select
+                    value={receivableFilters.branch}
+                    onChange={(e) => setReceivableFilters(p => ({ ...p, branch: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  >
+                    <option value="">All Branches</option>
+                    {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>From Date</label>
+                  <input type="date" value={receivableFilters.dateFrom}
+                    onChange={(e) => setReceivableFilters(p => ({ ...p, dateFrom: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>To Date</label>
+                  <input type="date" value={receivableFilters.dateTo}
+                    onChange={(e) => setReceivableFilters(p => ({ ...p, dateTo: e.target.value }))}
+                    className="w-full px-3 py-2 rounded text-sm"
+                    style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}`, color: theme.text.primary }}
+                  />
+                </div>
               </div>
-              {(receivableFilters.partySearch || receivableFilters.partyType) && (
+              {(receivableFilters.partySearch || receivableFilters.partyType || receivableFilters.paymentStatus || receivableFilters.branch || receivableFilters.dateFrom || receivableFilters.dateTo) && (
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-xs" style={{ color: theme.text.secondary }}>
                     {filteredReceivables.length} of {receivables.length} part{receivables.length !== 1 ? 'ies' : 'y'}
                   </span>
                   <button
-                    onClick={() => setReceivableFilters({ partySearch: '', partyType: '' })}
+                    onClick={() => setReceivableFilters({ 
+                      branch: isBranchScoped ? user?.branchId || '' : '',
+                      dateFrom: '',
+                      dateTo: '',
+                      partySearch: '',
+                      partyType: '',
+                      paymentStatus: '' as '' | 'DUE' | 'PARTIAL' | 'PAID' | 'OVERDUE',
+                    })}
                     className="text-xs font-semibold px-3 py-1 rounded border hover:bg-gray-50"
                     style={{ color: theme.text.secondary, borderColor: theme.borders.medium }}
                   >

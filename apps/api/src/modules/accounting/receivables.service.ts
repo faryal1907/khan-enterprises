@@ -223,10 +223,23 @@ export class ReceivablesService {
 
   // ─── Aggregate receivables list (all parties) ─────────────────────────────
 
-  async getReceivables() {
+  async getReceivables(filters?: { branchId?: string; dateFrom?: string; dateTo?: string }) {
+    // Build date filter
+    const dateFilter: any = {};
+    if (filters?.dateFrom) dateFilter.gte = new Date(`${filters.dateFrom}T00:00:00Z`);
+    if (filters?.dateTo) dateFilter.lte = new Date(`${filters.dateTo}T23:59:59Z`);
+
+    // Build branch filter
+    const branchFilter = filters?.branchId ? { branchId: filters.branchId } : {};
+
     // ── Order-based receivables (CUSTOMER parties) ─────────────────────────
     const orders = await this.prisma.client.order.findMany({
-      where: { paymentVerified: true, status: { notIn: ["CANCELLED"] as any } },
+      where: { 
+        paymentVerified: true, 
+        status: { notIn: ["CANCELLED"] as any },
+        ...branchFilter,
+        ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
+      },
       select: {
         id: true, orderNumber: true, customerName: true, customerPhone: true,
         customerId: true, totalAmount: true, paidAmount: true, balanceDue: true,
@@ -242,7 +255,12 @@ export class ReceivablesService {
     });
 
     const partOrders = await this.prisma.client.partOrder.findMany({
-      where: { paymentVerified: true, status: { notIn: ["CANCELLED"] as any } },
+      where: { 
+        paymentVerified: true, 
+        status: { notIn: ["CANCELLED"] as any },
+        ...branchFilter,
+        ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
+      },
       select: {
         id: true, orderNumber: true, customerName: true, customerPhone: true,
         customerId: true, amount: true, paidAmount: true, balanceDue: true,

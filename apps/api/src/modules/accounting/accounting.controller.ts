@@ -273,8 +273,12 @@ export class AccountingController {
 
   @Get("receivables")
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async getReceivables() {
-    return this.receivablesService.getReceivables();
+  async getReceivables(
+    @Query("branchId") branchId?: string,
+    @Query("dateFrom") dateFrom?: string,
+    @Query("dateTo") dateTo?: string,
+  ) {
+    return this.receivablesService.getReceivables({ branchId, dateFrom, dateTo });
   }
 
   @Get("receivables/payment-accounts")

@@ -125,8 +125,17 @@ export const RECEIVABLE_PARTY_TYPE_LABELS: Record<ReceivablePartyType, string> =
   OTHER: 'Other',
 };
 
-export const getReceivables = async () => {
-  const { data } = await api.get('/accounting/receivables');
+export const getReceivables = async (filters?: {
+  branchId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}) => {
+  const params = new URLSearchParams();
+  if (filters?.branchId) params.append('branchId', filters.branchId);
+  if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+  if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+  const query = params.toString();
+  const { data } = await api.get(`/accounting/receivables${query ? `?${query}` : ''}`);
   return data;
 };
 
