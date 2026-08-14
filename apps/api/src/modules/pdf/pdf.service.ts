@@ -37,7 +37,7 @@ export class PdfService {
     }
 
     // Header vertical line
-    doc.moveTo(120, 28).lineTo(120, 88).lineWidth(2).stroke('#74950A');
+    doc.moveTo(120, 28).lineTo(120, 88).lineWidth(0.5).stroke('#74950A');
 
     // Company header
     doc.font('Helvetica-Bold').fontSize(13).fillColor('#74950A').text("ALI & KHAN'S GREEN WHEELS", 130, 34);
@@ -45,12 +45,12 @@ export class PdfService {
     doc.font('Helvetica').fontSize(7.5).fillColor('gray').text("Pakistan | ghulam.ali9366@gmail.com | +92 323 9143977 | +92 311 9143977", 130, 62);
 
     // Banner
-    doc.rect(30, 96, 535, 24).fill('#5E1414');
-    doc.font('Helvetica-Bold').fontSize(12).fillColor('white').text('INVOICE / SALE AGREEMENT', 30, 103, { align: 'center', width: 535 });
+    doc.rect(30, 96, 535, 24).stroke('#5E1414');
+    doc.font('Helvetica-Bold').fontSize(12).fillColor('#5E1414').text('INVOICE / SALE AGREEMENT', 30, 103, { align: 'center', width: 535 });
 
     // Order Number / Date grid
-    doc.rect(30, 126, 267, 30).fillAndStroke('#EAEFC4', '#74950A');
-    doc.rect(297, 126, 268, 30).fillAndStroke('#EAEFC4', '#74950A');
+    doc.rect(30, 126, 267, 30).stroke('#74950A');
+    doc.rect(297, 126, 268, 30).stroke('#74950A');
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#74950A').text('Order Number', 30, 131, { align: 'center', width: 267 });
     doc.font('Helvetica').fontSize(8).fillColor('black').text(order.orderNumber, 30, 141, { align: 'center', width: 267 });
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#74950A').text('Date', 297, 131, { align: 'center', width: 268 });
@@ -63,14 +63,14 @@ export class PdfService {
     const VW = 535 - L; // value col width
 
     const drawRow = (y: number, label: string, value: string) => {
-      doc.rect(30, y, L, R).stroke('#d3d3d3');
-      doc.rect(V, y, VW, R).stroke('#d3d3d3');
+      doc.rect(30, y, L, R).lineWidth(0.5).stroke('#d3d3d3');
+      doc.rect(V, y, VW, R).lineWidth(0.5).stroke('#d3d3d3');
       doc.font('Helvetica-Bold').fontSize(8).fillColor('#5E1414').text(label, 35, y + 6);
       doc.font('Helvetica').fontSize(8).fillColor('#333').text(value, V + 5, y + 6);
     };
 
     const drawSectionHeader = (y: number, label: string) => {
-      doc.rect(30, y, 535, 16).fill('#EAEFC4');
+      doc.rect(30, y, 535, 16).lineWidth(0.5).stroke('#74950A');
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#74950A').text(label, 35, y + 4);
     };
 
@@ -105,9 +105,9 @@ export class PdfService {
     drawRow(y, 'Payment Method', methodMap[order.paymentMethod] || order.paymentMethod); y += R;
 
     // Total amount row
-    doc.rect(30, y, L, 28).fillAndStroke('#74950A', '#74950A');
-    doc.rect(V, y, VW, 28).fillAndStroke('#EAEFC4', '#d3d3d3');
-    doc.font('Helvetica-Bold').fontSize(10).fillColor('white').text('TOTAL AMOUNT', 30, y + 9, { width: L, align: 'center' });
+    doc.rect(30, y, L, 28).lineWidth(0.5).stroke('#74950A');
+    doc.rect(V, y, VW, 28).lineWidth(0.5).stroke('#d3d3d3');
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#74950A').text('TOTAL AMOUNT', 30, y + 9, { width: L, align: 'center' });
     const amount = order.bike?.actualSalePrice || order.amount || 0;
     doc.font('Helvetica-Bold').fontSize(11).fillColor('#74950A').text(`Rs. ${Number(amount).toLocaleString()}`, V + 5, y + 9);
     y += 36;
@@ -120,8 +120,8 @@ export class PdfService {
     const leftX = 30;
     const rightX = 325;
 
-    doc.rect(leftX, y, sigW, sigH).stroke('#d3d3d3');
-    doc.rect(rightX, y, sigW, sigH).stroke('#d3d3d3');
+    doc.rect(leftX, y, sigW, sigH).lineWidth(0.5).stroke('#d3d3d3');
+    doc.rect(rightX, y, sigW, sigH).lineWidth(0.5).stroke('#d3d3d3');
 
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#5E1414')
       .text('Customer Signature', leftX, y + sigH + 4, { width: sigW, align: 'center' });
@@ -137,7 +137,6 @@ export class PdfService {
 
     // Footer
     doc.moveTo(30, y).lineTo(565, y).lineWidth(0.5).stroke('#5E1414');
-    doc.rect(30, y, 535, 30).fill('#F8F8F8');
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#74950A')
       .text("Thank you for your purchase! — Ali & Khan's Green Wheels", 30, y + 7, { align: 'center', width: 535 });
     doc.font('Helvetica-Oblique').fontSize(7).fillColor('gray')
@@ -175,7 +174,7 @@ export class PdfService {
     }
 
     // Header vertical line
-    doc.moveTo(120, 28).lineTo(120, 88).lineWidth(2).stroke('#74950A');
+    doc.moveTo(120, 28).lineTo(120, 88).lineWidth(0.5).stroke('#74950A');
 
     // Company header
     doc.font('Helvetica-Bold').fontSize(13).fillColor('#74950A').text("ALI & KHAN'S GREEN WHEELS", 130, 34);
@@ -183,12 +182,12 @@ export class PdfService {
     doc.font('Helvetica').fontSize(7.5).fillColor('gray').text("Pakistan | ghulam.ali9366@gmail.com | +92 311 9143977 | +92 323 9143977", 130, 62);
 
     // Banner
-    doc.rect(30, 96, 535, 24).fill('#5E1414');
-    doc.font('Helvetica-Bold').fontSize(12).fillColor('white').text('PAYMENT RECEIPT', 30, 103, { align: 'center', width: 535 });
+    doc.rect(30, 96, 535, 24).stroke('#5E1414');
+    doc.font('Helvetica-Bold').fontSize(12).fillColor('#5E1414').text('PAYMENT RECEIPT', 30, 103, { align: 'center', width: 535 });
 
     // Receipt ID / Date grid
-    doc.rect(30, 126, 267, 30).fillAndStroke('#EAEFC4', '#74950A');
-    doc.rect(297, 126, 268, 30).fillAndStroke('#EAEFC4', '#74950A');
+    doc.rect(30, 126, 267, 30).stroke('#74950A');
+    doc.rect(297, 126, 268, 30).stroke('#74950A');
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#74950A').text('Receipt ID', 30, 131, { align: 'center', width: 267 });
     doc.font('Helvetica').fontSize(8).fillColor('black').text(transaction.id, 30, 141, { align: 'center', width: 267 });
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#74950A').text('Date', 297, 131, { align: 'center', width: 268 });
@@ -201,14 +200,14 @@ export class PdfService {
     const VW = 535 - L;
 
     const drawRow = (y: number, label: string, value: string) => {
-      doc.rect(30, y, L, R).stroke('#d3d3d3');
-      doc.rect(V, y, VW, R).stroke('#d3d3d3');
+      doc.rect(30, y, L, R).lineWidth(0.5).stroke('#d3d3d3');
+      doc.rect(V, y, VW, R).lineWidth(0.5).stroke('#d3d3d3');
       doc.font('Helvetica-Bold').fontSize(8).fillColor('#5E1414').text(label, 35, y + 6);
       doc.font('Helvetica').fontSize(8).fillColor('#333').text(value, V + 5, y + 6);
     };
 
     const drawSectionHeader = (y: number, label: string) => {
-      doc.rect(30, y, 535, 16).fill('#EAEFC4');
+      doc.rect(30, y, 535, 16).lineWidth(0.5).stroke('#74950A');
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#74950A').text(label, 35, y + 4);
     };
 
@@ -220,9 +219,9 @@ export class PdfService {
     drawRow(y, 'Payment Method', methodMap[transaction.method] || transaction.method); y += R;
 
     // Amount paid row
-    doc.rect(30, y, L, 28).fillAndStroke('#74950A', '#74950A');
-    doc.rect(V, y, VW, 28).fillAndStroke('#EAEFC4', '#d3d3d3');
-    doc.font('Helvetica-Bold').fontSize(10).fillColor('white').text('AMOUNT PAID', 30, y + 9, { width: L, align: 'center' });
+    doc.rect(30, y, L, 28).lineWidth(0.5).stroke('#74950A');
+    doc.rect(V, y, VW, 28).lineWidth(0.5).stroke('#d3d3d3');
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#74950A').text('AMOUNT PAID', 30, y + 9, { width: L, align: 'center' });
     doc.font('Helvetica-Bold').fontSize(11).fillColor('#74950A').text(`Rs. ${Number(transaction.amount).toLocaleString()}`, V + 5, y + 9);
     y += 36;
 
@@ -252,8 +251,8 @@ export class PdfService {
     const leftX = 30;
     const rightX = 325;
 
-    doc.rect(leftX, y, sigW, sigH).stroke('#d3d3d3');
-    doc.rect(rightX, y, sigW, sigH).stroke('#d3d3d3');
+    doc.rect(leftX, y, sigW, sigH).lineWidth(0.5).stroke('#d3d3d3');
+    doc.rect(rightX, y, sigW, sigH).lineWidth(0.5).stroke('#d3d3d3');
 
     const customerName = order?.customerName || '';
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#5E1414')
@@ -270,7 +269,6 @@ export class PdfService {
 
     // Footer
     doc.moveTo(30, y).lineTo(565, y).lineWidth(0.5).stroke('#5E1414');
-    doc.rect(30, y, 535, 30).fill('#F8F8F8');
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#74950A')
       .text("Thank you for your business! — Ali & Khan's Green Wheels", 30, y + 7, { align: 'center', width: 535 });
     doc.font('Helvetica-Oblique').fontSize(7).fillColor('gray')
