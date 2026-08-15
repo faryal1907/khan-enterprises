@@ -55,6 +55,14 @@ export class VendorService {
       _sum: { totalAmount: true },
     });
 
+    const totalDefectiveReturned = await this.prisma.client.vendorDefectiveReturn.aggregate({
+      where: { vendorId },
+      _sum: { totalAmount: true },
+    });
+
+    // Current allocated value still in stock = total allocations - returns
+    const currentAllocated = Number(totalAllocated._sum.totalAmount ?? 0) - Number(totalDefectiveReturned._sum.totalAmount ?? 0);
+
     return {
       id: vendor.id,
       name: vendor.name,
@@ -66,7 +74,7 @@ export class VendorService {
       commissionRate: Number(vendor.commissionRate),
       prepaidBalance,
       totalPaid: Number(totalPaid._sum.amount ?? 0),
-      totalAllocated: Number(totalAllocated._sum.totalAmount ?? 0),
+      totalAllocated: currentAllocated,
     };
   }
 
