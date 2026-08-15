@@ -55,6 +55,35 @@ export class VendorService {
       _sum: { totalAmount: true },
     });
 
+    // Also check journal entries for allocations to see if there are missing records
+    const allocationJournalEntries = await this.prisma.client.journalEntry.findMany({
+      where: {
+        description: { contains: `Inventory received from ${vendor.name}` },
+        status: JournalStatus.POSTED,
+        lines: {
+          some: {
+            account: { subtype: AccountSubtype.VENDOR_PREPAID },
+            credit: { gt: 0 }
+          }
+        }
+      },
+      include: {
+        lines: {
+          include: {
+            account: true
+          }
+        }
+      }
+    });
+
+    const totalAllocatedFromJournals = allocationJournalEntries.reduce((s, je) => {
+      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.credit) > 0);
+      return s + (prepaidLine ? Number(prepaidLine.credit) : 0);
+    }, 0);
+
+    // Use journal entries as source of truth for allocations if they differ
+    const finalTotalAllocated = totalAllocatedFromJournals > 0 ? totalAllocatedFromJournals : Number(totalAllocated._sum.totalAmount ?? 0);
+
     // Calculate defective returns from journal entries for accuracy
     // First get the defective return records for this vendor to get their journal entry IDs
     const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
@@ -86,7 +115,7 @@ export class VendorService {
     }, 0);
 
     // Current allocated value still in stock = total allocations - returns
-    const currentAllocated = Number(totalAllocated._sum.totalAmount ?? 0) - totalDefectiveReturned;
+    const currentAllocated = finalTotalAllocated - totalDefectiveReturned;
 
     return {
       id: vendor.id,
