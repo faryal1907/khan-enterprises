@@ -59,11 +59,11 @@ export class VendorService {
     // First get the defective return records for this vendor to get their journal entry IDs
     const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
       where: { vendorId },
-      select: { journalEntryId: true }
+      select: { journalEntry: { select: { id: true } } }
     });
     
     const journalEntryIds = vendorDefectiveReturns
-      .map(dr => dr.journalEntryId)
+      .map(dr => dr.journalEntry?.id)
       .filter((id): id is string => id !== null);
     
     const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
@@ -215,11 +215,11 @@ export class VendorService {
     // First get the defective return records for this vendor to get their journal entry IDs
     const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
       where: { vendorId },
-      select: { journalEntryId: true }
+      select: { journalEntry: { select: { id: true } } }
     });
     
     const journalEntryIds = vendorDefectiveReturns
-      .map(dr => dr.journalEntryId)
+      .map(dr => dr.journalEntry?.id)
       .filter((id): id is string => id !== null);
     
     const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
@@ -289,7 +289,7 @@ export class VendorService {
     const defectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
       where: { vendorId },
       include: {
-        journalEntryId: true,
+        journalEntry: { select: { id: true } },
         bikes: {
           select: {
             id: true,
@@ -405,7 +405,7 @@ export class VendorService {
     // Calculate defective returns from journal entries for accuracy
     // Use the journal entry IDs from the defective return records
     const journalEntryIds = defectiveReturns
-      .map(dr => dr.journalEntryId)
+      .map(dr => dr.journalEntry?.id)
       .filter((id): id is string => id !== null);
     
     const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
