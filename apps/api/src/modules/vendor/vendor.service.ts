@@ -55,13 +55,38 @@ export class VendorService {
       _sum: { totalAmount: true },
     });
 
-    const totalDefectiveReturned = await this.prisma.client.vendorDefectiveReturn.aggregate({
+    // Calculate defective returns from journal entries for accuracy
+    // First get the defective return records for this vendor to get their journal entry IDs
+    const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
       where: { vendorId },
-      _sum: { totalAmount: true },
+      select: { journalEntryId: true }
     });
+    
+    const journalEntryIds = vendorDefectiveReturns
+      .map(dr => dr.journalEntryId)
+      .filter((id): id is string => id !== null);
+    
+    const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
+      where: {
+        id: { in: journalEntryIds },
+        status: JournalStatus.POSTED,
+      },
+      include: {
+        lines: {
+          include: {
+            account: true
+          }
+        }
+      }
+    });
+    
+    const totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
+      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
+      return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
+    }, 0);
 
     // Current allocated value still in stock = total allocations - returns
-    const currentAllocated = Number(totalAllocated._sum.totalAmount ?? 0) - Number(totalDefectiveReturned._sum.totalAmount ?? 0);
+    const currentAllocated = Number(totalAllocated._sum.totalAmount ?? 0) - totalDefectiveReturned;
 
     return {
       id: vendor.id,
@@ -172,7 +197,7 @@ export class VendorService {
   // ─── Balance ───────────────────────────────────────────────────────────────
 
   async getVendorBalance(vendorId: string): Promise<number> {
-    const [paid, allocated, defectiveReturned] = await Promise.all([
+    const [paid, allocated] = await Promise.all([
       this.prisma.client.vendorPayment.aggregate({
         where: { vendorId },
         _sum: { amount: true },
@@ -181,15 +206,41 @@ export class VendorService {
         where: { vendorId },
         _sum: { totalAmount: true },
       }),
-      this.prisma.client.vendorDefectiveReturn.aggregate({
-        where: { vendorId },
-        _sum: { totalAmount: true },
-      }),
     ]);
 
     const totalPaid = Number(paid._sum.amount ?? 0);
     const totalAllocated = Number(allocated._sum.totalAmount ?? 0);
-    const totalDefectiveReturned = Number(defectiveReturned._sum.totalAmount ?? 0);
+    
+    // Calculate defective returns from journal entries for accuracy
+    // First get the defective return records for this vendor to get their journal entry IDs
+    const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
+      where: { vendorId },
+      select: { journalEntryId: true }
+    });
+    
+    const journalEntryIds = vendorDefectiveReturns
+      .map(dr => dr.journalEntryId)
+      .filter((id): id is string => id !== null);
+    
+    const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
+      where: {
+        id: { in: journalEntryIds },
+        status: JournalStatus.POSTED,
+      },
+      include: {
+        lines: {
+          include: {
+            account: true
+          }
+        }
+      }
+    });
+    
+    const totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
+      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
+      return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
+    }, 0);
+    
     // Current allocated value still in stock = total allocations - returns
     const currentAllocated = totalAllocated - totalDefectiveReturned;
 
@@ -238,6 +289,7 @@ export class VendorService {
     const defectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
       where: { vendorId },
       include: {
+        journalEntryId: true,
         bikes: {
           select: {
             id: true,
@@ -349,8 +401,34 @@ export class VendorService {
     const totalPaid = payments.reduce((s, p) => s + Number(p.amount), 0);
     const totalAllocated = allocations.reduce((s, a) => s + Number(a.totalAmount), 0);
     const totalDefectiveReturned = defectiveReturns.reduce((s, r) => s + Number(r.totalAmount), 0);
-    // Current allocated value still in stock = total allocations - returns
-    const currentAllocated = totalAllocated - totalDefectiveReturned;
+    
+    // Calculate defective returns from journal entries for accuracy
+    // Use the journal entry IDs from the defective return records
+    const journalEntryIds = defectiveReturns
+      .map(dr => dr.journalEntryId)
+      .filter((id): id is string => id !== null);
+    
+    const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
+      where: {
+        id: { in: journalEntryIds },
+        status: JournalStatus.POSTED,
+      },
+      include: {
+        lines: {
+          include: {
+            account: true
+          }
+        }
+      }
+    });
+    
+    const totalDefectiveReturnedFromJournals = defectiveReturnJournalEntries.reduce((s, je) => {
+      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
+      return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
+    }, 0);
+    
+    // Use journal entries for accuracy as they are the source of truth
+    const currentAllocated = totalAllocated - totalDefectiveReturnedFromJournals;
     const prepaidBalance = totalPaid - currentAllocated;
 
     return {
