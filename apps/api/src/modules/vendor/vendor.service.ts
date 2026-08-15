@@ -239,18 +239,53 @@ export class VendorService {
 
     const totalPaid = Number(paid._sum.amount ?? 0);
     const totalAllocated = Number(allocated._sum.totalAmount ?? 0);
-    
+
+    // Get vendor name for journal entry query
+    const vendor = await this.prisma.client.vendor.findUnique({
+      where: { id: vendorId },
+      select: { name: true }
+    });
+
+    // Also check journal entries for allocations to see if there are missing records
+    const allocationJournalEntries = await this.prisma.client.journalEntry.findMany({
+      where: {
+        description: { contains: `Inventory received from ${vendor?.name}` },
+        status: JournalStatus.POSTED,
+        lines: {
+          some: {
+            account: { subtype: AccountSubtype.VENDOR_PREPAID },
+            credit: { gt: 0 }
+          }
+        }
+      },
+      include: {
+        lines: {
+          include: {
+            account: true
+          }
+        }
+      }
+    });
+
+    const totalAllocatedFromJournals = allocationJournalEntries.reduce((s, je) => {
+      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.credit) > 0);
+      return s + (prepaidLine ? Number(prepaidLine.credit) : 0);
+    }, 0);
+
+    // Use journal entries as source of truth for allocations if they differ
+    const finalTotalAllocated = totalAllocatedFromJournals > 0 ? totalAllocatedFromJournals : totalAllocated;
+
     // Calculate defective returns from journal entries for accuracy
     // First get the defective return records for this vendor to get their journal entry IDs
     const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
       where: { vendorId },
       select: { journalEntry: { select: { id: true } } }
     });
-    
+
     const journalEntryIds = vendorDefectiveReturns
       .map(dr => dr.journalEntry?.id)
       .filter((id): id is string => id !== null);
-    
+
     const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
       where: {
         id: { in: journalEntryIds },
@@ -264,14 +299,14 @@ export class VendorService {
         }
       }
     });
-    
+
     const totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
       const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
       return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
     }, 0);
-    
+
     // Current allocated value still in stock = total allocations - returns
-    const currentAllocated = totalAllocated - totalDefectiveReturned;
+    const currentAllocated = finalTotalAllocated - totalDefectiveReturned;
 
     return totalPaid - currentAllocated;
   }
@@ -430,13 +465,42 @@ export class VendorService {
     const totalPaid = payments.reduce((s, p) => s + Number(p.amount), 0);
     const totalAllocated = allocations.reduce((s, a) => s + Number(a.totalAmount), 0);
     const totalDefectiveReturned = defectiveReturns.reduce((s, r) => s + Number(r.totalAmount), 0);
-    
+
+    // Calculate allocations from journal entries for accuracy
+    const allocationJournalEntries = await this.prisma.client.journalEntry.findMany({
+      where: {
+        description: { contains: `Inventory received from ${vendor.name}` },
+        status: JournalStatus.POSTED,
+        lines: {
+          some: {
+            account: { subtype: AccountSubtype.VENDOR_PREPAID },
+            credit: { gt: 0 }
+          }
+        }
+      },
+      include: {
+        lines: {
+          include: {
+            account: true
+          }
+        }
+      }
+    });
+
+    const totalAllocatedFromJournals = allocationJournalEntries.reduce((s, je) => {
+      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.credit) > 0);
+      return s + (prepaidLine ? Number(prepaidLine.credit) : 0);
+    }, 0);
+
+    // Use journal entries for allocations as they are the source of truth
+    const finalTotalAllocated = totalAllocatedFromJournals > 0 ? totalAllocatedFromJournals : totalAllocated;
+
     // Calculate defective returns from journal entries for accuracy
     // Use the journal entry IDs from the defective return records
     const journalEntryIds = defectiveReturns
       .map(dr => dr.journalEntry?.id)
       .filter((id): id is string => id !== null);
-    
+
     const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
       where: {
         id: { in: journalEntryIds },
@@ -450,14 +514,14 @@ export class VendorService {
         }
       }
     });
-    
+
     const totalDefectiveReturnedFromJournals = defectiveReturnJournalEntries.reduce((s, je) => {
       const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
       return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
     }, 0);
-    
+
     // Use journal entries for accuracy as they are the source of truth
-    const currentAllocated = totalAllocated - totalDefectiveReturnedFromJournals;
+    const currentAllocated = finalTotalAllocated - totalDefectiveReturnedFromJournals;
     const prepaidBalance = totalPaid - currentAllocated;
 
     return {
