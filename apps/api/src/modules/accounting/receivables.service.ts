@@ -383,14 +383,23 @@ export class ReceivablesService {
     }
 
     // ── Manual-entry receivables (all parties with entries) ────────────────────
-    const manualParties = await this.prisma.client.receivableParty.findMany({
+    // Build entry date filter for manual receivables
+    const entryDateFilter: any = {};
+    if (filters?.dateFrom) entryDateFilter.gte = new Date(`${filters.dateFrom}T00:00:00Z`);
+    if (filters?.dateTo) entryDateFilter.lte = new Date(`${filters.dateTo}T23:59:59Z`);
+
+    // Manual receivables don't have branch association, so exclude them when branch filter is active
+    const shouldIncludeManualReceivables = !filters?.branchId;
+
+    const manualParties = shouldIncludeManualReceivables ? await this.prisma.client.receivableParty.findMany({
       where: { isActive: true },
       include: {
         entries: {
+          where: Object.keys(entryDateFilter).length > 0 ? { date: entryDateFilter } : undefined,
           select: { amount: true, paidAmount: true, balanceDue: true, status: true, date: true },
         },
       },
-    });
+    }) : [];
 
     const manualRows: PartyRow[] = manualParties
       .filter((p) => p.entries.length > 0)
