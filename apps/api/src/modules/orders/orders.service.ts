@@ -249,9 +249,9 @@ export class OrdersService {
    */
   async createCustomerOrder(dto: CreateCustomerOrderDto, user: any) {
     const isCash = dto.paymentMethod === "CASH";
-    
+
     // Generate order number outside the transaction to avoid timeout
-    const orderNumber = await generateSequentialOrderNumber("ORD", this.prisma);
+    const { orderNumber, sequence } = await generateSequentialOrderNumber("ORD", this.prisma);
 
     const result = await this.prisma.client.$transaction(async (tx) => {
       const bike = await tx.bikeUnit.findUnique({
@@ -413,6 +413,20 @@ export class OrdersService {
           },
         } },
       });
+    });
+
+    // Save sequence number after successful transaction
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const sequenceKey = `ORDER_SEQUENCE_${dateStr}`;
+    await this.prisma.client.systemSetting.upsert({
+      where: { key: sequenceKey },
+      create: {
+        key: sequenceKey,
+        value: sequence.toString()
+      },
+      update: {
+        value: sequence.toString()
+      }
     });
 
     await this.orderAlertsService.createAlertsForOrder(result!.id, isCash ? AlertType.NEW_ORDER : AlertType.PAYMENT_PENDING);
@@ -1059,7 +1073,7 @@ export class OrdersService {
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
     // Generate order number outside the transaction to avoid timeout
-    const orderNumber = await generateSequentialOrderNumber("ORD", this.prisma);
+    const { orderNumber, sequence } = await generateSequentialOrderNumber("ORD", this.prisma);
 
     // Fetch accounts outside transaction to reduce transaction time
     const cashAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
@@ -1213,50 +1227,69 @@ export class OrdersService {
         });
       }
 
-      // Revenue Recognition Journal Entry
-      await tx.journalEntry.create({
+
+      return { order, bike, finalSalePrice, initialPayment };
+    });
+
+    // Save sequence number after successful transaction
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const sequenceKey = `ORDER_SEQUENCE_${dateStr}`;
+    await this.prisma.client.systemSetting.upsert({
+      where: { key: sequenceKey },
+      create: {
+        key: sequenceKey,
+        value: sequence.toString()
+      },
+      update: {
+        value: sequence.toString()
+      }
+    });
+
+    // Create journal entries AFTER transaction commits to avoid timeout
+    const { order, bike, finalSalePrice, initialPayment } = createdOrder;
+    const costOfGoods = Number(bike.purchaseCost || 0);
+
+    // Revenue Recognition Journal Entry
+    await this.prisma.client.journalEntry.create({
+      data: {
+        entryNo: `JV-SALE-${order.orderNumber}`,
+        description: `Sale registered for ${order.orderNumber}`,
+        sourceRef: order.orderNumber,
+        status: JournalStatus.POSTED,
+        lines: {
+          create: [
+            { accountId: arAcc.id, debit: finalSalePrice, credit: 0 },
+            { accountId: revAcc.id, debit: 0, credit: finalSalePrice },
+          ]
+        }
+      }
+    });
+
+    if (costOfGoods > 0 && cogsAcc && inventoryAcc) {
+      await this.prisma.client.journalEntry.create({
         data: {
-          entryNo: `JV-SALE-${order.orderNumber}`,
-          description: `Sale registered for ${order.orderNumber}`,
+          entryNo: `JV-COGS-${order.orderNumber}`,
+          description: `Cost of Goods Sold for ${order.orderNumber}`,
           sourceRef: order.orderNumber,
           status: JournalStatus.POSTED,
           lines: {
             create: [
-              { accountId: arAcc.id, debit: finalSalePrice, credit: 0 },
-              { accountId: revAcc.id, debit: 0, credit: finalSalePrice },
+              { accountId: cogsAcc.id, debit: costOfGoods, credit: 0 },
+              { accountId: inventoryAcc.id, debit: 0, credit: costOfGoods },
             ]
           }
         }
       });
+    }
 
-      const costOfGoods = Number(bike.purchaseCost || 0);
+    // Receipt Journal Entry (if payment was made)
+    if (initialPayment > 0 && paymentAcc && arAcc) {
+      const transaction = await this.prisma.client.paymentTransaction.findFirst({
+        where: { orderId: order.id }
+      });
 
-      if (costOfGoods > 0) {
-        if (!cogsAcc || !inventoryAcc) {
-          throw new BadRequestException(
-            "Required accounts (COGS, Inventory) not found in Chart of Accounts. Please ensure accounts with codes 5001 and 1003 exist."
-          );
-        }
-
-        await tx.journalEntry.create({
-          data: {
-            entryNo: `JV-COGS-${order.orderNumber}`,
-            description: `Cost of Goods Sold for ${order.orderNumber}`,
-            sourceRef: order.orderNumber,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: cogsAcc.id, debit: costOfGoods, credit: 0 },
-                { accountId: inventoryAcc.id, debit: 0, credit: costOfGoods },
-              ]
-            }
-          }
-        });
-      }
-
-      // Receipt Journal Entry
-      if (initialPayment > 0 && paymentAcc && arAcc && transaction) {
-        await tx.journalEntry.create({
+      if (transaction) {
+        await this.prisma.client.journalEntry.create({
           data: {
             entryNo: `JV-PAY-${transaction.id.substring(0, 8)}`,
             description: `Payment received for ${order.orderNumber} via ${dto.paymentMethod}`,
@@ -1271,9 +1304,7 @@ export class OrdersService {
           }
         });
       }
-
-      return order;
-    });
+    }
 
     // Create audit log AFTER transaction commits to avoid timeout
     await this.prisma.client.auditLog.create({
@@ -1282,15 +1313,15 @@ export class OrdersService {
         userRole: user.role,
         action: AuditAction.CREATE,
         entityType: "ORDER",
-        entityId: createdOrder.id,
-        newValue: { ...dto, orderNumber: createdOrder.orderNumber },
+        entityId: order.id,
+        newValue: { ...dto, orderNumber: order.orderNumber },
       },
     });
 
     // Create alerts for users based on their role AFTER transaction commits
-    await this.orderAlertsService.createAlertsForOrder(createdOrder.id, AlertType.NEW_ORDER);
+    await this.orderAlertsService.createAlertsForOrder(order.id, AlertType.NEW_ORDER);
 
-    return createdOrder;
+    return order;
   }
 
   /**

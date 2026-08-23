@@ -76,7 +76,7 @@ export class PartOrdersService {
    */
   async createPartOrder(dto: CreatePartOrderDto, user: any) {
     // Generate order number outside the transaction to avoid timeout
-    const orderNumber = await generateSequentialOrderNumber("PART", this.prisma);
+    const { orderNumber, sequence } = await generateSequentialOrderNumber("PART", this.prisma);
 
     const result = await this.prisma.client.$transaction(async (tx) => {
 
@@ -207,6 +207,20 @@ const partOrder = await tx.partOrder.create({
       }
 
       return { order: partOrder, transaction };
+    });
+
+    // Save sequence number after successful transaction
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const sequenceKey = `ORDER_SEQUENCE_${dateStr}`;
+    await this.prisma.client.systemSetting.upsert({
+      where: { key: sequenceKey },
+      create: {
+        key: sequenceKey,
+        value: sequence.toString()
+      },
+      update: {
+        value: sequence.toString()
+      }
     });
 
     await this.orderAlertsService.createAlertsForPartOrder(
@@ -780,7 +794,7 @@ const partOrder = await tx.partOrder.create({
    */
   async createManualPartOrder(dto: CreateManualPartOrderDto, user: any) {
     // Generate order number outside the transaction to avoid timeout
-    const orderNumber = await generateSequentialOrderNumber("PART", this.prisma);
+    const { orderNumber, sequence } = await generateSequentialOrderNumber("PART", this.prisma);
 
     const result = await this.prisma.client.$transaction(async (tx) => {
       const inventoryWhere: any = dto.partInventoryId
@@ -968,8 +982,22 @@ const partOrder = await tx.partOrder.create({
       return partOrder;
     });
 
+    // Save sequence number after successful transaction
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const sequenceKey = `ORDER_SEQUENCE_${dateStr}`;
+    await this.prisma.client.systemSetting.upsert({
+      where: { key: sequenceKey },
+      create: {
+        key: sequenceKey,
+        value: sequence.toString()
+      },
+      update: {
+        value: sequence.toString()
+      }
+    });
+
     await this.orderAlertsService.createAlertsForPartOrder(
-      result.id, 
+      result.id,
       AlertType.NEW_ORDER
     );
 

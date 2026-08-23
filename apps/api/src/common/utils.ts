@@ -5,12 +5,12 @@ import { PrismaService } from "../prisma/prisma.service";
  * Uses SystemSetting to track daily sequence counter
  * @param prefix - Order type prefix (e.g., "ORD" for bikes, "PART" for parts)
  * @param prisma - PrismaService instance for database access
- * @returns Sequential order number string
+ * @returns Object with orderNumber and sequence (sequence should be saved after successful transaction)
  */
 export async function generateSequentialOrderNumber(
   prefix: string,
   prisma: PrismaService
-): Promise<string> {
+): Promise<{ orderNumber: string; sequence: number }> {
   const date = new Date();
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -18,52 +18,38 @@ export async function generateSequentialOrderNumber(
   const dateStr = `${year}${month}${day}`;
   const sequenceKey = `ORDER_SEQUENCE_${dateStr}`;
 
-  // Use transaction to ensure atomic read-increment-update
-  const result = await prisma.client.$transaction(async (tx) => {
-    // Get all orders for today to find the actual highest sequence
-    const todayOrders = await tx.order.findMany({
-      where: {
-        orderNumber: {
-          startsWith: `${prefix}-${dateStr}`
-        }
-      },
-      select: {
-        orderNumber: true
-      }
-    });
-
-    // Extract sequence numbers from existing orders
-    const existingSequences = todayOrders
-      .map(order => {
-        const match = order.orderNumber.match(new RegExp(`${prefix}-${dateStr}(\\d+)$`));
-        return match ? parseInt(match[1], 10) : 0;
-      })
-      .filter(seq => seq > 0);
-
-    // Find the highest existing sequence
-    const highestSequence = existingSequences.length > 0 ? Math.max(...existingSequences) : 0;
-
-    // Next sequence is highest + 1
-    const sequence = highestSequence + 1;
-
-    // Update the system setting with the new sequence
-    await tx.systemSetting.upsert({
-      where: { key: sequenceKey },
-      create: {
-        key: sequenceKey,
-        value: sequence.toString()
-      },
-      update: {
-        value: sequence.toString()
-      }
-    });
-
-    return sequence;
+  // Use system setting as primary source for performance
+  let sequence = 1;
+  const setting = await prisma.client.systemSetting.findUnique({
+    where: { key: sequenceKey }
   });
 
+  if (setting) {
+    const currentSequence = parseInt(setting.value, 10);
+    // Only validate if sequence seems unreasonably high (more than 100 orders today)
+    if (currentSequence > 100) {
+      // Validate by checking if order actually exists
+      const existingOrder = await prisma.client.order.findFirst({
+        where: {
+          orderNumber: {
+            endsWith: currentSequence.toString().padStart(4, '0')
+          }
+        }
+      });
+      if (!existingOrder) {
+        // Reset to 1 if no order exists with this sequence
+        sequence = 1;
+      } else {
+        sequence = currentSequence + 1;
+      }
+    } else {
+      sequence = currentSequence + 1;
+    }
+  }
+
   // Pad sequence to at least 4 digits (e.g., 1 -> 0001, 12 -> 0012, 12345 -> 12345)
-  const paddedSequence = result.toString().padStart(4, '0');
-  return `${prefix}-${dateStr}${paddedSequence}`;
+  const paddedSequence = sequence.toString().padStart(4, '0');
+  return { orderNumber: `${prefix}-${dateStr}${paddedSequence}`, sequence };
 }
 
 /**

@@ -629,7 +629,7 @@ export class VendorService {
     const vendor = await this.prisma.client.vendor.findUnique({ where: { id: vendorId } });
     if (!vendor) throw new NotFoundException("Vendor not found");
 
-    return this.prisma.client.$transaction(async (tx) => {
+    const result = await this.prisma.client.$transaction(async (tx) => {
       const fromAccount = await tx.account.findUnique({ where: { id: data.fromAccountId } });
       if (!fromAccount) throw new NotFoundException("Funding account not found");
       if (!fromAccount.isActive) throw new BadRequestException("Funding account is inactive");
@@ -692,7 +692,6 @@ export class VendorService {
         },
       });
 
-      const newBalance = await this.getVendorBalance(vendorId);
       return {
         payment: {
           id: payment.id,
@@ -709,9 +708,11 @@ export class VendorService {
           fromAccount: payment.fromAccount,
         },
         journalEntry: { id: journalEntry.id, entryNo: journalEntry.entryNo },
-        newPrepaidBalance: newBalance,
       };
-    });
+    }, { timeout: 15000 });
+
+    const newBalance = await this.getVendorBalance(vendorId);
+    return { ...result, newPrepaidBalance: newBalance };
   }
 
   // ─── Allocate Inventory ────────────────────────────────────────────────────
@@ -780,10 +781,7 @@ export class VendorService {
       );
     }
 
-    return this.prisma.client.$transaction(async (tx) => {
-      // Models were already validated above, no need to re-validate in transaction
-      // unless concurrency is a major concern, but it's fine for now.
-
+    const result = await this.prisma.client.$transaction(async (tx) => {
       const inventoryAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.INVENTORY } });
       const prepaidAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.VENDOR_PREPAID } });
       if (!inventoryAcc || !prepaidAcc) {
@@ -897,17 +895,20 @@ export class VendorService {
         }
       }
 
-      const newBalance = await this.getVendorBalance(vendorId);
-
       return {
         allocation: { id: allocation.id },
         journalEntry: { id: journalEntry.id, entryNo: journalEntry.entryNo },
         bikesCreated: createdBikeIds.length,
         partsProcessed: data.parts.length,
         totalAllocated: totalAmount,
-        newPrepaidBalance: newBalance,
       };
-    });
+    }, { timeout: 15000 });
+
+    // Fetch updated balance AFTER the transaction commits — avoids holding the
+    // transaction open while getVendorBalance runs its own multi-query calculation.
+    const newPrepaidBalance = await this.getVendorBalance(vendorId);
+
+    return { ...result, newPrepaidBalance };
   }
 
   // ─── Return Defective Inventory ────────────────────────────────────────────────
@@ -929,7 +930,7 @@ export class VendorService {
       throw new BadRequestException("At least one bike or part must be returned");
     }
 
-    return this.prisma.client.$transaction(async (tx) => {
+    const result = await this.prisma.client.$transaction(async (tx) => {
       // Validate and fetch bikes to return
       const bikesToReturn = await tx.bikeUnit.findMany({
         where: {
@@ -1098,17 +1099,18 @@ export class VendorService {
         },
       });
 
-      const newBalance = await this.getVendorBalance(vendorId);
-
       return {
         return: { id: defectiveReturn.id },
         journalEntry: { id: journalEntry.id, entryNo: journalEntry.entryNo },
         bikesRemoved: bikesToReturn.length,
         partsProcessed: partTotalsWithCosts.length,
         totalReturned: totalAmount,
-        newPrepaidBalance: newBalance,
       };
-    });
+    }, { timeout: 15000 });
+
+    // Fetch updated balance AFTER the transaction commits
+    const newPrepaidBalance = await this.getVendorBalance(vendorId);
+    return { ...result, newPrepaidBalance };
   }
 
   // ─── Private helpers ───────────────────────────────────────────────────────
