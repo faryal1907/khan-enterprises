@@ -13,6 +13,7 @@ import { RevenueQueryDto, RevenueDuration } from "./dto/revenue-query.dto";
 import { OrderStatus, BikeStatus, PaymentStatus, AuditAction, PaymentState, JournalStatus, AccountSubtype } from "@khan/prisma";
 import { OrderAlertsService } from "../order-alerts/order-alerts.service";
 import { AlertType } from "../order-alerts/dto/get-alerts.dto";
+import { generateSequentialOrderNumber } from "../../common/utils";
 
 @Injectable()
 export class OrdersService {
@@ -122,6 +123,7 @@ export class OrdersService {
         { customerName: { contains: query.search, mode: "insensitive" } },
         { customerPhone: { contains: query.search, mode: "insensitive" } },
         { bike: { is: { chassisNumber: { contains: query.search, mode: "insensitive" } } } },
+        { bike: { is: { engineNumber: { contains: query.search, mode: "insensitive" } } } },
       ];
     }
 
@@ -138,9 +140,23 @@ export class OrdersService {
         take: limit,
         include: {
           bike: {
-            include: {
-              model: true,
-              branch: true,
+            select: {
+              id: true,
+              chassisNumber: true,
+              engineNumber: true,
+              actualSalePrice: true,
+              model: {
+                select: {
+                  brand: true,
+                  modelName: true,
+                },
+              },
+              branch: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
           branch: true,
@@ -233,6 +249,10 @@ export class OrdersService {
    */
   async createCustomerOrder(dto: CreateCustomerOrderDto, user: any) {
     const isCash = dto.paymentMethod === "CASH";
+    
+    // Generate order number outside the transaction to avoid timeout
+    const orderNumber = await generateSequentialOrderNumber("ORD", this.prisma);
+
     const result = await this.prisma.client.$transaction(async (tx) => {
       const bike = await tx.bikeUnit.findUnique({
         where: { id: dto.bikeId },
@@ -250,7 +270,6 @@ export class OrdersService {
       const basePrice = Number(bike.model.basePrice);
       const salePrice = basePrice * (1 - effectiveDiscount / 100);
       const discountAmount = basePrice - salePrice;
-      const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
       // For online (non-cash) orders: customer pays an advance
       let advanceAmount: number;
@@ -1039,6 +1058,39 @@ export class OrdersService {
    * Handles both ONLINE and ONSITE order types
    */
   async createManualOrder(dto: CreateManualOrderDto, user: any) {
+    // Generate order number outside the transaction to avoid timeout
+    const orderNumber = await generateSequentialOrderNumber("ORD", this.prisma);
+
+    // Fetch accounts outside transaction to reduce transaction time
+    const cashAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
+    const arAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.AR } });
+    const revAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
+    const cogsAcc = await this.prisma.client.account.findUnique({ where: { code: '5001' } });
+    const inventoryAcc = await this.prisma.client.account.findUnique({ where: { code: '1003' } });
+
+    // Resolve payment account: use explicitly selected account, fall back by subtype
+    let paymentAcc: any = null;
+    if (dto.paymentMethod === 'CASH') {
+      paymentAcc = cashAcc;
+    } else if (dto.accountId) {
+      paymentAcc = await this.prisma.client.account.findUnique({ where: { id: dto.accountId } });
+    }
+    if (!paymentAcc) {
+      paymentAcc = await this.prisma.client.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
+    }
+
+    if (!paymentAcc) {
+      throw new BadRequestException(
+        "Required payment account not found. Please ensure CASH or BANK accounts exist in the Chart of Accounts."
+      );
+    }
+
+    if (!arAcc || !revAcc) {
+      throw new BadRequestException(
+        "Required accounts (AR, Revenue) not found in Chart of Accounts. Please ensure these accounts exist."
+      );
+    }
+
     const createdOrder = await this.prisma.client.$transaction(async (tx) => {
       // 1. Find bike with model to get base price
       const bike = await tx.bikeUnit.findUnique({
@@ -1081,8 +1133,7 @@ export class OrdersService {
         isOnlineOrder = false;
       }
 
-      // 3. Generate order number
-      const orderNumber = `ORD-MAN-${Date.now()}`;
+      // 3. Use pre-generated order number
 
       // 4. Validate Installment Rule
       const isInstallment = dto.isInstallmentPlan || false;
@@ -1137,21 +1188,6 @@ export class OrdersService {
       });
 
       // 8. Create PaymentTransaction & Allocations & Journal Entries
-      const cashAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.CASH } });
-      const arAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.AR } });
-      const revAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.REVENUE } });
-
-      // Resolve payment account: use explicitly selected account, fall back by subtype
-      let paymentAcc: any = null;
-      if (dto.paymentMethod === 'CASH') {
-        paymentAcc = cashAcc;
-      } else if (dto.accountId) {
-        paymentAcc = await tx.account.findUnique({ where: { id: dto.accountId } });
-      }
-      if (!paymentAcc) {
-        paymentAcc = await tx.account.findFirst({ where: { subtype: AccountSubtype.BANK } });
-      }
-
       let transaction: any = null;
       if (initialPayment > 0) {
         transaction = await tx.paymentTransaction.create({
@@ -1178,28 +1214,30 @@ export class OrdersService {
       }
 
       // Revenue Recognition Journal Entry
-      if (arAcc && revAcc) {
-        await tx.journalEntry.create({
-          data: {
-            entryNo: `JV-SALE-${order.orderNumber}`,
-            description: `Sale registered for ${order.orderNumber}`,
-            sourceRef: order.orderNumber,
-            status: JournalStatus.POSTED,
-            lines: {
-              create: [
-                { accountId: arAcc.id, debit: finalSalePrice, credit: 0 },
-                { accountId: revAcc.id, debit: 0, credit: finalSalePrice },
-              ]
-            }
+      await tx.journalEntry.create({
+        data: {
+          entryNo: `JV-SALE-${order.orderNumber}`,
+          description: `Sale registered for ${order.orderNumber}`,
+          sourceRef: order.orderNumber,
+          status: JournalStatus.POSTED,
+          lines: {
+            create: [
+              { accountId: arAcc.id, debit: finalSalePrice, credit: 0 },
+              { accountId: revAcc.id, debit: 0, credit: finalSalePrice },
+            ]
           }
-        });
-      }
+        }
+      });
 
-      const cogsAcc = await tx.account.findUnique({ where: { code: '5001' } });
-      const inventoryAcc = await tx.account.findUnique({ where: { code: '1003' } });
       const costOfGoods = Number(bike.purchaseCost || 0);
 
-      if (cogsAcc && inventoryAcc && costOfGoods > 0) {
+      if (costOfGoods > 0) {
+        if (!cogsAcc || !inventoryAcc) {
+          throw new BadRequestException(
+            "Required accounts (COGS, Inventory) not found in Chart of Accounts. Please ensure accounts with codes 5001 and 1003 exist."
+          );
+        }
+
         await tx.journalEntry.create({
           data: {
             entryNo: `JV-COGS-${order.orderNumber}`,
@@ -1234,18 +1272,19 @@ export class OrdersService {
         });
       }
 
-      await tx.auditLog.create({
-        data: {
-          userId: user.id,
-          userRole: user.role,
-          action: AuditAction.CREATE,
-          entityType: "ORDER",
-          entityId: order.id,
-          newValue: { ...dto, finalSalePrice, orderType, orderNumber },
-        },
-      });
-
       return order;
+    });
+
+    // Create audit log AFTER transaction commits to avoid timeout
+    await this.prisma.client.auditLog.create({
+      data: {
+        userId: user.id,
+        userRole: user.role,
+        action: AuditAction.CREATE,
+        entityType: "ORDER",
+        entityId: createdOrder.id,
+        newValue: { ...dto, orderNumber: createdOrder.orderNumber },
+      },
     });
 
     // Create alerts for users based on their role AFTER transaction commits

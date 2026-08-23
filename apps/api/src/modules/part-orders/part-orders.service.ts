@@ -7,6 +7,7 @@ import { RevenueQueryDto, RevenueDuration } from "../orders/dto/revenue-query.dt
 import { OrderAlertsService } from "../order-alerts/order-alerts.service";
 import { AlertType } from "../order-alerts/dto/get-alerts.dto";
 import { OrderStatus, PaymentStatus, PaymentMethod, BikeStatus, AuditAction, AccountSubtype, JournalStatus, PaymentState } from "@khan/prisma";
+import { generateSequentialOrderNumber } from "../../common/utils";
 @Injectable()
 export class PartOrdersService {
   constructor(
@@ -74,6 +75,9 @@ export class PartOrdersService {
    * - Customer pays at least 50% advance; remainder becomes a receivable.
    */
   async createPartOrder(dto: CreatePartOrderDto, user: any) {
+    // Generate order number outside the transaction to avoid timeout
+    const orderNumber = await generateSequentialOrderNumber("PART", this.prisma);
+
     const result = await this.prisma.client.$transaction(async (tx) => {
 
       // 1. Verify part exists
@@ -102,8 +106,7 @@ export class PartOrdersService {
         );
       }
 
-      // 3. Generate unique order number
-      const orderNumber = this.generateOrderNumber();
+      // 3. Use pre-generated order number
 
       // 4. Calculate discounted unit price
       const baseUnitPrice = Number(part.sellingPrice);
@@ -348,6 +351,7 @@ const partOrder = await tx.partOrder.create({
       where.OR = [
         { orderNumber: { contains: query.search, mode: "insensitive" } },
         { customerName: { contains: query.search, mode: "insensitive" } },
+        { customerPhone: { contains: query.search, mode: "insensitive" } },
       ];
     }
 
@@ -775,6 +779,9 @@ const partOrder = await tx.partOrder.create({
    * Manual part sale registration (admin bypasses offer workflow)
    */
   async createManualPartOrder(dto: CreateManualPartOrderDto, user: any) {
+    // Generate order number outside the transaction to avoid timeout
+    const orderNumber = await generateSequentialOrderNumber("PART", this.prisma);
+
     const result = await this.prisma.client.$transaction(async (tx) => {
       const inventoryWhere: any = dto.partInventoryId
         ? { id: dto.partInventoryId, partId: dto.partId }
@@ -808,8 +815,7 @@ const partOrder = await tx.partOrder.create({
         },
       });
 
-      // 4. Generate order number
-      const orderNumber = this.generateOrderNumber();
+      // 4. Use pre-generated order number
 
       // 5. Resolve partial payment
       const totalAmount = dto.amount;
@@ -968,18 +974,6 @@ const partOrder = await tx.partOrder.create({
     );
 
     return result;
-  }
-
-  /**
-   * Generate unique order number
-   */
-  private generateOrderNumber(): string {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `PART-${year}${month}${day}-${random}`;
   }
 
   /**

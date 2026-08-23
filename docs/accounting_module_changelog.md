@@ -1,4 +1,38 @@
-# Accounting Module Changelog
+Orders
+Manage bike and part customer orders.
+
+Bike Orders
+Part Orders
+Status
+
+All Statuses
+Branch
+
+All Branches
+Date From
+
+mm/dd/yyyy
+Date To
+
+mm/dd/yyyy
+Search
+Order, customer, phone, chassis
+Order Type
+
+All Types
+Pickup Type
+
+All Pickups
+Order Number	Type	Pickup	Customer	Item	Branch	Amount	Payment Method	Status	Created Date
+ORD-MAN-1786170870517
+Onsite	Pickup	Faryal Khan Ghulam Ali	Evee MODEL 2	Islamabad Branch	Rs. 150,000	CASH	DELIVERED	08/08/2026
+ORD-MAN-1785740787651
+Onsite	Pickup	Faryal-2	Evee C1 Pro	Islamabad Branch	Rs. 95,000	ONLINE TRANSFER	CANCELLED	03/08/2026
+ORD-MAN-1785738026294
+Onsite	Pickup	Faryal-1	Evee MODEL 2	Islamabad Branch	Rs. 150,000	ONLINE TRANSFER	CANCELLED	03/08/2026
+ORD-MAN-1785737053238
+Onsite	Pickup	Faryal-1	Evee MODEL 2	Islamabad Branch	Rs. 150,000	CASH	CANCELLED	03/08/2026
+Export Excel# Accounting Module Changelog
 
 This document summarizes all the architectural, backend, and frontend changes made during this session to extend the ERP system with full accounting capabilities, including Accounts Receivable (AR), Accounts Payable (AP), Partial Payments, and Installment Plans.
 

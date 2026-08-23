@@ -36,6 +36,8 @@ type SaleRecord = {
       brand?: string;
       modelName?: string;
     };
+    chassisNumber?: string;
+    engineNumber?: string;
   };
   part?: {
     name?: string;
@@ -209,12 +211,14 @@ export default function SalesRecordsPage() {
   };
 
   const handleExportXLSX = () => {
-    const headers = ["Order Number", "Customer", "Items", "Total (Rs)", "Source", "Status", "Staff", "Date"];
+    const headers = ["Order Number", "Customer", "Items", "Total (Rs)", "Chassis No.", "Engine No.", "Source", "Status", "Staff", "Date"];
     const rows = sales.map((sale) => [
       sale.orderNumber,
       sale.customerName,
       getSaleItemLabel(sale),
       getSaleAmount(sale),
+      sale.bike?.chassisNumber || "",
+      sale.bike?.engineNumber || "",
       sale.type,
       sale.status,
       sale.processedBy?.fullName || "",
@@ -351,7 +355,7 @@ export default function SalesRecordsPage() {
                   border: `1px solid ${theme.borders.medium}`,
                   color: theme.text.primary,
                 }}
-                placeholder="Order, customer, phone, chassis"
+                placeholder="Order, customer, phone, chassis, engine"
               />
             </div>
           </div>
@@ -364,7 +368,7 @@ export default function SalesRecordsPage() {
           <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: theme.backgrounds.secondary }}>
-                {["Order Number", "Customer", "Items", "Total", "Source", "Status", "Staff", "Date", "Actions"].map((header) => (
+                {["Order Number", "Customer", "Items", "Total", "Chassis No.", "Engine No.", "Source", "Status", "Staff", "Date", "Actions"].map((header) => (
                   <th key={header} className="px-3 md:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: theme.text.secondary }}>
                     {header}
                   </th>
@@ -374,13 +378,13 @@ export default function SalesRecordsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                  <td colSpan={11} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     Loading sales records...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                  <td colSpan={11} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     <div className="flex flex-col items-center gap-3">
                       <span>{error}</span>
                       <AsyncButton onClick={fetchSales}>Retry</AsyncButton>
@@ -389,7 +393,7 @@ export default function SalesRecordsPage() {
                 </tr>
               ) : sales.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
+                  <td colSpan={11} className="px-3 md:px-6 py-6 md:py-8 text-center text-sm md:text-base" style={{ color: theme.text.secondary }}>
                     No completed sales found
                   </td>
                 </tr>
@@ -420,6 +424,12 @@ export default function SalesRecordsPage() {
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
                       Rs. {getSaleAmount(sale).toLocaleString()}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {sale.bike?.chassisNumber || "-"}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm" style={{ color: theme.text.primary }}>
+                      {sale.bike?.engineNumber || "-"}
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">
                       <span
