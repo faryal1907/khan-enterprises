@@ -20,32 +20,33 @@ export async function generateSequentialOrderNumber(
 
   // Use transaction to ensure atomic read-increment-update
   const result = await prisma.client.$transaction(async (tx) => {
-    // Get or create the sequence counter for today
-    let setting = await tx.systemSetting.findUnique({
-      where: { key: sequenceKey }
+    // Get all orders for today to find the actual highest sequence
+    const todayOrders = await tx.order.findMany({
+      where: {
+        orderNumber: {
+          startsWith: `${prefix}-${dateStr}`
+        }
+      },
+      select: {
+        orderNumber: true
+      }
     });
 
-    let sequence = 1;
-    if (setting) {
-      const currentSequence = parseInt(setting.value, 10);
-      // Check if there are actual orders with this sequence to validate the counter
-      const existingOrder = await tx.order.findFirst({
-        where: {
-          orderNumber: {
-            endsWith: currentSequence.toString().padStart(4, '0')
-          }
-        }
-      });
+    // Extract sequence numbers from existing orders
+    const existingSequences = todayOrders
+      .map(order => {
+        const match = order.orderNumber.match(new RegExp(`${prefix}-${dateStr}(\\d+)$`));
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter(seq => seq > 0);
 
-      // If no order exists with this sequence, reset to 1
-      if (!existingOrder) {
-        sequence = 1;
-      } else {
-        sequence = currentSequence > 0 ? currentSequence + 1 : 1;
-      }
-    }
+    // Find the highest existing sequence
+    const highestSequence = existingSequences.length > 0 ? Math.max(...existingSequences) : 0;
 
-    // Upsert to handle both create and update cases
+    // Next sequence is highest + 1
+    const sequence = highestSequence + 1;
+
+    // Update the system setting with the new sequence
     await tx.systemSetting.upsert({
       where: { key: sequenceKey },
       create: {
