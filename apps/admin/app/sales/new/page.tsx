@@ -75,6 +75,7 @@ export default function ManualOrderPage() {
   interface BikeInventory {
     id: string;
     chassisNumber: string;
+    engineNumber: string;
     status: string;
     model?: {
       brand: string;
@@ -145,7 +146,7 @@ export default function ManualOrderPage() {
     bikeSearchTerm.trim() && (!formData.chassisNumber || !bikeSearchTerm.includes(formData.chassisNumber))
       ? allBikes.filter(
           (b: BikeInventory) =>
-            b.chassisNumber?.toLowerCase().includes(bikeSearchTerm.toLowerCase()) ||
+            b.engineNumber?.toLowerCase().includes(bikeSearchTerm.toLowerCase()) ||
             `${b.model?.brand} ${b.model?.modelName}`.toLowerCase().includes(bikeSearchTerm.toLowerCase())
         )
       : allBikes;
@@ -333,7 +334,7 @@ export default function ManualOrderPage() {
             <h3 className="text-lg font-semibold mb-3 md:mb-4" style={{ color: theme.text.primary }}>Bike Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <div className="relative">
-                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Chassis Number *</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Motor Number *</label>
                 <input 
                   type="text" 
                   value={bikeSearchTerm} 
@@ -350,7 +351,7 @@ export default function ManualOrderPage() {
                   disabled={isSubmitting} 
                   className="w-full px-3 py-2 rounded text-sm" 
                   style={inputStyle} 
-                  placeholder="Search chassis number..." 
+                  placeholder="Search motor number..." 
                 />
                 {showBikeDropdown && (
                   <div className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}` }}>
@@ -365,7 +366,7 @@ export default function ManualOrderPage() {
                           onClick={() => { 
                             const modelName = `${b.model?.brand} ${b.model?.modelName}`;
                             const price = b.price || b.model?.basePrice || 0;
-                            setBikeSearchTerm(b.chassisNumber);
+                            setBikeSearchTerm(b.engineNumber);
                             handleInputChange("chassisNumber", b.chassisNumber);
                             setBikeDetails({ id: b.id, model: modelName, price: price.toString() });
                             setFormData((prev) => ({
@@ -377,8 +378,8 @@ export default function ManualOrderPage() {
                             setShowBikeDropdown(false);
                           }}
                         >
-                          <div className="font-medium">{b.chassisNumber}</div>
-                          <div className="text-xs" style={{ color: theme.text.secondary }}>{b.model?.brand} {b.model?.modelName} | Rs. {Number(b.price || b.model?.basePrice || 0).toLocaleString()}</div>
+                          <div className="font-medium">{b.engineNumber}</div>
+                          <div className="text-xs" style={{ color: theme.text.secondary }}>{b.model?.brand} {b.model?.modelName} | Chassis: {b.chassisNumber} | Rs. {Number(b.price || b.model?.basePrice || 0).toLocaleString()}</div>
                         </div>
                       ))
                     ) : (
@@ -389,11 +390,11 @@ export default function ManualOrderPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Model</label>
-                <input type="text" value={formData.bikeModel} readOnly className="w-full px-3 py-2 rounded text-sm" style={{ ...inputStyle, opacity: 0.7 }} placeholder="Auto-filled from chassis" />
+                <input type="text" value={formData.bikeModel} readOnly className="w-full px-3 py-2 rounded text-sm" style={{ ...inputStyle, opacity: 0.7 }} placeholder="Auto-filled from motor number" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Base Price</label>
-                <input type="text" value={formData.bikePrice} readOnly className="w-full px-3 py-2 rounded text-sm" style={{ ...inputStyle, opacity: 0.7 }} placeholder="Auto-filled from chassis" />
+                <input type="text" value={formData.bikePrice} readOnly className="w-full px-3 py-2 rounded text-sm" style={{ ...inputStyle, opacity: 0.7 }} placeholder="Auto-filled from motor number" />
               </div>
             </div>
           </div>
