@@ -347,7 +347,7 @@ export default function ManualOrderPage() {
                     setShowBikeDropdown(true); 
                   }} 
                   onFocus={() => setShowBikeDropdown(true)} 
-                  onBlur={() => setTimeout(() => setShowBikeDropdown(false), 200)} 
+                  onBlur={() => setShowBikeDropdown(false)} 
                   disabled={isSubmitting} 
                   className="w-full px-3 py-2 rounded text-sm" 
                   style={inputStyle} 
@@ -363,7 +363,8 @@ export default function ManualOrderPage() {
                           key={b.id} 
                           className="px-3 py-2 text-sm cursor-pointer hover:opacity-80" 
                           style={{ color: theme.text.primary, backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }} 
-                          onClick={() => { 
+                          onMouseDown={(e) => { 
+                            e.preventDefault();
                             const modelName = `${b.model?.brand} ${b.model?.modelName}`;
                             const price = b.price || b.model?.basePrice || 0;
                             setBikeSearchTerm(b.engineNumber);
@@ -407,14 +408,14 @@ export default function ManualOrderPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <div className="relative">
                 <label className="block text-sm font-medium mb-1" style={{ color: theme.text.secondary }}>Part *</label>
-                <input type="text" value={partSearchTerm} onChange={(e) => { setPartSearchTerm(e.target.value); if (formData.partId) { ["partInventoryId","partId","partName","partPrice","partMaxQuantity"].forEach(k => handleInputChange(k, "")); } setShowPartDropdown(true); }} onFocus={() => setShowPartDropdown(true)} onBlur={() => setTimeout(() => setShowPartDropdown(false), 200)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Search for a part..." />
+                <input type="text" value={partSearchTerm} onChange={(e) => { setPartSearchTerm(e.target.value); if (formData.partId) { ["partInventoryId","partId","partName","partPrice","partMaxQuantity"].forEach(k => handleInputChange(k, "")); } setShowPartDropdown(true); }} onFocus={() => setShowPartDropdown(true)} onBlur={() => setShowPartDropdown(false)} disabled={isSubmitting} className="w-full px-3 py-2 rounded text-sm" style={inputStyle} placeholder="Search for a part..." />
                 {showPartDropdown && (
                   <div className="absolute z-10 w-full mt-1 rounded shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: theme.backgrounds.primary, border: `1px solid ${theme.borders.medium}` }}>
                     {isFetchingParts ? (
                       <div className="px-3 py-2 text-sm" style={{ color: theme.text.secondary }}>Loading parts...</div>
                     ) : partSearchResults.length > 0 ? (
                       partSearchResults.map((p: PartInventory) => (
-                        <div key={p.id} className="px-3 py-2 text-sm cursor-pointer hover:opacity-80" style={{ color: theme.text.primary, backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }} onClick={() => { const avail = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0)); setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`); handleInputChange("partInventoryId", p.id); handleInputChange("partId", p.part?.id || ""); handleInputChange("partName", p.part?.name || ""); handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0"); handleInputChange("partMaxQuantity", avail.toString()); setShowPartDropdown(false); }}>
+                        <div key={p.id} className="px-3 py-2 text-sm cursor-pointer hover:opacity-80" style={{ color: theme.text.primary, backgroundColor: theme.backgrounds.tertiary, borderBottom: `1px solid ${theme.borders.light}` }} onMouseDown={(e) => { e.preventDefault(); const avail = Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0)); setPartSearchTerm(`${p.part?.name} (${p.part?.sku})`); handleInputChange("partInventoryId", p.id); handleInputChange("partId", p.part?.id || ""); handleInputChange("partName", p.part?.name || ""); handleInputChange("partPrice", p.part?.sellingPrice?.toString() || "0"); handleInputChange("partMaxQuantity", avail.toString()); setShowPartDropdown(false); }}>
                           <div className="font-medium">{p.part?.name}</div>
                           <div className="text-xs" style={{ color: theme.text.secondary }}>SKU: {p.part?.sku} | Rs. {Number(p.part?.sellingPrice || 0).toLocaleString()} | Available: {Math.max(0, (p.quantity || 0) - (p.reservedQuantity || 0))}</div>
                         </div>
