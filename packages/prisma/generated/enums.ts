@@ -33,7 +33,8 @@ export const BikeStatus = {
   AVAILABLE: 'AVAILABLE',
   RESERVED: 'RESERVED',
   SOLD: 'SOLD',
-  IN_DELIVERY: 'IN_DELIVERY'
+  IN_DELIVERY: 'IN_DELIVERY',
+  RETURNED_TO_VENDOR: 'RETURNED_TO_VENDOR'
 } as const
 
 export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus]

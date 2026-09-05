@@ -1137,7 +1137,7 @@ if (bikesWithCancelledOrders.length > 0) {
             await tx.bikeUnit.update({
               where: { id: bike.id },
               data: { 
-                status: 'RETURNED_TO_VENDOR' as any
+                status: 'RETURNED_TO_VENDOR'
               }
             });
           } else {

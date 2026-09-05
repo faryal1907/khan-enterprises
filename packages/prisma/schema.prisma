@@ -833,6 +833,7 @@ enum BikeStatus {
   RESERVED
   SOLD
   IN_DELIVERY
+  RETURNED_TO_VENDOR
 }
 
 enum OrderStatus {
