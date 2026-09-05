@@ -17,6 +17,7 @@ export declare const BikeStatus: {
     readonly RESERVED: "RESERVED";
     readonly SOLD: "SOLD";
     readonly IN_DELIVERY: "IN_DELIVERY";
+    readonly RETURNED_TO_VENDOR: "RETURNED_TO_VENDOR";
 };
 export type BikeStatus = (typeof BikeStatus)[keyof typeof BikeStatus];
 export declare const OrderStatus: {
