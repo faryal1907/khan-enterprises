@@ -1128,7 +1128,22 @@ if (bikesWithCancelledOrders.length > 0) {
           },
         });
 
-        await tx.bikeUnit.delete({ where: { id: bike.id } });
+        try {
+          await tx.bikeUnit.delete({ where: { id: bike.id } });
+        } catch (error: any) {
+          // If deletion fails due to foreign key constraint, change status instead
+          if (error.code === 'P2003') {
+            console.log(`Cannot delete bike ${bike.chassisNumber} due to foreign key constraint, marking as returned to vendor instead`);
+            await tx.bikeUnit.update({
+              where: { id: bike.id },
+              data: { 
+                status: 'RETURNED_TO_VENDOR' as any
+              }
+            });
+          } else {
+            throw error;
+          }
+        }
       }
 
       // Create part return lines and adjust stock
