@@ -984,6 +984,36 @@ export class VendorService {
         include: { model: true },
       });
 
+      // Check for ACTIVE orders (non-cancelled) only
+const bikesWithActiveOrders = await tx.order.findMany({
+  where: {
+    bikeId: { in: data.bikeIds },
+    status: { not: 'CANCELLED' }  // Only block non-cancelled orders
+  },
+  select: { bikeId: true, orderNumber: true }
+});
+
+if (bikesWithActiveOrders.length > 0) {
+  const orderNumbers = bikesWithActiveOrders.map(o => o.orderNumber).join(', ');
+  throw new BadRequestException(
+    `Cannot return bikes that are associated with active orders. Order numbers: ${orderNumbers}`
+  );
+}
+
+// For cancelled orders, log but allow deletion
+const bikesWithCancelledOrders = await tx.order.findMany({
+  where: {
+    bikeId: { in: data.bikeIds },
+    status: 'CANCELLED'
+  },
+  select: { bikeId: true, orderNumber: true }
+});
+
+if (bikesWithCancelledOrders.length > 0) {
+  console.log(`Returning ${bikesWithCancelledOrders.length} bikes with cancelled orders:`, 
+    bikesWithCancelledOrders.map(o => o.orderNumber).join(', '));
+}
+
       if (bikesToReturn.length !== data.bikeIds.length) {
         throw new BadRequestException("Some bikes are not available or not allocated to this vendor");
       }
