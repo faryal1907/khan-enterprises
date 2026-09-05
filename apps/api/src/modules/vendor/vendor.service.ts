@@ -1128,21 +1128,22 @@ if (bikesWithCancelledOrders.length > 0) {
           },
         });
 
-        try {
+        // Check if bike has any references that would prevent deletion
+        const orderCount = await tx.order.count({ where: { bikeId: bike.id } });
+        const documentCount = await tx.document.count({ where: { bikeId: bike.id } });
+        
+        if (orderCount > 0 || documentCount > 0) {
+          // Cannot delete due to foreign key constraints, update status instead
+          console.log(`Cannot delete bike ${bike.chassisNumber} due to foreign key constraint (${orderCount} orders, ${documentCount} documents), marking as returned to vendor instead`);
+          await tx.bikeUnit.update({
+            where: { id: bike.id },
+            data: { 
+              status: 'RETURNED_TO_VENDOR' as any
+            }
+          });
+        } else {
+          // Safe to delete
           await tx.bikeUnit.delete({ where: { id: bike.id } });
-        } catch (error: any) {
-          // If deletion fails due to foreign key constraint, change status instead
-          if (error.code === 'P2003') {
-            console.log(`Cannot delete bike ${bike.chassisNumber} due to foreign key constraint, marking as returned to vendor instead`);
-            await tx.bikeUnit.update({
-              where: { id: bike.id },
-              data: { 
-                status: 'RETURNED_TO_VENDOR' as any
-              }
-            });
-          } else {
-            throw error;
-          }
         }
       }
 
