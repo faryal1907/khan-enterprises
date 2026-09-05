@@ -93,26 +93,34 @@ export class VendorService {
     
     const journalEntryIds = vendorDefectiveReturns
       .map(dr => dr.journalEntry?.id)
-      .filter((id): id is string => id !== null);
+      .filter((id): id is string => id !== null && id !== undefined);
     
-    const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
-      where: {
-        id: { in: journalEntryIds },
-        status: JournalStatus.POSTED,
-      },
-      include: {
-        lines: {
-          include: {
-            account: true
+    // Only query if we have valid IDs
+    let totalDefectiveReturned = 0;
+    if (journalEntryIds.length > 0) {
+      const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
+        where: {
+          id: { in: journalEntryIds },
+          status: JournalStatus.POSTED,
+        },
+        include: {
+          lines: {
+            include: {
+              account: true
+            }
           }
         }
-      }
-    });
-    
-    const totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
-      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
-      return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
-    }, 0);
+      });
+      
+      totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
+        // Added null safety for lines array
+        if (!je.lines || je.lines.length === 0) {
+          return s;
+        }
+        const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
+        return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
+      }, 0);
+    }
 
     // Current allocated value still in stock = total allocations - returns
     const currentAllocated = finalTotalAllocated - totalDefectiveReturned;
@@ -226,89 +234,112 @@ export class VendorService {
   // ─── Balance ───────────────────────────────────────────────────────────────
 
   async getVendorBalance(vendorId: string): Promise<number> {
-    const [paid, allocated] = await Promise.all([
-      this.prisma.client.vendorPayment.aggregate({
-        where: { vendorId },
-        _sum: { amount: true },
-      }),
-      this.prisma.client.vendorAllocation.aggregate({
-        where: { vendorId },
-        _sum: { totalAmount: true },
-      }),
-    ]);
+    try {
+      const [paid, allocated] = await Promise.all([
+        this.prisma.client.vendorPayment.aggregate({
+          where: { vendorId },
+          _sum: { amount: true },
+        }),
+        this.prisma.client.vendorAllocation.aggregate({
+          where: { vendorId },
+          _sum: { totalAmount: true },
+        }),
+      ]);
 
-    const totalPaid = Number(paid._sum.amount ?? 0);
-    const totalAllocated = Number(allocated._sum.totalAmount ?? 0);
+      const totalPaid = Number(paid._sum.amount ?? 0);
+      const totalAllocated = Number(allocated._sum.totalAmount ?? 0);
 
-    // Get vendor name for journal entry query
-    const vendor = await this.prisma.client.vendor.findUnique({
-      where: { id: vendorId },
-      select: { name: true }
-    });
+      // Get vendor name for journal entry query with null check
+      const vendor = await this.prisma.client.vendor.findUnique({
+        where: { id: vendorId },
+        select: { name: true }
+      });
 
-    // Also check journal entries for allocations to see if there are missing records
-    const allocationJournalEntries = await this.prisma.client.journalEntry.findMany({
-      where: {
-        description: { contains: `Inventory received from ${vendor?.name}` },
-        status: JournalStatus.POSTED,
-        lines: {
-          some: {
-            account: { subtype: AccountSubtype.VENDOR_PREPAID },
-            credit: { gt: 0 }
-          }
-        }
-      },
-      include: {
-        lines: {
-          include: {
-            account: true
-          }
-        }
+      if (!vendor) {
+        // If vendor doesn't exist, balance should be 0
+        return 0;
       }
-    });
 
-    const totalAllocatedFromJournals = allocationJournalEntries.reduce((s, je) => {
-      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.credit) > 0);
-      return s + (prepaidLine ? Number(prepaidLine.credit) : 0);
-    }, 0);
-
-    // Use journal entries as source of truth for allocations if they differ
-    const finalTotalAllocated = totalAllocatedFromJournals > 0 ? totalAllocatedFromJournals : totalAllocated;
-
-    // Calculate defective returns from journal entries for accuracy
-    // First get the defective return records for this vendor to get their journal entry IDs
-    const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
-      where: { vendorId },
-      select: { journalEntry: { select: { id: true } } }
-    });
-
-    const journalEntryIds = vendorDefectiveReturns
-      .map(dr => dr.journalEntry?.id)
-      .filter((id): id is string => id !== null);
-
-    const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
-      where: {
-        id: { in: journalEntryIds },
-        status: JournalStatus.POSTED,
-      },
-      include: {
-        lines: {
-          include: {
-            account: true
+      // Also check journal entries for allocations to see if there are missing records
+      const allocationJournalEntries = await this.prisma.client.journalEntry.findMany({
+        where: {
+          description: { contains: `Inventory received from ${vendor.name}` },
+          status: JournalStatus.POSTED,
+          lines: {
+            some: {
+              account: { subtype: AccountSubtype.VENDOR_PREPAID },
+              credit: { gt: 0 }
+            }
+          }
+        },
+        include: {
+          lines: {
+            include: {
+              account: true
+            }
           }
         }
+      });
+
+      const totalAllocatedFromJournals = allocationJournalEntries.reduce((s, je) => {
+        // Added null safety for lines array
+        if (!je.lines || je.lines.length === 0) {
+          return s;
+        }
+        const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.credit) > 0);
+        return s + (prepaidLine ? Number(prepaidLine.credit) : 0);
+      }, 0);
+
+      // Use journal entries as source of truth for allocations if they differ
+      const finalTotalAllocated = totalAllocatedFromJournals > 0 ? totalAllocatedFromJournals : totalAllocated;
+
+      // Calculate defective returns from journal entries for accuracy
+      // First get the defective return records for this vendor to get their journal entry IDs
+      const vendorDefectiveReturns = await this.prisma.client.vendorDefectiveReturn.findMany({
+        where: { vendorId },
+        select: { journalEntry: { select: { id: true } } }
+      });
+
+      const journalEntryIds = vendorDefectiveReturns
+        .map(dr => dr.journalEntry?.id)
+        .filter((id): id is string => id !== null && id !== undefined);
+
+      // Only query if we have valid IDs
+      let totalDefectiveReturned = 0;
+      if (journalEntryIds.length > 0) {
+        const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
+          where: {
+            id: { in: journalEntryIds },
+            status: JournalStatus.POSTED,
+          },
+          include: {
+            lines: {
+              include: {
+                account: true
+              }
+            }
+          }
+        });
+
+        totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
+          // Added null safety for lines array
+          if (!je.lines || je.lines.length === 0) {
+            return s;
+          }
+          const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
+          return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
+        }, 0);
       }
-    });
 
-    const totalDefectiveReturned = defectiveReturnJournalEntries.reduce((s, je) => {
-      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
-      return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
-    }, 0);
+      // Current allocated value still in stock = total allocations - returns
+      const currentAllocated = finalTotalAllocated - totalDefectiveReturned;
 
-    // Current allocated value still in stock = total allocations - returns
-    const currentAllocated = finalTotalAllocated - totalDefectiveReturned;
-
-    return totalPaid - currentAllocated;
+      return totalPaid - currentAllocated;
+    } catch (error) {
+      console.error(`Error calculating balance for vendor ${vendorId}:`, error);
+      // Surface error properly instead of internal server error
+      throw new BadRequestException('Unable to calculate vendor balance. Please try again.');
+    }
   }
 
   // ─── Ledger ────────────────────────────────────────────────────────────────
@@ -488,6 +519,10 @@ export class VendorService {
     });
 
     const totalAllocatedFromJournals = allocationJournalEntries.reduce((s, je) => {
+      // Added null safety for lines array
+      if (!je.lines || je.lines.length === 0) {
+        return s;
+      }
       const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.credit) > 0);
       return s + (prepaidLine ? Number(prepaidLine.credit) : 0);
     }, 0);
@@ -499,26 +534,34 @@ export class VendorService {
     // Use the journal entry IDs from the defective return records
     const journalEntryIds = defectiveReturns
       .map(dr => dr.journalEntry?.id)
-      .filter((id): id is string => id !== null);
+      .filter((id): id is string => id !== null && id !== undefined);
 
-    const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
-      where: {
-        id: { in: journalEntryIds },
-        status: JournalStatus.POSTED,
-      },
-      include: {
-        lines: {
-          include: {
-            account: true
+    // Only query if we have valid IDs
+    let totalDefectiveReturnedFromJournals = 0;
+    if (journalEntryIds.length > 0) {
+      const defectiveReturnJournalEntries = await this.prisma.client.journalEntry.findMany({
+        where: {
+          id: { in: journalEntryIds },
+          status: JournalStatus.POSTED,
+        },
+        include: {
+          lines: {
+            include: {
+              account: true
+            }
           }
         }
-      }
-    });
+      });
 
-    const totalDefectiveReturnedFromJournals = defectiveReturnJournalEntries.reduce((s, je) => {
-      const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
-      return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
-    }, 0);
+      totalDefectiveReturnedFromJournals = defectiveReturnJournalEntries.reduce((s, je) => {
+        // Added null safety for lines array
+        if (!je.lines || je.lines.length === 0) {
+          return s;
+        }
+        const prepaidLine = je.lines.find(l => l.account.subtype === AccountSubtype.VENDOR_PREPAID && Number(l.debit) > 0);
+        return s + (prepaidLine ? Number(prepaidLine.debit) : 0);
+      }, 0);
+    }
 
     // Use journal entries for accuracy as they are the source of truth
     const currentAllocated = finalTotalAllocated - totalDefectiveReturnedFromJournals;
@@ -1108,9 +1151,19 @@ export class VendorService {
       };
     }, { timeout: 15000 });
 
-    // Fetch updated balance AFTER the transaction commits
-    const newPrepaidBalance = await this.getVendorBalance(vendorId);
-    return { ...result, newPrepaidBalance };
+    // Try to get balance, but don't fail the entire operation if it fails
+    try {
+      const newPrepaidBalance = await this.getVendorBalance(vendorId);
+      return { ...result, newPrepaidBalance };
+    } catch (balanceError) {
+      console.error('Failed to calculate balance after defective return:', balanceError);
+      // Return the successful result without balance, with a warning
+      return {
+        ...result,
+        newPrepaidBalance: null,
+        warning: 'Balance calculation failed. The defective return was processed successfully, but please refresh to see the updated balance.'
+      };
+    }
   }
 
   // ─── Private helpers ───────────────────────────────────────────────────────
